@@ -8,6 +8,7 @@ import jwtAuthenticationStrategy from '../auth-strategies/jwt'
 import { serializeUser, deserializeUser } from '../db/local/users'
 
 import auth from './auth'
+import admin from './admin'
 
 // TODO -> from environment
 // const firebaseConfig = {
@@ -33,5 +34,6 @@ app.use(bodyParser.json())
 app.use(passport.initialize())
 
 app.use('/auth', auth)
+app.use('/admin', admin)
 
 export default app
