@@ -14,7 +14,7 @@ const users: User[] = [
     username: 'jim',
     displayName: 'jim',
     password: 'hellothere',
-    roles: ['admin', 'artist', 'gallery']
+    roles: ['admin', 'artist']
   },
   {
     id: '1',
@@ -28,7 +28,7 @@ const users: User[] = [
     username: 'mike',
     displayName: 'mike',
     password: 'mike',
-    roles: ['admin', 'artist', 'gallery']
+    roles: ['admin', 'artist']
   }
 ]
 
@@ -93,7 +93,8 @@ const updateUser = (
   id: string,
   password: string,
   newPassword: string,
-  displayName: string
+  displayName: string,
+  roles?: string[]
 ) => {
   const user = users.find((u) => u.id === id)
 
@@ -102,6 +103,9 @@ const updateUser = (
       user.password = newPassword
     }
     user.displayName = displayName
+    if (roles) {
+      user.roles = roles
+    }
 
     return true
   }
@@ -121,6 +125,20 @@ const resetPassword = (username: string, newPassword: string) => {
   return false
 }
 
+const listUsers = () => users
+
+const setUserRoles = (id: string, roles: string[]) => {
+  const user = users.find((u) => u.id === id)
+
+  if (user) {
+    user.roles = roles
+
+    return true
+  }
+
+  return false
+}
+
 export {
   serializeUser,
   deserializeUser,
@@ -128,5 +146,7 @@ export {
   findUserById,
   addUser,
   updateUser,
-  resetPassword
+  resetPassword,
+  listUsers,
+  setUserRoles
 }
