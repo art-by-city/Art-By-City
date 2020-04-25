@@ -48,7 +48,7 @@ const passwordRules = () => {
   )
 }
 
-const validateUserFields = (username: string, password: string): string[] => {
+const validateUsername = (username: string): string[] => {
   const messages: string[] = []
 
   for (let i = 0; i < _usernameRules.length; i++) {
@@ -56,6 +56,12 @@ const validateUserFields = (username: string, password: string): string[] => {
       messages.push(_usernameRules[i].message)
     }
   }
+
+  return messages
+}
+
+const validatePassword = (password: string): string[] => {
+  const messages: string[] = []
 
   for (let i = 0; i < _passwordRules.length; i++) {
     if (!_passwordRules[i].validate(password)) {
@@ -66,4 +72,4 @@ const validateUserFields = (username: string, password: string): string[] => {
   return messages
 }
 
-export { usernameRules, passwordRules, validateUserFields }
+export { usernameRules, passwordRules, validateUsername, validatePassword }

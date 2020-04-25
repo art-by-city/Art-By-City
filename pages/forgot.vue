@@ -3,30 +3,28 @@
     <v-row justify="center">
       <v-col cols="4">
         <v-card>
-          <v-card-title>Sign Up</v-card-title>
+          <v-card-title>Password Reset</v-card-title>
           <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="register">
+            <v-form ref="form" v-model="valid" @submit.prevent="save">
               <v-text-field
                 v-model="login.username"
                 type="text"
                 label="Username"
-                :rules="usernameRules"
-                required
+                :rules="required"
               ></v-text-field>
 
               <v-text-field
-                v-model="login.password"
+                v-model="newPassword"
                 type="password"
-                label="Password"
+                label="New Password"
                 :rules="passwordRules"
-                required
               ></v-text-field>
 
               <v-text-field
+                v-model="repeatNewPassword"
                 type="password"
-                label="Repeat Password"
+                label="Repeat New Password"
                 :rules="repeatPasswordRules"
-                required
               ></v-text-field>
 
               <template v-if="errors.length > 0">
@@ -35,7 +33,7 @@
                 </v-alert>
               </template>
 
-              <v-btn type="submit" color="primary">Sign Up</v-btn>
+              <v-btn type="submit" color="primary">Reset Password</v-btn>
             </v-form>
           </v-card-text>
         </v-card>
@@ -44,8 +42,9 @@
   </v-container>
 </template>
 
-<script type>
-import { usernameRules, passwordRules } from '~/helpers/validation/user'
+<script>
+import { required } from '~/helpers/validation'
+import { passwordRules } from '~/helpers/validation/user'
 
 export default {
   data() {
@@ -53,19 +52,20 @@ export default {
       valid: false,
       errors: [],
       login: {
-        username: '',
-        password: ''
-      }
+        username: ''
+      },
+      newPassword: '',
+      repeatNewPassword: ''
     }
   },
   computed: {
-    usernameRules,
     passwordRules,
     repeatPasswordRules() {
-      return [
-        (v) => (v || '') === this.login.password || 'Passwords must match'
-      ]
-    }
+      return required().concat([
+        (v) => (v || '') === this.newPassword || 'Passwords must match'
+      ])
+    },
+    required
   },
   watch: {
     model: 'validateForm'
@@ -74,23 +74,19 @@ export default {
     validateForm() {
       this.$refs.form.validate()
     },
-    async register() {
+    async save() {
       this.errors = []
       const result = await this.$axios
-        .$put('/api/auth/register', this.login)
+        .$post('/api/auth/forgot', {
+          username: this.login.username,
+          newPassword: this.newPassword
+        })
         .catch((error) => {
           this.errors = error.response.data.messages
         })
 
-      if (result && result.token) {
-        try {
-          await this.$auth.setUserToken(result.token)
-          this.$router.push({ path: '/' })
-        } catch (err) {
-          // TODO -> Sentry
-          // eslint-disable-next-line no-console
-          console.error(err)
-        }
+      if (result) {
+        this.$router.push({ path: '/login' })
       }
     }
   }

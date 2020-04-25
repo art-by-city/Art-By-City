@@ -3,8 +3,11 @@ import passport from 'passport'
 import jwt from 'jsonwebtoken'
 
 import { JWT_SECRET } from '../../auth-strategies/jwt'
-import { User, addUser } from '../../db/local/users'
-import { validateUserFields } from '../../../helpers/validation/user'
+import { User, addUser, updateUser, resetPassword } from '../../db/local/users'
+import {
+  validateUsername,
+  validatePassword
+} from '../../../helpers/validation/user'
 
 const router = Router()
 
@@ -17,7 +20,7 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
 })
 
 router.post('/logout', (_req, res) => {
-  return res.send('OK')
+  return res.send()
 })
 
 router.get(
@@ -34,7 +37,9 @@ router.put('/register', (req, res) => {
   const username = req.body.username
   const password = req.body.password
 
-  const validationMessages = validateUserFields(username, password)
+  const validationMessages = validateUsername(username).concat(
+    validatePassword(password)
+  )
 
   if (validationMessages.length > 0) {
     return res.status(400).json({ messages: validationMessages })
@@ -49,6 +54,44 @@ router.put('/register', (req, res) => {
 
     return res.json({ user, token })
   })
+})
+
+router.post(
+  '/update',
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    const user = <User>req.user || {}
+
+    const validationMessages = validatePassword(req.body.newPassword)
+
+    if (validationMessages.length > 0) {
+      return res.status(400).json({ messages: validationMessages })
+    }
+
+    const updated = updateUser(user.id, req.body.password, req.body.newPassword)
+
+    if (updated) {
+      return res.send(true)
+    }
+
+    return res.status(404).json({ messages: ['User not found'] })
+  }
+)
+
+router.post('/forgot', (req, res) => {
+  const updated = resetPassword(req.body.username, req.body.newPassword)
+
+  const validationMessages = validatePassword(req.body.newPassword)
+
+  if (validationMessages.length > 0) {
+    return res.status(400).json({ messages: validationMessages })
+  }
+
+  if (updated) {
+    return res.send(true)
+  }
+
+  return res.status(404).json({ messages: ['User not found'] })
 })
 
 export default router
