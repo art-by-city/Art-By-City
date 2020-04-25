@@ -62,13 +62,20 @@ router.post(
   (req, res) => {
     const user = <User>req.user || {}
 
-    const validationMessages = validatePassword(req.body.newPassword)
+    if (req.body.newPassword) {
+      const validationMessages = validatePassword(req.body.newPassword)
 
-    if (validationMessages.length > 0) {
-      return res.status(400).json({ messages: validationMessages })
+      if (validationMessages.length > 0) {
+        return res.status(400).json({ messages: validationMessages })
+      }
     }
 
-    const updated = updateUser(user.id, req.body.password, req.body.newPassword)
+    const updated = updateUser(
+      user.id,
+      req.body.password,
+      req.body.newPassword,
+      req.body.displayName
+    )
 
     if (updated) {
       return res.send(true)

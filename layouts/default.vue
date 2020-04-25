@@ -37,7 +37,9 @@
             <template v-slot:activator="{ on }">
               <v-btn text v-on="on">
                 <v-avatar color="indigo">
-                  <span class="white--text">{{ $auth.user.username[0] }}</span>
+                  <span class="white--text">
+                    {{ $auth.user.displayName[0] }}
+                  </span>
                 </v-avatar>
               </v-btn>
             </template>
@@ -48,6 +50,14 @@
                 </v-list-item-action>
                 <v-list-item-content>
                   <v-list-item-title>Account</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item v-if="isAdmin" to="/admin">
+                <v-list-item-action>
+                  <v-icon>mdi-account-cowboy-hat</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>Admin</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item @click="logout">
@@ -89,6 +99,15 @@ export default {
           disabled: true
         }
       ]
+    }
+  },
+  computed: {
+    isAdmin() {
+      if (this.$auth.user && this.$auth.user.roles) {
+        return this.$auth.user.roles.includes('admin')
+      }
+
+      return false
     }
   },
   methods: {
