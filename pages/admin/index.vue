@@ -7,6 +7,10 @@
       </v-alert>
     </template>
 
+    <v-alert v-if="success" type="success" dense>
+      Account saved
+    </v-alert>
+
     <v-simple-table>
       <thead>
         <tr>
@@ -51,14 +55,15 @@ export default {
   data() {
     return {
       errors: [],
-      users: [],
-      roles: ['admin', 'artist']
+      roles: ['admin', 'artist'],
+      success: false
     }
   },
   middleware: 'role/admin',
   methods: {
     async saveUser(user) {
       this.errors = []
+      this.success = false
       this.success = await this.$axios
         .$post('/api/admin/user', { user })
         .catch((error) => {
