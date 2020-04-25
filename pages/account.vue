@@ -7,10 +7,10 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="save">
               <v-text-field
-                v-model="login.username"
+                v-model="displayName"
                 type="text"
-                label="Username"
-                disabled
+                label="Display Name"
+                :rules="required"
               ></v-text-field>
 
               <v-text-field
@@ -70,19 +70,17 @@ export default {
       errors: [],
       success: false,
       login: {
-        username: this.$auth.user.username,
         password: ''
       },
       newPassword: '',
-      repeatNewPassword: ''
+      repeatNewPassword: '',
+      displayName: this.$auth.user.displayName
     }
   },
   computed: {
     passwordRules,
     repeatPasswordRules() {
-      return required().concat([
-        (v) => (v || '') === this.newPassword || 'Passwords must match'
-      ])
+      return [(v) => (v || '') === this.newPassword || 'Passwords must match']
     },
     required
   },
@@ -98,7 +96,8 @@ export default {
       this.success = await this.$axios
         .$post('/api/auth/update', {
           password: this.login.password,
-          newPassword: this.newPassword
+          newPassword: this.newPassword,
+          displayName: this.displayName
         })
         .catch((error) => {
           this.errors = error.response.data.messages

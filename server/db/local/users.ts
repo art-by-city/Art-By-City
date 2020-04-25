@@ -1,12 +1,36 @@
 export interface User {
   id: string
   username: string
+  displayName: string
   password?: string
+  roles: string[]
 }
 
 let nextId = 0
 
-const users: User[] = [{ id: '0', username: 'jim', password: 'hellothere' }]
+const users: User[] = [
+  {
+    id: '0',
+    username: 'jim',
+    displayName: 'jim',
+    password: 'hellothere',
+    roles: ['admin', 'artist', 'gallery']
+  },
+  {
+    id: '1',
+    username: 'guest',
+    displayName: 'guest',
+    password: 'guest',
+    roles: []
+  },
+  {
+    id: '2',
+    username: 'mike',
+    displayName: 'mike',
+    password: 'mike',
+    roles: ['admin', 'artist', 'gallery']
+  }
+]
 
 const serializeUser = (user: User, callback: Function) => {
   callback(null, user.id)
@@ -57,7 +81,7 @@ const addUser = (username: string, password: string, callback: Function) => {
   if (isUsernameUnique(username)) {
     nextId++
     const id = nextId.toString()
-    const user = { id, username, password }
+    const user = { id, username, password, displayName: username, roles: [] }
     users.push(user)
     callback(null, user)
   } else {
@@ -65,11 +89,19 @@ const addUser = (username: string, password: string, callback: Function) => {
   }
 }
 
-const updateUser = (id: string, password: string, newPassword: string) => {
+const updateUser = (
+  id: string,
+  password: string,
+  newPassword: string,
+  displayName: string
+) => {
   const user = users.find((u) => u.id === id)
 
   if (user && user.password === password) {
-    user.password = newPassword
+    if (newPassword) {
+      user.password = newPassword
+    }
+    user.displayName = displayName
 
     return true
   }
