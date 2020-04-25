@@ -1,7 +1,5 @@
-import colors from 'vuetify/es5/util/colors'
-
 export default {
-  mode: 'spa',
+  mode: 'universal',
   /*
    ** Headers of the page
    */
@@ -39,16 +37,36 @@ export default {
    ** Nuxt.js modules
    */
   modules: [
-    // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    '@nuxtjs/auth',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv'
   ],
+  serverMiddleware: [{ path: '/api', handler: '~/server/api/index.ts' }],
+  auth: {
+    redirect: {
+      rewriteRedirects: true
+    },
+    strategies: {
+      local: {
+        login: {
+          url: '/auth/login',
+          method: 'post',
+          propertyName: 'token'
+        },
+        logout: false,
+        user: { url: '/auth/user', method: 'get', propertyName: 'user' }
+      }
+    }
+  },
+  router: {},
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
-  axios: {},
+  axios: {
+    proxy: true
+  },
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
@@ -58,17 +76,6 @@ export default {
     theme: {
       dark: false,
       default: 'light'
-      // themes: {
-      //   dark: {
-      //     primary: colors.blue.darken2,
-      //     accent: colors.grey.darken3,
-      //     secondary: colors.amber.darken3,
-      //     info: colors.teal.lighten1,
-      //     warning: colors.amber.base,
-      //     error: colors.deepOrange.accent4,
-      //     success: colors.green.accent3
-      //   }
-      // }
     }
   },
   /*
@@ -78,6 +85,7 @@ export default {
     /*
      ** You can extend webpack config here
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     extend(config, ctx) {}
   }
 }

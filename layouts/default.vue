@@ -25,9 +25,16 @@
       <v-toolbar-title>art x by x city</v-toolbar-title>
       <v-spacer />
       <v-toolbar-items>
-        <v-btn text>SIGN UP</v-btn>
-        <v-divider vertical />
-        <v-btn text>LOG IN</v-btn>
+        <template v-if="!$auth.loggedIn">
+          <v-btn text to="/register">SIGN UP</v-btn>
+          <v-divider vertical />
+          <v-btn text to="/login">LOG IN</v-btn>
+        </template>
+        <template v-if="$auth.loggedIn">
+          <v-btn text>{{ $auth.user.username }}</v-btn>
+          <v-divider vertical />
+          <v-btn text @click="logout">LOG OUT</v-btn>
+        </template>
       </v-toolbar-items>
     </v-app-bar>
     <v-content>
@@ -56,6 +63,11 @@ export default {
           disabled: true
         }
       ]
+    }
+  },
+  methods: {
+    async logout() {
+      await this.$auth.logout()
     }
   }
 }
