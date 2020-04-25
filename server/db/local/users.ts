@@ -16,7 +16,7 @@ const deserializeUser = (id: string, callback: Function) => {
   const user = users.find((u) => u.id === id)
 
   if (user) {
-    callback(null, { id: user.id, username: user.username })
+    callback(null, sanitizeUser(user))
   }
 
   callback(new Error('Could not deserialize user: User not found'))
@@ -65,10 +65,36 @@ const addUser = (username: string, password: string, callback: Function) => {
   }
 }
 
+const updateUser = (id: string, password: string, newPassword: string) => {
+  const user = users.find((u) => u.id === id)
+
+  if (user && user.password === password) {
+    user.password = newPassword
+
+    return true
+  }
+
+  return false
+}
+
+const resetPassword = (username: string, newPassword: string) => {
+  const user = users.find((u) => u.username === username)
+
+  if (user) {
+    user.password = newPassword
+
+    return true
+  }
+
+  return false
+}
+
 export {
   serializeUser,
   deserializeUser,
   authenticateUser,
   findUserById,
-  addUser
+  addUser,
+  updateUser,
+  resetPassword
 }

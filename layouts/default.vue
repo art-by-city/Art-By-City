@@ -3,18 +3,18 @@
     <v-navigation-drawer v-model="drawer" :clipped="true" fixed app>
       <v-list>
         <v-list-item
-          v-for="(item, i) in items"
+          v-for="(navItem, i) in navItems"
           :key="i"
-          :to="item.to"
+          :to="navItem.to"
           router
           exact
-          :disabled="item.disabled"
+          :disabled="navItem.disabled"
         >
           <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
+            <v-icon>{{ navItem.icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
+            <v-list-item-title v-text="navItem.title" />
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -22,18 +22,44 @@
     <v-app-bar :clipped-left="true" fixed app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-spacer />
-      <v-toolbar-title>art x by x city</v-toolbar-title>
+      <v-toolbar-title>
+        <nuxt-link to="/">art x by x city</nuxt-link>
+      </v-toolbar-title>
       <v-spacer />
       <v-toolbar-items>
         <template v-if="!$auth.loggedIn">
-          <v-btn text to="/register">SIGN UP</v-btn>
+          <v-btn text to="/register">Sign Up</v-btn>
           <v-divider vertical />
-          <v-btn text to="/login">LOG IN</v-btn>
+          <v-btn text to="/login">Log In</v-btn>
         </template>
         <template v-if="$auth.loggedIn">
-          <v-btn text>{{ $auth.user.username }}</v-btn>
-          <v-divider vertical />
-          <v-btn text @click="logout">LOG OUT</v-btn>
+          <v-menu offset-y>
+            <template v-slot:activator="{ on }">
+              <v-btn text v-on="on">
+                <v-avatar color="indigo">
+                  <span class="white--text">{{ $auth.user.username[0] }}</span>
+                </v-avatar>
+              </v-btn>
+            </template>
+            <v-list dense>
+              <v-list-item to="/account">
+                <v-list-item-action>
+                  <v-icon>mdi-account</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>Account</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item @click="logout">
+                <v-list-item-action>
+                  <v-icon>mdi-logout-variant</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>Log Out</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </template>
       </v-toolbar-items>
     </v-app-bar>
@@ -50,7 +76,7 @@ export default {
   data() {
     return {
       drawer: false,
-      items: [
+      navItems: [
         {
           icon: 'mdi-apps',
           title: 'Home',
@@ -72,3 +98,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+div.v-toolbar__content div.v-toolbar__title a {
+  color: rgba(0, 0, 0, 0.87);
+  text-decoration: none;
+}
+</style>
