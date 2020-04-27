@@ -1,34 +1,38 @@
 import { Router } from 'express'
 import passport from 'passport'
 
-import { listUsers, setUserRoles } from '../../db/local/users'
+import UserService from '../../services/user.service'
+import { isApiServiceError } from '../../interfaces/services/errors/apiServiceError.interface'
 
 const router = Router()
+// TODO -> Singleton DI Factory pattern?
+const userService = new UserService()
+
+const jwtAuth = passport.authenticate('jwt', { session: false })
 
 // TODO -> role middleware
-router.get(
-  '/users',
-  passport.authenticate('jwt', { session: false }),
-  (_req, res) => {
-    return res.json({ users: listUsers() })
-  }
-)
+router.get('/users', jwtAuth, (_req, res) => {
+  const users = userService.list()
+
+  return res.json({ users })
+})
 
 // TODO -> role middleware
-router.post(
-  '/user',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    if (req.body.user) {
-      const updated = setUserRoles(req.body.user.id, req.body.user.roles)
+router.post('/user', jwtAuth, (req, res) => {
+  try {
+    const result = userService.setUserRoles(
+      req.body.user.id,
+      req.body.user.roles
+    )
 
-      if (updated) {
-        return res.send(true)
-      }
+    return res.send(result)
+  } catch (error) {
+    if (isApiServiceError(error)) {
+      return res.status(error.statusCode).json({ messages: [error.message] })
+    } else {
+      return res.status(500)
     }
-
-    return res.send(400)
   }
-)
+})
 
 export default router

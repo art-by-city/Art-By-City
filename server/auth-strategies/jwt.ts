@@ -3,6 +3,7 @@ import {
   StrategyOptions,
   ExtractJwt
 } from 'passport-jwt'
+import jwt from 'jsonwebtoken'
 
 import { findUserById } from '../db/local/users'
 
@@ -23,4 +24,8 @@ export default new JWTStrategy(strategyOptions, (jwtPayload, next) => {
   return next(null, user)
 })
 
-export { JWT_SECRET }
+const sign = (thing: any) => {
+  return jwt.sign(thing, JWT_SECRET)
+}
+
+export { JWT_SECRET, sign }

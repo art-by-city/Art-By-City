@@ -1,10 +1,4 @@
-export interface User {
-  id: string
-  username: string
-  displayName: string
-  password?: string
-  roles: string[]
-}
+import { User } from '../../core/auth/user'
 
 let nextId = 0
 
@@ -77,15 +71,16 @@ const isUsernameUnique = (username: string) => {
   return !users.find((u) => u.username === username)
 }
 
-const addUser = (username: string, password: string, callback: Function) => {
+const addUser = (username: string, password: string): User => {
   if (isUsernameUnique(username)) {
     nextId++
     const id = nextId.toString()
     const user = { id, username, password, displayName: username, roles: [] }
     users.push(user)
-    callback(null, user)
+
+    return user
   } else {
-    callback(new Error('Username already taken'))
+    throw new Error('Username already taken')
   }
 }
 
@@ -93,7 +88,6 @@ const updateUser = (
   id: string,
   password: string,
   newPassword: string,
-  displayName: string,
   roles?: string[]
 ) => {
   const user = users.find((u) => u.id === id)
@@ -102,7 +96,6 @@ const updateUser = (
     if (newPassword) {
       user.password = newPassword
     }
-    user.displayName = displayName
     if (roles) {
       user.roles = roles
     }

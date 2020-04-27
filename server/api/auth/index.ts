@@ -1,104 +1,120 @@
 import { Router } from 'express'
 import passport from 'passport'
-import jwt from 'jsonwebtoken'
 
-import { JWT_SECRET } from '../../auth-strategies/jwt'
-import { User, addUser, updateUser, resetPassword } from '../../db/local/users'
-import {
-  validateUsername,
-  validatePassword
-} from '../../../helpers/validation/user'
+import { User } from '../../core/auth/user'
+import UserValidator from '../../core/validators/user'
+import LocalAuthService from '../../services/auth.service'
+import UserService from '../../services/user.service'
+import { isApiServiceError } from '../../interfaces/services/errors/apiServiceError.interface'
 
 const router = Router()
+// TODO -> Singleton DI Factory pattern?
+const userService = new UserService()
+const authService = new LocalAuthService(userService)
+const userValidator = new UserValidator()
 
-router.post('/login', passport.authenticate('local'), (req, res) => {
-  const user = req.user || {}
+const localAuth = passport.authenticate('local')
+const jwtAuth = passport.authenticate('jwt', { session: false })
 
-  const token = jwt.sign(user, JWT_SECRET)
+/**
+ * This function is only reached after successful auth
+ */
+router.post('/login', localAuth, (req, res) => {
+  const result = authService.login(<User>req.user)
 
-  return res.json({ user, token })
+  return res.json(result)
 })
 
 router.post('/logout', (_req, res) => {
   return res.send()
 })
 
-router.get(
-  '/user',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
-    const user = req.user || {}
+router.get('/user', jwtAuth, (req, res) => {
+  const user = <User>req.user
 
-    return res.json({ user })
-  }
-)
+  return res.json({ user })
+})
 
 router.put('/register', (req, res) => {
   const username = req.body.username
   const password = req.body.password
 
-  const validationMessages = validateUsername(username).concat(
-    validatePassword(password)
-  )
+  const messages = userValidator.validate(username, password)
 
-  if (validationMessages.length > 0) {
-    return res.status(400).json({ messages: validationMessages })
+  if (messages) {
+    return res.status(400).json({ messages })
   }
 
-  addUser(username, password, (err: Error, user: User) => {
-    if (err) {
-      return res.status(409).json({ messages: [err.message] })
-    }
+  try {
+    const result = authService.register(username, password)
 
-    const token = jwt.sign(user, JWT_SECRET)
-
-    return res.json({ user, token })
-  })
+    return res.json(result)
+  } catch (error) {
+    return res.status(409).json({ messages: [error.message] })
+  }
 })
 
 router.post(
   '/update',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {
-    const user = <User>req.user || {}
+    const user = <User>req.user
+    const currentPassword = req.body.password
+    const newPassword = req.body.newPassword
 
-    if (req.body.newPassword) {
-      const validationMessages = validatePassword(req.body.newPassword)
+    const messages = userValidator.validatePassword(newPassword)
 
-      if (validationMessages.length > 0) {
-        return res.status(400).json({ messages: validationMessages })
-      }
+    if (messages) {
+      return res.status(400).json({ messages })
     }
 
-    const updated = updateUser(
-      user.id,
-      req.body.password,
-      req.body.newPassword,
-      req.body.displayName
+    try {
+      const result = userService.updatePassword(
+        user,
+        currentPassword,
+        newPassword
+      )
+
+      // TODO -> Update displayname?
+
+      return res.send(result)
+    } catch (error) {
+      if (isApiServiceError(error)) {
+        return res.status(error.statusCode).json({ messages: [error.message] })
+      } else {
+        return res.status(500)
+      }
+    }
+  }
+)
+
+router.post('/forgot', (req, res) => {
+  const messages = userValidator.validatePassword(req.body.newPassword)
+
+  if (messages) {
+    return res.status(400).json({ messages })
+  }
+
+  if (messages) {
+    return res.status(400).json({ messages })
+  }
+
+  try {
+    const updated = userService.resetPassword(
+      req.body.username,
+      req.body.newPassword
     )
 
     if (updated) {
       return res.send(true)
     }
-
-    return res.status(404).json({ messages: ['User not found'] })
+  } catch (error) {
+    if (isApiServiceError(error)) {
+      return res.status(error.statusCode).json({ messages: [error.message] })
+    } else {
+      return res.status(500)
+    }
   }
-)
-
-router.post('/forgot', (req, res) => {
-  const updated = resetPassword(req.body.username, req.body.newPassword)
-
-  const validationMessages = validatePassword(req.body.newPassword)
-
-  if (validationMessages.length > 0) {
-    return res.status(400).json({ messages: validationMessages })
-  }
-
-  if (updated) {
-    return res.send(true)
-  }
-
-  return res.status(404).json({ messages: ['User not found'] })
 })
 
 export default router
