@@ -7,6 +7,10 @@
       </v-alert>
     </template>
 
+    <v-alert v-if="success" type="success" dense>
+      Account saved
+    </v-alert>
+
     <v-simple-table>
       <thead>
         <tr>
@@ -51,8 +55,8 @@ export default {
   data() {
     return {
       errors: [],
-      users: [],
-      roles: ['admin', 'artist']
+      roles: ['admin', 'artist'],
+      success: false
     }
   },
   middleware: 'role/admin',
