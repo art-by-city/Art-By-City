@@ -16,25 +16,25 @@
         <tr>
           <th class="text-left">ID</th>
           <th class="text-left">Username</th>
-          <th class="text-left">Display Name</th>
           <th class="text-left">Roles</th>
           <th class="text-left">Save</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.displayName }}</td>
+        <tr v-for="account in accounts" :key="account.id">
+          <td>{{ account.id }}</td>
+          <td>{{ account.username }}</td>
           <td>
             <v-combobox
-              v-model="user.roles"
+              v-model="account.roles"
               :items="roles"
               multiple
             ></v-combobox>
           </td>
           <td>
-            <v-btn text color="primary" @click="saveUser(user)">Save</v-btn>
+            <v-btn text color="primary" @click="saveAccount(account)">
+              Save
+            </v-btn>
           </td>
         </tr>
       </tbody>
@@ -46,11 +46,13 @@
 export default {
   async asyncData({ $axios }) {
     let errors = []
-    const { users } = await $axios.$get('/api/admin/users').catch((error) => {
-      errors = error.response.data.messages
-    })
+    const { accounts } = await $axios
+      .$get('/api/admin/accounts')
+      .catch((error) => {
+        errors = error.response.data.messages
+      })
 
-    return { errors, users }
+    return { errors, accounts }
   },
   data() {
     return {
@@ -61,10 +63,10 @@ export default {
   },
   middleware: 'role/admin',
   methods: {
-    async saveUser(user) {
+    async saveAccount(account) {
       this.errors = []
       this.success = await this.$axios
-        .$post('/api/admin/user', { user })
+        .$post('/api/admin/account', { account })
         .catch((error) => {
           this.errors = error.response.data.messages
         })

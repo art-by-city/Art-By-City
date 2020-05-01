@@ -37,9 +37,7 @@
             <template v-slot:activator="{ on }">
               <v-btn text v-on="on">
                 <v-avatar color="indigo">
-                  <span class="white--text">
-                    {{ $auth.user.displayName[0] }}
-                  </span>
+                  <span class="white--text">{{ avatar }}</span>
                 </v-avatar>
               </v-btn>
             </template>
@@ -108,6 +106,13 @@ export default {
       }
 
       return false
+    },
+    avatar() {
+      if (this.$auth.user.username) {
+        return this.$auth.user?.username[0]
+      } else {
+        return 'User'[0]
+      }
     }
   },
   methods: {

@@ -7,10 +7,11 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="save">
               <v-text-field
-                v-model="displayName"
+                v-model="login.username"
                 type="text"
-                label="Display Name"
+                label="Username"
                 :rules="required"
+                disabled
               ></v-text-field>
 
               <v-text-field
@@ -59,8 +60,8 @@
 </template>
 
 <script>
-import { required } from '~/helpers/validation'
-import { passwordRules } from '~/helpers/validation/user'
+import { required } from '../server/core/validators'
+import { passwordRules } from '../server/core/validators/accountValidator'
 
 export default {
   middleware: 'auth',
@@ -70,11 +71,11 @@ export default {
       errors: [],
       success: false,
       login: {
+        username: this.$auth.user.username,
         password: ''
       },
       newPassword: '',
-      repeatNewPassword: '',
-      displayName: this.$auth.user.displayName
+      repeatNewPassword: ''
     }
   },
   computed: {
@@ -95,12 +96,16 @@ export default {
       this.errors = []
       this.success = await this.$axios
         .$post('/api/auth/update', {
+          username: this.login.username,
           password: this.login.password,
-          newPassword: this.newPassword,
-          displayName: this.displayName
+          newPassword: this.newPassword
         })
         .catch((error) => {
-          this.errors = error.response.data.messages
+          if (error.response.status === 401) {
+            this.errors = ['Incorrect password']
+          } else {
+            this.errors = ['Error']
+          }
         })
     }
   }
