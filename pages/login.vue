@@ -27,7 +27,7 @@
               </template>
 
               <v-btn type="submit" color="primary">Login</v-btn>
-              <nuxt-link to="/forgot">I forgot my password</nuxt-link>
+              <!-- <nuxt-link to="/forgot">I forgot my password</nuxt-link>-->
             </v-form>
           </v-card-text>
         </v-card>
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { required } from '~/helpers/validation'
+import { required } from '../server/core/validators'
 
 export default {
   data() {
@@ -61,17 +61,18 @@ export default {
       this.$refs.form.validate()
     },
     async userLogin() {
-      try {
-        this.errors = []
-        await this.$auth.loginWith('local', {
+      this.errors = []
+      await this.$auth
+        .loginWith('local', {
           data: this.login
         })
-      } catch (err) {
-        this.errors = ['Invalid credentials']
-        // TODO -> Sentry
-        // eslint-disable-next-line no-console
-        console.error(err)
-      }
+        .catch((error) => {
+          if (error.response.status === 401) {
+            this.errors = ['Invalid credentials']
+          } else {
+            this.errors = ['Error']
+          }
+        })
     }
   }
 }

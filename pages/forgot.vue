@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import { required } from '~/helpers/validation'
-import { passwordRules } from '~/helpers/validation/user'
+import { required } from '../server/core/validators'
+import { passwordRules } from '../server/core/validators/accountValidator'
 
 export default {
   data() {
