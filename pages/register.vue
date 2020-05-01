@@ -45,7 +45,10 @@
 </template>
 
 <script type>
-import { usernameRules, passwordRules } from '~/helpers/validation/user'
+import {
+  usernameRules,
+  passwordRules
+} from '../server/core/validators/accountValidator'
 
 export default {
   data() {
@@ -79,7 +82,7 @@ export default {
       const result = await this.$axios
         .$put('/api/auth/register', this.login)
         .catch((error) => {
-          this.errors = error.response.data.messages
+          this.errors = [error.response.data.error.message]
         })
 
       if (result && result.token) {
