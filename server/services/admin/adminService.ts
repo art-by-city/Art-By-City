@@ -22,7 +22,7 @@ export default class AdminService implements AdminServiceInterface {
   setAccountRoles(
     accountId: string,
     roles: string[]
-  ): Promise<ApiServiceResult> {
+  ): Promise<ApiServiceResult<void>> {
     return this.accountService.setAccountRoles(accountId, roles)
   }
 }

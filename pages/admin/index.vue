@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script>
+<script type="ts">
 export default {
   async asyncData({ $axios }) {
     let errors = []
@@ -58,7 +58,8 @@ export default {
     return {
       errors: [],
       roles: ['admin', 'artist'],
-      success: false
+      success: false,
+      accounts: []
     }
   },
   middleware: 'role/admin',

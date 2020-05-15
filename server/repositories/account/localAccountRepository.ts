@@ -5,6 +5,8 @@ import LocalAccount from '../../core/account/localAccount'
 import Account from '../../core/account/account.interface'
 import AccountRepository from './accountRepository.interface'
 
+// TODO -> Fix all this garbage :)
+
 @injectable()
 export default class LocalAccountRepository implements AccountRepository {
   async create(username: string, password: string): Promise<Account | null> {
@@ -32,7 +34,7 @@ export default class LocalAccountRepository implements AccountRepository {
     try {
       return await Collection(LocalAccount).update(account)
     } catch (error) {
-      throw new Error(`Error updating account by id: ${error.message}`)
+      throw new Error(`Error updating account: ${error.message}`)
     }
   }
 

@@ -1,7 +1,9 @@
 import Account from '../../core/account/account.interface'
-import Repository from '../repository.interface'
+// import Repository from '../repository.interface'
 
-export default interface AccountRepository extends Repository<Account> {
+// TODO -> extend Repository<Account>
+
+export default interface AccountRepository {
   create(username: string, password: string): Promise<Account | null>
   getByUsername(username: string): Promise<Account | null>
   get(id: string): Promise<Account | null>
