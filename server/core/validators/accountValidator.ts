@@ -1,4 +1,4 @@
-import { ValidationRule } from './validationRule.interface'
+import { ValidationRule, mapRules } from './validationRule.interface'
 
 const MIN_USERNAME_LENGTH = 3
 const MIN_PASSWORD_LENGTH = 8
@@ -34,15 +34,11 @@ const _passwordRules: ValidationRule[] = [
 ]
 
 export const usernameRules = () => {
-  return _usernameRules.map((rule) => (v: string) =>
-    rule.validate(v || '') || rule.message
-  )
+  return _usernameRules.map(mapRules)
 }
 
 export const passwordRules = () => {
-  return _passwordRules.map((rule) => (v: string) =>
-    rule.validate(v || '') || rule.message
-  )
+  return _passwordRules.map(mapRules)
 }
 
 export default class AccountValidator {

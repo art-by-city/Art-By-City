@@ -5,7 +5,10 @@ export default interface AccountService {
   register(username: string, password: string): Promise<Account | null>
   authenticate(username: string, password: string): Promise<Account | null>
   getAccountById(id: string): Promise<Account | null>
-  updatePassword(id: string, password: string): Promise<ApiServiceResult>
+  updatePassword(id: string, password: string): Promise<ApiServiceResult<void>>
   listAccounts(): Promise<Account[]>
-  setAccountRoles(accountId: string, roles: string[]): Promise<ApiServiceResult>
+  setAccountRoles(
+    accountId: string,
+    roles: string[]
+  ): Promise<ApiServiceResult<void>>
 }

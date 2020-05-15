@@ -42,7 +42,7 @@
   </div>
 </template>
 
-<script>
+<script type="ts">
 export default {
   async asyncData({ $axios }) {
     let errors = []
@@ -58,13 +58,15 @@ export default {
     return {
       errors: [],
       roles: ['admin', 'artist'],
-      success: false
+      success: false,
+      accounts: []
     }
   },
   middleware: 'role/admin',
   methods: {
     async saveAccount(account) {
       this.errors = []
+      this.success = false
       this.success = await this.$axios
         .$post('/api/admin/account', { account })
         .catch((error) => {

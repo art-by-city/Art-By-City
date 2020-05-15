@@ -3,7 +3,7 @@
     <v-navigation-drawer v-model="drawer" :clipped="true" fixed app>
       <v-list>
         <v-list-item
-          v-for="(navItem, i) in navItems"
+          v-for="(navItem, i) in filterNavItemsForUserRoles(leftNavItems)"
           :key="i"
           :to="navItem.to"
           router
@@ -42,20 +42,21 @@
               </v-btn>
             </template>
             <v-list dense>
-              <v-list-item to="/account">
+              <v-list-item
+                v-for="(navItem, i) in filterNavItemsForUserRoles(
+                  rightNavItems
+                )"
+                :key="i"
+                :to="navItem.to"
+                router
+                exact
+                :disabled="navItem.disabled"
+              >
                 <v-list-item-action>
-                  <v-icon>mdi-account</v-icon>
+                  <v-icon>{{ navItem.icon }}</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
-                  <v-list-item-title>Account</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item v-if="isAdmin" to="/admin">
-                <v-list-item-action>
-                  <v-icon>mdi-account-cowboy-hat</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                  <v-list-item-title>Admin</v-list-item-title>
+                  <v-list-item-title>{{ navItem.title }}</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item @click="logout">
@@ -79,46 +80,85 @@
   </v-app>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      drawer: false,
-      navItems: [
-        {
-          icon: 'mdi-apps',
-          title: 'Home',
-          to: '/'
-        },
-        {
-          icon: 'mdi-cart',
-          title: 'Shop (Coming Soon!)',
-          to: '/',
-          disabled: true
-        }
-      ]
-    }
-  },
-  computed: {
-    isAdmin() {
-      if (this.$auth.user && this.$auth.user.roles) {
-        return this.$auth.user.roles.includes('admin')
-      }
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator'
 
-      return false
+import { NavItem } from '../components/types'
+
+@Component
+export default class DefaultLayout extends Vue {
+  $auth: any // TODO -> why doesn't @type lib work?
+
+  drawer: boolean = false
+
+  leftNavItems: NavItem[] = [
+    {
+      icon: 'mdi-apps',
+      title: 'Home',
+      to: '/'
     },
-    avatar() {
-      if (this.$auth.user.username) {
-        return this.$auth.user?.username[0]
-      } else {
-        return 'User'[0]
-      }
+    {
+      icon: 'mdi-account-cowboy-hat',
+      title: 'Admin',
+      to: '/admin',
+      only: ['admin']
+    },
+    {
+      icon: 'mdi-cart',
+      title: 'Shop (Coming Soon!)',
+      to: '/',
+      disabled: true
     }
-  },
-  methods: {
-    async logout() {
-      await this.$auth.logout()
+  ]
+
+  rightNavItems: NavItem[] = [
+    {
+      icon: 'mdi-account',
+      title: 'My Account',
+      to: '/account'
+    },
+    {
+      icon: 'mdi-brush',
+      title: 'My Artwork',
+      to: '/user/artwork',
+      only: ['artist']
     }
+  ]
+
+  get isAdmin(): boolean {
+    if (this.$auth.user && this.$auth.user.roles) {
+      return this.$auth.user.roles.includes('admin')
+    }
+
+    return false
+  }
+
+  get isArtist(): boolean {
+    if (this.$auth.user && this.$auth.user.roles) {
+      return this.$auth.user.roles.includes('artist')
+    }
+
+    return false
+  }
+
+  get avatar(): string {
+    if (this.$auth.user.username) {
+      return this.$auth.user?.username[0]
+    } else {
+      return 'User'[0]
+    }
+  }
+
+  private filterNavItemsForUserRoles(navItems: NavItem[]): NavItem[] {
+    return navItems.filter(
+      (navItem) =>
+        !navItem.only ||
+        navItem.only.every((role) => this.$auth.user?.roles?.includes(role))
+    )
+  }
+
+  private async logout() {
+    await this.$auth.logout()
   }
 }
 </script>

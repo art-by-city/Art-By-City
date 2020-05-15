@@ -13,7 +13,7 @@ export default class AuthController implements AuthControllerInterface {
   private authService: AuthService
   private accountService: AccountService
 
-  private router: Router
+  private router!: Router
 
   constructor(
     @inject(Symbol.for('AuthService'))
@@ -23,10 +23,13 @@ export default class AuthController implements AuthControllerInterface {
   ) {
     this.authService = authService
     this.accountService = accountService
-    this.router = this.buildRouter()
   }
 
   getRouter(): Router {
+    if (!this.router) {
+      this.router = this.buildRouter()
+    }
+
     return this.router
   }
 

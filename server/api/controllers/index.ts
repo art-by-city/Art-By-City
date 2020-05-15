@@ -9,6 +9,7 @@ import { container } from '../../inversify.config'
 import AuthService from '../../services/auth/authService.interface'
 import AdminController from '../controllers/admin/adminController.interface'
 import AuthController from './auth/authController.interface'
+import ArtworkController from './artwork/artworkController'
 
 // Firebase Config
 
@@ -43,8 +44,8 @@ passport.deserializeUser(authService.deserializeAccount)
 
 const app = express()
 
-app.use(bodyParser.json())
 app.use(passport.initialize())
+app.use(bodyParser.json())
 
 app.use(
   '/auth',
@@ -53,6 +54,10 @@ app.use(
 app.use(
   '/admin',
   container.get<AdminController>(Symbol.for('AdminController')).getRouter()
+)
+app.use(
+  '/artwork',
+  container.get<ArtworkController>(Symbol.for('ArtworkController')).getRouter()
 )
 
 export default app
