@@ -24,7 +24,7 @@ export default class LocalAccountService implements AccountService {
   async updatePassword(
     id: string,
     password: string
-  ): Promise<ApiServiceResult> {
+  ): Promise<ApiServiceResult<void>> {
     const accountValidator = new AccountValidator()
 
     const messages = accountValidator.validatePassword(password)
@@ -49,7 +49,7 @@ export default class LocalAccountService implements AccountService {
 
       return { success: true }
     } catch (error) {
-      throw new UnknownError()
+      throw new UnknownError(error.message)
     }
   }
 
@@ -100,7 +100,7 @@ export default class LocalAccountService implements AccountService {
   async setAccountRoles(
     accountId: string,
     roles: string[]
-  ): Promise<ApiServiceResult> {
+  ): Promise<ApiServiceResult<void>> {
     const account = await this.accountRepository.get(accountId)
 
     if (!account) {

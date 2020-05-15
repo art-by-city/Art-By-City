@@ -10,14 +10,17 @@ import AdminControllerInterface from './adminController.interface'
 export default class AdminController implements AdminControllerInterface {
   private adminService: AdminService
 
-  private router: Router
+  private router!: Router
 
   constructor(@inject(Symbol.for('AdminService')) adminService: AdminService) {
     this.adminService = adminService
-    this.router = this.buildRouter()
   }
 
   getRouter(): Router {
+    if (!this.router) {
+      this.router = this.buildRouter()
+    }
+
     return this.router
   }
 

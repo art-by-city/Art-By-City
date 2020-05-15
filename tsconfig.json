@@ -25,9 +25,11 @@
       ]
     },
     "types": [
-      "@types/node",
+      "node",
       "@nuxt/types",
-      "reflect-metadata"
+      "nuxtjs__auth",
+      "reflect-metadata",
+      "@types/multer"
     ]
   },
   "exclude": [
