@@ -149,7 +149,10 @@ export default {
       this.errors = []
       try {
         const result = await this.$axios.$put('/api/artwork/', formData, formDataConfig)
-        console.log('artwork upload result', result)
+
+        if (result.success && result.payload) {
+          this.$router.push(`/artwork/${result.payload.id}`)
+        }
       } catch (error) {
         this.errors = [error?.response?.data?.error?.message]
       }

@@ -56,10 +56,12 @@ export default class AuthController implements AuthControllerInterface {
 
     router.put('/register', async (req, res, next) => {
       try {
-        const result = await this.userService.register(
+        const user = await this.userService.register(
           req.body.username,
           req.body.password
         )
+
+        const result = this.authService.login(user)
 
         return res.json(result)
       } catch (error) {

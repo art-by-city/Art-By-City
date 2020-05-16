@@ -1,6 +1,8 @@
-import { injectable } from 'inversify'
-import { Collection } from 'firebase-firestorm'
+import { injectable, inject } from 'inversify'
+import { getRepository } from 'fireorm'
+import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
+import DatabaseAdapter from '../db/adapter.interface'
 import User from './user'
 import UserRepositoryInterface from './repository.interface'
 
@@ -8,61 +10,72 @@ import UserRepositoryInterface from './repository.interface'
 
 @injectable()
 export default class UserRepository implements UserRepositoryInterface {
-  async create(username: string, password: string): Promise<User | null> {
-    if (!(await this.getByUsername(username))) {
-      // TODO -> this shouldn't be done in repository
-      const user = new User()
-      user.username = username
-      user.password = password
+  private repository = getRepository(User)
+  private client: Firestore
 
-      return await Collection(User).create(user)
+  constructor(
+    @inject(Symbol.for('DatabaseAdapter')) databaseAdapter: DatabaseAdapter
+  ) {
+    this.client = databaseAdapter.getClient()
+  }
+
+  async create(user: User): Promise<User> {
+    if (!(await this.getByUsername(user.username))) {
+      return this.repository.create(user)
     }
 
     throw new Error('Error creating user: Username already taken')
   }
 
-  async get(id: string): Promise<User | null> {
+  get(id: string): Promise<User | null> {
     try {
-      return await Collection(User).get(id)
+      return this.repository.findById(id)
     } catch (error) {
       throw new Error(`Error getting user by id: ${error.message}`)
     }
   }
 
-  async update(user: User): Promise<User | null> {
+  update(user: User): Promise<User | null> {
     try {
-      return await Collection(User).update(user)
+      return this.repository.update(user)
     } catch (error) {
       throw new Error(`Error updating user: ${error.message}`)
     }
   }
 
-  async getByUsername(username: string): Promise<User | null> {
+  delete(id: string): Promise<void> {
     try {
-      const { empty, docs } = await Collection(User)
-        .query()
-        .where('username', '==', username)
-        .get()
+      return this.repository.delete(id)
+    } catch (error) {
+      throw new Error(`Error deleting user: ${error.message}`)
+    }
+  }
 
-      if (empty) {
-        return null
-      }
-
-      return docs[0]
+  getByUsername(username: string): Promise<User | null> {
+    try {
+      return this.repository.whereEqualTo('username', username).findOne()
     } catch (error) {
       throw new Error(`Error getting user by username: ${error.message}`)
     }
   }
 
-  async list(): Promise<User[]> {
+  list(): Promise<User[]> {
     try {
-      const { empty, docs } = await Collection(User)
-        .query()
-        .get()
-
-      return empty ? [] : docs
+      return this.repository.find()
     } catch (error) {
       throw new Error(`Error listing users: ${error.message}`)
     }
+  }
+
+  find(): Promise<User[]> {
+    try {
+      return this.repository.find()
+    } catch (error) {
+      throw new Error(`Error listing users: ${error.message}`)
+    }
+  }
+
+  getDocumentReference(id: string): DocumentReference<User> {
+    return <DocumentReference<User>>this.client.doc(`Artworks/${id}`)
   }
 }

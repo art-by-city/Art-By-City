@@ -56,6 +56,6 @@ export const regions = [
   'Austin'
 ]
 
-export interface ArtworkImageInterface {
+export interface ArtworkImage {
   source: string
 }

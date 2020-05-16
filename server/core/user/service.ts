@@ -4,7 +4,7 @@ import UsernameAlreadyTakenError from '../api/errors/usernameAlreadyTakenError'
 import UnknownError from '../api/errors/unknownError'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import ValidationError from '../api/errors/validationError'
-import UserNotFoundError from '../api/errors/userNotFoundError'
+import NotFoundError from '../api/errors/notFoundError'
 import UserValidator from './validator'
 import UserRepository from './repository.interface'
 import User from './user'
@@ -35,7 +35,7 @@ export default class UserService implements UserServiceInterface {
     const user = await this.userRepository.get(id)
 
     if (!user) {
-      throw new UserNotFoundError()
+      throw new NotFoundError(new User())
     }
 
     user.updatePassword(password)
@@ -53,7 +53,7 @@ export default class UserService implements UserServiceInterface {
     }
   }
 
-  async register(username: string, password: string): Promise<User | null> {
+  register(username: string, password: string): Promise<User> {
     const validator = new UserValidator()
 
     const messages = validator.validate(username, password)
@@ -63,7 +63,11 @@ export default class UserService implements UserServiceInterface {
     }
 
     try {
-      return await this.userRepository.create(username, password)
+      const user = new User()
+      user.username = username
+      user.password = password
+
+      return this.userRepository.create(user)
     } catch (error) {
       // TODO -> Other errors
       throw new UsernameAlreadyTakenError()
@@ -90,8 +94,8 @@ export default class UserService implements UserServiceInterface {
     return user
   }
 
-  async listUsers(): Promise<User[]> {
-    return await this.userRepository.list()
+  listUsers(): Promise<User[]> {
+    return this.userRepository.list()
   }
 
   async setUserRoles(

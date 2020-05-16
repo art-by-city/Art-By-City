@@ -2,52 +2,107 @@ import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import UnknownError from '../api/errors/unknownError'
-import ArtworkDomainService from './service.interface'
+import User from '../user/user'
+import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
+import NotFoundError from '../api/errors/notFoundError'
+import UnauthorizedError from '../api/errors/unauthorizedError'
+import ArtworkService from './service.interface'
 import Artwork from './artwork'
-import ArtworkServiceInterface from './appService.interface'
+import ArtworkApplicationServiceInterface from './appService.interface'
+import { ArtworkImage } from './artwork.interface'
 
 @injectable()
-export default class ArtworkService implements ArtworkServiceInterface {
-  private artworkDomainService: ArtworkDomainService
+export default class ArtworkApplicationService
+  implements ArtworkApplicationServiceInterface {
+  private artworkService: ArtworkService
 
   constructor(
-    @inject(Symbol.for('ArtworkDomainService'))
-    artworkDomainService: ArtworkDomainService
+    @inject(Symbol.for('ArtworkService'))
+    artworkService: ArtworkService
   ) {
-    this.artworkDomainService = artworkDomainService
+    this.artworkService = artworkService
   }
 
-  async create(
-    props: any,
-    files?: Express.Multer.File[]
-  ): Promise<ApiServiceResult<void>> {
-    const artwork = new Artwork()
-    artwork.title = props.title || ''
-    artwork.description = props.description || ''
-    artwork.type = props.type || ''
-    artwork.region = props.region || ''
-    artwork.hashtags = props.hashtags?.split(',') || []
+  async create(req: any): Promise<ApiServiceResult<Artwork>> {
+    const user = <User>req.user
+    const files = <Express.Multer.File[]>req.files
 
+    const artwork = new Artwork()
+    artwork.title = req.body?.title || ''
+    artwork.description = req.body?.description || ''
+    artwork.type = req.body?.type || ''
+    artwork.region = req.body?.region || ''
+    artwork.hashtags = req.body?.hashtags?.split(',') || []
+
+    let images: ArtworkImage[] = []
     if (files) {
-      artwork.images = files.map((file) => {
+      images = files.map((file) => {
         return { source: file.filename }
       })
     }
 
     try {
-      await this.artworkDomainService.create(artwork)
+      const savedArtwork = await this.artworkService.create(
+        user,
+        artwork,
+        images
+      )
+
+      if (savedArtwork) {
+        return new ApiServiceSuccessResult(savedArtwork)
+      }
+
+      return { success: false }
     } catch (error) {
       throw new UnknownError(error.message)
     }
-
-    return { success: true }
   }
 
   async list(): Promise<ApiServiceResult<Artwork[]>> {
     try {
-      const artworks = await this.artworkDomainService.list()
+      const artworks = await this.artworkService.list()
 
-      return { success: true, payload: artworks }
+      return new ApiServiceSuccessResult(artworks)
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async listForUser(user: User): Promise<ApiServiceResult<Artwork[]>> {
+    try {
+      const artworks = await this.artworkService.listForUser(user)
+
+      return new ApiServiceSuccessResult(artworks)
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async get(id: string): Promise<ApiServiceResult<Artwork>> {
+    try {
+      const artwork = await this.artworkService.get(id)
+
+      return new ApiServiceSuccessResult(artwork)
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async delete(user: User, id: string): Promise<ApiServiceResult<void>> {
+    try {
+      const artwork = await this.artworkService.get(id)
+
+      if (artwork) {
+        if (artwork.owner.id !== user.id) {
+          throw new UnauthorizedError()
+        }
+      } else {
+        throw new NotFoundError(new Artwork())
+      }
+
+      await this.artworkService.delete(id)
+
+      return new ApiServiceSuccessResult()
     } catch (error) {
       throw new UnknownError(error.message)
     }
