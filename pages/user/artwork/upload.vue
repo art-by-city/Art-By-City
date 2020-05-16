@@ -92,7 +92,7 @@ import {
   descriptionRules,
   typeRules,
   regionRules
-} from '~/server/core/validators/artworkValidator'
+} from '~/server/core/artwork/validator'
 import { artworkTypes, regions } from '~/server/core/artwork/artwork.interface'
 
 export default {

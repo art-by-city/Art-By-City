@@ -1,11 +1,7 @@
 import { rootCollection, field, map } from 'firebase-firestorm'
 import DomainEntity from '../domainEntity'
 
-import ArtworkInterface, {
-  ArtworkType,
-  ArtworkImageInterface,
-  Region
-} from './artwork.interface'
+import { ArtworkType, ArtworkImageInterface, Region } from './artwork.interface'
 
 export class ArtworkImage implements ArtworkImageInterface {
   @field({ name: 'source' })
@@ -13,7 +9,7 @@ export class ArtworkImage implements ArtworkImageInterface {
 }
 
 @rootCollection({ name: 'artworks' })
-export default class Artwork extends DomainEntity implements ArtworkInterface {
+export default class Artwork extends DomainEntity {
   @field({ name: 'title' })
   title!: string
 

@@ -42,9 +42,7 @@ export default {
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv'
   ],
-  serverMiddleware: [
-    { path: '/api', handler: '~/server/api/controllers/index.ts' }
-  ],
+  serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     redirect: {
       rewriteRedirects: true

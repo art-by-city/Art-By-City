@@ -1,12 +1,3 @@
-export default interface Artwork {
-  title: string
-  description: string
-  type: ArtworkType
-  region: string
-  hashtags: string[]
-  images: ArtworkImageInterface[]
-}
-
 export type ArtworkType =
   | 'Painting'
   | 'Illustration'

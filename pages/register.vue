@@ -45,10 +45,7 @@
 </template>
 
 <script type>
-import {
-  usernameRules,
-  passwordRules
-} from '../server/core/validators/accountValidator'
+import { usernameRules, passwordRules } from '../server/core/user/validator'
 
 export default {
   data() {
