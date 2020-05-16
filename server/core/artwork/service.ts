@@ -1,30 +1,44 @@
 import { injectable, inject } from 'inversify'
 
 import ValidationError from '../api/errors/validationError'
+import User from '../user/user'
+import UserRepository from '../user/repository.interface'
 import ArtworkValidator from './validator'
 import ArtworkRepository from './repository.interface'
 import Artwork from './artwork'
+import { ArtworkImage } from './artwork.interface'
 import ArtworkServiceInterface from './service.interface'
 
 @injectable()
 export default class ArtworkService implements ArtworkServiceInterface {
   private artworkRepository: ArtworkRepository
+  private userRepository: UserRepository
   private artworkValidator = new ArtworkValidator()
 
   constructor(
     @inject(Symbol.for('ArtworkRepository'))
-    artworkRepository: ArtworkRepository
+    artworkRepository: ArtworkRepository,
+    @inject(Symbol.for('UserRepository'))
+    userRepository: UserRepository
   ) {
     this.artworkRepository = artworkRepository
+    this.userRepository = userRepository
   }
 
-  async create(artwork: Artwork): Promise<Artwork | null> {
+  async create(
+    user: User,
+    artwork: Artwork,
+    images: ArtworkImage[]
+  ): Promise<Artwork | null> {
     // Validate
-    const messages = this.artworkValidator.validiate(artwork)
+    const messages = this.artworkValidator.validate(artwork)
 
     if (messages) {
       throw new ValidationError(messages)
     }
+
+    artwork.owner = this.userRepository.getDocumentReference(user.id)
+    artwork.images = images
 
     // Save
     return await this.artworkRepository.create(artwork)
@@ -34,8 +48,35 @@ export default class ArtworkService implements ArtworkServiceInterface {
     return this.artworkRepository.get(id)
   }
 
-  list(): Promise<Artwork[]> {
-    return this.artworkRepository.list()
+  async list(): Promise<Artwork[]> {
+    const artworks = await this.artworkRepository.list()
+
+    const hydratedArtworks = Promise.all(
+      artworks.map(async (a) => {
+        a.owner = <User>await this.userRepository.get(a.owner.id)
+
+        return a
+      })
+    )
+
+    return hydratedArtworks
+  }
+
+  async listForUser(user: User): Promise<Artwork[]> {
+    const filter = new Artwork()
+    filter.owner = this.userRepository.getDocumentReference(user.id)
+
+    const artworks = await this.artworkRepository.find(filter)
+
+    const hydratedArtworks = Promise.all(
+      artworks.map(async (a) => {
+        a.owner = <User>await this.userRepository.get(a.owner.id)
+
+        return a
+      })
+    )
+
+    return hydratedArtworks
   }
 
   update(artwork: Artwork): Promise<Artwork | null> {

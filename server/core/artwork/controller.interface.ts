@@ -1,3 +1,3 @@
-import Controller from '../controller.interface'
+import ControllerInterface from '../controller.interface'
 
-export default interface ArtworkController extends Controller {}
+export default interface ArtworkController extends ControllerInterface {}

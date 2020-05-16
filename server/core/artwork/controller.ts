@@ -4,6 +4,7 @@ import multer from 'multer'
 import passport from 'passport'
 
 import roles from '../middleware/roles'
+import User from '../user/user'
 import ArtworkApplicationService from './appService.interface'
 import ArtworkControllerInterface from './controller.interface'
 
@@ -25,13 +26,13 @@ const upload = multer({ storage })
 export default class ArtworkController implements ArtworkControllerInterface {
   private router!: Router
 
-  private artworkService: ArtworkApplicationService
+  private artworkAppService: ArtworkApplicationService
 
   constructor(
-    @inject(Symbol.for('ArtworkService'))
-    artworkService: ArtworkApplicationService
+    @inject(Symbol.for('ArtworkApplicationService'))
+    artworkAppService: ArtworkApplicationService
   ) {
-    this.artworkService = artworkService
+    this.artworkAppService = artworkAppService
   }
 
   getRouter(): Router {
@@ -54,19 +55,29 @@ export default class ArtworkController implements ArtworkControllerInterface {
       roles(['artist']),
       upload.array('images'),
       async (req, res) => {
-        const result = await this.artworkService.create(
-          req.body,
-          <Express.Multer.File[]>req.files
-        )
+        const result = await this.artworkAppService.create(req)
 
         return res.send(result)
       }
     )
 
     router.get('/', async (_req, res) => {
-      const result = await this.artworkService.list()
+      const result = await this.artworkAppService.list()
 
-      console.log('GET /api/artwork result', result)
+      return res.send(result)
+    })
+
+    router.get('/:id', async (req, res) => {
+      const result = await this.artworkAppService.get(req.params.id)
+
+      return res.send(result)
+    })
+
+    router.delete('/:id', roles(['artist']), async (req, res) => {
+      const result = await this.artworkAppService.delete(
+        <User>req.user,
+        req.params.id
+      )
 
       return res.send(result)
     })

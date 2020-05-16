@@ -1,14 +1,26 @@
-import { injectable } from 'inversify'
-import { Collection } from 'firebase-firestorm'
+import { injectable, inject } from 'inversify'
+import { getRepository } from 'fireorm'
+import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
+import DatabaseAdapter from '../db/adapter.interface'
+import User from '../user/user'
 import Artwork from './artwork'
 import ArtworkRepositoryInterface from './repository.interface'
 
 @injectable()
 export default class ArtworkRepository implements ArtworkRepositoryInterface {
-  create(artwork: Artwork): Promise<Artwork | null> {
+  private repository = getRepository(Artwork)
+  private client: Firestore
+
+  constructor(
+    @inject(Symbol.for('DatabaseAdapter')) databaseAdapter: DatabaseAdapter
+  ) {
+    this.client = databaseAdapter.getClient()
+  }
+
+  create(artwork: Artwork): Promise<Artwork> {
     try {
-      return Collection(Artwork).create(artwork)
+      return this.repository.create(artwork)
     } catch (error) {
       throw new Error(`Error creating new artwork: ${error.message}`)
     }
@@ -16,19 +28,31 @@ export default class ArtworkRepository implements ArtworkRepositoryInterface {
 
   get(id: string): Promise<Artwork | null> {
     try {
-      return Collection(Artwork).get(id)
+      return this.repository.findById(id)
     } catch (error) {
       throw new Error(`Error getting artwork by id: ${error.message}`)
     }
   }
 
-  async list(): Promise<Artwork[]> {
+  list(): Promise<Artwork[]> {
     try {
-      const { docs } = await Collection(Artwork)
-        .query()
-        .get()
+      return this.repository.find()
+    } catch (error) {
+      throw new Error(`Error listing artwork: ${error.message}`)
+    }
+  }
 
-      return docs
+  async find(filter?: Artwork): Promise<Artwork[]> {
+    try {
+      if (!filter) {
+        return this.list()
+      }
+
+      const found = await this.repository
+        .whereEqualTo('owner', <DocumentReference<User>>filter.owner)
+        .find()
+
+      return found
     } catch (error) {
       throw new Error(`Error listing artwork: ${error.message}`)
     }
@@ -36,7 +60,7 @@ export default class ArtworkRepository implements ArtworkRepositoryInterface {
 
   update(artwork: Artwork): Promise<Artwork | null> {
     try {
-      return Collection(Artwork).update(artwork)
+      return this.repository.update(artwork)
     } catch (error) {
       throw new Error(`Error updating artwork: ${error.message}`)
     }
@@ -44,9 +68,13 @@ export default class ArtworkRepository implements ArtworkRepositoryInterface {
 
   delete(id: string): Promise<void> {
     try {
-      return Collection(Artwork).remove(id)
+      return this.repository.delete(id)
     } catch (error) {
       throw new Error(`Error deleting artwork: ${error.message}`)
     }
+  }
+
+  getDocumentReference(id: string): DocumentReference<Artwork> {
+    return <DocumentReference<Artwork>>this.client.doc(`Artworks/${id}`)
   }
 }

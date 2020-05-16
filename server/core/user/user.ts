@@ -1,15 +1,13 @@
-import { rootCollection, field } from 'firebase-firestorm'
-import DomainEntity from '../domainEntity'
+import { Collection } from 'fireorm'
 
-@rootCollection({ name: 'users' })
-export default class User extends DomainEntity {
-  @field({ name: 'username' })
+@Collection()
+export default class User {
+  id!: string
+
   username!: string
 
-  @field({ name: 'password' })
   password?: string
 
-  @field({ name: 'roles' })
   roles!: string[]
 
   updatePassword(newPassword: string): void {
@@ -30,13 +28,13 @@ export default class User extends DomainEntity {
     this.roles = roles
   }
 
-  toJSON(): DomainEntity {
-    const clean = Object.assign(this, {})
+  // toJSON(): DomainEntity {
+  //   const clean = Object.assign(this, {})
 
-    delete clean.password
+  //   delete clean.password
 
-    return (() => {
-      return super.toJSON()
-    }).call(clean)
-  }
+  //   return (() => {
+  //     return super.toJSON()
+  //   }).call(clean)
+  // }
 }

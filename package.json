@@ -11,9 +11,11 @@
     "start": "nuxt-ts start",
     "generate": "nuxt-ts generate",
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
-    "firestore:local": "firebase emulators:start --only firestore"
+    "firestore": "firebase emulators:start --project art-by-city-dev --only firestore --import=./data",
+    "firestore:export": "firebase emulators:export --only firestore --project art-by-city-dev ./data"
   },
   "dependencies": {
+    "@google-cloud/firestore": "^3.8.0",
     "@nuxt/typescript-runtime": "^0.4.5",
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.10.1",
@@ -26,8 +28,7 @@
     "@types/passport-local": "^1.0.33",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
-    "firebase": "^7.14.2",
-    "firebase-firestorm": "^2.0.5",
+    "fireorm": "^0.13.4",
     "inversify": "^5.0.1",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2",

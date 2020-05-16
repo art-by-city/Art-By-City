@@ -79,7 +79,7 @@ export const hashtagRules = () => {
 }
 
 export default class ArtworkValidator {
-  validiate(artwork: Artwork): string[] | null {
+  validate(artwork: Artwork): string[] | null {
     const messages: string[] = []
 
     _titleRules.forEach((rule) => {
