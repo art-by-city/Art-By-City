@@ -44,7 +44,7 @@
 
 <script>
 import { required } from '../server/core/validators'
-import { passwordRules } from '../server/core/validators/accountValidator'
+import { passwordRules } from '../server/core/user/validator'
 
 export default {
   data() {

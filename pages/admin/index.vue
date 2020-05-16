@@ -8,7 +8,7 @@
     </template>
 
     <v-alert v-if="success" type="success" dense>
-      Account saved
+      User saved
     </v-alert>
 
     <v-simple-table>
@@ -21,18 +21,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="account in accounts" :key="account.id">
-          <td>{{ account.id }}</td>
-          <td>{{ account.username }}</td>
+        <tr v-for="user in users" :key="user.id">
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
           <td>
             <v-combobox
-              v-model="account.roles"
+              v-model="user.roles"
               :items="roles"
               multiple
             ></v-combobox>
           </td>
           <td>
-            <v-btn text color="primary" @click="saveAccount(account)">
+            <v-btn text color="primary" @click="saveUser(user)">
               Save
             </v-btn>
           </td>
@@ -46,29 +46,29 @@
 export default {
   async asyncData({ $axios }) {
     let errors = []
-    const { accounts } = await $axios
-      .$get('/api/admin/accounts')
+    const { users } = await $axios
+      .$get('/api/admin/users')
       .catch((error) => {
         errors = error.response.data.messages
       })
 
-    return { errors, accounts }
+    return { errors, users }
   },
   data() {
     return {
       errors: [],
       roles: ['admin', 'artist'],
       success: false,
-      accounts: []
+      users: []
     }
   },
   middleware: 'role/admin',
   methods: {
-    async saveAccount(account) {
+    async saveUser(user) {
       this.errors = []
       this.success = false
       this.success = await this.$axios
-        .$post('/api/admin/account', { account })
+        .$post('/api/admin/user', { user })
         .catch((error) => {
           this.errors = error.response.data.messages
         })
