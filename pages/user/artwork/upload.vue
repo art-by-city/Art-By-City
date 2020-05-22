@@ -46,6 +46,7 @@
                 label="Hashtags"
                 multiple
                 chips
+                @input="onHashtagInput"
               >
                 <template v-slot:selection="data">
                   <v-chip
@@ -121,6 +122,11 @@ export default {
   methods: {
     validateForm() {
       this.$refs.form.validate()
+    },
+    onHashtagInput(hashtags) {
+      this.artwork.hashtags = hashtags.map((h) => {
+        return h[0] === '#' ? h.slice(1) : h
+      })
     },
     async upload() {
       const formDataConfig = { headers: {
