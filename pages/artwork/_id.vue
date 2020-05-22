@@ -11,9 +11,9 @@
               ></v-img>
               <v-img
                 v-for="(image, i) in artwork.images.slice(1)"
+                :key="i"
                 max-height="50"
                 contain
-                :key="i"
                 :src="'/artwork-images/' + image.source"
               ></v-img>
             </v-col>
@@ -49,37 +49,40 @@
   </div>
 </template>
 
-<script type="ts">
-export default {
-  async asyncData({ $axios, params }) {
-    let errors = []
+<script lang="ts">
+import { Context } from '@nuxt/types'
+import { Component } from 'nuxt-property-decorator'
+
+import FormPageComponent from '~/components/pages/formPage.component'
+
+@Component
+export default class ArtworkPage extends FormPageComponent {
+  artwork: any = {}
+
+  async asyncData({ $axios, params }: Context) {
     try {
-      const result = await $axios.$get(`/api/artwork/${params.id}`)
+      const { payload } = await $axios.$get(`/api/artwork/${params.id}`)
 
-      return { errors, artwork: result.payload }
+      return { artwork: payload }
     } catch (error) {
-      errors = error.response.data.messages
+      return { errors: error.response.data.messages }
     }
+  }
 
-    return { errors, artwork: null }
-  },
-  data() {
-    return {
-      artwork: null
-    }
-  },
-  methods: {
-    async deleteArtwork() {
-      if (confirm('Are you sure you want to delete this artwork?')) {
-        try {
-          const result = await this.$axios.$delete(`/api/artwork/${this.artwork.id}`)
+  toggleEditMode(_on?: boolean) {}
 
-          if (result.success) {
-            this.$router.push(`/`)
-          }
-        } catch (error) {
-          this.errors = [error?.response?.data?.error?.message]
+  async deleteArtwork() {
+    if (confirm('Are you sure you want to delete this artwork?')) {
+      try {
+        const { success } = await this.$axios.$delete(
+          `/api/artwork/${this.artwork.id}`
+        )
+
+        if (success) {
+          this.$router.push(`/`)
         }
+      } catch (error) {
+        this.errors = error.response.data.messages
       }
     }
   }

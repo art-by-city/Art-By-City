@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>ADMIN AREA</h1>
-    <template v-if="errors.length > 0">
+    <template v-if="hasErrors">
       <v-alert v-for="(error, i) in errors" :key="i" type="error" dense>
         {{ error }}
       </v-alert>
@@ -42,36 +42,36 @@
   </div>
 </template>
 
-<script type="ts">
-export default {
-  async asyncData({ $axios }) {
-    let errors = []
-    const { users } = await $axios
-      .$get('/api/admin/users')
-      .catch((error) => {
-        errors = error.response.data.messages
-      })
+<script lang="ts">
+import { Context } from '@nuxt/types'
+import { Component } from 'nuxt-property-decorator'
 
-    return { errors, users }
-  },
-  data() {
-    return {
-      errors: [],
-      roles: ['admin', 'artist'],
-      success: false,
-      users: []
+import FormPageComponent from '~/components/pages/formPage.component'
+
+@Component({
+  middleware: 'role/admin'
+})
+export default class AdminIndexPage extends FormPageComponent {
+  roles = ['admin', 'artist']
+  users: any[] = []
+
+  async asyncData({ $axios }: Context) {
+    try {
+      const { users } = await $axios.$get('/api/admin/users')
+
+      return { users }
+    } catch (error) {
+      return { errors: error.response.data.messages }
     }
-  },
-  middleware: 'role/admin',
-  methods: {
-    async saveUser(user) {
-      this.errors = []
-      this.success = false
-      this.success = await this.$axios
-        .$post('/api/admin/user', { user })
-        .catch((error) => {
-          this.errors = error.response.data.messages
-        })
+  }
+
+  async saveUser(user: any) {
+    this.errors = []
+    this.success = false
+    try {
+      this.success = await this.$axios.$post('/api/admin/user', { user })
+    } catch (error) {
+      this.errors = error.response.data.messages
     }
   }
 }

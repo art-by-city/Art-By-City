@@ -20,7 +20,7 @@
                 :rules="required"
               ></v-text-field>
 
-              <template v-if="errors.length > 0">
+              <template v-if="hasErrors">
                 <v-alert v-for="(error, i) in errors" :key="i" type="error">
                   {{ error }}
                 </v-alert>
@@ -36,44 +36,32 @@
   </v-container>
 </template>
 
-<script>
-import { required } from '../server/core/validators'
+<script lang="ts">
+import { Component } from 'nuxt-property-decorator'
 
-export default {
-  data() {
-    return {
-      errors: [],
-      valid: false,
-      login: {
-        username: '',
-        password: ''
-      }
-    }
-  },
-  computed: {
-    required
-  },
-  watch: {
-    model: 'validateForm'
-  },
-  methods: {
-    validateForm() {
-      this.$refs.form.validate()
-    },
-    async userLogin() {
-      this.errors = []
-      await this.$auth
-        .loginWith('local', {
-          data: this.login
-        })
-        .catch((error) => {
-          if (error.response.status === 401) {
-            this.errors = ['Invalid credentials']
-          } else {
-            this.errors = ['Error']
-          }
-        })
-    }
+import FormPageComponent from '../components/pages/formPage.component'
+
+@Component
+export default class LoginPage extends FormPageComponent {
+  login = {
+    username: '',
+    password: ''
+  }
+
+  async userLogin() {
+    this.errors = []
+
+    await this.$auth
+      .loginWith('local', {
+        data: this.login
+      })
+      .catch((error) => {
+        if (error.response.status === 401) {
+          this.errors = ['Invalid credentials']
+        } else {
+          this.errors = ['Error']
+        }
+      })
   }
 }
 </script>

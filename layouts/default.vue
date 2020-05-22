@@ -20,7 +20,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="true" fixed app>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-app-bar-nav-icon @click.stop="toggleDrawer" />
       <v-spacer />
       <v-toolbar-title>
         <nuxt-link to="/">art x by x city</nuxt-link>
@@ -81,15 +81,17 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
 
 @Component
 export default class DefaultLayout extends Vue {
-  $auth: any // TODO -> why doesn't @type lib work?
-
   drawer: boolean = false
+
+  toggleDrawer() {
+    this.drawer = !this.drawer
+  }
 
   leftNavItems: NavItem[] = [
     {

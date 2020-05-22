@@ -27,7 +27,7 @@
                 :rules="repeatPasswordRules"
               ></v-text-field>
 
-              <template v-if="errors.length > 0">
+              <template v-if="hasErrors">
                 <v-alert v-for="(error, i) in errors" :key="i" type="error">
                   {{ error }}
                 </v-alert>
@@ -42,52 +42,43 @@
   </v-container>
 </template>
 
-<script>
-import { required } from '../server/core/validators'
+<script lang="ts">
+import { Component } from 'nuxt-property-decorator'
+
 import { passwordRules } from '../server/core/user/validator'
+import FormPageComponent from '~/components/pages/formPage.component'
 
-export default {
-  data() {
-    return {
-      valid: false,
-      errors: [],
-      login: {
-        username: ''
-      },
-      newPassword: '',
-      repeatNewPassword: ''
-    }
-  },
-  computed: {
-    passwordRules,
-    repeatPasswordRules() {
-      return required().concat([
-        (v) => (v || '') === this.newPassword || 'Passwords must match'
-      ])
-    },
-    required
-  },
-  watch: {
-    model: 'validateForm'
-  },
-  methods: {
-    validateForm() {
-      this.$refs.form.validate()
-    },
-    async save() {
-      this.errors = []
-      const result = await this.$axios
-        .$post('/api/auth/forgot', {
-          username: this.login.username,
-          newPassword: this.newPassword
-        })
-        .catch((error) => {
-          this.errors = error.response.data.messages
-        })
+@Component
+export default class ForgotPasswordPage extends FormPageComponent {
+  newPassword = ''
+  repeatNewPassword = ''
+  login = {
+    username: ''
+  }
 
-      if (result) {
-        this.$router.push({ path: '/login' })
-      }
+  get passwordRules() {
+    return passwordRules()
+  }
+
+  repeatPasswordRules() {
+    return [
+      (v: string) => (v || '') === this.newPassword || 'Passwords must match'
+    ]
+  }
+
+  async save() {
+    this.errors = []
+    const result = await this.$axios
+      .$post('/api/auth/forgot', {
+        username: this.login.username,
+        newPassword: this.newPassword
+      })
+      .catch((error) => {
+        this.errors = error.response.data.messages
+      })
+
+    if (result) {
+      this.$router.push({ path: '/login' })
     }
   }
 }

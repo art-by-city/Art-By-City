@@ -10,7 +10,6 @@
                 v-model="login.username"
                 type="text"
                 label="Username"
-                :rules="required"
                 disabled
               ></v-text-field>
 
@@ -29,13 +28,13 @@
               ></v-text-field>
 
               <v-text-field
-                v-model="repeatNewPassword"
+                v-model="repeatPassword"
                 type="password"
                 label="Repeat New Password"
                 :rules="repeatPasswordRules"
               ></v-text-field>
 
-              <template v-if="errors.length > 0">
+              <template v-if="hasErrors">
                 <v-alert
                   v-for="(error, i) in errors"
                   :key="i"
@@ -59,55 +58,48 @@
   </v-container>
 </template>
 
-<script>
-import { required } from '../server/core/validators'
-import { passwordRules } from '../server/core/user/validator'
+<script lang="ts">
+import { Component } from 'nuxt-property-decorator'
 
-export default {
-  middleware: 'auth',
-  data() {
-    return {
-      valid: false,
-      errors: [],
-      success: false,
-      login: {
-        username: this.$auth.user.username,
-        password: ''
-      },
-      newPassword: '',
-      repeatNewPassword: ''
-    }
-  },
-  computed: {
-    passwordRules,
-    repeatPasswordRules() {
-      return [(v) => (v || '') === this.newPassword || 'Passwords must match']
-    },
-    required
-  },
-  watch: {
-    model: 'validateForm'
-  },
-  methods: {
-    validateForm() {
-      this.$refs.form.validate()
-    },
-    async save() {
-      this.errors = []
-      this.success = await this.$axios
-        .$post('/api/auth/update', {
-          username: this.login.username,
-          password: this.login.password,
-          newPassword: this.newPassword
-        })
-        .catch((error) => {
-          if (error.response.status === 401) {
-            this.errors = ['Incorrect password']
-          } else {
-            this.errors = ['Error']
-          }
-        })
-    }
+import { passwordRules } from '../server/core/user/validator'
+import FormPageComponent from '~/components/pages/formPage.component'
+
+@Component({
+  middleware: 'auth'
+})
+export default class AccountPage extends FormPageComponent {
+  newPassword = ''
+  repeatPassword = ''
+  login = {
+    username: this.$auth.user.username,
+    password: ''
+  }
+
+  get passwordRules() {
+    return passwordRules()
+  }
+
+  get repeatPasswordRules() {
+    return [
+      (v: string) => (v || '') === this.newPassword || 'Passwords must match'
+    ]
+  }
+
+  async save() {
+    this.errors = []
+    this.success = await this.$axios
+      .$post('/api/auth/update', {
+        username: this.login.username,
+        password: this.login.password,
+        newPassword: this.newPassword
+      })
+      .catch((error) => {
+        if (error.response.status === 401) {
+          this.errors = ['Incorrect password']
+        } else {
+          this.errors = ['Error']
+        }
+      })
   }
 }
 </script>
