@@ -71,7 +71,7 @@
                 chips
               ></v-file-input>
 
-              <template v-if="errors.length > 0">
+              <template v-if="hasErrors">
                 <v-alert v-for="(error, i) in errors" :key="i" type="error">
                   {{ error }}
                 </v-alert>
@@ -86,8 +86,10 @@
   </v-container>
 </template>
 
-<script type="ts">
-import { required } from '~/server/core/validators'
+<script lang="ts">
+import { Component } from 'nuxt-property-decorator'
+import FormComponent from '~/components/pages/formPage.component'
+
 import {
   titleRules,
   descriptionRules,
@@ -96,72 +98,77 @@ import {
 } from '~/server/core/artwork/validator'
 import { artworkTypes, regions } from '~/server/core/artwork/artwork.interface'
 
-export default {
-  middleware: 'role/artist',
-  data() {
-    return {
-      errors: [],
-      valid: false,
-      artworkTypes,
-      regions,
-      artwork: {
-        images: []
+@Component({
+  middleware: 'role/artist'
+})
+export default class ArtworkUploadPage extends FormComponent {
+  artworkTypes: string[] = artworkTypes
+  regions: string[] = regions
+  artwork: any = {
+    images: []
+  }
+
+  get titleRules() {
+    return titleRules()
+  }
+
+  get descriptionRules() {
+    return descriptionRules()
+  }
+
+  get typeRules() {
+    return typeRules()
+  }
+
+  get regionRules() {
+    return regionRules
+  }
+
+  onHashtagInput(hashtags: string[]) {
+    this.artwork.hashtags = hashtags.map((h) => {
+      return h[0] === '#' ? h.slice(1) : h
+    })
+  }
+
+  async upload() {
+    const formDataConfig = {
+      headers: {
+        'Content-Type': 'multipart/form-data'
       }
     }
-  },
-  computed: {
-    required,
-    titleRules,
-    descriptionRules,
-    typeRules,
-    regionRules
-  },
-  watch: {
-    model: 'validateForm'
-  },
-  methods: {
-    validateForm() {
-      this.$refs.form.validate()
-    },
-    onHashtagInput(hashtags) {
-      this.artwork.hashtags = hashtags.map((h) => {
-        return h[0] === '#' ? h.slice(1) : h
-      })
-    },
-    async upload() {
-      const formDataConfig = { headers: {
-        'Content-Type': 'multipart/form-data'
-      }}
-      const formData = new FormData()
-      if (this.artwork.title) {
-        formData.append('title', this.artwork.title)
-      }
-      if (this.artwork.description) {
-        formData.append('description', this.artwork.description)
-      }
-      if (this.artwork.type) {
-        formData.append('type', this.artwork.type)
-      }
-      if (this.artwork.region) {
-        formData.append('region', this.artwork.region)
-      }
-      if (this.artwork.hashtags?.length > 0) {
-        formData.append('hashtags', this.artwork.hashtags.join(','))
-      }
-      if (this.artwork.images?.length > 0) {
-        this.artwork.images.forEach((i) => formData.append('images', i))
-      }
+    const formData = new FormData()
+    if (this.artwork.title) {
+      formData.append('title', this.artwork.title)
+    }
+    if (this.artwork.description) {
+      formData.append('description', this.artwork.description)
+    }
+    if (this.artwork.type) {
+      formData.append('type', this.artwork.type)
+    }
+    if (this.artwork.region) {
+      formData.append('region', this.artwork.region)
+    }
+    if (this.artwork.hashtags?.length > 0) {
+      formData.append('hashtags', this.artwork.hashtags.join(','))
+    }
+    if (this.artwork.images?.length > 0) {
+      this.artwork.images.forEach((i: File) => formData.append('images', i))
+    }
 
-      this.errors = []
-      try {
-        const result = await this.$axios.$put('/api/artwork/', formData, formDataConfig)
+    this.errors = []
+    try {
+      const result = await this.$axios.$put(
+        '/api/artwork/',
+        formData,
+        formDataConfig
+      )
 
-        if (result.success && result.payload) {
-          this.$router.push(`/artwork/${result.payload.id}`)
-        }
-      } catch (error) {
-        this.errors = [error?.response?.data?.error?.message]
+      if (result.success && result.payload) {
+        this.$router.push(`/artwork/${result.payload.id}`)
       }
+    } catch (error) {
+      this.errors = [error?.response?.data?.error?.message]
     }
   }
 }

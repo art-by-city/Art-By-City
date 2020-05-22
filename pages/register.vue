@@ -29,7 +29,7 @@
                 required
               ></v-text-field>
 
-              <template v-if="errors.length > 0">
+              <template v-if="hasErrors">
                 <v-alert v-for="(error, i) in errors" :key="i" type="error">
                   {{ error }}
                 </v-alert>
@@ -44,53 +44,49 @@
   </v-container>
 </template>
 
-<script type>
-import { usernameRules, passwordRules } from '../server/core/user/validator'
+<script lang="ts">
+import { Component } from 'nuxt-property-decorator'
 
-export default {
-  data() {
-    return {
-      valid: false,
-      errors: [],
-      login: {
-        username: '',
-        password: ''
-      }
-    }
-  },
-  computed: {
-    usernameRules,
-    passwordRules,
-    repeatPasswordRules() {
-      return [
-        (v) => (v || '') === this.login.password || 'Passwords must match'
-      ]
-    }
-  },
-  watch: {
-    model: 'validateForm'
-  },
-  methods: {
-    validateForm() {
-      this.$refs.form.validate()
-    },
-    async register() {
-      this.errors = []
-      const result = await this.$axios
-        .$put('/api/auth/register', this.login)
-        .catch((error) => {
-          this.errors = [error.response.data.error.message]
-        })
+import FormPageComponent from '~/components/pages/formPage.component'
+import { usernameRules, passwordRules } from '~/server/core/user/validator'
 
-      if (result && result.token) {
-        try {
-          await this.$auth.setUserToken(result.token)
-          this.$router.push({ path: '/' })
-        } catch (err) {
-          // TODO -> Sentry
-          // eslint-disable-next-line no-console
-          console.error(err)
-        }
+@Component
+export default class RegisterPage extends FormPageComponent {
+  login = {
+    username: '',
+    password: ''
+  }
+
+  get usernameRules() {
+    return usernameRules()
+  }
+
+  get passwordRules() {
+    return passwordRules()
+  }
+
+  repeatPasswordRules() {
+    return [
+      (v: string) => (v || '') === this.login.password || 'Passwords must match'
+    ]
+  }
+
+  async register() {
+    this.errors = []
+    const { token } = await this.$axios
+      .$put('/api/auth/register', this.login)
+      .catch((error) => {
+        this.errors = [error.response.data.error.message]
+      })
+
+    if (token) {
+      try {
+        await this.$auth.setUserToken(token)
+        this.$router.push({ path: '/' })
+      } catch (err) {
+        // TODO -> Sentry
+        // eslint-disable-next-line no-console
+        console.error(err)
       }
     }
   }

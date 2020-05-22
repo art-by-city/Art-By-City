@@ -25,24 +25,25 @@
   </div>
 </template>
 
-<script type="ts">
-export default {
-  middleware: 'role/artist',
-  async asyncData({ $axios }) {
-    let errors = []
+<script lang="ts">
+import { Context } from '@nuxt/types'
+import { Component } from 'nuxt-property-decorator'
+
+import PageComponent from '~/components/pages/page.component'
+
+@Component({
+  middleware: 'role/artist'
+})
+export default class UserArtworkPage extends PageComponent {
+  artworks: any = []
+
+  async asyncData({ $axios }: Context) {
     try {
-      const result = await $axios.$get('/api/user/artwork')
+      const { payload } = await $axios.$get('/api/user/artwork')
 
-      return { errors, artworks: result.payload }
+      return { artworks: payload }
     } catch (error) {
-      errors = error.response.data.messages
-    }
-
-    return { errors, artworks: [] }
-  },
-  data() {
-    return {
-      artworks: []
+      return { errors: error.response.data.messages }
     }
   }
 }

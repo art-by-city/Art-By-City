@@ -10,6 +10,7 @@
     ],
     "esModuleInterop": true,
     "allowJs": true,
+    "checkJs": true,
     "sourceMap": true,
     "strict": true,
     "noEmit": true,
@@ -29,7 +30,9 @@
       "@nuxt/types",
       "nuxtjs__auth",
       "reflect-metadata",
-      "@types/multer"
+      "@types/multer",
+      "@nuxtjs/axios",
+      "vuetify"
     ]
   },
   "exclude": [

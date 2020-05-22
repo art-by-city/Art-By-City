@@ -16,10 +16,6 @@
               <v-card-text>
                 <v-icon>mdi-brush</v-icon> {{ artwork.owner.username }}
               </v-card-text>
-              <!-- <v-card-actions>
-                <v-btn icon><v-icon>mdi-heart</v-icon></v-btn>
-                <v-btn icon><v-icon>mdi-share-variant</v-icon></v-btn>
-              </v-card-actions> -->
             </v-card>
           </v-col>
         </v-row>
@@ -28,23 +24,23 @@
   </v-layout>
 </template>
 
-<script>
-export default {
-  async asyncData({ $axios }) {
-    let errors = []
+<script lang="ts">
+import { Context } from '@nuxt/types'
+import { Component } from 'nuxt-property-decorator'
+
+import PageComponent from '~/components/pages/page.component'
+
+@Component
+export default class HomePage extends PageComponent {
+  artworks: any[] = []
+
+  async asyncData({ $axios }: Context) {
     try {
-      const result = await $axios.$get('/api/artwork')
+      const { payload } = await $axios.$get('/api/artwork')
 
-      return { errors, artworks: result.payload }
+      return { artworks: payload }
     } catch (error) {
-      errors = error.response.data.messages
-    }
-
-    return { errors, artworks: [] }
-  },
-  data() {
-    return {
-      artworks: []
+      return { errors: error.response.data.messages }
     }
   }
 }
