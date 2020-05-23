@@ -94,9 +94,10 @@ import {
   titleRules,
   descriptionRules,
   typeRules,
-  regionRules
+  regionRules,
+  artworkTypes,
+  regions
 } from '~/server/core/artwork/validator'
-import { artworkTypes, regions } from '~/server/core/artwork/artwork.interface'
 
 @Component({
   middleware: 'role/artist'

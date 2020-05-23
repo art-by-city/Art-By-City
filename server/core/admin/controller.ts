@@ -3,11 +3,10 @@ import { Router } from 'express'
 import passport from 'passport'
 
 import roles from '../middleware/roles'
-import AdminService from './service.interface'
-import AdminControllerInterface from './controller.interface'
+import { AdminController, AdminService } from './'
 
 @injectable()
-export default class AdminController implements AdminControllerInterface {
+export default class AdminControllerImpl implements AdminController {
   private adminService: AdminService
 
   private router!: Router

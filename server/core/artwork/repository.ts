@@ -3,12 +3,11 @@ import { getRepository } from 'fireorm'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
-import User from '../user/user'
-import Artwork from './artwork'
-import ArtworkRepositoryInterface from './repository.interface'
+import { User } from '../user'
+import { Artwork, ArtworkRepository } from './'
 
 @injectable()
-export default class ArtworkRepository implements ArtworkRepositoryInterface {
+export default class ArtworkRepositoryImpl implements ArtworkRepository {
   private repository = getRepository(Artwork)
   private client: Firestore
 

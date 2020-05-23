@@ -1,4 +1,4 @@
-import User from '../user/user'
+import { User } from '../user'
 
 export default (roles: string[]) => {
   return (req: any, res: any, next: Function) => {

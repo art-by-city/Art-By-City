@@ -1,8 +1,8 @@
 import { Collection } from 'fireorm'
 import { DocumentReference } from '@google-cloud/firestore'
 
-import User from '../user/user'
-import { ArtworkType, ArtworkImage, Region } from './artwork.interface'
+import { User } from '../user'
+import { ArtworkType, ArtworkImage, Region } from './'
 
 @Collection()
 export default class Artwork {

@@ -1,4 +1,4 @@
-import User from '../../user/user'
+import { User } from '../../user'
 import ApiServiceResult from './apiServiceResult.interface'
 
 export interface AuthenticationResult extends ApiServiceResult<void> {

@@ -1,12 +1,11 @@
 import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import UserService from '../user/service.interface'
-import User from '../user/user'
-import AdminServiceInterface from './service.interface'
+import { User, UserService } from '../user'
+import { AdminService } from './'
 
 @injectable()
-export default class AdminService implements AdminServiceInterface {
+export default class AdminServiceImpl implements AdminService {
   private userService: UserService
 
   constructor(@inject(Symbol.for('UserService')) userService: UserService) {

@@ -2,13 +2,12 @@ import { injectable, inject } from 'inversify'
 import { Router } from 'express'
 import passport from 'passport'
 
-import AuthService from '../auth/service.interface'
-import UserService from '../user/service.interface'
-import User from '../user/user'
-import AuthControllerInterface from './controller.interface'
+import { AuthService } from '../auth'
+import { User, UserService } from '../user'
+import { AuthController } from './'
 
 @injectable()
-export default class AuthController implements AuthControllerInterface {
+export default class AuthControllerImpl implements AuthController {
   private authService: AuthService
   private userService: UserService
 
