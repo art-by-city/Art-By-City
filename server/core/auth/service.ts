@@ -7,13 +7,12 @@ import {
 import { Strategy as LocalStrategy } from 'passport-local'
 import jwt from 'jsonwebtoken'
 
-import UserService from '../user/service.interface'
 import { AuthenticationResult } from '../api/results/authenticationResult.interface'
-import User from '../user/user'
-import AuthServiceInterface from '../auth/service.interface'
+import { User, UserService } from '../user'
+import { AuthService } from './'
 
 @injectable()
-export default class AuthService implements AuthServiceInterface {
+export default class AuthServiceImpl implements AuthService {
   private JWT_SECRET = 'TODO_REAL_JWT_SECRET'
 
   private strategyOptions: StrategyOptions = {

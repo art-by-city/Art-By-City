@@ -1,16 +1,12 @@
 import { injectable, inject } from 'inversify'
 
 import ValidationError from '../api/errors/validationError'
-import User from '../user/user'
-import UserRepository from '../user/repository.interface'
+import { User, UserRepository } from '../user'
 import ArtworkValidator from './validator'
-import ArtworkRepository from './repository.interface'
-import Artwork from './artwork'
-import { ArtworkImage } from './artwork.interface'
-import ArtworkServiceInterface from './service.interface'
+import { Artwork, ArtworkImage, ArtworkService, ArtworkRepository } from './'
 
 @injectable()
-export default class ArtworkService implements ArtworkServiceInterface {
+export default class ArtworkServiceImpl implements ArtworkService {
   private artworkRepository: ArtworkRepository
   private userRepository: UserRepository
   private artworkValidator = new ArtworkValidator()

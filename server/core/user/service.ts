@@ -6,12 +6,10 @@ import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import ValidationError from '../api/errors/validationError'
 import NotFoundError from '../api/errors/notFoundError'
 import UserValidator from './validator'
-import UserRepository from './repository.interface'
-import User from './user'
-import UserServiceInterface from './service.interface'
+import { User, UserService, UserRepository } from './'
 
 @injectable()
-export default class UserService implements UserServiceInterface {
+export default class UserServiceImpl implements UserService {
   private userRepository: UserRepository
 
   constructor(

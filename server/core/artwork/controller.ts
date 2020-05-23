@@ -4,9 +4,8 @@ import multer from 'multer'
 import passport from 'passport'
 
 import roles from '../middleware/roles'
-import User from '../user/user'
-import ArtworkApplicationService from './appService.interface'
-import ArtworkControllerInterface from './controller.interface'
+import { User } from '../user'
+import { ArtworkApplicationService, ArtworkController } from './'
 
 // TODO -> service
 const uploadDir = './static/artwork-images/'
@@ -23,7 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })
 
 @injectable()
-export default class ArtworkController implements ArtworkControllerInterface {
+export default class ArtworkControllerImpl implements ArtworkController {
   private router!: Router
 
   private artworkAppService: ArtworkApplicationService

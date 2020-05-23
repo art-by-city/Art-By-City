@@ -3,12 +3,11 @@ import { Router } from 'express'
 import passport from 'passport'
 
 import roles from '../middleware/roles'
-import ArtworkApplicationService from '../artwork/appService.interface'
-import UserControllerInterface from './controller.interface'
-import User from './user'
+import { ArtworkApplicationService } from '../artwork'
+import { User, UserController } from './'
 
 @injectable()
-export default class UserController implements UserControllerInterface {
+export default class UserControllerImpl implements UserController {
   private router!: Router
 
   private artworkAppService: ArtworkApplicationService

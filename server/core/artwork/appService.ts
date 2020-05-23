@@ -2,18 +2,20 @@ import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import UnknownError from '../api/errors/unknownError'
-import User from '../user/user'
+import { User } from '../user'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
-import ArtworkService from './service.interface'
-import Artwork from './artwork'
-import ArtworkApplicationServiceInterface from './appService.interface'
-import { ArtworkImage } from './artwork.interface'
+import {
+  Artwork,
+  ArtworkImage,
+  ArtworkService,
+  ArtworkApplicationService
+} from './'
 
 @injectable()
-export default class ArtworkApplicationService
-  implements ArtworkApplicationServiceInterface {
+export default class ArtworkApplicationServiceImpl
+  implements ArtworkApplicationService {
   private artworkService: ArtworkService
 
   constructor(

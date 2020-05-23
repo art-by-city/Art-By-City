@@ -3,12 +3,11 @@ import bodyParser from 'body-parser'
 import passport from 'passport'
 
 import { container } from './inversify.config'
-import AuthService from './core/auth/service.interface'
-import AdminController from './core/admin/controller.interface'
-import AuthController from './core/auth/controller.interface'
-import ArtworkController from './core/artwork/controller'
 import DatabaseAdapter from './core/db/adapter.interface'
-import UserController from './core/user/controller.interface'
+import { AuthController, AuthService } from './core/auth'
+import { AdminController } from './core/admin'
+import { ArtworkController } from './core/artwork'
+import { UserController } from './core/user'
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(

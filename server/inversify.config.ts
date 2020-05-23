@@ -1,9 +1,9 @@
 import { Container } from 'inversify'
 
-import UserModule from './core/user/module'
-import AdminModule from './core/admin/module'
-import AuthModule from './core/auth/module'
-import ArtworkModule from './core/artwork/module'
+import { UserModule } from './core/user'
+import { AdminModule } from './core/admin'
+import { AuthModule } from './core/auth'
+import { ArtworkModule } from './core/artwork'
 import DatabaseModule from './core/db/module'
 
 const container = new Container()

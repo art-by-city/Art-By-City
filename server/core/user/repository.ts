@@ -3,13 +3,10 @@ import { getRepository } from 'fireorm'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
-import User from './user'
-import UserRepositoryInterface from './repository.interface'
-
-// TODO -> Fix all this garbage :)
+import { User, UserRepository } from './'
 
 @injectable()
-export default class UserRepository implements UserRepositoryInterface {
+export default class UserRepositoryImpl implements UserRepository {
   private repository = getRepository(User)
   private client: Firestore
 

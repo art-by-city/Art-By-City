@@ -1,3 +1,0 @@
-import Controller from '../controller.interface'
-
-export default interface AdminController extends Controller {}

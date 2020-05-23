@@ -86,6 +86,6 @@ export default {
      ** You can extend webpack config here
      */
     // @ts-ignore
-    extend(_config, _ctx) {}
+    extend(config, ctx) {}
   }
 }
