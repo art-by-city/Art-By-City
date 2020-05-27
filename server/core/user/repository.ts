@@ -32,7 +32,7 @@ export default class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  update(user: User): Promise<User | null> {
+  update(user: User): Promise<User> {
     try {
       return this.repository.update(user)
     } catch (error) {

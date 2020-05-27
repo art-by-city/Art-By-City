@@ -47,8 +47,6 @@ export default class ArtworkControllerImpl implements ArtworkController {
 
     router.use(passport.authenticate('jwt', { session: false }))
 
-    // TODO -> individual routes use roles(['artist']) middleware
-
     router.put(
       '/',
       roles(['artist']),
@@ -59,6 +57,12 @@ export default class ArtworkControllerImpl implements ArtworkController {
         return res.send(result)
       }
     )
+
+    router.post('/:id', roles(['artist']), async (req, res) => {
+      const result = await this.artworkAppService.update(req)
+
+      return res.send(result)
+    })
 
     router.get('/', async (_req, res) => {
       const result = await this.artworkAppService.list()

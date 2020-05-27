@@ -87,7 +87,7 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Watch } from 'nuxt-property-decorator'
 import FormComponent from '~/components/pages/formPage.component'
 
 import {
@@ -98,6 +98,7 @@ import {
   artworkTypes,
   regions
 } from '~/server/core/artwork/validator'
+import { MAX_ARTWORK_HASHTAGS, MAX_ARTWORK_IMAGES } from '~/server/config'
 
 @Component({
   middleware: 'role/artist'
@@ -123,6 +124,20 @@ export default class ArtworkUploadPage extends FormComponent {
 
   get regionRules() {
     return regionRules
+  }
+
+  @Watch('artwork.hashtags')
+  enforceMaxHashtags(hashtags: string[]) {
+    if (hashtags.length > MAX_ARTWORK_HASHTAGS) {
+      this.$nextTick(() => this.artwork.hashtags.pop())
+    }
+  }
+
+  @Watch('artwork.images')
+  enforceMaxImages(images: File[]) {
+    if (images.length > MAX_ARTWORK_IMAGES) {
+      this.$nextTick(() => this.artwork.images.pop())
+    }
   }
 
   onHashtagInput(hashtags: string[]) {

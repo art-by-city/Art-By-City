@@ -10,6 +10,8 @@
               <v-card>
                 <v-img
                   :src="'/artwork-images/' + artwork.images[0].source"
+                  max-width="500"
+                  max-height="500"
                 ></v-img>
                 <v-card-title>
                   <nuxt-link :to="`/artwork/${artwork.id}`">

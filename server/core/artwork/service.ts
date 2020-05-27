@@ -75,7 +75,7 @@ export default class ArtworkServiceImpl implements ArtworkService {
     return hydratedArtworks
   }
 
-  update(artwork: Artwork): Promise<Artwork | null> {
+  update(artwork: Artwork): Promise<Artwork> {
     return this.artworkRepository.update(artwork)
   }
 
