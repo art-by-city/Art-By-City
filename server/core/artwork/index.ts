@@ -56,7 +56,7 @@ export interface ArtworkApplicationService
     request: any,
     files?: Express.Multer.File[]
   ): Promise<ApiServiceResult<Artwork>>
-
+  update(request: any): Promise<ApiServiceResult<Artwork>>
   list(): Promise<ApiServiceResult<Artwork[]>>
   listForUser(user: User): Promise<ApiServiceResult<Artwork[]>>
 }
@@ -70,6 +70,7 @@ export interface ArtworkService {
   list(): Promise<Artwork[]>
   listForUser(user: User): Promise<Artwork[]>
   get(id: string): Promise<Artwork | null>
+  update(artwork: Artwork): Promise<Artwork>
   delete(id: string): Promise<void>
 }
 

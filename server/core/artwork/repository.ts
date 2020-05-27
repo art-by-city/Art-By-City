@@ -57,7 +57,7 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
     }
   }
 
-  update(artwork: Artwork): Promise<Artwork | null> {
+  update(artwork: Artwork): Promise<Artwork> {
     try {
       return this.repository.update(artwork)
     } catch (error) {

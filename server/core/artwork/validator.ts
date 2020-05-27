@@ -1,3 +1,4 @@
+import { MAX_ARTWORK_HASHTAGS, MAX_ARTWORK_IMAGES } from '../../config'
 import {
   ValidationRule,
   mapRules
@@ -143,6 +144,14 @@ export default class ArtworkValidator {
         }
       })
     })
+
+    if (artwork.hashtags?.length > MAX_ARTWORK_HASHTAGS) {
+      messages.push(`No more than ${MAX_ARTWORK_HASHTAGS} hashtags allowed`)
+    }
+
+    if (artwork.images?.length > MAX_ARTWORK_IMAGES) {
+      messages.push(`No more than ${MAX_ARTWORK_IMAGES} images allowed`)
+    }
 
     return messages.length > 0 ? messages : null
   }

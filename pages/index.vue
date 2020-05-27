@@ -5,17 +5,21 @@
         <v-row dense>
           <v-col v-for="(artwork, i) in artworks" :key="i" cols="auto">
             <v-card>
-              <v-img
-                :src="'/artwork-images/' + artwork.images[0].source"
-              ></v-img>
-              <v-card-title>
+              <nuxt-link :to="`/artwork/${artwork.id}`">
+                <v-img
+                  :src="'/artwork-images/' + artwork.images[0].source"
+                  max-width="500"
+                  max-height="500"
+                ></v-img>
+              </nuxt-link>
+              <!-- <v-card-title>
                 <nuxt-link :to="`/artwork/${artwork.id}`">
                   {{ artwork.title }}
                 </nuxt-link>
               </v-card-title>
               <v-card-text>
                 <v-icon>mdi-brush</v-icon> {{ artwork.owner.username }}
-              </v-card-text>
+              </v-card-text> -->
             </v-card>
           </v-col>
         </v-row>

@@ -60,6 +60,40 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
+  async update(req: any): Promise<ApiServiceResult<Artwork>> {
+    const user = <User>req.user
+
+    try {
+      const artwork = await this.artworkService.get(req.body.id)
+
+      if (!artwork) {
+        throw new NotFoundError(new Artwork())
+      }
+
+      if (artwork.owner.id !== user.id) {
+        throw new UnauthorizedError()
+      }
+
+      if (artwork && artwork.owner.id === user.id) {
+        artwork.title = req.body?.title || ''
+        artwork.description = req.body?.description || ''
+        artwork.type = req.body?.type || ''
+        artwork.region = req.body?.region || ''
+        artwork.hashtags = req.body?.hashtags || []
+        const savedArtwork = await this.artworkService.update(artwork)
+        if (savedArtwork) {
+          return new ApiServiceSuccessResult(savedArtwork)
+        }
+
+        return { success: false }
+      } else {
+        throw new UnknownError('Artwork not found or permission denied')
+      }
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
   async list(): Promise<ApiServiceResult<Artwork[]>> {
     try {
       const artworks = await this.artworkService.list()
