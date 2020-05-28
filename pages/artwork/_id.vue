@@ -129,7 +129,7 @@
             <v-col v-if="editMode">
               <v-btn color="primary" @click="saveArtwork">Save</v-btn>
             </v-col>
-            <v-col>
+            <v-col v-if="editMode">
               <v-btn color="error" @click="deleteArtwork">Delete</v-btn>
             </v-col>
           </v-row>
@@ -236,6 +236,6 @@ export default class ArtworkPage extends FormPageComponent {
 }
 
 .highlighted {
-  border: 2px solid blue;
+  border: 2px solid black;
 }
 </style>
