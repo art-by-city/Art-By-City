@@ -1,7 +1,7 @@
 <template>
   <div v-if="artwork">
     <v-layout column justify-center align-center>
-      <h2>{{ artwork.title }}</h2>
+      <h2><LikeButton :artwork="artwork" />{{ artwork.title }}</h2>
       <v-flex xs12 sm8 md6>
         <v-container fluid>
           <v-row justify="center">
@@ -122,6 +122,9 @@
               </template>
             </v-col>
           </v-row>
+          <v-row>
+            <v-col><strong>Likes: </strong> {{ artwork.likes }}</v-col>
+          </v-row>
           <v-row v-if="isOwner">
             <v-col v-if="!editMode">
               <v-btn color="primary" @click="toggleEditMode">Edit</v-btn>
@@ -129,7 +132,7 @@
             <v-col v-if="editMode">
               <v-btn color="primary" @click="saveArtwork">Save</v-btn>
             </v-col>
-            <v-col>
+            <v-col v-if="editMode">
               <v-btn color="error" @click="deleteArtwork">Delete</v-btn>
             </v-col>
           </v-row>
@@ -144,10 +147,14 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import { artworkTypes, regions } from '~/server/core/artwork/validator'
-
+import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 
-@Component
+@Component({
+  components: {
+    LikeButton
+  }
+})
 export default class ArtworkPage extends FormPageComponent {
   artwork: any = {}
   artworkTypes: string[] = artworkTypes
@@ -236,6 +243,6 @@ export default class ArtworkPage extends FormPageComponent {
 }
 
 .highlighted {
-  border: 2px solid blue;
+  border: 2px solid black;
 }
 </style>

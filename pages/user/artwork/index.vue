@@ -6,12 +6,12 @@
       <v-flex xs12 sm8 md6>
         <v-container fluid>
           <v-row dense>
-            <v-col v-for="(artwork, i) in artworks" :key="i" cols="auto">
+            <v-col v-for="(artwork, i) in artworks" :key="i" cols="3">
               <v-card>
                 <v-img
                   :src="'/artwork-images/' + artwork.images[0].source"
-                  max-width="500"
-                  max-height="500"
+                  max-width="250"
+                  max-height="250"
                 ></v-img>
                 <v-card-title>
                   <nuxt-link :to="`/artwork/${artwork.id}`">

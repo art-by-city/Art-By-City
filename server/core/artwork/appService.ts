@@ -104,9 +104,19 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
-  async listForUser(user: User): Promise<ApiServiceResult<Artwork[]>> {
+  async listByUser(user: User): Promise<ApiServiceResult<Artwork[]>> {
     try {
-      const artworks = await this.artworkService.listForUser(user)
+      const artworks = await this.artworkService.listByUser(user)
+
+      return new ApiServiceSuccessResult(artworks)
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async listLikedByUser(user: User): Promise<ApiServiceResult<Artwork[]>> {
+    try {
+      const artworks = await this.artworkService.listLikedByUser(user)
 
       return new ApiServiceSuccessResult(artworks)
     } catch (error) {
@@ -137,6 +147,56 @@ export default class ArtworkApplicationServiceImpl
       }
 
       await this.artworkService.delete(id)
+
+      return new ApiServiceSuccessResult()
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async like(user: User, id: string): Promise<ApiServiceResult<void>> {
+    try {
+      const artwork = await this.artworkService.get(id)
+
+      if (artwork) {
+        if (!artwork.likes) {
+          artwork.likes = []
+        }
+
+        if (!artwork.likes.includes(user.id)) {
+          artwork.likes.push(user.id)
+        }
+      } else {
+        throw new NotFoundError(new Artwork())
+      }
+
+      await this.artworkService.update(artwork)
+
+      return new ApiServiceSuccessResult()
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async unlike(user: User, id: string): Promise<ApiServiceResult<void>> {
+    try {
+      const artwork = await this.artworkService.get(id)
+
+      if (artwork) {
+        if (!artwork.likes) {
+          artwork.likes = []
+        }
+
+        if (artwork.likes.includes(user.id)) {
+          artwork.likes = artwork.likes.filter((id: string) => {
+            return id !== user.id
+          })
+        }
+      } else {
+        throw new NotFoundError(new Artwork())
+      }
+
+      await this.artworkService.update(artwork)
 
       return new ApiServiceSuccessResult()
     } catch (error) {
