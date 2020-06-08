@@ -1,31 +1,37 @@
 <template>
   <v-app dark>
-    <v-navigation-drawer v-model="drawer" :clipped="true" fixed app>
-      <v-list>
-        <v-list-item
-          v-for="(navItem, i) in filterNavItemsForUserRoles(leftNavItems)"
-          :key="i"
-          :to="navItem.to"
-          router
-          exact
-          :disabled="navItem.disabled"
-        >
-          <v-list-item-action>
-            <v-icon>{{ navItem.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="navItem.title" />
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
     <v-app-bar :clipped-left="true" fixed app>
-      <v-app-bar-nav-icon @click.stop="toggleDrawer" />
+      <v-menu offset-y>
+        <template v-slot:activator="{ on }">
+          <v-app-bar-nav-icon v-on="on" />
+        </template>
+        <v-list dense>
+          <v-list-item
+            v-for="(navItem, i) in filterNavItemsForUserRoles(leftNavItems)"
+            :key="i"
+            :to="navItem.to"
+            router
+            exact
+            :disabled="navItem.disabled"
+          >
+            <v-list-item-action>
+              <v-icon>{{ navItem.icon }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title v-text="navItem.title" />
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+
       <v-spacer />
+
       <v-toolbar-title>
         <nuxt-link to="/">art x by x city</nuxt-link>
       </v-toolbar-title>
+
       <v-spacer />
+
       <v-toolbar-items>
         <template v-if="!$auth.loggedIn">
           <v-btn text to="/register">Sign Up</v-btn>
@@ -87,12 +93,6 @@ import { NavItem } from '../components/types'
 
 @Component
 export default class DefaultLayout extends Vue {
-  drawer: boolean = false
-
-  toggleDrawer() {
-    this.drawer = !this.drawer
-  }
-
   leftNavItems: NavItem[] = [
     {
       icon: 'mdi-apps',
