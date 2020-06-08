@@ -1,6 +1,6 @@
 <template>
   <v-btn v-ripple="{ class: 'red--text' }" icon @click.stop="toggleLike">
-    <v-icon :color="color()">{{ icon() }}</v-icon>
+    <v-icon :color="color()">{{ icon() }}</v-icon> {{ totalLikes() }}
   </v-btn>
 </template>
 
@@ -68,6 +68,10 @@ export default class LikeButton extends Vue {
     }
 
     return false
+  }
+
+  totalLikes() {
+    return this.artwork.likes?.length || ''
   }
 }
 </script>
