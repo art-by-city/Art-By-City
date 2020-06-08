@@ -33,7 +33,7 @@ export default class UserControllerImpl implements UserController {
     router.use(passport.authenticate('jwt', { session: false }))
 
     router.get('/artwork', roles(['artist']), async (req, res) => {
-      const result = await this.artworkAppService.listForUser(<User>req.user)
+      const result = await this.artworkAppService.listByUser(<User>req.user)
 
       return res.send(result)
     })

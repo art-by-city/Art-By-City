@@ -85,6 +85,24 @@ export default class ArtworkControllerImpl implements ArtworkController {
       return res.send(result)
     })
 
+    router.put('/:id/like', async (req, res) => {
+      const result = await this.artworkAppService.like(
+        <User>req.user,
+        req.params.id
+      )
+
+      return res.send(result)
+    })
+
+    router.delete('/:id/like', async (req, res) => {
+      const result = await this.artworkAppService.unlike(
+        <User>req.user,
+        req.params.id
+      )
+
+      return res.send(result)
+    })
+
     return router
   }
 }

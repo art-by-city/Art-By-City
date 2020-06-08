@@ -58,9 +58,28 @@ export default class ArtworkServiceImpl implements ArtworkService {
     return hydratedArtworks
   }
 
-  async listForUser(user: User): Promise<Artwork[]> {
+  async listByUser(user: User): Promise<Artwork[]> {
     const filter = new Artwork()
     filter.owner = this.userRepository.getDocumentReference(user.id)
+
+    const artworks = await this.artworkRepository.find(filter)
+
+    const hydratedArtworks = Promise.all(
+      artworks.map(async (a) => {
+        a.owner = <User>await this.userRepository.get(a.owner.id)
+
+        return a
+      })
+    )
+
+    return hydratedArtworks
+  }
+
+  async listLikedByUser(user: User): Promise<Artwork[]> {
+    const filter = new Artwork()
+
+    // TODO -> Fix filter
+    filter.likes = [user.id]
 
     const artworks = await this.artworkRepository.find(filter)
 

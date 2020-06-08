@@ -58,7 +58,10 @@ export interface ArtworkApplicationService
   ): Promise<ApiServiceResult<Artwork>>
   update(request: any): Promise<ApiServiceResult<Artwork>>
   list(): Promise<ApiServiceResult<Artwork[]>>
-  listForUser(user: User): Promise<ApiServiceResult<Artwork[]>>
+  listByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
+  listLikedByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
+  like(user: User, id: string): Promise<ApiServiceResult<void>>
+  unlike(user: User, id: string): Promise<ApiServiceResult<void>>
 }
 
 export interface ArtworkService {
@@ -68,7 +71,8 @@ export interface ArtworkService {
     images?: ArtworkImage[]
   ): Promise<Artwork | null>
   list(): Promise<Artwork[]>
-  listForUser(user: User): Promise<Artwork[]>
+  listByUser(user: User): Promise<Artwork[]>
+  listLikedByUser(user: User): Promise<Artwork[]>
   get(id: string): Promise<Artwork | null>
   update(artwork: Artwork): Promise<Artwork>
   delete(id: string): Promise<void>

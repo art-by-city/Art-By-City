@@ -21,4 +21,6 @@ export default class Artwork {
   hashtags!: string[]
 
   images!: ArtworkImage[]
+
+  likes!: string[]
 }
