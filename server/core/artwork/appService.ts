@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
@@ -94,7 +95,7 @@ export default class ArtworkApplicationServiceImpl
     try {
       const artworks = await this.artworkService.list()
 
-      return new ApiServiceSuccessResult(artworks)
+      return new ApiServiceSuccessResult(_.shuffle(artworks))
     } catch (error) {
       throw new UnknownError(error.message)
     }
