@@ -28,7 +28,7 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col><strong>Artist:</strong> {{ artwork.owner.id }}</v-col>
+            <v-col><strong>Artist:</strong> {{ artwork.owner.username }}</v-col>
           </v-row>
           <v-row>
             <v-col>
@@ -120,20 +120,6 @@
                   </template>
                 </v-combobox>
               </template>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col><strong>Likes: </strong> {{ artwork.likes }}</v-col>
-          </v-row>
-          <v-row v-if="isOwner">
-            <v-col v-if="!editMode">
-              <v-btn color="primary" @click="toggleEditMode">Edit</v-btn>
-            </v-col>
-            <v-col v-if="editMode">
-              <v-btn color="primary" @click="saveArtwork">Save</v-btn>
-            </v-col>
-            <v-col v-if="editMode">
-              <v-btn color="error" @click="deleteArtwork">Delete</v-btn>
             </v-col>
           </v-row>
         </v-container>

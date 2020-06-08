@@ -23,8 +23,6 @@ export default class LikeButton extends Vue {
       this.artwork.likes = []
     }
 
-    console.log('likes', this.artwork.likes)
-
     if (!this.artwork.likes.includes(this.$auth.user.id)) {
       this.artwork.likes.push(this.$auth.user.id)
       try {
@@ -47,7 +45,6 @@ export default class LikeButton extends Vue {
   }
 
   color() {
-    console.log('dark', this.dark)
     if (this.isLiked()) {
       return 'red'
     } else if (this.dark) {
