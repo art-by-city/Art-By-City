@@ -40,8 +40,14 @@ export default class ArtworkServiceImpl implements ArtworkService {
     return await this.artworkRepository.create(artwork)
   }
 
-  get(id: string): Promise<Artwork | null> {
-    return this.artworkRepository.get(id)
+  async get(id: string): Promise<Artwork | null> {
+    const artwork = await this.artworkRepository.get(id)
+
+    if (artwork) {
+      artwork.owner = <User>await this.userRepository.get(artwork?.owner.id)
+    }
+
+    return artwork
   }
 
   async list(): Promise<Artwork[]> {
