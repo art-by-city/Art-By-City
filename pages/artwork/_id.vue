@@ -123,6 +123,17 @@
               </template>
             </v-col>
           </v-row>
+          <v-row v-if="isOwner">
+            <v-col v-if="!editMode">
+              <v-btn color="primary" @click="toggleEditMode">Edit</v-btn>
+            </v-col>
+            <v-col v-if="editMode">
+              <v-btn color="primary" @click="saveArtwork">Save</v-btn>
+            </v-col>
+            <v-col v-if="editMode">
+              <v-btn color="error" @click="deleteArtwork">Delete</v-btn>
+            </v-col>
+          </v-row>
         </v-container>
       </v-flex>
     </v-layout>
@@ -150,7 +161,7 @@ export default class ArtworkPage extends FormPageComponent {
   imagePreviewIndex = 0
 
   get isOwner() {
-    return this.$store.state?.auth?.user?.id === this.artwork?.owner?.id
+    return this.$store.state?.auth?.user?.id === this.artwork?.owner.id
   }
 
   async asyncData({ $axios, params }: Context) {

@@ -1,5 +1,4 @@
 import { Collection } from 'fireorm'
-import { DocumentReference } from '@google-cloud/firestore'
 
 import { User } from '../user'
 import { ArtworkType, ArtworkImage, Region } from './'
@@ -8,7 +7,7 @@ import { ArtworkType, ArtworkImage, Region } from './'
 export default class Artwork {
   id!: string
 
-  owner!: DocumentReference<User> | User
+  owner!: string | User
 
   title!: string
 

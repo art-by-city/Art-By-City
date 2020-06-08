@@ -37,4 +37,8 @@ export default class User {
   //     return super.toJSON()
   //   }).call(clean)
   // }
+
+  toString() {
+    return this.id
+  }
 }

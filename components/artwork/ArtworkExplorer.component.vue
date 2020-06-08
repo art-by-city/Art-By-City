@@ -105,7 +105,7 @@ export default class ArtworkExplorer extends Vue {
 
   gridSize = 3
 
-  vw = 0
+  vw = 1000
 
   mounted() {
     this.$nextTick(() => {
@@ -152,7 +152,14 @@ export default class ArtworkExplorer extends Vue {
       return '70vh'
     }
 
-    return '25vh'
+    switch (this.gridSize) {
+      case 6:
+        return '40vh'
+      case 9:
+        return '25vh'
+      default:
+        return '75vh'
+    }
   }
 
   isHighlighted(index: number) {
