@@ -3,8 +3,8 @@ import { getRepository } from 'fireorm'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
-import { User } from '../user'
 import { Artwork, ArtworkRepository } from './'
+import { User } from '../user'
 
 @injectable()
 export default class ArtworkRepositoryImpl implements ArtworkRepository {
@@ -48,7 +48,7 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
       }
 
       const found = await this.repository
-        .whereEqualTo('owner', <DocumentReference<User>>filter.owner)
+        .whereEqualTo('owner', <string>filter.owner)
         .find()
 
       return found
@@ -59,6 +59,10 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
 
   update(artwork: Artwork): Promise<Artwork> {
     try {
+      if ((<User>artwork.owner).id) {
+        artwork.owner = (<User>artwork.owner).id
+      }
+
       return this.repository.update(artwork)
     } catch (error) {
       throw new Error(`Error updating artwork: ${error.message}`)

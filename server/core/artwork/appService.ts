@@ -42,7 +42,7 @@ export default class ArtworkApplicationServiceImpl
       })
     }
 
-    artwork.owner = this.userRepository.getDocumentReference(user.id)
+    artwork.owner = user.id
 
     try {
       const savedArtwork = await this.artworkService.create(artwork)
@@ -67,11 +67,11 @@ export default class ArtworkApplicationServiceImpl
         throw new NotFoundError(new Artwork())
       }
 
-      if (artwork.owner.id !== user.id) {
+      if (artwork.owner !== user.id) {
         throw new UnauthorizedError()
       }
 
-      if (artwork && artwork.owner.id === user.id) {
+      if (artwork && artwork.owner === user.id) {
         artwork.title = req.body?.title || ''
         artwork.description = req.body?.description || ''
         artwork.type = req.body?.type || ''
@@ -136,7 +136,7 @@ export default class ArtworkApplicationServiceImpl
       const artwork = await this.artworkService.get(id)
 
       if (artwork) {
-        if (artwork.owner.id !== user.id) {
+        if (artwork.owner !== user.id) {
           throw new UnauthorizedError()
         }
       } else {

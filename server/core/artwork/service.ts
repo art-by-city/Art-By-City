@@ -36,7 +36,9 @@ export default class ArtworkServiceImpl implements ArtworkService {
     const artwork = await this.artworkRepository.get(id)
 
     if (artwork && opts?.hydrated) {
-      artwork.owner = <User>await this.userRepository.get(artwork?.owner.id)
+      artwork.owner = <User>(
+        await this.userRepository.get(<string>artwork?.owner)
+      )
     }
 
     return artwork
@@ -47,7 +49,7 @@ export default class ArtworkServiceImpl implements ArtworkService {
 
     const hydratedArtworks = Promise.all(
       artworks.map(async (a) => {
-        a.owner = <User>await this.userRepository.get(a.owner.id)
+        a.owner = <User>await this.userRepository.get(<string>a.owner)
 
         return a
       })
@@ -58,13 +60,13 @@ export default class ArtworkServiceImpl implements ArtworkService {
 
   async listByUser(user: User): Promise<Artwork[]> {
     const filter = new Artwork()
-    filter.owner = this.userRepository.getDocumentReference(user.id)
+    filter.owner = user.id
 
     const artworks = await this.artworkRepository.find(filter)
 
     return Promise.all(
       artworks.map(async (a) => {
-        a.owner = <User>await this.userRepository.get(a.owner.id)
+        a.owner = <User>await this.userRepository.get(<string>a.owner)
 
         return a
       })
@@ -81,7 +83,7 @@ export default class ArtworkServiceImpl implements ArtworkService {
 
     return Promise.all(
       artworks.map(async (a) => {
-        a.owner = <User>await this.userRepository.get(a.owner.id)
+        a.owner = <User>await this.userRepository.get(<string>a.owner)
 
         return a
       })
