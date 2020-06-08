@@ -41,21 +41,23 @@
       </v-card>
     </v-dialog>
     <ArtworkExplorerToolbar :gridsize.sync="gridSize" @refresh="refresh" />
-    <v-container fluid>
+    <v-container>
       <v-row dense>
         <v-col
-          v-for="(artwork, i) in artworks.slice(0, gridSize)"
+          v-for="(artwork, i) in sliceArtworks()"
           :key="i"
-          cols="4"
+          cols="12"
+          md="4"
         >
           <v-hover>
             <template v-slot:default="{ hover }">
               <v-card class="artwork-card">
                 <v-img
                   :src="'/artwork-images/' + artwork.images[0].source"
-                  width="500"
-                  height="500"
                   style="cursor: pointer"
+                  aspect-ratio="1"
+                  :height="calcArtworkHeight()"
+                  :width="calcArtworkWidth()"
                   @click="showArtworkPreview(i)"
                 >
                   <v-fade-transition>
@@ -103,6 +105,23 @@ export default class ArtworkExplorer extends Vue {
 
   gridSize = 3
 
+  vw = 0
+
+  mounted() {
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize)
+    })
+  }
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResize)
+  }
+
+  onResize() {
+    console.log('onResize() window.innerHeight', window.innerHeight)
+    this.vw = window.innerWidth
+  }
+
   async refresh() {
     try {
       const { payload } = await this.$axios.$get('/api/artwork')
@@ -111,6 +130,30 @@ export default class ArtworkExplorer extends Vue {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  sliceArtworks() {
+    if (this.vw < 960) {
+      return this.artworks.slice(0, 1)
+    }
+
+    return this.artworks.slice(0, this.gridSize)
+  }
+
+  calcArtworkWidth() {
+    if (this.vw < 960) {
+      return '100vw'
+    }
+
+    return '30vw'
+  }
+
+  calcArtworkHeight() {
+    if (this.vw < 960) {
+      return '70vh'
+    }
+
+    return '25vh'
   }
 
   isHighlighted(index: number) {

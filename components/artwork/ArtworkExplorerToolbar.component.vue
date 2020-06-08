@@ -3,7 +3,11 @@
     <v-btn icon @click="onRefreshClicked">
       <v-icon>mdi-refresh</v-icon>
     </v-btn>
-    <v-btn icon @click="onGridPreferenceClicked">
+    <v-btn
+      class="d-none d-sm-none d-md-flex"
+      icon
+      @click="onGridPreferenceClicked"
+    >
       <v-icon v-if="syncedGridSize === 3">mdi-view-week-outline</v-icon>
       <v-icon v-if="syncedGridSize === 6">mdi-view-module-outline</v-icon>
       <v-icon v-if="syncedGridSize === 9">mdi-grid</v-icon>
