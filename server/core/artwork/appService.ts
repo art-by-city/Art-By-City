@@ -2,27 +2,26 @@ import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import UnknownError from '../api/errors/unknownError'
-import { User } from '../user'
+import { User, UserRepository } from '../user'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
-import {
-  Artwork,
-  ArtworkImage,
-  ArtworkService,
-  ArtworkApplicationService
-} from './'
+import { Artwork, ArtworkService, ArtworkApplicationService } from './'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
   implements ArtworkApplicationService {
   private artworkService: ArtworkService
+  private userRepository: UserRepository
 
   constructor(
     @inject(Symbol.for('ArtworkService'))
-    artworkService: ArtworkService
+    artworkService: ArtworkService,
+    @inject(Symbol.for('UserRepository'))
+    userRepository: UserRepository
   ) {
     this.artworkService = artworkService
+    this.userRepository = userRepository
   }
 
   async create(req: any): Promise<ApiServiceResult<Artwork>> {
@@ -36,19 +35,16 @@ export default class ArtworkApplicationServiceImpl
     artwork.region = req.body?.region || ''
     artwork.hashtags = req.body?.hashtags?.split(',') || []
 
-    let images: ArtworkImage[] = []
     if (files) {
-      images = files.map((file) => {
+      artwork.images = files.map((file) => {
         return { source: file.filename }
       })
     }
 
+    artwork.owner = this.userRepository.getDocumentReference(user.id)
+
     try {
-      const savedArtwork = await this.artworkService.create(
-        user,
-        artwork,
-        images
-      )
+      const savedArtwork = await this.artworkService.create(artwork)
 
       if (savedArtwork) {
         return new ApiServiceSuccessResult(savedArtwork)
@@ -126,7 +122,7 @@ export default class ArtworkApplicationServiceImpl
 
   async get(id: string): Promise<ApiServiceResult<Artwork>> {
     try {
-      const artwork = await this.artworkService.get(id)
+      const artwork = await this.artworkService.get(id, { hydrated: true })
 
       return new ApiServiceSuccessResult(artwork)
     } catch (error) {

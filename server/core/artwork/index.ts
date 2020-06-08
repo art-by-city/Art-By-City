@@ -3,6 +3,9 @@ import { ContainerModule } from 'inversify'
 import BaseControllerInterface from '../controller.interface'
 import BaseApplicationServiceInterface from '../applicationService.interface'
 import BaseRepositoryInterface from '../repository.interface'
+import BaseDomainServiceInterface, {
+  DomainServiceOptions
+} from '../domainService.interface'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import { User } from '../user'
 
@@ -64,18 +67,14 @@ export interface ArtworkApplicationService
   unlike(user: User, id: string): Promise<ApiServiceResult<void>>
 }
 
-export interface ArtworkService {
-  create(
-    user: User,
-    artwork: Artwork,
-    images?: ArtworkImage[]
-  ): Promise<Artwork | null>
+export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
+  create(artwork: Artwork): Promise<Artwork | null>
+  get(id: string, opts?: DomainServiceOptions): Promise<Artwork | null>
+  update(artwork: Artwork): Promise<Artwork>
+  delete(id: string): Promise<void>
   list(): Promise<Artwork[]>
   listByUser(user: User): Promise<Artwork[]>
   listLikedByUser(user: User): Promise<Artwork[]>
-  get(id: string): Promise<Artwork | null>
-  update(artwork: Artwork): Promise<Artwork>
-  delete(id: string): Promise<void>
 }
 
 export interface ArtworkRepository extends BaseRepositoryInterface<Artwork> {}
