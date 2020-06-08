@@ -118,7 +118,6 @@ export default class ArtworkExplorer extends Vue {
   }
 
   onResize() {
-    console.log('onResize() window.innerHeight', window.innerHeight)
     this.vw = window.innerWidth
   }
 
