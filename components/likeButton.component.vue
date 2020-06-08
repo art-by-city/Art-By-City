@@ -1,7 +1,13 @@
 <template>
-  <v-btn v-ripple="{ class: 'red--text' }" icon @click.stop="toggleLike">
-    <v-icon :color="color()">{{ icon() }}</v-icon> {{ totalLikes() }}
-  </v-btn>
+  <v-chip
+    v-ripple="{ class: 'red--text' }"
+    color="rgba(0,0,0,0)"
+    @click.stop="toggleLike"
+  >
+    <v-icon small :color="color()">{{ icon() }}</v-icon>
+    &nbsp;
+    <span v-if="totalLikes() > 0">{{ totalLikes() }}</span>
+  </v-chip>
 </template>
 
 <script lang="ts">

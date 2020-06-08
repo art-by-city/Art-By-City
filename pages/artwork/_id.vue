@@ -1,7 +1,7 @@
 <template>
   <div v-if="artwork">
     <v-layout column justify-center align-center>
-      <h2><LikeButton :artwork="artwork" />{{ artwork.title }}</h2>
+      <h2>{{ artwork.title }}</h2>
       <v-flex xs12 sm8 md6>
         <v-container fluid>
           <v-row justify="center">
@@ -27,6 +27,7 @@
               ></v-img>
             </v-col>
           </v-row>
+          <v-row><LikeButton :artwork="artwork"/></v-row>
           <v-row>
             <v-col><strong>Artist:</strong> {{ artwork.owner.username }}</v-col>
           </v-row>
