@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-app-bar :clipped-left="true" fixed app>
+    <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app>
       <v-menu offset-y>
         <template v-slot:activator="{ on }">
           <v-app-bar-nav-icon v-on="on" />
