@@ -1,6 +1,27 @@
 <template>
   <v-layout column justify-center align-center>
-    <ArtworkExplorer :initial.sync="payload" />
+    <template v-if="$auth.loggedIn">
+      <ArtworkExplorer :initial.sync="payload" />
+    </template>
+    <template v-if="!$auth.loggedIn">
+      <v-row style="height: 45vh" align="end">
+        <v-col cols="12">
+          <span class="splash-logo" @click="expand = !expand">
+            art x by x city
+          </span>
+        </v-col>
+      </v-row>
+      <v-expand-transition>
+        <v-row v-show="expand">
+          <v-col cols="auto">
+            <nuxt-link to="/login">login</nuxt-link>
+          </v-col>
+          <v-col cols="auto">
+            <nuxt-link to="/register">sign up</nuxt-link>
+          </v-col>
+        </v-row>
+      </v-expand-transition>
+    </template>
   </v-layout>
 </template>
 
@@ -18,6 +39,7 @@ import ArtworkExplorer from '~/components/artwork/ArtworkExplorer.component.vue'
 })
 export default class HomePage extends PageComponent {
   payload: any[] = []
+  expand: boolean = false
 
   async asyncData({ $axios }: Context) {
     try {
@@ -30,3 +52,12 @@ export default class HomePage extends PageComponent {
   }
 }
 </script>
+
+<style scoped>
+.splash-logo {
+  color: black;
+  font-size: 72px;
+  text-decoration: none;
+  cursor: pointer;
+}
+</style>
