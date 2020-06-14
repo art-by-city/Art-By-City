@@ -41,13 +41,20 @@ export default class HomePage extends PageComponent {
   payload: any[] = []
   expand: boolean = false
 
-  async asyncData({ $axios }: Context) {
+  async asyncData({ $axios, store }: Context) {
     try {
-      const { payload } = await $axios.$get('/api/artwork')
+      if (!(store.state.artworks.list?.length > 0)) {
+        const { payload } = await $axios.$get('/api/artwork')
 
-      return { payload }
+        store.commit('artworks/set', payload)
+
+        return { payload }
+      } else {
+        return { payload: store.state.artworks.list }
+      }
     } catch (error) {
-      return { errors: error.response.data.messages }
+      console.error(error)
+      return { errors: error.response.data?.messages }
     }
   }
 }

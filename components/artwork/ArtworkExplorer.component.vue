@@ -125,6 +125,8 @@ export default class ArtworkExplorer extends Vue {
     try {
       const { payload } = await this.$axios.$get('/api/artwork')
 
+      this.$store.commit('artworks/set', payload)
+
       this.artworks = payload
     } catch (error) {
       console.error(error)
