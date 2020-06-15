@@ -1,5 +1,5 @@
 <template>
-  <v-flex xs12 sm8 md6>
+  <v-container>
     <v-dialog
       v-model="artworkPreview.show"
       max-width="80vw"
@@ -41,6 +41,7 @@
       </v-card>
     </v-dialog>
     <ArtworkExplorerToolbar :gridsize.sync="gridSize" @refresh="refresh" />
+    <v-divider></v-divider>
     <v-container>
       <v-row dense>
         <v-col
@@ -79,7 +80,7 @@
         </v-col>
       </v-row>
     </v-container>
-  </v-flex>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -121,9 +122,19 @@ export default class ArtworkExplorer extends Vue {
     this.vw = window.innerWidth
   }
 
-  async refresh() {
+  async refresh(opts: any) {
+    const params = opts
+
+    if (params.type === 'Any') {
+      delete params.type
+    }
+
+    if (params.region === 'Any') {
+      delete params.region
+    }
+
     try {
-      const { payload } = await this.$axios.$get('/api/artwork')
+      const { payload } = await this.$axios.$get('/api/artwork', { params })
 
       this.$store.commit('artworks/set', payload)
 
@@ -156,11 +167,11 @@ export default class ArtworkExplorer extends Vue {
 
     switch (this.gridSize) {
       case 6:
-        return '40vh'
+        return '35vh'
       case 9:
         return '25vh'
       default:
-        return '75vh'
+        return '70vh'
     }
   }
 

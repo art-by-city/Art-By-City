@@ -10,7 +10,10 @@ import UserControllerImpl from './controller'
 
 export { default as User } from './user'
 
-export interface UserRepository extends BaseRepositoryInterface<User> {
+export interface UserFilterOptions {}
+
+export interface UserRepository
+  extends BaseRepositoryInterface<User, UserFilterOptions> {
   getByUsername(username: string): Promise<User | null>
 }
 

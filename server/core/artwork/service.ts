@@ -4,7 +4,12 @@ import ValidationError from '../api/errors/validationError'
 import { User, UserRepository } from '../user'
 import { DomainServiceOptions } from '../domainService.interface'
 import ArtworkValidator from './validator'
-import { Artwork, ArtworkService, ArtworkRepository } from './'
+import {
+  Artwork,
+  ArtworkService,
+  ArtworkRepository,
+  ArtworkFilterOptions
+} from './'
 
 @injectable()
 export default class ArtworkServiceImpl implements ArtworkService {
@@ -44,25 +49,22 @@ export default class ArtworkServiceImpl implements ArtworkService {
     return artwork
   }
 
-  async list(): Promise<Artwork[]> {
-    const artworks = await this.artworkRepository.list()
+  async list(opts?: ArtworkFilterOptions): Promise<Artwork[]> {
+    const artworks = opts
+      ? await this.artworkRepository.find(opts)
+      : await this.artworkRepository.list()
 
-    const hydratedArtworks = Promise.all(
+    return Promise.all(
       artworks.map(async (a) => {
         a.owner = <User>await this.userRepository.get(<string>a.owner)
 
         return a
       })
     )
-
-    return hydratedArtworks
   }
 
   async listByUser(user: User): Promise<Artwork[]> {
-    const filter = new Artwork()
-    filter.owner = user.id
-
-    const artworks = await this.artworkRepository.find(filter)
+    const artworks = await this.artworkRepository.find({ owner: user.id })
 
     return Promise.all(
       artworks.map(async (a) => {
@@ -74,12 +76,7 @@ export default class ArtworkServiceImpl implements ArtworkService {
   }
 
   async listLikedByUser(user: User): Promise<Artwork[]> {
-    const filter = new Artwork()
-
-    // TODO -> Fix filter
-    filter.likes = [user.id]
-
-    const artworks = await this.artworkRepository.find(filter)
+    const artworks = await this.artworkRepository.find({ likes: [user.id] })
 
     return Promise.all(
       artworks.map(async (a) => {

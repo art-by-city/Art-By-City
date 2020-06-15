@@ -49,6 +49,15 @@ export interface ArtworkImage {
   source: string
 }
 
+export interface ArtworkFilterOptions {
+  region?: string
+  type?: string
+  hashtags?: string[]
+  owner?: string
+  likes?: string[]
+  limit?: number
+}
+
 export interface ArtworkController extends BaseControllerInterface {}
 
 export interface ArtworkApplicationService
@@ -60,7 +69,7 @@ export interface ArtworkApplicationService
     files?: Express.Multer.File[]
   ): Promise<ApiServiceResult<Artwork>>
   update(request: any): Promise<ApiServiceResult<Artwork>>
-  list(): Promise<ApiServiceResult<Artwork[]>>
+  list(opts?: ArtworkFilterOptions): Promise<ApiServiceResult<Artwork[]>>
   listByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
   listLikedByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
   like(user: User, id: string): Promise<ApiServiceResult<void>>
@@ -72,12 +81,13 @@ export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
   get(id: string, opts?: DomainServiceOptions): Promise<Artwork | null>
   update(artwork: Artwork): Promise<Artwork>
   delete(id: string): Promise<void>
-  list(): Promise<Artwork[]>
+  list(opts?: ArtworkFilterOptions): Promise<Artwork[]>
   listByUser(user: User): Promise<Artwork[]>
   listLikedByUser(user: User): Promise<Artwork[]>
 }
 
-export interface ArtworkRepository extends BaseRepositoryInterface<Artwork> {}
+export interface ArtworkRepository
+  extends BaseRepositoryInterface<Artwork, ArtworkFilterOptions> {}
 
 export const ArtworkModule = new ContainerModule((bind) => {
   bind<ArtworkRepository>(Symbol.for('ArtworkRepository')).to(
