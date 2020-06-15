@@ -3,8 +3,8 @@ import { getRepository } from 'fireorm'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
-import { Artwork, ArtworkRepository } from './'
 import { User } from '../user'
+import { Artwork, ArtworkRepository, ArtworkFilterOptions } from './'
 
 @injectable()
 export default class ArtworkRepositoryImpl implements ArtworkRepository {
@@ -33,23 +33,41 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
     }
   }
 
-  list(): Promise<Artwork[]> {
+  list(limit: number = 9): Promise<Artwork[]> {
     try {
-      return this.repository.find()
+      return this.repository.limit(limit).find()
     } catch (error) {
       throw new Error(`Error listing artwork: ${error.message}`)
     }
   }
 
-  async find(filter?: Artwork): Promise<Artwork[]> {
+  async find(filter?: ArtworkFilterOptions): Promise<Artwork[]> {
     try {
       if (!filter) {
         return this.list()
       }
 
-      const found = await this.repository
-        .whereEqualTo('owner', <string>filter.owner)
-        .find()
+      let query = this.repository.limit(filter.limit || 9)
+
+      if (filter.owner) {
+        query = query.whereEqualTo('owner', filter.owner)
+      }
+
+      if (filter.region) {
+        query = query.whereEqualTo('region', filter.region)
+      }
+
+      if (filter.type) {
+        query = query.whereEqualTo('type', filter.type)
+      }
+
+      if (filter.hashtags) {
+        filter.hashtags.forEach((hashtag) => {
+          query = query.whereArrayContains('hashtags', hashtag)
+        })
+      }
+
+      const found = await query.find()
 
       return found
     } catch (error) {

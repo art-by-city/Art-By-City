@@ -3,26 +3,27 @@ import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import UnknownError from '../api/errors/unknownError'
-import { User, UserRepository } from '../user'
+import { User } from '../user'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
-import { Artwork, ArtworkService, ArtworkApplicationService } from './'
+import {
+  Artwork,
+  ArtworkService,
+  ArtworkApplicationService,
+  ArtworkFilterOptions
+} from './'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
   implements ArtworkApplicationService {
   private artworkService: ArtworkService
-  private userRepository: UserRepository
 
   constructor(
     @inject(Symbol.for('ArtworkService'))
-    artworkService: ArtworkService,
-    @inject(Symbol.for('UserRepository'))
-    userRepository: UserRepository
+    artworkService: ArtworkService
   ) {
     this.artworkService = artworkService
-    this.userRepository = userRepository
   }
 
   async create(req: any): Promise<ApiServiceResult<Artwork>> {
@@ -91,9 +92,11 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
-  async list(): Promise<ApiServiceResult<Artwork[]>> {
+  async list(
+    opts?: ArtworkFilterOptions
+  ): Promise<ApiServiceResult<Artwork[]>> {
     try {
-      const artworks = await this.artworkService.list()
+      const artworks = await this.artworkService.list(opts)
 
       return new ApiServiceSuccessResult(_.shuffle(artworks))
     } catch (error) {
