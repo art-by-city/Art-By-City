@@ -19,6 +19,15 @@
           <v-icon x-large color="black">mdi-record-circle</v-icon>
         </v-btn>
       </v-col>
+      <v-col offset="3">
+        <v-btn
+          v-if="$store.state.artworks.prev.length > 0"
+          icon
+          @click="onPreviousClicked"
+        >
+          <v-icon x-large color="black">mdi-arrow-left-circle</v-icon>
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row no-gutters>
       <v-col cols="3">
@@ -100,6 +109,8 @@ export default class ArtworkExplorerToolbar extends Vue {
   @Emit('refresh') onRefreshClicked() {
     return { type: this.type, region: this.region, hashtags: this.hashtags }
   }
+
+  @Emit('previous') onPreviousClicked() {}
 
   @PropSync('gridsize', { type: Number }) syncedGridSize!: number
 

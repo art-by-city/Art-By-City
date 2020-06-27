@@ -40,7 +40,11 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <ArtworkExplorerToolbar :gridsize.sync="gridSize" @refresh="refresh" />
+    <ArtworkExplorerToolbar
+      :gridsize.sync="gridSize"
+      @refresh="refresh"
+      @previous="previous"
+    />
     <v-divider></v-divider>
     <div class="artwork-explorer-container" :style="calcContainerStyle()">
       <v-container>
@@ -151,6 +155,11 @@ export default class ArtworkExplorer extends Vue {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  previous() {
+    this.$store.commit('artworks/previous')
+    this.artworks = this.$store.state.artworks.list
   }
 
   sliceArtworks() {
