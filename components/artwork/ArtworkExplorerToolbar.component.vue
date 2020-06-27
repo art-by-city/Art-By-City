@@ -3,7 +3,7 @@
     <v-row no-gutters>
       <v-col cols="3">
         <v-select
-          v-model="region"
+          v-model="opts.region"
           name="region"
           label="Region"
           :items="regions"
@@ -32,7 +32,7 @@
     <v-row no-gutters>
       <v-col cols="3">
         <v-select
-          v-model="type"
+          v-model="opts.type"
           name="type"
           label="Type"
           :items="artworkTypes"
@@ -45,7 +45,7 @@
       </v-col>
       <v-col offset="1" cols="4">
         <v-combobox
-          v-model="hashtags"
+          v-model="opts.hashtags"
           name="hashtags"
           label="Hashtags"
           multiple
@@ -91,23 +91,29 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, PropSync } from 'nuxt-property-decorator'
+import { Vue, Component, Emit, Prop, PropSync } from 'nuxt-property-decorator'
 
 import { artworkTypes, regions } from '~/server/core/artwork/validator'
 
 @Component
 export default class ArtworkExplorerToolbar extends Vue {
-  // Selections
   artworkTypes = ['Any'].concat(artworkTypes)
   regions = ['Any'].concat(regions)
-
-  // Options
-  type: string = 'Any'
-  region: string = 'Any'
-  hashtags: string[] = []
+  @Prop({
+    default: {
+      type: 'Any',
+      region: 'Any',
+      hashtags: [] as string[]
+    }
+  })
+  opts: any
 
   @Emit('refresh') onRefreshClicked() {
-    return { type: this.type, region: this.region, hashtags: this.hashtags }
+    return {
+      type: this.opts.type,
+      region: this.opts.region,
+      hashtags: this.opts.hashtags
+    }
   }
 
   @Emit('previous') onPreviousClicked() {}
@@ -129,7 +135,7 @@ export default class ArtworkExplorerToolbar extends Vue {
   }
 
   onHashtagInput(hashtags: string[]) {
-    this.hashtags = hashtags.map((h) => {
+    this.opts.hashtags = hashtags.map((h) => {
       return h[0] === '#' ? h.slice(1) : h
     })
   }

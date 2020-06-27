@@ -1,7 +1,7 @@
 <template>
   <v-layout column justify-center align-center>
     <template v-if="$auth.loggedIn">
-      <ArtworkExplorer :initial.sync="payload" />
+      <ArtworkExplorer :initial.sync="payload" :options.sync="options" />
     </template>
     <template v-if="!$auth.loggedIn">
       <v-row style="height: 45vh" align="end">
@@ -39,23 +39,35 @@ import ArtworkExplorer from '~/components/artwork/ArtworkExplorer.component.vue'
 })
 export default class HomePage extends PageComponent {
   payload: any[] = []
+  options: any
   expand: boolean = false
 
   async asyncData({ $axios, store, $auth }: Context) {
     if ($auth.loggedIn) {
       try {
+        const options = { ...store.state.artworks.options }
+        const params = { ...options }
+
+        if (params.type === 'Any') {
+          delete params.type
+        }
+
+        if (params.region === 'Any') {
+          delete params.region
+        }
+
         if (!(store.state.artworks.list?.length > 0)) {
-          const { payload } = await $axios.$get('/api/artwork')
+          const { payload } = await $axios.$get('/api/artwork', { params })
 
           store.commit('artworks/set', payload)
 
-          return { payload }
+          return { payload, options }
         } else {
-          return { payload: store.state.artworks.list }
+          return { payload: store.state.artworks.list, options }
         }
       } catch (error) {
         console.error(error)
-        return { errors: error.response.data?.messages }
+        return { errors: error.response?.data?.messages }
       }
     }
   }

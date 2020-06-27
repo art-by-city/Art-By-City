@@ -1,6 +1,7 @@
 export const state = () => ({
   list: [] as any[],
-  prev: [] as any[]
+  prev: [] as any[],
+  options: {}
 })
 
 export type ArtworkStoreState = ReturnType<typeof state>
@@ -12,11 +13,13 @@ export const mutations = {
   },
 
   previous(state: ArtworkStoreState) {
-    console.log('artworkstore previous() prev', state.prev.length, state.prev)
     if (state.prev.length > 0) {
       state.list = state.prev
       state.prev = []
     }
-    console.log('artworkstore previous() list', state.list.length, state.list)
+  },
+
+  options(state: ArtworkStoreState, options: any) {
+    state.options = options
   }
 }
