@@ -42,6 +42,7 @@
     </v-dialog>
     <ArtworkExplorerToolbar
       :gridsize.sync="gridSize"
+      :opts.sync="opts"
       @refresh="refresh"
       @previous="previous"
     />
@@ -107,6 +108,7 @@ import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
 })
 export default class ArtworkExplorer extends Vue {
   @PropSync('initial', { type: Array }) artworks!: any[]
+  @PropSync('options', { type: Object }) opts!: any
 
   artworkPreview = {
     show: false,
@@ -136,7 +138,7 @@ export default class ArtworkExplorer extends Vue {
   }
 
   async refresh(opts: any) {
-    const params = opts
+    const params = { ...opts }
 
     if (params.type === 'Any') {
       delete params.type
@@ -150,6 +152,7 @@ export default class ArtworkExplorer extends Vue {
       const { payload } = await this.$axios.$get('/api/artwork', { params })
 
       this.$store.commit('artworks/set', payload)
+      this.$store.commit('artworks/options', opts)
 
       this.artworks = payload
     } catch (error) {
