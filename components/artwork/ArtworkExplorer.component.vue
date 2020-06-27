@@ -42,44 +42,50 @@
     </v-dialog>
     <ArtworkExplorerToolbar :gridsize.sync="gridSize" @refresh="refresh" />
     <v-divider></v-divider>
-    <v-container>
-      <v-row dense>
-        <v-col
-          v-for="(artwork, i) in sliceArtworks()"
-          :key="i"
-          cols="12"
-          md="4"
-        >
-          <v-hover>
-            <template v-slot:default="{ hover }">
-              <v-card class="artwork-card">
-                <v-img
-                  :src="'/artwork-images/' + artwork.images[0].source"
-                  style="cursor: pointer"
-                  aspect-ratio="1"
+    <div class="artwork-explorer-container" :style="calcContainerStyle()">
+      <v-container>
+        <v-row dense justify="center">
+          <v-col
+            v-for="(artwork, i) in sliceArtworks()"
+            :key="i"
+            justify="center"
+            xs="12"
+            md="4"
+          >
+            <v-hover>
+              <template v-slot:default="{ hover }">
+                <v-card
+                  class="artwork-card"
+                  :width="calcArtworkHeight()"
                   :height="calcArtworkHeight()"
-                  :width="calcArtworkWidth()"
-                  @click="showArtworkPreview(i)"
                 >
-                  <v-fade-transition>
-                    <v-overlay v-if="hover" absolute class="artwork-overlay">
-                      <v-row align="end" class="fill-height pa-1">
-                        <v-col>
-                          <LikeButton :dark="true" :artwork="artwork" />
-                          <a class="white--text">
-                            {{ artwork.title }}
-                          </a>
-                        </v-col>
-                      </v-row>
-                    </v-overlay>
-                  </v-fade-transition>
-                </v-img>
-              </v-card>
-            </template>
-          </v-hover>
-        </v-col>
-      </v-row>
-    </v-container>
+                  <v-img
+                    :src="'/artwork-images/' + artwork.images[0].source"
+                    style="cursor: pointer"
+                    height="100%"
+                    width="100%"
+                    @click="showArtworkPreview(i)"
+                  >
+                    <v-fade-transition>
+                      <v-overlay v-if="hover" absolute class="artwork-overlay">
+                        <v-row align="end" class="fill-height pa-1">
+                          <v-col>
+                            <LikeButton :dark="true" :artwork="artwork" />
+                            <a class="white--text">
+                              {{ artwork.title }}
+                            </a>
+                          </v-col>
+                        </v-row>
+                      </v-overlay>
+                    </v-fade-transition>
+                  </v-img>
+                </v-card>
+              </template>
+            </v-hover>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
   </v-container>
 </template>
 
@@ -107,10 +113,12 @@ export default class ArtworkExplorer extends Vue {
   gridSize = 3
 
   vw = 1000
+  vh = 1000
 
   mounted() {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize)
+      this.onResize()
     })
   }
 
@@ -120,6 +128,7 @@ export default class ArtworkExplorer extends Vue {
 
   onResize() {
     this.vw = window.innerWidth
+    this.vh = window.innerHeight
   }
 
   async refresh(opts: any) {
@@ -152,12 +161,17 @@ export default class ArtworkExplorer extends Vue {
     return this.artworks.slice(0, this.gridSize)
   }
 
-  calcArtworkWidth() {
-    if (this.vw < 960) {
-      return '100vw'
+  calcContainerStyle() {
+    let width = '100%'
+    switch (this.gridSize) {
+      case 6:
+        width = '80%'
+        break
+      case 9:
+        width = '50%'
     }
 
-    return '30vw'
+    return `width: ${width}`
   }
 
   calcArtworkHeight() {
@@ -165,14 +179,22 @@ export default class ArtworkExplorer extends Vue {
       return '70vh'
     }
 
-    switch (this.gridSize) {
-      case 6:
-        return '35vh'
-      case 9:
-        return '25vh'
-      default:
-        return '70vh'
+    let available = this.vh
+    if (this.vh > this.vw) {
+      available = this.vw
     }
+    let magic = 425
+    if (this.gridSize === 6) {
+      magic = 300
+    } else if (this.gridSize === 9) {
+      magic = 300
+    }
+
+    available = available - magic
+
+    const h = available / (this.gridSize / 3)
+
+    return h
   }
 
   isHighlighted(index: number) {
@@ -272,5 +294,9 @@ export default class ArtworkExplorer extends Vue {
 
 .artwork-preview-dialog > * {
   width: auto;
+}
+
+.artwork-explorer-container {
+  margin: auto;
 }
 </style>
