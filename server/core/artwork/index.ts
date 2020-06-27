@@ -28,22 +28,22 @@ export type ArtworkType =
   | 'Other'
 
 export type Region =
-  | 'NYC'
-  | 'LA'
+  | 'Austin'
+  | 'Boston'
   | 'Chicago'
+  | 'Dallas'
+  | 'Denver'
   | 'Houston'
-  | 'Phoenix'
+  | 'Los Angeles'
+  | 'New York City'
   | 'Philadelphia'
+  | 'Phoenix'
+  | 'Portland'
   | 'San Antonio'
   | 'San Diego'
-  | 'Dallas'
   | 'San Jose'
   | 'Seattle'
-  | 'Portland'
-  | 'Denver'
-  | 'Boston'
-  | 'DC'
-  | 'Austin'
+  | 'Washington D.C.'
 
 export interface ArtworkImage {
   source: string
