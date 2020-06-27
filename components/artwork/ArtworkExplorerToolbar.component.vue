@@ -12,10 +12,11 @@
           dense
           single-line
           prepend-icon="mdi-map"
+          @input="onRefresh"
         ></v-select>
       </v-col>
       <v-col offset="1" cols="4" class="text-center">
-        <v-btn icon @click="onRefreshClicked">
+        <v-btn icon @click="onRefresh">
           <v-icon x-large color="black">mdi-record-circle</v-icon>
         </v-btn>
       </v-col>
@@ -41,6 +42,7 @@
           dense
           single-line
           prepend-icon="mdi-image-frame"
+          @input="onRefresh"
         ></v-select>
       </v-col>
       <v-col offset="1" cols="4">
@@ -62,6 +64,7 @@
               v-bind="data.attrs"
               :input-value="data.selected"
               :disabled="data.disabled"
+              close
               @click:close="data.parent.selectItem(data.item)"
             >
               # {{ data.item }}
@@ -108,7 +111,7 @@ export default class ArtworkExplorerToolbar extends Vue {
   })
   opts: any
 
-  @Emit('refresh') onRefreshClicked() {
+  @Emit('refresh') onRefresh() {
     return {
       type: this.opts.type,
       region: this.opts.region,
@@ -138,6 +141,8 @@ export default class ArtworkExplorerToolbar extends Vue {
     this.opts.hashtags = hashtags.map((h) => {
       return h[0] === '#' ? h.slice(1) : h
     })
+    // this.$emit('refresh', this.opts)
+    this.onRefresh()
   }
 }
 </script>
