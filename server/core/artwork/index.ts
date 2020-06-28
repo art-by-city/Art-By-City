@@ -56,6 +56,7 @@ export interface ArtworkFilterOptions {
   owner?: string
   likes?: string[]
   limit?: number
+  shuffle?: boolean
 }
 
 export interface ArtworkController extends BaseControllerInterface {}

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { injectable, inject } from 'inversify'
 import { getRepository } from 'fireorm'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
@@ -47,7 +48,7 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
         return this.list()
       }
 
-      let query = this.repository.limit(filter.limit || 9)
+      let query = this.repository.orderByAscending('id')
 
       if (filter.owner) {
         query = query.whereEqualTo('owner', filter.owner)
@@ -62,14 +63,29 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
       }
 
       if (filter.hashtags) {
-        filter.hashtags.forEach((hashtag) => {
-          query = query.whereArrayContains('hashtags', hashtag)
-        })
+        query = query.whereArrayContains('hashtags', filter.hashtags[0])
       }
 
       const found = await query.find()
 
-      return found
+      let matches: Artwork[] = [...found]
+      if (filter.hashtags && filter.hashtags.length > 0) {
+        filter.hashtags.forEach((hashtag) => {
+          matches = matches.filter((doc) => {
+            return doc.hashtags.includes(hashtag)
+          })
+        })
+      }
+
+      // Shuffle
+      matches = filter.shuffle ? _.shuffle(matches) : matches
+
+      // Limit
+      if (filter.limit) {
+        matches = matches.slice(0, filter.limit)
+      }
+
+      return matches
     } catch (error) {
       throw new Error(`Error listing artwork: ${error.message}`)
     }
