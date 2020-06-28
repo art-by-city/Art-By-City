@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
@@ -93,12 +92,18 @@ export default class ArtworkApplicationServiceImpl
   }
 
   async list(
-    opts?: ArtworkFilterOptions
+    opts: ArtworkFilterOptions = {}
   ): Promise<ApiServiceResult<Artwork[]>> {
     try {
+      if (opts.shuffle !== false) {
+        opts.shuffle = true
+      }
+      if (!opts.limit) {
+        opts.limit = 9
+      }
       const artworks = await this.artworkService.list(opts)
 
-      return new ApiServiceSuccessResult(_.shuffle(artworks))
+      return new ApiServiceSuccessResult(artworks)
     } catch (error) {
       throw new UnknownError(error.message)
     }
