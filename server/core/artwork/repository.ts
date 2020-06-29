@@ -18,6 +18,24 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
     this.client = databaseAdapter.getClient()
   }
 
+  async discover(userId: string): Promise<Artwork[]> {
+    try {
+      const query = await this.client
+        .collectionGroup('UserArtworkViews')
+        .where('userId', '==', userId)
+        .get()
+
+      query.forEach((doc) => {
+        console.log(`ArtworkRepository->discover() doc ${doc.id}`, doc.data())
+      })
+      // const query2 = await this.client.
+
+      return await this.repository.find()
+    } catch (error) {
+      throw new Error(`Error discovering artwork: ${error.message}`)
+    }
+  }
+
   create(artwork: Artwork): Promise<Artwork> {
     try {
       return this.repository.create(artwork)
@@ -83,6 +101,24 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
       // Limit
       if (filter.limit) {
         matches = matches.slice(0, filter.limit)
+      }
+
+      console.log('ArtworkRepository->find() filter', filter)
+      if (filter.userId) {
+        matches.forEach(async (match) => {
+          if (filter.userId && match.userViews) {
+            const uv = await match.userViews
+              ?.whereEqualTo('userId', filter.userId)
+              .findOne()
+            console.log('ArtworkRepository->find() uv', uv)
+            if (uv) {
+              uv.views = uv.views + 1
+              await match.userViews?.update(uv)
+            } else {
+              await match.userViews?.create({ userId: filter.userId, views: 1 })
+            }
+          }
+        })
       }
 
       return matches

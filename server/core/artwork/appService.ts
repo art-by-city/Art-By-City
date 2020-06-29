@@ -6,6 +6,7 @@ import { User } from '../user'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
+import { DiscoveryService } from '../discovery'
 import {
   Artwork,
   ArtworkService,
@@ -17,12 +18,16 @@ import {
 export default class ArtworkApplicationServiceImpl
   implements ArtworkApplicationService {
   private artworkService: ArtworkService
+  private discoveryService: DiscoveryService
 
   constructor(
     @inject(Symbol.for('ArtworkService'))
-    artworkService: ArtworkService
+    artworkService: ArtworkService,
+    @inject(Symbol.for('DiscoveryService'))
+    discoveryService: DiscoveryService
   ) {
     this.artworkService = artworkService
+    this.discoveryService = discoveryService
   }
 
   async create(req: any): Promise<ApiServiceResult<Artwork>> {
@@ -112,6 +117,14 @@ export default class ArtworkApplicationServiceImpl
   async listByUser(user: User): Promise<ApiServiceResult<Artwork[]>> {
     try {
       const artworks = await this.artworkService.listByUser(user)
+      const discoveries = await this.discoveryService.generateArtworkDiscoveryBatchForUser(
+        user.id
+      )
+
+      console.log(
+        'ArtworkApplicationService->listByUser() discoveries',
+        discoveries
+      )
 
       return new ApiServiceSuccessResult(artworks)
     } catch (error) {

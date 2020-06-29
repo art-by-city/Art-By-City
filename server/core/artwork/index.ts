@@ -57,6 +57,7 @@ export interface ArtworkFilterOptions {
   likes?: string[]
   limit?: number
   shuffle?: boolean
+  userId?: string
 }
 
 export interface ArtworkController extends BaseControllerInterface {}
@@ -88,7 +89,9 @@ export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
 }
 
 export interface ArtworkRepository
-  extends BaseRepositoryInterface<Artwork, ArtworkFilterOptions> {}
+  extends BaseRepositoryInterface<Artwork, ArtworkFilterOptions> {
+  discover(userId: string): Promise<Artwork[]>
+}
 
 export const ArtworkModule = new ContainerModule((bind) => {
   bind<ArtworkRepository>(Symbol.for('ArtworkRepository')).to(

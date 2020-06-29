@@ -1,7 +1,13 @@
-import { Collection } from 'fireorm'
+import { Collection, SubCollection, ISubCollection } from 'fireorm'
 
 import { User } from '../user'
 import { ArtworkType, ArtworkImage, Region } from './'
+
+export class UserArtworkViews {
+  id!: string
+  userId!: string
+  views: number = 0
+}
 
 @Collection()
 export default class Artwork {
@@ -22,4 +28,7 @@ export default class Artwork {
   images!: ArtworkImage[]
 
   likes!: string[]
+
+  @SubCollection(UserArtworkViews, 'UserArtworkViews')
+  userViews?: ISubCollection<UserArtworkViews>
 }

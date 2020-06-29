@@ -65,7 +65,9 @@ export default class ArtworkControllerImpl implements ArtworkController {
     })
 
     router.get('/', async (req, res) => {
-      const result = await this.artworkAppService.list(req.query)
+      const opts = { ...req.query }
+      opts.userId = (<User>req.user).id
+      const result = await this.artworkAppService.list(opts)
 
       return res.send(result)
     })
