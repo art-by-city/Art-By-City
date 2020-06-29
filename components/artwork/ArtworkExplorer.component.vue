@@ -47,7 +47,7 @@
       @previous="previous"
     />
     <v-divider></v-divider>
-    <div class="artwork-explorer-container" :style="calcContainerStyle()">
+    <div class="artwork-explorer-container" :class="calcContainerClass()">
       <v-container>
         <v-row dense justify="center">
           <v-col
@@ -173,17 +173,8 @@ export default class ArtworkExplorer extends Vue {
     return this.artworks.slice(0, this.gridSize)
   }
 
-  calcContainerStyle() {
-    let width = '100%'
-    switch (this.gridSize) {
-      case 6:
-        width = '80%'
-        break
-      case 9:
-        width = '50%'
-    }
-
-    return `width: ${width}`
+  calcContainerClass() {
+    return { [`grid-size-${this.gridSize}`]: true }
   }
 
   calcArtworkHeight() {
@@ -310,5 +301,15 @@ export default class ArtworkExplorer extends Vue {
 
 .artwork-explorer-container {
   margin: auto;
+}
+
+.artwork-explorer-container.grid-size-3 {
+  width: 96%;
+}
+.artwork-explorer-container.grid-size-6 {
+  width: 60%;
+}
+.artwork-explorer-container.grid-size-9 {
+  width: 41%;
 }
 </style>
