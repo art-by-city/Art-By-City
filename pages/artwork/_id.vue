@@ -81,15 +81,18 @@
           <v-row>
             <v-col>
               <template v-if="!editMode">
-                <strong>Region:</strong> {{ artwork.region }}
+                <strong>City:</strong> {{ cityName }}
               </template>
               <template v-if="editMode">
-                <v-select
-                  v-model="artwork.region"
-                  name="region"
-                  label="Region"
-                  :items="regions"
-                ></v-select>
+                <v-autocomplete
+                  v-model="artwork.city"
+                  name="city"
+                  label="City"
+                  item-text="name"
+                  item-value="id"
+                  item-disabled="disabled"
+                  :items="cities"
+                ></v-autocomplete>
               </template>
             </v-col>
           </v-row>
@@ -144,7 +147,7 @@
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
-import { artworkTypes, regions } from '~/server/core/artwork/validator'
+import { artworkTypes } from '~/server/core/artwork/validator'
 import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 
@@ -156,7 +159,8 @@ import FormPageComponent from '~/components/pages/formPage.component'
 export default class ArtworkPage extends FormPageComponent {
   artwork: any = {}
   artworkTypes: string[] = artworkTypes
-  regions: string[] = regions
+  cities: any[] = this.$store.state.config.cities
+
   editMode = false
   imagePreviewIndex = 0
 
@@ -164,13 +168,30 @@ export default class ArtworkPage extends FormPageComponent {
     return this.$store.state?.auth?.user?.id === this.artwork?.owner.id
   }
 
-  async asyncData({ $axios, params }: Context) {
+  get cityName() {
+    for (let i = 0; i < this.cities.length; i++) {
+      if (this.cities[i].id === this.artwork.city) {
+        return this.cities[i].name
+      }
+    }
+  }
+
+  async asyncData({ $axios, store, params }: Context) {
     try {
       const { payload } = await $axios.$get(`/api/artwork/${params.id}`)
 
-      return { artwork: payload }
+      if (!payload.city) {
+        payload.city = null
+      }
+
+      const citiesResult = await $axios.$get('/api/city')
+      const cities = citiesResult.payload || []
+      store.commit('config/setCities', cities)
+
+      return { artwork: payload, cities }
     } catch (error) {
-      return { errors: error.response.data.messages }
+      console.error(error)
+      return { errors: error.response?.data?.messages }
     }
   }
 

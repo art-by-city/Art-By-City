@@ -43,10 +43,7 @@ export default class AdminControllerImpl implements AdminController {
      * Temporary
      */
     router.post('/user', async (req, res) => {
-      const result = await this.adminService.setUserRoles(
-        req.body.user.id,
-        req.body.user.roles
-      )
+      const result = await this.adminService.saveUser(req.body.user)
 
       return res.send(result)
     })

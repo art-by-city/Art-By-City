@@ -24,6 +24,7 @@ export interface UserService {
   updatePassword(id: string, password: string): Promise<ApiServiceResult<void>>
   listUsers(): Promise<User[]>
   setUserRoles(userId: string, roles: string[]): Promise<ApiServiceResult<void>>
+  saveUser(user: any): Promise<ApiServiceResult<void>>
 }
 
 export interface UserController extends BaseControllerInterface {}

@@ -54,8 +54,8 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
         query = query.whereEqualTo('owner', filter.owner)
       }
 
-      if (filter.region) {
-        query = query.whereEqualTo('region', filter.region)
+      if (filter.city) {
+        query = query.whereEqualTo('city', filter.city)
       }
 
       if (filter.type) {
@@ -87,7 +87,7 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
 
       return matches
     } catch (error) {
-      throw new Error(`Error listing artwork: ${error.message}`)
+      throw new Error(`Error finding artwork: ${error.message}`)
     }
   }
 

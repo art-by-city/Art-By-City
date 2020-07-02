@@ -33,7 +33,7 @@ export default class ArtworkApplicationServiceImpl
     artwork.title = req.body?.title || ''
     artwork.description = req.body?.description || ''
     artwork.type = req.body?.type || ''
-    artwork.region = req.body?.region || ''
+    artwork.city = req.body?.city || ''
     artwork.hashtags = req.body?.hashtags?.split(',') || []
 
     if (files) {
@@ -75,7 +75,7 @@ export default class ArtworkApplicationServiceImpl
         artwork.title = req.body?.title || ''
         artwork.description = req.body?.description || ''
         artwork.type = req.body?.type || ''
-        artwork.region = req.body?.region || ''
+        artwork.city = req.body?.city || ''
         artwork.hashtags = req.body?.hashtags || []
         const savedArtwork = await this.artworkService.update(artwork)
         if (savedArtwork) {

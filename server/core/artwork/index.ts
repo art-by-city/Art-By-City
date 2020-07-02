@@ -50,7 +50,7 @@ export interface ArtworkImage {
 }
 
 export interface ArtworkFilterOptions {
-  region?: string
+  city?: string
   type?: string
   hashtags?: string[]
   owner?: string

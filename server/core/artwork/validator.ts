@@ -130,11 +130,11 @@ export default class ArtworkValidator {
       }
     })
 
-    _regionRules.forEach((rule) => {
-      if (!rule.validate(artwork.region)) {
-        messages.push(rule.message)
-      }
-    })
+    // _regionRules.forEach((rule) => {
+    //   if (!rule.validate(artwork.region)) {
+    //     messages.push(rule.message)
+    //   }
+    // })
 
     _hashtagRules.forEach((rule) => {
       const hashtags = artwork.hashtags || []

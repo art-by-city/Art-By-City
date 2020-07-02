@@ -36,25 +36,41 @@ import PageComponent from '~/components/pages/page.component'
   middleware: 'role/artist'
 })
 export default class UserArtworkPage extends PageComponent {
-  artworks: any = []
+  artworks: any[] = []
+  cities: any[] = []
 
   headers = [
     { text: 'title', value: 'title' },
     { text: 'type', value: 'type' },
-    { text: 'region', value: 'region' },
+    { text: 'city', value: 'city' },
     { text: 'hashtags', value: 'hashtags' },
     { text: 'likes', value: 'likes' },
     { text: 'images', value: 'images' },
     { text: 'actions', value: 'actions' }
   ]
 
-  async asyncData({ $axios }: Context) {
+  async asyncData({ $axios, store }: Context) {
     try {
       const { payload } = await $axios.$get('/api/user/artwork')
 
-      return { artworks: payload }
+      const citiesResult = await $axios.$get('/api/city')
+      const cities = citiesResult.payload || []
+      store.commit('config/setCities', cities)
+
+      return {
+        cities,
+        artworks: payload.map((a: any) => {
+          for (let i = 0; i < cities.length; i++) {
+            if (cities[i].id === a.city) {
+              a.city = cities[i].name
+            }
+          }
+          return a
+        })
+      }
     } catch (error) {
-      return { errors: error.response.data.messages }
+      console.error(error)
+      return { errors: error.response?.data?.messages }
     }
   }
 
@@ -64,6 +80,14 @@ export default class UserArtworkPage extends PageComponent {
 
   previewImageSource(artwork: any) {
     return artwork.images[0].source
+  }
+
+  cityName(cityId: string) {
+    for (let i = 0; i < this.cities.length; i++) {
+      if (this.cities[i].id === cityId) {
+        return this.cities[i].name
+      }
+    }
   }
 }
 </script>

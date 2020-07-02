@@ -2,18 +2,21 @@
   <v-container fluid class="pa-0">
     <v-row no-gutters>
       <v-col cols="3">
-        <v-select
-          v-model="opts.region"
-          name="region"
-          label="Region"
-          :items="regions"
+        <v-autocomplete
+          v-model="opts.city"
+          name="city"
+          label="City"
+          :items="cities"
           outlined
           rounded
           dense
           single-line
           prepend-icon="mdi-map"
+          item-text="name"
+          item-value="id"
+          item-disabled="disabled"
           @input="onRefresh"
-        ></v-select>
+        ></v-autocomplete>
       </v-col>
       <v-col offset="1" cols="4" class="text-center">
         <v-btn icon @click="onRefresh">
@@ -96,16 +99,17 @@
 <script lang="ts">
 import { Vue, Component, Emit, Prop, PropSync } from 'nuxt-property-decorator'
 
-import { artworkTypes, regions } from '~/server/core/artwork/validator'
+import { artworkTypes } from '~/server/core/artwork/validator'
 
 @Component
 export default class ArtworkExplorerToolbar extends Vue {
   artworkTypes = ['Any'].concat(artworkTypes)
-  regions = ['Any'].concat(regions)
+  cities = [{ id: 'Any', name: 'Any' }].concat(this.$store.state.config.cities)
+
   @Prop({
     default: {
       type: 'Any',
-      region: 'Any',
+      city: 'Any',
       hashtags: [] as string[]
     }
   })
@@ -114,7 +118,7 @@ export default class ArtworkExplorerToolbar extends Vue {
   @Emit('refresh') onRefresh() {
     return {
       type: this.opts.type,
-      region: this.opts.region,
+      city: this.opts.city,
       hashtags: this.opts.hashtags
     }
   }

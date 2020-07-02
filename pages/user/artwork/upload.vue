@@ -32,13 +32,17 @@
                 :rules="required"
               ></v-select>
 
-              <v-select
-                v-model="artwork.region"
-                name="region"
-                label="Region"
-                :items="regions"
+              <v-autocomplete
+                v-model="artwork.city"
+                name="city"
+                label="City"
+                :items="cities"
+                prepend-icon="mdi-map"
+                item-text="name"
+                item-value="id"
+                item-disabled="disabled"
                 :rules="required"
-              ></v-select>
+              ></v-autocomplete>
 
               <v-combobox
                 v-model="artwork.hashtags"
@@ -87,6 +91,7 @@
 </template>
 
 <script lang="ts">
+import { Context } from '@nuxt/types'
 import { Component, Watch } from 'nuxt-property-decorator'
 import FormComponent from '~/components/pages/formPage.component'
 
@@ -95,8 +100,7 @@ import {
   descriptionRules,
   typeRules,
   regionRules,
-  artworkTypes,
-  regions
+  artworkTypes
 } from '~/server/core/artwork/validator'
 import { MAX_ARTWORK_HASHTAGS, MAX_ARTWORK_IMAGES } from '~/server/config'
 
@@ -105,9 +109,23 @@ import { MAX_ARTWORK_HASHTAGS, MAX_ARTWORK_IMAGES } from '~/server/config'
 })
 export default class ArtworkUploadPage extends FormComponent {
   artworkTypes: string[] = artworkTypes
-  regions: string[] = regions
+  cities: string[] = []
   artwork: any = {
     images: []
+  }
+
+  async asyncData({ $axios }: Context) {
+    const errors = []
+    let cities = [] as any[]
+
+    try {
+      const citiesResponse = await $axios.$get('/api/city')
+      cities = citiesResponse.payload || []
+    } catch (error) {
+      errors.push(error.response?.data?.messages)
+    }
+
+    return { errors, cities }
   }
 
   get titleRules() {
@@ -162,8 +180,8 @@ export default class ArtworkUploadPage extends FormComponent {
     if (this.artwork.type) {
       formData.append('type', this.artwork.type)
     }
-    if (this.artwork.region) {
-      formData.append('region', this.artwork.region)
+    if (this.artwork.city) {
+      formData.append('city', this.artwork.city)
     }
     if (this.artwork.hashtags?.length > 0) {
       formData.append('hashtags', this.artwork.hashtags.join(','))
