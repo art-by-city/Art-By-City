@@ -8,6 +8,7 @@ import { AuthController, AuthService } from './core/auth'
 import { AdminController } from './core/admin'
 import { ArtworkController } from './core/artwork'
 import { UserController } from './core/user'
+import { CityController } from './core/city'
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(
@@ -41,6 +42,10 @@ app.use(
 app.use(
   '/user',
   container.get<UserController>(Symbol.for('UserController')).getRouter()
+)
+app.use(
+  '/city',
+  container.get<CityController>(Symbol.for('CityController')).getRouter()
 )
 
 export default app

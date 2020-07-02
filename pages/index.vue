@@ -39,36 +39,44 @@ import ArtworkExplorer from '~/components/artwork/ArtworkExplorer.component.vue'
 })
 export default class HomePage extends PageComponent {
   payload: any[] = []
+  cities: any[] = []
   options: any
   expand: boolean = false
 
   async asyncData({ $axios, store, $auth }: Context) {
     if ($auth.loggedIn) {
+      const options = { ...store.state.artworks.options }
+      let payload = []
+      let errors = []
+      let cities = []
       try {
-        const options = { ...store.state.artworks.options }
         const params = { ...options }
 
         if (params.type === 'Any') {
           delete params.type
         }
 
-        if (params.region === 'Any') {
-          delete params.region
+        if (params.city === 'Any') {
+          delete params.city
         }
 
         if (!(store.state.artworks.list?.length > 0)) {
-          const { payload } = await $axios.$get('/api/artwork', { params })
-
+          const artworksResult = await $axios.$get('/api/artwork', { params })
+          payload = artworksResult.payload
           store.commit('artworks/set', payload)
-
-          return { payload, options }
         } else {
-          return { payload: store.state.artworks.list, options }
+          payload = store.state.artworks.list
         }
+
+        const citiesResult = await $axios.$get('/api/city')
+        cities = citiesResult.payload || []
+        store.commit('config/setCities', cities)
       } catch (error) {
         console.error(error)
-        return { errors: error.response?.data?.messages }
+        errors = error.response?.data?.messages
       }
+
+      return { errors, payload, options, cities }
     }
   }
 }

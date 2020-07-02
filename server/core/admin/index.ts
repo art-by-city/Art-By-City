@@ -11,6 +11,7 @@ export interface AdminController extends BaseControllerInterface {}
 export interface AdminService {
   listUsers(): Promise<User[]>
   setUserRoles(userId: string, roles: string[]): Promise<ApiServiceResult<void>>
+  saveUser(user: any): Promise<ApiServiceResult<void>>
 }
 
 export const AdminModule = new ContainerModule((bind) => {

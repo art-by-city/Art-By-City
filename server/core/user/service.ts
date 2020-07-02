@@ -116,4 +116,14 @@ export default class UserServiceImpl implements UserService {
 
     return { success: true }
   }
+
+  async saveUser(user: User): Promise<ApiServiceResult<void>> {
+    const savedUser = await this.userRepository.update(user)
+
+    if (!savedUser) {
+      return { success: false, messages: ['Could not save user'] }
+    }
+
+    return { success: true }
+  }
 }

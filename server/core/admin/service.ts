@@ -22,4 +22,8 @@ export default class AdminServiceImpl implements AdminService {
   ): Promise<ApiServiceResult<void>> {
     return this.userService.setUserRoles(userId, roles)
   }
+
+  saveUser(user: any): Promise<ApiServiceResult<void>> {
+    return this.userService.saveUser(<User>user)
+  }
 }

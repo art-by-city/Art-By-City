@@ -3,12 +3,10 @@ import { Collection } from 'fireorm'
 @Collection()
 export default class User {
   id!: string
-
   username!: string
-
   password?: string
-
   roles!: string[]
+  city!: string
 
   updatePassword(newPassword: string): void {
     this.password = newPassword

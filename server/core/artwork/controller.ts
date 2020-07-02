@@ -24,7 +24,6 @@ const upload = multer({ storage })
 @injectable()
 export default class ArtworkControllerImpl implements ArtworkController {
   private router!: Router
-
   private artworkAppService: ArtworkApplicationService
 
   constructor(
