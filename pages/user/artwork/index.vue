@@ -1,8 +1,10 @@
 <template>
   <div>
     <v-layout column justify-center align-center>
-      <h2>My Artwork</h2>
-      <nuxt-link to="/user/artwork/upload">Upload New</nuxt-link>
+      <h2 class="text-lowercase">My Artwork</h2>
+      <nuxt-link to="/user/artwork/upload" class="text-lowercase">
+        Upload New
+      </nuxt-link>
       <v-container fluid>
         <v-data-table :headers="headers" :items="artworks" item-key="id">
           <template v-slot:item.likes="{ item }">

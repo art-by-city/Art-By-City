@@ -4,7 +4,7 @@
       <v-col cols="3">
         <v-autocomplete
           v-model="opts.city"
-          class="condensed-input"
+          class="condensed-input text-lowercase"
           name="city"
           label="city"
           :items="cities"
@@ -17,7 +17,11 @@
           item-value="id"
           item-disabled="disabled"
           @input="onRefresh"
-        ></v-autocomplete>
+        >
+          <template v-slot:item="{ item }">
+            <span class="text-lowercase">{{ item.name }}</span>
+          </template>
+        </v-autocomplete>
       </v-col>
       <v-col offset="1" cols="4" class="text-center">
         <v-btn icon @click="onRefresh">
@@ -48,7 +52,11 @@
           single-line
           prepend-icon="mdi-image-frame"
           @input="onRefresh"
-        ></v-select>
+        >
+          <template v-slot:item="{ item }">
+            <span class="text-lowercase">{{ item }}</span>
+          </template>
+        </v-select>
       </v-col>
       <v-col offset="1" cols="4">
         <v-combobox
@@ -73,6 +81,7 @@
               close
               pill
               small
+              class="text-lowercase"
               @click:close="data.parent.selectItem(data.item)"
             >
               # {{ data.item }}
@@ -159,13 +168,16 @@ export default class ArtworkExplorerToolbar extends Vue {
 <style scoped>
 .condensed-input >>> .v-label {
   font-size: 14px;
+  text-transform: lowercase;
   top: 6px;
 }
 .condensed-input >>> .v-select__selection {
   font-size: 14px;
+  text-transform: lowercase;
 }
 .condensed-input >>> input {
   font-size: 14px;
+  text-transform: lowercase;
 }
 .condensed-input >>> .v-input__slot {
   min-height: 32px !important;

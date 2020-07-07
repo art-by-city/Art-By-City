@@ -8,7 +8,7 @@
     <v-row justify="center">
       <v-col cols="4">
         <v-card>
-          <v-card-title>Sign Up</v-card-title>
+          <v-card-title class="text-lowercase">Sign Up</v-card-title>
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="register">
               <v-text-field
@@ -17,6 +17,7 @@
                 label="Username"
                 :rules="usernameRules"
                 required
+                class="text-lowercase"
               ></v-text-field>
 
               <v-text-field
@@ -25,6 +26,7 @@
                 label="Password"
                 :rules="passwordRules"
                 required
+                class="text-lowercase"
               ></v-text-field>
 
               <v-text-field
@@ -32,15 +34,23 @@
                 label="Repeat Password"
                 :rules="repeatPasswordRules"
                 required
+                class="text-lowercase"
               ></v-text-field>
 
               <template v-if="hasErrors">
-                <v-alert v-for="(error, i) in errors" :key="i" type="error">
+                <v-alert
+                  v-for="(error, i) in errors"
+                  :key="i"
+                  type="error"
+                  class="text-lowercase"
+                >
                   {{ error }}
                 </v-alert>
               </template>
 
-              <v-btn type="submit" color="primary">Sign Up</v-btn>
+              <v-btn type="submit" color="primary" class="text-lowercase">
+                Sign Up
+              </v-btn>
             </v-form>
           </v-card-text>
         </v-card>
