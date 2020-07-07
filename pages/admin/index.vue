@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>
+    <h1 class="text-lowercase">
       <v-icon color="black" large>mdi-account-cowboy-hat</v-icon>
       ADMIN AREA
     </h1>
@@ -15,11 +15,11 @@
     </v-alert>
 
     <v-tabs v-model="tab" icons-and-text>
-      <v-tab>
+      <v-tab class="text-lowercase">
         Users
         <v-icon>mdi-table-account</v-icon>
       </v-tab>
-      <v-tab>
+      <v-tab class="text-lowercase">
         Cities
         <v-icon>mdi-map</v-icon>
       </v-tab>
@@ -29,11 +29,11 @@
           <v-simple-table dense fixed-header>
             <thead>
               <tr>
-                <th class="text-left">ID</th>
-                <th class="text-left">Username</th>
-                <th class="text-left">City</th>
-                <th class="text-left">Roles</th>
-                <th class="text-left">Actions</th>
+                <th class="text-left text-lowercase">ID</th>
+                <th class="text-left text-lowercase">Username</th>
+                <th class="text-left text-lowercase">City</th>
+                <th class="text-left text-lowercase">Roles</th>
+                <th class="text-left text-lowercase">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -41,16 +41,21 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
                 <td>
-                  <v-autocomplete
+                  <v-select
                     v-model="user.city"
                     name="city"
                     label="City"
+                    class="text-lowercase"
                     :items="cities"
                     prepend-icon="mdi-map"
                     item-text="name"
                     item-value="id"
                     item-disabled="disabled"
-                  ></v-autocomplete>
+                  >
+                    <template v-slot:item="{ item }">
+                      <span class="text-lowercase">{{ item.name }}</span>
+                    </template>
+                  </v-select>
                 </td>
                 <td>
                   <v-combobox
@@ -60,7 +65,12 @@
                   ></v-combobox>
                 </td>
                 <td>
-                  <v-btn text color="primary" @click="saveUser(user)">
+                  <v-btn
+                    text
+                    color="primary"
+                    class="text-lowercase"
+                    @click="saveUser(user)"
+                  >
                     Save
                   </v-btn>
                 </td>
@@ -79,16 +89,18 @@
                 </th>
               </tr>
               <tr>
-                <th class="text-left">Country</th>
-                <th class="text-left">Code</th>
-                <th class="text-left">Name</th>
-                <th class="text-left">Actions</th>
+                <th class="text-left text-lowercase">Country</th>
+                <th class="text-left text-lowercase">Code</th>
+                <th class="text-left text-lowercase">Name</th>
+                <th class="text-left text-lowercase">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(city, idx) in cities" :key="city.id">
-                <td style="width: 100px">{{ city.country }}</td>
-                <td style="width: 100px">
+                <td style="width: 100px" class="text-lowercase">
+                  {{ city.country }}
+                </td>
+                <td style="width: 100px" class="text-lowercase">
                   <template v-if="editCity !== idx">
                     {{ city.code }}
                   </template>
@@ -96,10 +108,11 @@
                     <v-text-field
                       v-model="city.code"
                       type="text"
+                      class="text-lowercase"
                     ></v-text-field>
                   </template>
                 </td>
-                <td>
+                <td class="text-lowercase">
                   <template v-if="editCity !== idx">
                     {{ city.name }}
                   </template>
@@ -107,10 +120,11 @@
                     <v-text-field
                       v-model="city.name"
                       type="text"
+                      class="text-lowercase"
                     ></v-text-field>
                   </template>
                 </td>
-                <td>
+                <td class="text-lowercase">
                   <template v-if="editCity !== idx">
                     <v-btn icon @click="editCity = idx">
                       <v-icon>mdi-square-edit-outline</v-icon>

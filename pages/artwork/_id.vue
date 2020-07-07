@@ -1,7 +1,7 @@
 <template>
   <div v-if="artwork">
     <v-layout column justify-center align-center>
-      <h2>{{ artwork.title }}</h2>
+      <h2 class="text-lowercase">{{ artwork.title }}</h2>
       <v-flex xs12 sm8 md6>
         <v-container fluid>
           <v-row justify="center">
@@ -29,10 +29,12 @@
           </v-row>
           <v-row><LikeButton :artwork="artwork"/></v-row>
           <v-row>
-            <v-col><strong>Artist:</strong> {{ artwork.owner.username }}</v-col>
+            <v-col class="text-lowercase">
+              <strong>Artist:</strong> {{ artwork.owner.username }}
+            </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col class="text-lowercase">
               <template v-if="!editMode">
                 <strong>Title:</strong> {{ artwork.title }}
               </template>
@@ -42,12 +44,13 @@
                   type="text"
                   name="title"
                   label="Title"
+                  class="text-lowercase"
                 ></v-text-field>
               </template>
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col class="text-lowercase">
               <template v-if="!editMode">
                 <strong>Description:</strong> {{ artwork.description }}
               </template>
@@ -59,12 +62,13 @@
                   hint="Enter a description for this Artwork"
                   auto-grow
                   rows="1"
+                  class="text-lowercase"
                 ></v-textarea>
               </template>
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col class="text-lowercase">
               <template v-if="!editMode">
                 <strong>Type:</strong> {{ artwork.type }}
               </template>
@@ -74,17 +78,22 @@
                   name="type"
                   label="Type"
                   :items="artworkTypes"
-                ></v-select>
+                  class="text-lowercase"
+                >
+                  <template v-slot:item="{ item }">
+                    <span class="text-lowercase">{{ item }}</span>
+                  </template>
+                </v-select>
               </template>
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col class="text-lowercase">
               <template v-if="!editMode">
                 <strong>City:</strong> {{ cityName }}
               </template>
               <template v-if="editMode">
-                <v-autocomplete
+                <v-select
                   v-model="artwork.city"
                   name="city"
                   label="City"
@@ -92,12 +101,17 @@
                   item-value="id"
                   item-disabled="disabled"
                   :items="cities"
-                ></v-autocomplete>
+                  class="text-lowercase"
+                >
+                  <template v-slot:item="{ item }">
+                    <span class="text-lowercase">{{ item.name }}</span>
+                  </template>
+                </v-select>
               </template>
             </v-col>
           </v-row>
           <v-row>
-            <v-col>
+            <v-col class="text-lowercase">
               <template v-if="!editMode">
                 <strong>Hashtags:</strong>
                 {{ artwork.hashtags.map((h) => `#${h}`).join(', ') }}

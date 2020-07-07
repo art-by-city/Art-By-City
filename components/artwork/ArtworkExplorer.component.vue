@@ -10,11 +10,14 @@
         <v-img :src="previewImageSource" max-height="65vh" contain></v-img>
         <v-card-title>
           <LikeButton :dark="true" :artwork="previewArtwork" />
-          <nuxt-link class="white--text" :to="`/artwork/${previewArtwork.id}`">
+          <nuxt-link
+            class="white--text text-lowercase"
+            :to="`/artwork/${previewArtwork.id}`"
+          >
             {{ previewArtwork.title }}
           </nuxt-link>
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle class="text-lowercase">
           <v-icon>mdi-brush</v-icon>
           {{ previewArtwork.owner.username }}
         </v-card-subtitle>
@@ -76,7 +79,7 @@
                         <v-row align="end" class="fill-height pa-1">
                           <v-col class="artwork-overlay-title-container">
                             <LikeButton :dark="true" :artwork="artwork" />
-                            <a class="white--text">
+                            <a class="white--text text-lowercase">
                               {{ artwork.title }}
                             </a>
                           </v-col>

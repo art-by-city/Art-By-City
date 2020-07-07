@@ -3,13 +3,14 @@
     <v-row justify="center">
       <v-col cols="4">
         <v-card>
-          <v-card-title>Account Settings</v-card-title>
+          <v-card-title class="text-lowercase">Account Settings</v-card-title>
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="save">
               <v-text-field
                 v-model="login.username"
                 type="text"
                 label="Username"
+                class="text-lowercase"
                 disabled
               ></v-text-field>
 
@@ -17,6 +18,7 @@
                 v-model="login.password"
                 type="password"
                 label="Current Password"
+                class="text-lowercase"
                 :rules="required"
               ></v-text-field>
 
@@ -24,6 +26,7 @@
                 v-model="newPassword"
                 type="password"
                 label="New Password"
+                class="text-lowercase"
                 :rules="passwordRules"
               ></v-text-field>
 
@@ -31,6 +34,7 @@
                 v-model="repeatPassword"
                 type="password"
                 label="Repeat New Password"
+                class="text-lowercase"
                 :rules="repeatPasswordRules"
               ></v-text-field>
 
@@ -45,11 +49,18 @@
                 </v-alert>
               </template>
 
-              <v-alert v-if="success" type="success" dense>
+              <v-alert
+                v-if="success"
+                type="success"
+                dense
+                class="text-lowercase"
+              >
                 Account saved
               </v-alert>
 
-              <v-btn type="submit" color="primary">Save</v-btn>
+              <v-btn type="submit" color="primary" class="text-lowercase">
+                Save
+              </v-btn>
             </v-form>
           </v-card-text>
         </v-card>

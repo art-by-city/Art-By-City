@@ -3,7 +3,7 @@
     <v-row justify="center">
       <v-col cols="4">
         <v-card>
-          <v-card-title>Upload New Artwork</v-card-title>
+          <v-card-title class="text-lowercase">Upload New Artwork</v-card-title>
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="upload">
               <v-text-field
@@ -12,6 +12,7 @@
                 name="title"
                 label="Title"
                 :rules="titleRules"
+                class="text-lowercase"
               ></v-text-field>
 
               <v-textarea
@@ -22,6 +23,7 @@
                 auto-grow
                 rows="1"
                 :rules="descriptionRules"
+                class="text-lowercase"
               ></v-textarea>
 
               <v-select
@@ -30,9 +32,14 @@
                 label="Type"
                 :items="artworkTypes"
                 :rules="required"
-              ></v-select>
+                class="text-lowercase"
+              >
+                <template v-slot:item="{ item }">
+                  <span class="text-lowercase">{{ item }}</span>
+                </template>
+              </v-select>
 
-              <v-autocomplete
+              <v-select
                 v-model="artwork.city"
                 name="city"
                 label="City"
@@ -42,7 +49,12 @@
                 item-value="id"
                 item-disabled="disabled"
                 :rules="required"
-              ></v-autocomplete>
+                class="text-lowercase"
+              >
+                <template v-slot:item="{ item }">
+                  <span class="text-lowercase">{{ item.name }}</span>
+                </template>
+              </v-select>
 
               <v-combobox
                 v-model="artwork.hashtags"
@@ -50,6 +62,7 @@
                 label="Hashtags"
                 multiple
                 chips
+                class="text-lowercase"
                 @input="onHashtagInput"
               >
                 <template v-slot:selection="data">
@@ -58,6 +71,7 @@
                     v-bind="data.attrs"
                     :input-value="data.selected"
                     :disabled="data.disabled"
+                    class="text-lowercase"
                     @click:close="data.parent.selectItem(data.item)"
                   >
                     # {{ data.item }}
@@ -73,15 +87,23 @@
                 accept="image/png, image/jpeg"
                 multiple
                 chips
+                class="text-lowercase"
               ></v-file-input>
 
               <template v-if="hasErrors">
-                <v-alert v-for="(error, i) in errors" :key="i" type="error">
+                <v-alert
+                  v-for="(error, i) in errors"
+                  :key="i"
+                  type="error"
+                  class="text-lowercase"
+                >
                   {{ error }}
                 </v-alert>
               </template>
 
-              <v-btn type="submit" color="primary">Upload</v-btn>
+              <v-btn type="submit" color="primary" class="text-lowercase">
+                Upload
+              </v-btn>
             </v-form>
           </v-card-text>
         </v-card>
@@ -207,3 +229,15 @@ export default class ArtworkUploadPage extends FormComponent {
   }
 }
 </script>
+
+<style scoped>
+.text-lowercase >>> input {
+  text-transform: lowercase;
+}
+.text-lowercase >>> .v-label {
+  text-transform: lowercase;
+}
+.text-lowercase >>> .v-select__selection {
+  text-transform: lowercase;
+}
+</style>

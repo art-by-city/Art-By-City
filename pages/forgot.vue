@@ -3,7 +3,7 @@
     <v-row justify="center">
       <v-col cols="4">
         <v-card>
-          <v-card-title>Password Reset</v-card-title>
+          <v-card-title class="text-lowercase">Password Reset</v-card-title>
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="save">
               <v-text-field
@@ -11,6 +11,7 @@
                 type="text"
                 label="Username"
                 :rules="required"
+                class="text-lowercase"
               ></v-text-field>
 
               <v-text-field
@@ -18,6 +19,7 @@
                 type="password"
                 label="New Password"
                 :rules="passwordRules"
+                class="text-lowercase"
               ></v-text-field>
 
               <v-text-field
@@ -25,15 +27,23 @@
                 type="password"
                 label="Repeat New Password"
                 :rules="repeatPasswordRules"
+                class="text-lowercase"
               ></v-text-field>
 
               <template v-if="hasErrors">
-                <v-alert v-for="(error, i) in errors" :key="i" type="error">
+                <v-alert
+                  v-for="(error, i) in errors"
+                  :key="i"
+                  type="error"
+                  class="text-lowercase"
+                >
                   {{ error }}
                 </v-alert>
               </template>
 
-              <v-btn type="submit" color="primary">Reset Password</v-btn>
+              <v-btn type="submit" color="primary" class="text-lowercase">
+                Reset Password
+              </v-btn>
             </v-form>
           </v-card-text>
         </v-card>

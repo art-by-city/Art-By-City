@@ -36,16 +36,18 @@
         <v-col cols="4" class="text-center">
           <v-toolbar-items>
             <template v-if="!$auth.loggedIn">
-              <v-btn text to="/register">Sign Up</v-btn>
+              <v-btn text to="/register">sign up</v-btn>
               <v-divider vertical />
-              <v-btn text to="/login">Log In</v-btn>
+              <v-btn text to="/login">log in</v-btn>
             </template>
             <template v-if="$auth.loggedIn">
               <v-menu offset-y>
                 <template v-slot:activator="{ on }">
                   <v-btn class="avatar-menu-button" text right v-on="on">
                     <v-avatar color="indigo">
-                      <span class="white--text">{{ avatar }}</span>
+                      <span class="white--text text-lowercase">
+                        {{ avatar }}
+                      </span>
                     </v-avatar>
                   </v-btn>
                 </template>
@@ -72,7 +74,7 @@
                       <v-icon>mdi-logout-variant</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
-                      <v-list-item-title>Log Out</v-list-item-title>
+                      <v-list-item-title>log out</v-list-item-title>
                     </v-list-item-content>
                   </v-list-item>
                 </v-list>
@@ -100,32 +102,26 @@ export default class DefaultLayout extends Vue {
   leftNavItems: NavItem[] = [
     {
       icon: 'mdi-apps',
-      title: 'Home',
+      title: 'home',
       to: '/'
     },
     {
       icon: 'mdi-account-cowboy-hat',
-      title: 'Admin',
+      title: 'admin',
       to: '/admin',
       only: ['admin']
-    },
-    {
-      icon: 'mdi-cart',
-      title: 'Shop (Coming Soon!)',
-      to: '/',
-      disabled: true
     }
   ]
 
   rightNavItems: NavItem[] = [
     {
       icon: 'mdi-account',
-      title: 'My Account',
+      title: 'my account',
       to: '/account'
     },
     {
       icon: 'mdi-brush',
-      title: 'My Artwork',
+      title: 'my artwork',
       to: '/user/artwork',
       only: ['artist']
     }
@@ -151,7 +147,7 @@ export default class DefaultLayout extends Vue {
     if (this.$auth.user.username) {
       return this.$auth.user?.username[0]
     } else {
-      return 'User'[0]
+      return 'u'
     }
   }
 

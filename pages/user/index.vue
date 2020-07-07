@@ -1,1 +1,1 @@
-<template><h2>My Profile</h2></template>
+<template><h2 class="text-lowercase">My Profile</h2></template>
