@@ -1,57 +1,15 @@
 <template>
   <v-app dark>
     <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app>
-      <v-menu offset-y>
-        <template v-slot:activator="{ on }">
-          <v-app-bar-nav-icon v-on="on" />
-        </template>
-        <v-list dense>
-          <v-list-item
-            v-for="(navItem, i) in filterNavItemsForUserRoles(leftNavItems)"
-            :key="i"
-            :to="navItem.to"
-            router
-            exact
-            :disabled="navItem.disabled"
-          >
-            <v-list-item-action>
-              <v-icon>{{ navItem.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title v-text="navItem.title" />
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-
-      <v-spacer />
-
-      <v-toolbar-title>
-        <nuxt-link to="/">art x by x city</nuxt-link>
-      </v-toolbar-title>
-
-      <v-spacer />
-
-      <v-toolbar-items>
-        <template v-if="!$auth.loggedIn">
-          <v-btn text to="/register">Sign Up</v-btn>
-          <v-divider vertical />
-          <v-btn text to="/login">Log In</v-btn>
-        </template>
-        <template v-if="$auth.loggedIn">
+      <v-row>
+        <v-col cols="4">
           <v-menu offset-y>
             <template v-slot:activator="{ on }">
-              <v-btn text v-on="on">
-                <v-avatar color="indigo">
-                  <span class="white--text">{{ avatar }}</span>
-                </v-avatar>
-              </v-btn>
+              <v-app-bar-nav-icon v-on="on" />
             </template>
             <v-list dense>
               <v-list-item
-                v-for="(navItem, i) in filterNavItemsForUserRoles(
-                  rightNavItems
-                )"
+                v-for="(navItem, i) in filterNavItemsForUserRoles(leftNavItems)"
                 :key="i"
                 :to="navItem.to"
                 router
@@ -62,21 +20,67 @@
                   <v-icon>{{ navItem.icon }}</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
-                  <v-list-item-title>{{ navItem.title }}</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-              <v-list-item @click="logout">
-                <v-list-item-action>
-                  <v-icon>mdi-logout-variant</v-icon>
-                </v-list-item-action>
-                <v-list-item-content>
-                  <v-list-item-title>Log Out</v-list-item-title>
+                  <v-list-item-title v-text="navItem.title" />
                 </v-list-item-content>
               </v-list-item>
             </v-list>
           </v-menu>
-        </template>
-      </v-toolbar-items>
+        </v-col>
+
+        <v-col cols="4" class="text-center logo-col" align-self="center">
+          <v-toolbar-title>
+            <nuxt-link to="/">art x by x city</nuxt-link>
+          </v-toolbar-title>
+        </v-col>
+
+        <v-col cols="4" class="text-center">
+          <v-toolbar-items>
+            <template v-if="!$auth.loggedIn">
+              <v-btn text to="/register">Sign Up</v-btn>
+              <v-divider vertical />
+              <v-btn text to="/login">Log In</v-btn>
+            </template>
+            <template v-if="$auth.loggedIn">
+              <v-menu offset-y>
+                <template v-slot:activator="{ on }">
+                  <v-btn class="avatar-menu-button" text right v-on="on">
+                    <v-avatar color="indigo">
+                      <span class="white--text">{{ avatar }}</span>
+                    </v-avatar>
+                  </v-btn>
+                </template>
+                <v-list dense>
+                  <v-list-item
+                    v-for="(navItem, i) in filterNavItemsForUserRoles(
+                      rightNavItems
+                    )"
+                    :key="i"
+                    :to="navItem.to"
+                    router
+                    exact
+                    :disabled="navItem.disabled"
+                  >
+                    <v-list-item-action>
+                      <v-icon>{{ navItem.icon }}</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                      <v-list-item-title>{{ navItem.title }}</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <v-list-item @click="logout">
+                    <v-list-item-action>
+                      <v-icon>mdi-logout-variant</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                      <v-list-item-title>Log Out</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
+          </v-toolbar-items>
+        </v-col>
+      </v-row>
     </v-app-bar>
     <v-content>
       <v-container>
@@ -87,7 +91,6 @@
 </template>
 
 <script lang="ts">
-import { Context } from '@nuxt/types'
 import { Vue, Component } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
@@ -170,5 +173,15 @@ export default class DefaultLayout extends Vue {
 div.v-toolbar__content div.v-toolbar__title a {
   color: rgba(0, 0, 0, 0.87);
   text-decoration: none;
+}
+
+.logo-col {
+  padding-left: 16px;
+}
+
+.avatar-menu-button {
+  position: absolute;
+  right: 0px;
+  top: 0px;
 }
 </style>

@@ -72,7 +72,7 @@
                     @click="showArtworkPreview(i)"
                   >
                     <v-fade-transition>
-                      <v-overlay v-if="true" absolute class="artwork-overlay">
+                      <v-overlay v-if="hover" absolute class="artwork-overlay">
                         <v-row align="end" class="fill-height pa-1">
                           <v-col class="artwork-overlay-title-container">
                             <LikeButton :dark="true" :artwork="artwork" />
