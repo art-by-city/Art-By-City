@@ -72,9 +72,9 @@
                     @click="showArtworkPreview(i)"
                   >
                     <v-fade-transition>
-                      <v-overlay v-if="hover" absolute class="artwork-overlay">
+                      <v-overlay v-if="true" absolute class="artwork-overlay">
                         <v-row align="end" class="fill-height pa-1">
-                          <v-col>
+                          <v-col class="artwork-overlay-title-container">
                             <LikeButton :dark="true" :artwork="artwork" />
                             <a class="white--text">
                               {{ artwork.title }}
@@ -308,10 +308,21 @@ export default class ArtworkExplorer extends Vue {
 .artwork-explorer-container.grid-size-3 {
   width: 96%;
 }
+.artwork-explorer-container.grid-size-3 .artwork-overlay-title-container {
+  padding-bottom: 2px;
+}
+
 .artwork-explorer-container.grid-size-6 {
   width: 60%;
 }
+.artwork-explorer-container.grid-size-6 .artwork-overlay-title-container {
+  padding-bottom: 2px;
+}
+
 .artwork-explorer-container.grid-size-9 {
   width: 41%;
+}
+.artwork-explorer-container.grid-size-9 .artwork-overlay-title-container {
+  padding-bottom: 2px;
 }
 </style>
