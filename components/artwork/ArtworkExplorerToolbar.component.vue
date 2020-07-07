@@ -1,11 +1,12 @@
 <template>
   <v-container fluid class="pa-0">
-    <v-row no-gutters>
+    <v-row dense>
       <v-col cols="3">
         <v-autocomplete
           v-model="opts.city"
+          class="condensed-input"
           name="city"
-          label="City"
+          label="city"
           :items="cities"
           outlined
           rounded
@@ -33,12 +34,13 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-row no-gutters>
+    <v-row dense>
       <v-col cols="3">
         <v-select
           v-model="opts.type"
+          class="condensed-input"
           name="type"
-          label="Type"
+          label="type"
           :items="artworkTypes"
           outlined
           rounded
@@ -51,8 +53,9 @@
       <v-col offset="1" cols="4">
         <v-combobox
           v-model="opts.hashtags"
+          class="condensed-input"
           name="hashtags"
-          label="Hashtags"
+          label="hashtags"
           multiple
           chips
           outlined
@@ -68,6 +71,8 @@
               :input-value="data.selected"
               :disabled="data.disabled"
               close
+              pill
+              small
               @click:close="data.parent.selectItem(data.item)"
             >
               # {{ data.item }}
@@ -150,3 +155,26 @@ export default class ArtworkExplorerToolbar extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.condensed-input >>> .v-label {
+  font-size: 14px;
+  top: 6px;
+}
+.condensed-input >>> .v-select__selection {
+  font-size: 14px;
+}
+.condensed-input >>> input {
+  font-size: 14px;
+}
+.condensed-input >>> .v-input__slot {
+  min-height: 32px !important;
+  height: 32px !important;
+}
+.condensed-input >>> .v-input__append-inner {
+  margin-top: 3px !important;
+}
+.condensed-input >>> .v-text-field__details {
+  display: none;
+}
+</style>
