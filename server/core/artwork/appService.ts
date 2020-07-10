@@ -6,6 +6,7 @@ import { User } from '../user'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
+import { DiscoveryService } from '../discovery'
 import {
   Artwork,
   ArtworkService,
@@ -17,12 +18,16 @@ import {
 export default class ArtworkApplicationServiceImpl
   implements ArtworkApplicationService {
   private artworkService: ArtworkService
+  private discoveryService: DiscoveryService
 
   constructor(
     @inject(Symbol.for('ArtworkService'))
-    artworkService: ArtworkService
+    artworkService: ArtworkService,
+    @inject(Symbol.for('DiscoveryService'))
+    discoveryService: DiscoveryService
   ) {
     this.artworkService = artworkService
+    this.discoveryService = discoveryService
   }
 
   async create(req: any): Promise<ApiServiceResult<Artwork>> {
@@ -91,21 +96,54 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
-  async list(
-    opts: ArtworkFilterOptions = {}
-  ): Promise<ApiServiceResult<Artwork[]>> {
+  async list(req: any): Promise<ApiServiceResult<Artwork[]>> {
     try {
+      const opts: ArtworkFilterOptions = <ArtworkFilterOptions>req.query
+      const user: User = <User>req.user
+
+      opts.userId = user.id
+
+      const userArtworkViews = await this.discoveryService.getLastArtworkViewed(
+        user.id
+      )
+
+      if (userArtworkViews && userArtworkViews.lastFetchedArtworkId) {
+        opts.lastFetchedArtworkId = userArtworkViews.lastFetchedArtworkId
+      }
+
       if (opts.shuffle !== false) {
         opts.shuffle = true
       }
       if (!opts.limit) {
         opts.limit = 9
       }
-      const artworks = await this.artworkService.list(opts)
+
+      let artworks = await this.artworkService.list(opts)
+
+      let shouldResetLastViewedArtwork = false
+      let moreArtworks: Artwork[] = []
+      if (artworks.length < opts.limit) {
+        const moreOpts = { ...opts }
+        const amountNeeded = opts.limit - artworks.length
+
+        moreOpts.limit = amountNeeded
+        delete moreOpts.lastFetchedArtworkId
+
+        moreArtworks = await this.artworkService.list(moreOpts)
+
+        if (moreArtworks.length > 0) {
+          shouldResetLastViewedArtwork = true
+          artworks = artworks.concat(moreArtworks)
+        }
+      }
+
+      await this.discoveryService.setLastArtworkViewedFromBatch(user.id, [
+        ...(shouldResetLastViewedArtwork ? moreArtworks : artworks)
+      ])
 
       return new ApiServiceSuccessResult(artworks)
     } catch (error) {
-      throw new UnknownError(error.message)
+      throw new UnknownError('ArtworkAppService->list(): ' + error.message)
     }
   }
 

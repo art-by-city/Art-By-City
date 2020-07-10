@@ -57,6 +57,8 @@ export interface ArtworkFilterOptions {
   likes?: string[]
   limit?: number
   shuffle?: boolean
+  userId?: string
+  lastFetchedArtworkId?: string
 }
 
 export interface ArtworkController extends BaseControllerInterface {}
@@ -70,7 +72,7 @@ export interface ArtworkApplicationService
     files?: Express.Multer.File[]
   ): Promise<ApiServiceResult<Artwork>>
   update(request: any): Promise<ApiServiceResult<Artwork>>
-  list(opts?: ArtworkFilterOptions): Promise<ApiServiceResult<Artwork[]>>
+  list(request: any): Promise<ApiServiceResult<Artwork[]>>
   listByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
   listLikedByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
   like(user: User, id: string): Promise<ApiServiceResult<void>>
