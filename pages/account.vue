@@ -7,6 +7,14 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="save">
               <v-text-field
+                v-model="login.id"
+                type="text"
+                label="Id"
+                class="text-lowercase"
+                disabled
+              ></v-text-field>
+
+              <v-text-field
                 v-model="login.username"
                 type="text"
                 label="Username"
@@ -82,6 +90,7 @@ export default class AccountPage extends FormPageComponent {
   newPassword = ''
   repeatPassword = ''
   login = {
+    id: this.$auth.user.id,
     username: this.$auth.user.username,
     password: ''
   }

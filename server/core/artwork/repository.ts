@@ -9,6 +9,7 @@ import { Artwork, ArtworkRepository, ArtworkFilterOptions } from './'
 
 @injectable()
 export default class ArtworkRepositoryImpl implements ArtworkRepository {
+  private collectionName = 'Artworks'
   private repository = getRepository(Artwork)
   private client: Firestore
 
@@ -48,27 +49,35 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
         return this.list()
       }
 
-      let query = this.repository.orderByAscending('id')
+      let query = this.client
+        .collection(this.collectionName)
+        .orderBy('id', 'asc')
+
+      if (filter.lastFetchedArtworkId) {
+        query = query.startAfter(filter.lastFetchedArtworkId)
+      }
 
       if (filter.owner) {
-        query = query.whereEqualTo('owner', filter.owner)
+        query = query.where('owner', '==', filter.owner)
       }
 
       if (filter.city) {
-        query = query.whereEqualTo('city', filter.city)
+        query = query.where('city', '==', filter.city)
       }
 
       if (filter.type) {
-        query = query.whereEqualTo('type', filter.type)
+        query = query.where('type', '==', filter.type)
       }
 
       if (filter.hashtags) {
-        query = query.whereArrayContains('hashtags', filter.hashtags[0])
+        query = query.where('hashtags', 'array-contains', filter.hashtags[0])
       }
 
-      const found = await query.find()
+      const found = await query.get()
 
-      let matches: Artwork[] = [...found]
+      let matches: Artwork[] = found.docs.map((doc) => {
+        return <Artwork>doc.data()
+      })
       if (filter.hashtags && filter.hashtags.length > 0) {
         filter.hashtags.forEach((hashtag) => {
           matches = matches.filter((doc) => {
@@ -77,13 +86,13 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
         })
       }
 
-      // Shuffle
-      matches = filter.shuffle ? _.shuffle(matches) : matches
-
       // Limit
       if (filter.limit) {
         matches = matches.slice(0, filter.limit)
       }
+
+      // Shuffle
+      matches = filter.shuffle ? _.shuffle(matches) : matches
 
       return matches
     } catch (error) {

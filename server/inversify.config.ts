@@ -5,6 +5,7 @@ import { AdminModule } from './core/admin'
 import { AuthModule } from './core/auth'
 import { ArtworkModule } from './core/artwork'
 import { CityModule } from './core/city'
+import { DiscoveryModule } from './core/discovery'
 import DatabaseModule from './core/db/module'
 
 const container = new Container()
@@ -14,6 +15,7 @@ container.load(AdminModule)
 container.load(AuthModule)
 container.load(ArtworkModule)
 container.load(CityModule)
+container.load(DiscoveryModule)
 container.load(DatabaseModule)
 
 export { container }
