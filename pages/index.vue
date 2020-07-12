@@ -31,6 +31,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
 import ArtworkExplorer from '~/components/artwork/ArtworkExplorer.component.vue'
+import { ConfigStoreState } from '~/store/config'
 
 @Component({
   components: {
@@ -39,7 +40,7 @@ import ArtworkExplorer from '~/components/artwork/ArtworkExplorer.component.vue'
 })
 export default class HomePage extends PageComponent {
   payload: any[] = []
-  cities: any[] = []
+  config: ConfigStoreState = { cities: [], hashtags: [] }
   options: any
   expand: boolean = false
 
@@ -48,7 +49,7 @@ export default class HomePage extends PageComponent {
       const options = { ...store.state.artworks.options }
       let payload = []
       let errors = []
-      let cities = []
+      let config: ConfigStoreState = { cities: [], hashtags: [] }
       try {
         const params = { ...options }
 
@@ -68,15 +69,14 @@ export default class HomePage extends PageComponent {
           payload = store.state.artworks.list
         }
 
-        const citiesResult = await $axios.$get('/api/city')
-        cities = citiesResult.payload || []
-        store.commit('config/setCities', cities)
+        config = await $axios.$get('/api/config')
+        store.commit('config/setConfig', config)
       } catch (error) {
         console.error(error)
         errors = error.response?.data?.messages
       }
 
-      return { errors, payload, options, cities }
+      return { errors, payload, options, config }
     }
   }
 }

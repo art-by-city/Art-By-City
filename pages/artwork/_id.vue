@@ -123,7 +123,12 @@
                   label="Hashtags"
                   multiple
                   chips
+                  :items="hashtags"
+                  no-filter
+                  hide-selected
+                  :search-input.sync="hashtagSearchInput"
                   @input="onHashtagInput"
+                  @update:search-input="onHashtagUpdateSearchInput"
                 >
                   <template v-slot:selection="data">
                     <v-chip
@@ -160,6 +165,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
+import Fuse from 'fuse.js'
 
 import { artworkTypes } from '~/server/core/artwork/validator'
 import LikeButton from '~/components/likeButton.component.vue'
@@ -174,9 +180,51 @@ export default class ArtworkPage extends FormPageComponent {
   artwork: any = {}
   artworkTypes: string[] = artworkTypes
   cities: any[] = this.$store.state.config.cities
+  hashtags: string[] = this.$store.state.config.hashtags
+  fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
+  hashtagSearchInput: string = ''
 
   editMode = false
   imagePreviewIndex = 0
+
+  async asyncData({ $axios, store, params }: Context) {
+    try {
+      const { payload } = await $axios.$get(`/api/artwork/${params.id}`)
+
+      if (!payload.city) {
+        payload.city = null
+      }
+
+      const config = await $axios.$get('/api/config')
+      store.commit('config/setConfig', config)
+
+      return {
+        artwork: payload,
+        cities: config.cities,
+        hashtags: config.hashtags
+      }
+    } catch (error) {
+      console.error(error)
+      return { errors: error.response?.data?.messages }
+    }
+  }
+
+  onHashtagInput(hashtags: string[]) {
+    this.artwork.hashtags = hashtags.map((h) => {
+      return h[0] === '#' ? h.slice(1) : h
+    })
+    this.hashtagSearchInput = ''
+  }
+
+  onHashtagUpdateSearchInput(value: string) {
+    if (!value) {
+      this.hashtags = this.$store.state.config.hashtags
+    } else {
+      const result = this.fuzzyHashtags.search(value)
+
+      this.hashtags = result.map((r: any) => r.item)
+    }
+  }
 
   get isOwner() {
     return this.$store.state?.auth?.user?.id === this.artwork?.owner.id
@@ -190,35 +238,10 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
-  async asyncData({ $axios, store, params }: Context) {
-    try {
-      const { payload } = await $axios.$get(`/api/artwork/${params.id}`)
-
-      if (!payload.city) {
-        payload.city = null
-      }
-
-      const citiesResult = await $axios.$get('/api/city')
-      const cities = citiesResult.payload || []
-      store.commit('config/setCities', cities)
-
-      return { artwork: payload, cities }
-    } catch (error) {
-      console.error(error)
-      return { errors: error.response?.data?.messages }
-    }
-  }
-
   get previewImageSource() {
     return (
       '/artwork-images/' + this.artwork.images[this.imagePreviewIndex].source
     )
-  }
-
-  onHashtagInput(hashtags: string[]) {
-    this.artwork.hashtags = hashtags.map((h) => {
-      return h[0] === '#' ? h.slice(1) : h
-    })
   }
 
   isHighlighted(i: number) {

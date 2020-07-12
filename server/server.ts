@@ -9,6 +9,8 @@ import { AdminController } from './core/admin'
 import { ArtworkController } from './core/artwork'
 import { UserController } from './core/user'
 import { CityController } from './core/city'
+import { ConfigController } from './core/config'
+import { EventService } from './core/events'
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(
@@ -23,10 +25,12 @@ passport.use(authService.getJwtAuthenticationStrategy())
 passport.serializeUser(authService.serializeUser)
 passport.deserializeUser(authService.deserializeUser)
 
-// Express App Config / Routing
+// Express Config
 const app = express()
 app.use(passport.initialize())
 app.use(bodyParser.json())
+
+// Express Routing
 app.use(
   '/auth',
   container.get<AuthController>(Symbol.for('AuthController')).getRouter()
@@ -47,5 +51,12 @@ app.use(
   '/city',
   container.get<CityController>(Symbol.for('CityController')).getRouter()
 )
+app.use(
+  '/config',
+  container.get<ConfigController>(Symbol.for('ConfigController')).getRouter()
+)
+
+// Event Registration
+container.get<EventService>(Symbol.for('EventService')).registerEvents()
 
 export default app

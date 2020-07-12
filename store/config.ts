@@ -1,11 +1,13 @@
 export const state = () => ({
-  cities: [] as string[]
+  cities: [] as any[],
+  hashtags: [] as string[]
 })
 
 export type ConfigStoreState = ReturnType<typeof state>
 
 export const mutations = {
-  setCities(state: ConfigStoreState, cities: string[]) {
-    state.cities = cities
+  setConfig(state: ConfigStoreState, newState: ConfigStoreState) {
+    state.cities = newState.cities
+    state.hashtags = newState.hashtags
   }
 }

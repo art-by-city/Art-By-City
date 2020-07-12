@@ -3,6 +3,7 @@ import { ContainerModule } from 'inversify'
 import BaseRepositoryInterface from '../repository.interface'
 import BaseDomainServiceInterface from '../domainService.interface'
 import BaseApplicationServiceInterface from '../applicationService.interface'
+
 import { Artwork } from '../artwork'
 import UserArtworkViews from './userArtworkViews'
 import UserArtworkViewsRepositoryImpl from './userArtworkViewsRepository'

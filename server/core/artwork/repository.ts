@@ -53,10 +53,6 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
         .collection(this.collectionName)
         .orderBy('id', 'asc')
 
-      if (filter.lastFetchedArtworkId) {
-        query = query.startAfter(filter.lastFetchedArtworkId)
-      }
-
       if (filter.owner) {
         query = query.where('owner', '==', filter.owner)
       }
@@ -71,6 +67,10 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
 
       if (filter.hashtags) {
         query = query.where('hashtags', 'array-contains', filter.hashtags[0])
+      }
+
+      if (filter.lastFetchedArtworkId) {
+        query = query.startAfter(filter.lastFetchedArtworkId)
       }
 
       const found = await query.get()
