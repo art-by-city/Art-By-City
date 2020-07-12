@@ -7,6 +7,7 @@ import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
 import { DiscoveryService } from '../discovery'
+import { EventService } from '../events'
 import {
   Artwork,
   ArtworkService,
@@ -19,15 +20,19 @@ export default class ArtworkApplicationServiceImpl
   implements ArtworkApplicationService {
   private artworkService: ArtworkService
   private discoveryService: DiscoveryService
+  private eventService: EventService
 
   constructor(
     @inject(Symbol.for('ArtworkService'))
     artworkService: ArtworkService,
     @inject(Symbol.for('DiscoveryService'))
-    discoveryService: DiscoveryService
+    discoveryService: DiscoveryService,
+    @inject(Symbol.for('EventService'))
+    eventService: EventService
   ) {
     this.artworkService = artworkService
     this.discoveryService = discoveryService
+    this.eventService = eventService
   }
 
   async create(req: any): Promise<ApiServiceResult<Artwork>> {
@@ -51,6 +56,10 @@ export default class ArtworkApplicationServiceImpl
 
     try {
       const savedArtwork = await this.artworkService.create(artwork)
+
+      artwork.hashtags.forEach((hashtag) => {
+        this.eventService.emit('hashtag:added', hashtag)
+      })
 
       if (savedArtwork) {
         return new ApiServiceSuccessResult(savedArtwork)
@@ -83,6 +92,9 @@ export default class ArtworkApplicationServiceImpl
         artwork.city = req.body?.city || ''
         artwork.hashtags = req.body?.hashtags || []
         const savedArtwork = await this.artworkService.update(artwork)
+        artwork.hashtags.forEach((hashtag) => {
+          this.eventService.emit('hashtag:added', hashtag)
+        })
         if (savedArtwork) {
           return new ApiServiceSuccessResult(savedArtwork)
         }

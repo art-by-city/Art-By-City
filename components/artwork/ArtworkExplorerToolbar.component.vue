@@ -70,7 +70,12 @@
           rounded
           dense
           single-line
+          :items="hashtags"
+          no-filter
+          hide-selected
+          :search-input.sync="hashtagSearchInput"
           @input="onHashtagInput"
+          @update:search-input="onHashtagUpdateSearchInput"
         >
           <template v-slot:selection="data">
             <v-chip
@@ -112,6 +117,7 @@
 
 <script lang="ts">
 import { Vue, Component, Emit, Prop, PropSync } from 'nuxt-property-decorator'
+import Fuse from 'fuse.js'
 
 import { artworkTypes } from '~/server/core/artwork/validator'
 
@@ -119,6 +125,9 @@ import { artworkTypes } from '~/server/core/artwork/validator'
 export default class ArtworkExplorerToolbar extends Vue {
   artworkTypes = ['Any'].concat(artworkTypes)
   cities = [{ id: 'Any', name: 'Any' }].concat(this.$store.state.config.cities)
+  hashtags = this.$store.state.config.hashtags
+  fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
+  hashtagSearchInput: string = ''
 
   @Prop({
     default: {
@@ -159,8 +168,18 @@ export default class ArtworkExplorerToolbar extends Vue {
     this.opts.hashtags = hashtags.map((h) => {
       return h[0] === '#' ? h.slice(1) : h
     })
-    // this.$emit('refresh', this.opts)
+    this.hashtagSearchInput = ''
     this.onRefresh()
+  }
+
+  onHashtagUpdateSearchInput(value: string) {
+    if (!value) {
+      this.hashtags = this.$store.state.config.hashtags
+    } else {
+      const result = this.fuzzyHashtags.search(value)
+
+      this.hashtags = result.map((r: any) => r.item)
+    }
   }
 }
 </script>

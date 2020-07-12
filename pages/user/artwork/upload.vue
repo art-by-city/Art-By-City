@@ -60,10 +60,15 @@
                 v-model="artwork.hashtags"
                 name="hashtags"
                 label="Hashtags"
+                class="text-lowercase"
                 multiple
                 chips
-                class="text-lowercase"
+                :items="hashtags"
+                no-filter
+                hide-selected
+                :search-input.sync="hashtagSearchInput"
                 @input="onHashtagInput"
+                @update:search-input="onHashtagUpdateSearchInput"
               >
                 <template v-slot:selection="data">
                   <v-chip
@@ -115,8 +120,9 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component, Watch } from 'nuxt-property-decorator'
-import FormComponent from '~/components/pages/formPage.component'
+import Fuse from 'fuse.js'
 
+import FormComponent from '~/components/pages/formPage.component'
 import {
   titleRules,
   descriptionRules,
@@ -135,19 +141,25 @@ export default class ArtworkUploadPage extends FormComponent {
   artwork: any = {
     images: []
   }
+  hashtags: string[] = this.$store.state.config.hashtags
+  fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
+  hashtagSearchInput: string = ''
 
-  async asyncData({ $axios }: Context) {
+  async asyncData({ $axios, store }: Context) {
     const errors = []
     let cities = [] as any[]
+    let hashtags = [] as string[]
 
     try {
-      const citiesResponse = await $axios.$get('/api/city')
-      cities = citiesResponse.payload || []
+      const config = await $axios.$get('/api/config')
+      store.commit('config/setConfig', config)
+      cities = config.cities
+      hashtags = config.hashtags
     } catch (error) {
       errors.push(error.response?.data?.messages)
     }
 
-    return { errors, cities }
+    return { errors, cities, hashtags }
   }
 
   get titleRules() {
@@ -184,6 +196,17 @@ export default class ArtworkUploadPage extends FormComponent {
     this.artwork.hashtags = hashtags.map((h) => {
       return h[0] === '#' ? h.slice(1) : h
     })
+    this.hashtagSearchInput = ''
+  }
+
+  onHashtagUpdateSearchInput(value: string) {
+    if (!value) {
+      this.hashtags = this.$store.state.config.hashtags
+    } else {
+      const result = this.fuzzyHashtags.search(value)
+
+      this.hashtags = result.map((r: any) => r.item)
+    }
   }
 
   async upload() {

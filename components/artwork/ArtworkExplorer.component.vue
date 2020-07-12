@@ -151,8 +151,6 @@ export default class ArtworkExplorer extends Vue {
       delete params.city
     }
 
-    console.log('ArtworkExplorer refresh() params', params)
-
     try {
       const { payload } = await this.$axios.$get('/api/artwork', { params })
 

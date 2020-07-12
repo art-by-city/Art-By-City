@@ -25,7 +25,7 @@ export default class UserArtworkViewsRepositoryImpl
     try {
       return this.repository.create(userArtworkViews)
     } catch (error) {
-      throw new Error(`Error createing new UserArtworkViews: ${error.message}`)
+      throw new Error(`Error creating new UserArtworkViews: ${error.message}`)
     }
   }
 
