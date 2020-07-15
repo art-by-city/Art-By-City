@@ -89,6 +89,11 @@
         <nuxt />
       </v-container>
     </v-content>
+
+    <v-footer dark>
+      <v-spacer></v-spacer>
+      <div>&copy; {{ new Date().getFullYear() }}</div>
+    </v-footer>
   </v-app>
 </template>
 

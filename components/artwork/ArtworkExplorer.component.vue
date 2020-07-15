@@ -58,19 +58,21 @@
             :key="i"
             justify="center"
             xs="12"
-            md="4"
+            :md="calcColMdCols(i)"
           >
             <v-hover>
               <template v-slot:default="{ hover }">
                 <v-card
-                  class="artwork-card"
-                  :width="calcArtworkHeight()"
-                  :height="calcArtworkHeight()"
+                  :class="artworkCardClass(i)"
+                  :width="calcArtworkHeight(i)"
+                  :height="calcArtworkHeight(i)"
                   flat
                 >
                   <div :class="artworkFlipCardClass">
+                    <!-- {{ i }} -->
                     <div class="flip-card-inner">
                       <div class="flip-card-front">
+                        <!-- front -->
                         <v-img
                           v-if="artwork"
                           :src="'/artwork-images/' + artwork.images[0].source"
@@ -94,6 +96,7 @@
                         </v-img>
                       </div>
                       <div class="flip-card-back">
+                        <!-- back -->
                         <v-img
                           v-if="sliceArtworks('B')[i]"
                           :src="'/artwork-images/' + sliceArtworks('B')[i].images[0].source"
@@ -193,7 +196,8 @@ export default class ArtworkExplorer extends Vue {
     }
 
     if (this.gridSize === 1) {
-      return [ artworks.length > 1 ? artworks[1] : artworks[0] ]
+      // return [ artworks.length > 1 ? artworks[1] : artworks[0] ]
+      return artworks.slice(0, 3)
     }
 
     return artworks.slice(0, this.gridSize)
@@ -203,9 +207,46 @@ export default class ArtworkExplorer extends Vue {
     return { [`grid-size-${this.gridSize}`]: true }
   }
 
-  calcArtworkHeight() {
+  artworkCardClass(i: number) {
+    const classes: any = { 'artwork-card': true }
+
+    if (this.gridSize === 1) {
+      switch (i) {
+        case 0:
+          classes.hide = true
+          classes.left = true
+          break
+        case 1:
+          classes.show = true
+          break
+        case 2:
+          classes.hide = true
+          classes.right = true
+          break
+      }
+    }
+
+    return classes
+  }
+
+  calcColMdCols(i: number) {
+    if (this.gridSize === 1) {
+      if (i === 0 || i === 2) {
+        return 3
+      }
+
+      return 6
+    }
+    return 4
+  }
+
+  calcArtworkHeight(i: number) {
     if (this.vw < 960) {
       return '70vh'
+    }
+
+    if (this.gridSize === 1 && (i === 0 || i === 2)) {
+      return '0px'
     }
 
     let available = this.vh
@@ -213,10 +254,16 @@ export default class ArtworkExplorer extends Vue {
       available = this.vw
     }
     let magic = 425
-    if (this.gridSize === 6) {
-      magic = 300
-    } else if (this.gridSize === 9) {
-      magic = 300
+    switch (this.gridSize) {
+      case 1:
+        magic = 300
+        break
+      case 3:
+        magic = 425
+        break
+      case 6:
+      case 9:
+        magic = 300
     }
 
     available = available - magic
@@ -341,6 +388,30 @@ export default class ArtworkExplorer extends Vue {
 }
 .artwork-overlay-title-container {
   padding-bottom: 2px;
+}
+
+.artwork-card {
+  transition: all .5s ease-out;
+  /* opacity: 1 */
+}
+
+.artwork-card.hide {
+  /* display: none; */
+  /* visibility: hidden; */
+  opacity: 0
+}
+.artwork-card.hide.left {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.artwork-card.hide.right {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.artwork-card.show {
+  margin: auto
 }
 
 .artwork-explorer-container.grid-size-1 {
