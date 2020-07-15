@@ -72,6 +72,7 @@
                     <div class="flip-card-inner">
                       <div class="flip-card-front">
                         <v-img
+                          v-if="artwork"
                           :src="'/artwork-images/' + artwork.images[0].source"
                           style="cursor: pointer"
                           height="100%"
@@ -132,6 +133,7 @@ import { Vue, Component, PropSync } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
+import ArtworkOptions from '../../models/artwork/artworkOptions'
 
 @Component({
   components: {
@@ -149,7 +151,7 @@ export default class ArtworkExplorer extends Vue {
     imageIndex: 0
   }
 
-  gridSize = 3
+  gridSize = 1
 
   vw = 1000
   vh = 1000
@@ -172,7 +174,7 @@ export default class ArtworkExplorer extends Vue {
     this.vh = window.innerHeight
   }
 
-  async refresh(opts: any) {
+  async refresh(opts: ArtworkOptions) {
     this.$store.commit('artworks/options', opts)
     await this.$store.dispatch('artworks/fetchArtworks')
   }
@@ -188,6 +190,10 @@ export default class ArtworkExplorer extends Vue {
 
     if (this.vw < 960) {
       return artworks.slice(0, 1)
+    }
+
+    if (this.gridSize === 1) {
+      return [ artworks.length > 1 ? artworks[1] : artworks[0] ]
     }
 
     return artworks.slice(0, this.gridSize)
@@ -216,6 +222,10 @@ export default class ArtworkExplorer extends Vue {
     available = available - magic
 
     const h = available / (this.gridSize / 3)
+
+    if (this.gridSize === 1) {
+      return available
+    }
 
     return h
   }
@@ -329,26 +339,21 @@ export default class ArtworkExplorer extends Vue {
 .artwork-explorer-container {
   margin: auto;
 }
+.artwork-overlay-title-container {
+  padding-bottom: 2px;
+}
 
+.artwork-explorer-container.grid-size-1 {
+  width: 96%
+}
 .artwork-explorer-container.grid-size-3 {
   width: 96%;
 }
-.artwork-explorer-container.grid-size-3 .artwork-overlay-title-container {
-  padding-bottom: 2px;
-}
-
 .artwork-explorer-container.grid-size-6 {
   width: 60%;
 }
-.artwork-explorer-container.grid-size-6 .artwork-overlay-title-container {
-  padding-bottom: 2px;
-}
-
 .artwork-explorer-container.grid-size-9 {
   width: 41%;
-}
-.artwork-explorer-container.grid-size-9 .artwork-overlay-title-container {
-  padding-bottom: 2px;
 }
 
 /* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
