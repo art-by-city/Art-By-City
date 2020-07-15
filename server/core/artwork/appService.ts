@@ -7,7 +7,7 @@ import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
 import { DiscoveryService } from '../discovery'
-import { EventService } from '../events'
+import { EventService, UserEvents } from '../events'
 import {
   Artwork,
   ArtworkService,
@@ -152,6 +152,10 @@ export default class ArtworkApplicationServiceImpl
       await this.discoveryService.setLastArtworkViewedFromBatch(user.id, [
         ...(shouldResetLastViewedArtwork ? moreArtworks : artworks)
       ])
+
+      artworks.forEach((artwork) => {
+        this.eventService.emit(UserEvents.Artwork.Viewed, user.id, artwork.id)
+      })
 
       return new ApiServiceSuccessResult(artworks)
     } catch (error) {

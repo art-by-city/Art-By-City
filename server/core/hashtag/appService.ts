@@ -1,5 +1,4 @@
 import { injectable, inject } from 'inversify'
-import { Express } from 'express'
 import { EventEmitter } from 'events'
 
 import { HashtagApplicationService, HashtagService } from './'
@@ -20,6 +19,10 @@ export default class HashtagApplicationServiceImpl implements HashtagApplication
   }
 
   onHashtagAdded(hashtag: string) {
-    this.hashtagService.createOrUpdate(hashtag)
+    try {
+      this.hashtagService.createOrUpdate(hashtag)
+    } catch (error) {
+      console.error(error)
+    }
   }
 }

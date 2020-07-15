@@ -1,5 +1,4 @@
 import { ContainerModule } from 'inversify'
-import { Express, Application } from 'express'
 import { EventEmitter } from 'events'
 
 import BaseRepositoryInterface from '../repository.interface'

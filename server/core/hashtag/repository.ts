@@ -1,6 +1,5 @@
 import { injectable, inject } from 'inversify'
 import { Firestore, DocumentReference } from '@google-cloud/firestore'
-import { getRepository } from 'fireorm'
 
 import DatabaseAdapter from '../db/adapter.interface'
 import { HashtagRepository, Hashtag, HashtagFilterOptions } from '.'
@@ -13,7 +12,8 @@ export default class HashtagRepositoryImpl
   private client: Firestore
 
   constructor(
-    @inject(Symbol.for('DatabaseAdapter')) databaseAdapter: DatabaseAdapter
+    @inject(Symbol.for('DatabaseAdapter'))
+    databaseAdapter: DatabaseAdapter
   ) {
     super(Hashtag)
 
