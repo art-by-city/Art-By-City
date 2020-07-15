@@ -2,6 +2,7 @@
   <v-container fluid class="pa-0">
     <v-row dense>
       <v-col cols="3">
+        {{ $store.state.artworks.visibleSlot }}
         <v-autocomplete
           v-model="opts.city"
           class="condensed-input text-lowercase"
@@ -30,7 +31,7 @@
       </v-col>
       <v-col offset="3">
         <v-btn
-          v-if="$store.state.artworks.prev.length > 0"
+          v-if="$store.state.artworks.slotB.length > 0"
           icon
           @click="onPreviousClicked"
         >
