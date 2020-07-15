@@ -66,27 +66,57 @@
                   class="artwork-card"
                   :width="calcArtworkHeight()"
                   :height="calcArtworkHeight()"
+                  flat
                 >
-                  <v-img
-                    :src="'/artwork-images/' + artwork.images[0].source"
-                    style="cursor: pointer"
-                    height="100%"
-                    width="100%"
-                    @click="showArtworkPreview(i)"
-                  >
-                    <v-fade-transition>
-                      <v-overlay v-if="hover" absolute class="artwork-overlay">
-                        <v-row align="end" class="fill-height pa-1">
-                          <v-col class="artwork-overlay-title-container">
-                            <LikeButton :dark="true" :artwork="artwork" />
-                            <a class="white--text text-lowercase">
-                              {{ artwork.title }}
-                            </a>
-                          </v-col>
-                        </v-row>
-                      </v-overlay>
-                    </v-fade-transition>
-                  </v-img>
+                  <div :class="artworkFlipCardClass">
+                    <div class="flip-card-inner">
+                      <div class="flip-card-front">
+                        <v-img
+                          :src="'/artwork-images/' + artwork.images[0].source"
+                          style="cursor: pointer"
+                          height="100%"
+                          width="100%"
+                          @click="showArtworkPreview(i)"
+                        >
+                          <v-fade-transition>
+                            <v-overlay v-if="hover" absolute class="artwork-overlay">
+                              <v-row align="end" class="fill-height pa-1">
+                                <v-col class="artwork-overlay-title-container">
+                                  <LikeButton :dark="true" :artwork="artwork" />
+                                  <a class="white--text text-lowercase">
+                                    {{ artwork.title }}
+                                  </a>
+                                </v-col>
+                              </v-row>
+                            </v-overlay>
+                          </v-fade-transition>
+                        </v-img>
+                      </div>
+                      <div class="flip-card-back">
+                        <v-img
+                          v-if="sliceArtworks('B')[i]"
+                          :src="'/artwork-images/' + sliceArtworks('B')[i].images[0].source"
+                          style="cursor: pointer"
+                          height="100%"
+                          width="100%"
+                          @click="showArtworkPreview(i)"
+                        >
+                          <v-fade-transition>
+                            <v-overlay v-if="hover" absolute class="artwork-overlay">
+                              <v-row align="end" class="fill-height pa-1">
+                                <v-col class="artwork-overlay-title-container">
+                                  <LikeButton :dark="true" :artwork="artwork" />
+                                  <a class="white--text text-lowercase">
+                                    {{ artwork.title }}
+                                  </a>
+                                </v-col>
+                              </v-row>
+                            </v-overlay>
+                          </v-fade-transition>
+                        </v-img>
+                      </div>
+                    </div>
+                  </div>
                 </v-card>
               </template>
             </v-hover>
@@ -124,6 +154,8 @@ export default class ArtworkExplorer extends Vue {
   vw = 1000
   vh = 1000
 
+  showBackCards = false
+
   mounted() {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize)
@@ -141,39 +173,24 @@ export default class ArtworkExplorer extends Vue {
   }
 
   async refresh(opts: any) {
-    const params = { ...opts }
-
-    if (params.type === 'Any') {
-      delete params.type
-    }
-
-    if (params.city === 'Any') {
-      delete params.city
-    }
-
-    try {
-      const { payload } = await this.$axios.$get('/api/artwork', { params })
-
-      this.$store.commit('artworks/set', payload)
-      this.$store.commit('artworks/options', opts)
-
-      this.artworks = payload
-    } catch (error) {
-      console.error(error)
-    }
+    this.$store.commit('artworks/options', opts)
+    await this.$store.dispatch('artworks/fetchArtworks')
   }
 
   previous() {
     this.$store.commit('artworks/previous')
-    this.artworks = this.$store.state.artworks.list
   }
 
-  sliceArtworks() {
+  sliceArtworks(slot?: string) {
+    const artworks = !slot || slot === 'A'
+      ? this.$store.state.artworks.slotA
+      : this.$store.state.artworks.slotB
+
     if (this.vw < 960) {
-      return this.artworks.slice(0, 1)
+      return artworks.slice(0, 1)
     }
 
-    return this.artworks.slice(0, this.gridSize)
+    return artworks.slice(0, this.gridSize)
   }
 
   calcContainerClass() {
@@ -253,6 +270,13 @@ export default class ArtworkExplorer extends Vue {
     this.$forceUpdate()
   }
 
+  get artworkFlipCardClass() {
+    return {
+      'flip-card': true,
+      'show-back-card': this.$store.state.artworks.visibleSlot === 'B'
+    }
+  }
+
   showArtworkPreview(index: number) {
     this.artworkPreview.index = index
     this.toggleArtworkPreviewModal(true)
@@ -325,5 +349,76 @@ export default class ArtworkExplorer extends Vue {
 }
 .artwork-explorer-container.grid-size-9 .artwork-overlay-title-container {
   padding-bottom: 2px;
+}
+
+/* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
+.flip-card {
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+}
+
+/* This container is needed to position the front and back side */
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+/* Do an horizontal flip when you move the mouse over the flip box container */
+.flip-card.show-back-card .flip-card-inner {
+  transform: rotateY(180deg);
+  /* animation: flip-in .5s; */
+}
+/* Style the back side */
+.flip-card-back {
+  transform: rotateY(180deg);
+  /* animation: flip-in .5s; */
+}
+
+/* Position the front and back side */
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+
+  border-bottom-color:rgb(255, 255, 255);
+  border-bottom-left-radius:4px;
+  border-bottom-right-radius:4px;
+  border-bottom-width:0px;
+  border-left-color:rgb(255, 255, 255);
+  border-left-width:0px;
+  border-right-color:rgb(255, 255, 255);
+  border-right-width:0px;
+  border-top-color:rgb(255, 255, 255);
+  border-top-left-radius:4px;
+  border-top-right-radius:4px;
+  border-top-width:0px;
+  box-shadow:rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
+  box-sizing:border-box;
+}
+
+.flip-enter-active {
+  animation: flip-in .5s;
+}
+.flip-leave-active {
+  animation: flip-in .5s reverse;
+}
+@keyframes flip-in {
+  0% {
+    transform: rotateY(180deg);
+  }
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
 }
 </style>
