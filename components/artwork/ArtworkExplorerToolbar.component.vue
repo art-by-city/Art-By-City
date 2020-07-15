@@ -2,7 +2,6 @@
   <v-container fluid class="pa-0">
     <v-row dense>
       <v-col cols="3">
-        {{ $store.state.artworks.visibleSlot }}
         <v-autocomplete
           v-model="opts.city"
           class="condensed-input text-lowercase"
@@ -102,13 +101,7 @@
           @click="onGridPreferenceClicked"
         >
           <v-icon x-large color="black">
-            {{
-              syncedGridSize === 9
-                ? 'mdi-grid'
-                : syncedGridSize === 6
-                ? 'mdi-view-module-outline'
-                : 'mdi-view-week-outline'
-            }}
+            {{ gridIcon }}
           </v-icon>
         </v-btn>
       </v-col>
@@ -129,6 +122,7 @@ export default class ArtworkExplorerToolbar extends Vue {
   hashtags = this.$store.state.config.hashtags
   fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
   hashtagSearchInput: string = ''
+  gridSizes = [1,3]
 
   @Prop({
     default: {
@@ -143,7 +137,8 @@ export default class ArtworkExplorerToolbar extends Vue {
     return {
       type: this.opts.type,
       city: this.opts.city,
-      hashtags: this.opts.hashtags
+      hashtags: this.opts.hashtags,
+      limit: 3
     }
   }
 
@@ -152,16 +147,26 @@ export default class ArtworkExplorerToolbar extends Vue {
   @PropSync('gridsize', { type: Number }) syncedGridSize!: number
 
   onGridPreferenceClicked() {
+    let nextIndex = this.gridSizes.indexOf(this.syncedGridSize) + 1
+    if (nextIndex >= this.gridSizes.length) {
+      this.syncedGridSize = this.gridSizes[0]
+    } else {
+      this.syncedGridSize = this.gridSizes[nextIndex]
+    }
+  }
+
+  get gridIcon() {
     switch (this.syncedGridSize) {
+      case 1:
+        // return 'mdi-square-outline'
+        return 'mdi-circle-small'
       case 3:
-        this.syncedGridSize = 6
-        break
+        // return 'mdi-view-week-outline'
+        return 'mdi-dots-horizontal'
       case 6:
-        this.syncedGridSize = 9
-        break
+        return 'mdi-view-module-outline'
       case 9:
-      default:
-        this.syncedGridSize = 3
+        return 'mdi-grid'
     }
   }
 
