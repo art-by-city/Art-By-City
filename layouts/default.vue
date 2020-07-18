@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app>
+    <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app dense>
       <v-row>
         <v-col cols="4">
           <v-menu offset-y>
@@ -44,7 +44,7 @@
               <v-menu offset-y>
                 <template v-slot:activator="{ on }">
                   <v-btn class="avatar-menu-button" text right v-on="on">
-                    <v-avatar color="indigo">
+                    <v-avatar color="indigo" size="32">
                       <span class="white--text text-lowercase">
                         {{ avatar }}
                       </span>
