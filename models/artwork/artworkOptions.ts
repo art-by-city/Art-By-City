@@ -4,3 +4,14 @@ export default interface ArtworkOptions {
   hashtags: string[],
   limit: number
 }
+
+export const artworkTypes = [
+  'Painting',
+  'Illustration',
+  'Drawing',
+  'Sculpture',
+  'Photograph',
+  'Mixed-Media',
+  'Digital',
+  'Other'
+]

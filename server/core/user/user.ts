@@ -1,11 +1,48 @@
 import { Collection } from 'fireorm'
+import {
+  MinLength,
+  IsString,
+  ArrayUnique,
+  IsNotEmpty,
+  Matches
+} from 'class-validator'
+
+import Entity from '../common/entity'
 
 @Collection()
-export default class User {
-  id!: string
+export default class User extends Entity {
+  @IsString()
+  @MinLength(3, {
+    message: 'Username must be at least 3 characters'
+  })
   username!: string
+
+  @IsString()
+  @MinLength(8, {
+    message: 'Passwords must be at least 8 characters'
+  })
+  @Matches(/[a-z]/, {
+    message: 'Passwords must contain at least 1 lowercase character'
+  })
+  @Matches(/[A-Z]/, {
+    message: 'Passwords must contain at least 1 uppercase character'
+  })
+  @Matches(/[0-9]/, {
+    message: 'Passwords must contain at least 1 number'
+  })
+  @Matches(/[\s!"#$%&'()*+,-./\\:;<=>?@[\]^_`{|}~]/, {
+    message: 'Passwords must contain at least 1 symbol'
+  })
   password?: string
+
+  @ArrayUnique()
+  @IsString({ each: true })
   roles!: string[]
+
+  @IsString()
+  @IsNotEmpty({
+    message: 'City is required'
+  })
   city!: string
 
   updatePassword(newPassword: string): void {
@@ -25,16 +62,6 @@ export default class User {
   setRoles(roles: string[]): void {
     this.roles = roles
   }
-
-  // toJSON(): DomainEntity {
-  //   const clean = Object.assign(this, {})
-
-  //   delete clean.password
-
-  //   return (() => {
-  //     return super.toJSON()
-  //   }).call(clean)
-  // }
 
   toString() {
     return this.id

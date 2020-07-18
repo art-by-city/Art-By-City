@@ -1,7 +1,6 @@
 import { Vue, Watch } from 'nuxt-property-decorator'
 
 import PageComponent from './page.component'
-import { required } from '~/server/core/validators'
 
 export type VForm = Vue & { validate: () => boolean }
 
@@ -18,6 +17,6 @@ export default class FormPageComponent extends PageComponent {
   }
 
   get required() {
-    return required()
+    return [(v: string) => (v || '') !== '' || 'This field is required']
   }
 }

@@ -3,10 +3,9 @@ import { injectable, inject } from 'inversify'
 import UsernameAlreadyTakenError from '../api/errors/usernameAlreadyTakenError'
 import UnknownError from '../api/errors/unknownError'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import ValidationError from '../api/errors/validationError'
 import NotFoundError from '../api/errors/notFoundError'
 import { EventService } from '../events'
-import UserValidator from './validator'
+import validateUser from './validator'
 import { User, UserService, UserRepository } from './'
 import { UserEvents } from '../events/user'
 
@@ -25,26 +24,48 @@ export default class UserServiceImpl implements UserService {
     this.eventService = eventService
   }
 
+  async register(username: string, password: string): Promise<User> {
+    const user = new User()
+    user.id = ''
+    user.created = new Date()
+    user.updated = new Date()
+    user.username = username
+    user.password = password
+    user.roles = []
+
+    await validateUser(user)
+
+    try {
+      const savedUser = await this.userRepository.create(user)
+
+      this.eventService.emit(UserEvents.Account.Registered, savedUser.id)
+
+      return savedUser
+    } catch (error) {
+      // TODO -> Other errors
+      throw new UsernameAlreadyTakenError()
+    }
+  }
+
   async updatePassword(
     id: string,
     password: string
   ): Promise<ApiServiceResult<void>> {
-    const validator = new UserValidator()
+    const validatePasswordUser = new User()
+    validatePasswordUser.password = password
 
-    const messages = validator.validatePassword(password)
+    await validateUser(validatePasswordUser, true)
 
-    if (messages) {
-      throw new ValidationError(messages)
-    }
     const user = await this.userRepository.get(id)
 
     if (!user) {
       throw new NotFoundError(new User())
     }
 
-    user.updatePassword(password)
-
     try {
+      user.updatePassword(password)
+      user.updated = new Date()
+
       const updatedUser = await this.userRepository.update(user)
 
       if (!updatedUser) {
@@ -57,28 +78,52 @@ export default class UserServiceImpl implements UserService {
     }
   }
 
-  async register(username: string, password: string): Promise<User> {
-    const validator = new UserValidator()
+  async setUserRoles(
+    userId: string,
+    roles: string[]
+  ): Promise<ApiServiceResult<void>> {
+    const validateRolesUser = new User()
+    validateRolesUser.roles = roles
 
-    const messages = validator.validate(username, password)
+    await validateUser(validateRolesUser, true)
 
-    if (messages) {
-      throw new ValidationError(messages)
+    const user = await this.userRepository.get(userId)
+
+    if (!user) {
+      return { success: false, messages: ['User not found'] }
     }
 
     try {
-      const user = new User()
-      user.username = username
-      user.password = password
+      user.setRoles(roles)
+      user.updated = new Date()
 
-      const savedUser = await this.userRepository.create(user)
+      const savedUser = await this.userRepository.update(user)
 
-      this.eventService.emit(UserEvents.Account.Registered, savedUser.id)
+      if (!savedUser) {
+        throw new NotFoundError(new User())
+      }
 
-      return savedUser
+      return { success: true }
     } catch (error) {
-      // TODO -> Other errors
-      throw new UsernameAlreadyTakenError()
+      return { success: false, messages: ['Could not save user'] }
+    }
+  }
+
+  // Admin only?
+  async saveUser(user: User): Promise<ApiServiceResult<void>> {
+    await validateUser(user)
+
+    try {
+      user.updated = new Date()
+      const savedUser = await this.userRepository.update(user)
+
+      if (!savedUser) {
+        throw new NotFoundError(new User())
+      }
+
+      return { success: true }
+    } catch (error) {
+      return { success: false, messages: ['Could not save user'] }
     }
   }
 
@@ -104,36 +149,5 @@ export default class UserServiceImpl implements UserService {
 
   listUsers(): Promise<User[]> {
     return this.userRepository.list()
-  }
-
-  async setUserRoles(
-    userId: string,
-    roles: string[]
-  ): Promise<ApiServiceResult<void>> {
-    const user = await this.userRepository.get(userId)
-
-    if (!user) {
-      return { success: false, messages: ['User not found'] }
-    }
-
-    user.setRoles(roles)
-
-    const savedUser = await this.userRepository.update(user)
-
-    if (!savedUser) {
-      return { success: false, messages: ['Could not save user'] }
-    }
-
-    return { success: true }
-  }
-
-  async saveUser(user: User): Promise<ApiServiceResult<void>> {
-    const savedUser = await this.userRepository.update(user)
-
-    if (!savedUser) {
-      return { success: false, messages: ['Could not save user'] }
-    }
-
-    return { success: true }
   }
 }

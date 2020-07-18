@@ -113,7 +113,7 @@
 import { Vue, Component, Emit, Prop, PropSync } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
-import { artworkTypes } from '~/server/core/artwork/validator'
+import { artworkTypes } from '~/models/artwork/artworkOptions'
 
 @Component
 export default class ArtworkExplorerToolbar extends Vue {

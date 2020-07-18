@@ -45,6 +45,7 @@
                   name="title"
                   label="Title"
                   class="text-lowercase"
+                  :rules="titleRules"
                 ></v-text-field>
               </template>
             </v-col>
@@ -63,6 +64,7 @@
                   auto-grow
                   rows="1"
                   class="text-lowercase"
+                  :rules="descriptionRules"
                 ></v-textarea>
               </template>
             </v-col>
@@ -79,6 +81,7 @@
                   label="Type"
                   :items="artworkTypes"
                   class="text-lowercase"
+                  :rules="typeRules"
                 >
                   <template v-slot:item="{ item }">
                     <span class="text-lowercase">{{ item }}</span>
@@ -102,6 +105,7 @@
                   item-disabled="disabled"
                   :items="cities"
                   class="text-lowercase"
+                  :rules="cityRules"
                 >
                   <template v-slot:item="{ item }">
                     <span class="text-lowercase">{{ item.name }}</span>
@@ -167,9 +171,9 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
-import { artworkTypes } from '~/server/core/artwork/validator'
 import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
+import { artworkTypes } from '~/models/artwork/artworkOptions'
 
 @Component({
   components: {
@@ -242,6 +246,42 @@ export default class ArtworkPage extends FormPageComponent {
     return (
       '/artwork-images/' + this.artwork.images[this.imagePreviewIndex].source
     )
+  }
+
+  get titleRules() {
+    return [(value: string = '') => {
+      if (value.length < 1) {
+        return 'title is required'
+      }
+
+      if (value.length > 128) {
+        return 'title must be no more than 128 characters'
+      }
+    }]
+  }
+
+  get descriptionRules() {
+    return [(value: string = '') => {
+      if (value.length > 1024) {
+        return 'description must be no more than 1024 characters'
+      }
+    }]
+  }
+
+  get typeRules() {
+    return [(value: string = '') => {
+      if (!artworkTypes.includes(value)) {
+        return `type is required`
+      }
+    }]
+  }
+
+  get cityRules() {
+    return [(value: string = '') => {
+      if (!this.cities.includes(value)) {
+        return `city is required`
+      }
+    }]
   }
 
   isHighlighted(i: number) {

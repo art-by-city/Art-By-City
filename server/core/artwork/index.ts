@@ -1,4 +1,5 @@
 import { ContainerModule } from 'inversify'
+import { IsString, Matches } from 'class-validator'
 
 import BaseControllerInterface from '../controller.interface'
 import BaseApplicationServiceInterface from '../applicationService.interface'
@@ -45,8 +46,10 @@ export type Region =
   | 'Seattle'
   | 'Washington D.C.'
 
-export interface ArtworkImage {
-  source: string
+export class ArtworkImage {
+  @IsString()
+  @Matches(/\.(png|jpg)$/)
+  source!: string
 }
 
 export interface ArtworkFilterOptions {
