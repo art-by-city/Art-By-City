@@ -5,18 +5,24 @@ import UnknownError from '../api/errors/unknownError'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import ValidationError from '../api/errors/validationError'
 import NotFoundError from '../api/errors/notFoundError'
+import { EventService } from '../events'
 import UserValidator from './validator'
 import { User, UserService, UserRepository } from './'
+import { UserEvents } from '../events/user'
 
 @injectable()
 export default class UserServiceImpl implements UserService {
   private userRepository: UserRepository
+  private eventService: EventService
 
   constructor(
     @inject(Symbol.for('UserRepository'))
-    userRepository: UserRepository
+    userRepository: UserRepository,
+    @inject(Symbol.for('EventService'))
+    eventService: EventService
   ) {
     this.userRepository = userRepository
+    this.eventService = eventService
   }
 
   async updatePassword(
@@ -51,7 +57,7 @@ export default class UserServiceImpl implements UserService {
     }
   }
 
-  register(username: string, password: string): Promise<User> {
+  async register(username: string, password: string): Promise<User> {
     const validator = new UserValidator()
 
     const messages = validator.validate(username, password)
@@ -65,7 +71,11 @@ export default class UserServiceImpl implements UserService {
       user.username = username
       user.password = password
 
-      return this.userRepository.create(user)
+      const savedUser = await this.userRepository.create(user)
+
+      this.eventService.emit(UserEvents.Account.Registered, savedUser.id)
+
+      return savedUser
     } catch (error) {
       // TODO -> Other errors
       throw new UsernameAlreadyTakenError()
