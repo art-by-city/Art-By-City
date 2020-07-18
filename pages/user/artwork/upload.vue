@@ -31,7 +31,7 @@
                 name="type"
                 label="Type"
                 :items="artworkTypes"
-                :rules="required"
+                :rules="typeRules"
                 class="text-lowercase"
               >
                 <template v-slot:item="{ item }">
@@ -48,7 +48,7 @@
                 item-text="name"
                 item-value="id"
                 item-disabled="disabled"
-                :rules="required"
+                :rules="cityRules"
                 class="text-lowercase"
               >
                 <template v-slot:item="{ item }">
@@ -123,14 +123,10 @@ import { Component, Watch } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
 import FormComponent from '~/components/pages/formPage.component'
-import {
-  titleRules,
-  descriptionRules,
-  typeRules,
-  regionRules,
-  artworkTypes
-} from '~/server/core/artwork/validator'
-import { MAX_ARTWORK_HASHTAGS, MAX_ARTWORK_IMAGES } from '~/server/config'
+import { artworkTypes } from '~/models/artwork/artworkOptions'
+
+const MAX_ARTWORK_HASHTAGS = 12
+const MAX_ARTWORK_IMAGES = 12
 
 @Component({
   middleware: 'role/artist'
@@ -163,19 +159,39 @@ export default class ArtworkUploadPage extends FormComponent {
   }
 
   get titleRules() {
-    return titleRules()
+    return [(value: string = '') => {
+      if (value.length < 1) {
+        return 'title is required'
+      }
+
+      if (value.length > 128) {
+        return 'title must be no more than 128 characters'
+      }
+    }]
   }
 
   get descriptionRules() {
-    return descriptionRules()
+    return [(value: string = '') => {
+      if (value.length > 1024) {
+        return 'description must be no more than 1024 characters'
+      }
+    }]
   }
 
   get typeRules() {
-    return typeRules()
+    return [(value: string = '') => {
+      if (!artworkTypes.includes(value)) {
+        return `type is required`
+      }
+    }]
   }
 
-  get regionRules() {
-    return regionRules
+  get cityRules() {
+    return [(value: string = '') => {
+      if (!this.cities.includes(value)) {
+        return `city is required`
+      }
+    }]
   }
 
   @Watch('artwork.hashtags')

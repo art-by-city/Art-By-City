@@ -1,9 +1,9 @@
 import { injectable, inject } from 'inversify'
 
-import ValidationError from '../api/errors/validationError'
+import UnknownError from '../api/errors/unknownError'
 import { User, UserRepository } from '../user'
 import { DomainServiceOptions } from '../domainService.interface'
-import ArtworkValidator from './validator'
+import validateArtwork from './validator'
 import {
   Artwork,
   ArtworkService,
@@ -11,11 +11,11 @@ import {
   ArtworkFilterOptions
 } from './'
 
+
 @injectable()
 export default class ArtworkServiceImpl implements ArtworkService {
   private artworkRepository: ArtworkRepository
   private userRepository: UserRepository
-  private artworkValidator = new ArtworkValidator()
 
   constructor(
     @inject(Symbol.for('ArtworkRepository'))
@@ -28,13 +28,24 @@ export default class ArtworkServiceImpl implements ArtworkService {
   }
 
   async create(artwork: Artwork): Promise<Artwork | null> {
-    const messages = this.artworkValidator.validate(artwork)
+    await validateArtwork(artwork)
 
-    if (messages) {
-      throw new ValidationError(messages)
+    try {
+      return await this.artworkRepository.create(artwork)
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async update(artwork: Artwork): Promise<Artwork> {
+    await validateArtwork(artwork)
+
+    try {
+      return await this.artworkRepository.update(artwork)
+    } catch (error) {
+      throw new UnknownError(error.message)
     }
 
-    return await this.artworkRepository.create(artwork)
   }
 
   async get(id: string, opts?: DomainServiceOptions): Promise<Artwork | null> {
@@ -85,10 +96,6 @@ export default class ArtworkServiceImpl implements ArtworkService {
         return a
       })
     )
-  }
-
-  update(artwork: Artwork): Promise<Artwork> {
-    return this.artworkRepository.update(artwork)
   }
 
   delete(id: string): Promise<void> {

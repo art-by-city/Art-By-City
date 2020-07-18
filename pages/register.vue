@@ -32,7 +32,7 @@
               <v-text-field
                 type="password"
                 label="Repeat Password"
-                :rules="repeatPasswordRules"
+                :rules="repeatPasswordRules(login.password)"
                 required
                 class="text-lowercase"
               ></v-text-field>
@@ -63,7 +63,11 @@
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
-import { usernameRules, passwordRules } from '~/server/core/user/validator'
+import {
+  usernameRules,
+  passwordRules,
+  repeatPasswordRules
+} from '~/models/user/validation'
 
 @Component
 export default class RegisterPage extends FormPageComponent {
@@ -71,32 +75,21 @@ export default class RegisterPage extends FormPageComponent {
     username: '',
     password: ''
   }
-
-  get usernameRules() {
-    return usernameRules()
-  }
-
-  get passwordRules() {
-    return passwordRules()
-  }
-
-  repeatPasswordRules() {
-    return [
-      (v: string) => (v || '') === this.login.password || 'Passwords must match'
-    ]
-  }
+  usernameRules = usernameRules
+  passwordRules = passwordRules
+  repeatPasswordRules = repeatPasswordRules
 
   async register() {
     this.errors = []
-    const { token } = await this.$axios
+    const registrationResult = await this.$axios
       .$put('/api/auth/register', this.login)
       .catch((error) => {
         this.errors = [error.response.data.error.message]
       })
 
-    if (token) {
+    if (registrationResult && registrationResult.token) {
       try {
-        await this.$auth.setUserToken(token)
+        await this.$auth.setUserToken(registrationResult.token)
         this.$router.push({ path: '/' })
       } catch (err) {
         // TODO -> Sentry

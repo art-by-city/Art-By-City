@@ -50,56 +50,84 @@ export default class ArtworkControllerImpl implements ArtworkController {
       '/',
       roles(['artist']),
       upload.array('images'),
-      async (req, res) => {
-        const result = await this.artworkAppService.create(req)
+      async (req, res, next) => {
+        try {
+          const result = await this.artworkAppService.create(req)
 
-        return res.send(result)
+          return res.send(result)
+        } catch (error) {
+          next(error)
+        }
       }
     )
 
-    router.post('/:id', roles(['artist']), async (req, res) => {
-      const result = await this.artworkAppService.update(req)
+    router.post('/:id', roles(['artist']), async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.update(req)
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
-    router.get('/', async (req, res) => {
-      const result = await this.artworkAppService.list(req)
+    router.get('/', async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.list(req)
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
-    router.get('/:id', async (req, res) => {
-      const result = await this.artworkAppService.get(req.params.id)
+    router.get('/:id', async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.get(req.params.id)
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
-    router.delete('/:id', roles(['artist']), async (req, res) => {
-      const result = await this.artworkAppService.delete(
-        <User>req.user,
-        req.params.id
-      )
+    router.delete('/:id', roles(['artist']), async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.delete(
+          <User>req.user,
+          req.params.id
+        )
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
-    router.put('/:id/like', async (req, res) => {
-      const result = await this.artworkAppService.like(
-        <User>req.user,
-        req.params.id
-      )
+    router.put('/:id/like', async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.like(
+          <User>req.user,
+          req.params.id
+        )
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
-    router.delete('/:id/like', async (req, res) => {
-      const result = await this.artworkAppService.unlike(
-        <User>req.user,
-        req.params.id
-      )
+    router.delete('/:id/like', async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.unlike(
+          <User>req.user,
+          req.params.id
+        )
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     return router

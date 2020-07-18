@@ -16,7 +16,7 @@ export default class FirebaseAdapter implements DatabaseAdapter {
       port: 8080,
       ssl: false
     })
-    fireorm.initialize(this.firestore)
+    fireorm.initialize(this.firestore, { validateModels: false })
   }
 
   getClient() {

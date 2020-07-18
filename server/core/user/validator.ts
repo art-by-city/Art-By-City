@@ -1,89 +1,54 @@
 import {
-  ValidationRule,
-  mapRules
-} from '../validators/validationRule.interface'
+  validate,
+  ValidationError as ClassValidatorError
+} from 'class-validator'
 
-const MIN_USERNAME_LENGTH = 3
-const MIN_PASSWORD_LENGTH = 8
+import ValidationError from '../api/errors/validationError'
+import UnknownError from '../api/errors/unknownError'
+import { User } from './'
 
-const _usernameRules: ValidationRule[] = [
-  {
-    validate: (v: string) => v.length >= MIN_USERNAME_LENGTH,
-    message: 'Usernames must be at least 3 characters long'
-  }
-]
+export default async (
+  user: User,
+  skipMissingProperties?: boolean
+): Promise<void> => {
+  const internalProps = ['id', 'created', 'updated', 'roles']
 
-const _passwordRules: ValidationRule[] = [
-  {
-    validate: (v: string) => v.length >= MIN_PASSWORD_LENGTH,
-    message: 'Passwords must be at least 8 characters long'
-  },
-  {
-    validate: (v: string) => /[a-z]/.test(v),
-    message: 'Passwords must contain at least 1 lowercase character'
-  },
-  {
-    validate: (v: string) => /[A-Z]/.test(v),
-    message: 'Passwords must contain at least 1 uppercase character'
-  },
-  {
-    validate: (v: string) => /[0-9]/.test(v),
-    message: 'Passwords must contain at least 1 number'
-  },
-  {
-    validate: (v: string) => /[\s!"#$%&'()*+,-./\\:;<=>?@[\]^_`{|}~]/.test(v),
-    message: 'Passwords must contain at least 1 symbol'
-  }
-]
-
-export const usernameRules = () => {
-  return _usernameRules.map(mapRules)
-}
-
-export const passwordRules = () => {
-  return _passwordRules.map(mapRules)
-}
-
-export default class UserValidator {
-  validate(username: string, password: string): string[] | null {
-    let messages: string[] = []
-
-    const usernameMessages = this.validateUsername(username)
-
-    if (usernameMessages) {
-      messages = messages.concat(usernameMessages)
+  const validationErrors: ClassValidatorError[] = await validate(
+    user,
+    {
+      dismissDefaultMessages: true,
+      validationError: { target: false },
+      skipMissingProperties
     }
+  )
 
-    const passwordMessages = this.validatePassword(password)
-
-    if (passwordMessages) {
-      messages = messages.concat(passwordMessages)
-    }
-
-    return messages.length > 0 ? messages : null
-  }
-
-  validateUsername(username: string): string[] | null {
+  if (validationErrors.length > 0) {
     const messages: string[] = []
 
-    for (let i = 0; i < _usernameRules.length; i++) {
-      if (!_usernameRules[i].validate(username)) {
-        messages.push(_usernameRules[i].message)
+    const allowedErrors = validationErrors.filter((validationError) => {
+      return !internalProps.includes(validationError.property)
+    })
+    allowedErrors.forEach((validationError) => {
+      if (validationError.constraints) {
+        Object.entries(validationError.constraints).forEach((entry) => {
+          if (entry[1]) {
+            messages.push(entry[1])
+          }
+        })
       }
+    })
+
+    // const internalErrors = validationErrors.filter((validationError) => {
+    //   return internalProps.includes(validationError.property)
+    // })
+    // internalErrors.forEach((validationError) => {
+    //   console.log('INTERNAL VALIDATION ERROR', validationError)
+    // })
+
+    if (messages.length > 0) {
+      throw new ValidationError(messages)
     }
 
-    return messages.length > 0 ? messages : null
-  }
-
-  validatePassword(password: string): string[] | null {
-    const messages: string[] = []
-
-    for (let i = 0; i < _passwordRules.length; i++) {
-      if (!_passwordRules[i].validate(password)) {
-        messages.push(_passwordRules[i].message)
-      }
-    }
-
-    return messages.length > 0 ? messages : null
+    throw new UnknownError()
   }
 }

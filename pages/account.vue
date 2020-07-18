@@ -43,7 +43,7 @@
                 type="password"
                 label="Repeat New Password"
                 class="text-lowercase"
-                :rules="repeatPasswordRules"
+                :rules="repeatPasswordRules(newPassword)"
               ></v-text-field>
 
               <template v-if="hasErrors">
@@ -80,8 +80,8 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import { passwordRules } from '../server/core/user/validator'
 import FormPageComponent from '~/components/pages/formPage.component'
+import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
 
 @Component({
   middleware: 'auth'
@@ -94,16 +94,8 @@ export default class AccountPage extends FormPageComponent {
     username: this.$auth.user.username,
     password: ''
   }
-
-  get passwordRules() {
-    return passwordRules()
-  }
-
-  get repeatPasswordRules() {
-    return [
-      (v: string) => (v || '') === this.newPassword || 'Passwords must match'
-    ]
-  }
+  passwordRules = passwordRules
+  repeatPasswordRules = repeatPasswordRules
 
   async save() {
     this.errors = []

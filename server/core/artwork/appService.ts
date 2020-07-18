@@ -6,16 +6,17 @@ import { User } from '../user'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
+import { UserEvents } from '../events/user'
+import { ArtworkEvents } from '../events/artwork'
 import { DiscoveryService } from '../discovery'
 import { EventService } from '../events'
-import { UserEvents } from '../events/user'
 import {
   Artwork,
   ArtworkService,
   ArtworkApplicationService,
   ArtworkFilterOptions
 } from './'
-import { ArtworkEvents } from '../events/artwork'
+
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
@@ -42,35 +43,35 @@ export default class ArtworkApplicationServiceImpl
     const files = <Express.Multer.File[]>req.files
 
     const artwork = new Artwork()
+    artwork.id = ''
+    artwork.created = new Date()
+    artwork.updated = new Date()
+    artwork.owner = user.id
     artwork.title = req.body?.title || ''
     artwork.description = req.body?.description || ''
     artwork.type = req.body?.type || ''
     artwork.city = req.body?.city || ''
     artwork.hashtags = req.body?.hashtags?.split(',') || []
+    artwork.likes = []
 
+    // TODO -> Refactor out to a FileService
     if (files) {
       artwork.images = files.map((file) => {
         return { source: file.filename }
       })
     }
 
-    artwork.owner = user.id
+    const savedArtwork = await this.artworkService.create(artwork)
 
-    try {
-      const savedArtwork = await this.artworkService.create(artwork)
-
-      artwork.hashtags.forEach((hashtag) => {
+    if (savedArtwork) {
+      savedArtwork.hashtags.forEach((hashtag) => {
         this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
       })
 
-      if (savedArtwork) {
-        return new ApiServiceSuccessResult(savedArtwork)
-      }
-
-      return { success: false }
-    } catch (error) {
-      throw new UnknownError(error.message)
+      return new ApiServiceSuccessResult(savedArtwork)
     }
+
+    return { success: false }
   }
 
   async update(req: any): Promise<ApiServiceResult<Artwork>> {
@@ -88,13 +89,14 @@ export default class ArtworkApplicationServiceImpl
       }
 
       if (artwork && artwork.owner === user.id) {
+        artwork.updated = new Date()
         artwork.title = req.body?.title || ''
         artwork.description = req.body?.description || ''
         artwork.type = req.body?.type || ''
         artwork.city = req.body?.city || ''
         artwork.hashtags = req.body?.hashtags || []
         const savedArtwork = await this.artworkService.update(artwork)
-        artwork.hashtags.forEach((hashtag) => {
+        savedArtwork.hashtags.forEach((hashtag) => {
           this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
         })
         if (savedArtwork) {
