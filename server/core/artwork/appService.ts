@@ -7,13 +7,15 @@ import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
 import { DiscoveryService } from '../discovery'
-import { EventService, UserEvents } from '../events'
+import { EventService } from '../events'
+import { UserEvents } from '../events/user'
 import {
   Artwork,
   ArtworkService,
   ArtworkApplicationService,
   ArtworkFilterOptions
 } from './'
+import { ArtworkEvents } from '../events/artwork'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
@@ -58,7 +60,7 @@ export default class ArtworkApplicationServiceImpl
       const savedArtwork = await this.artworkService.create(artwork)
 
       artwork.hashtags.forEach((hashtag) => {
-        this.eventService.emit('hashtag:added', hashtag)
+        this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
       })
 
       if (savedArtwork) {
@@ -93,7 +95,7 @@ export default class ArtworkApplicationServiceImpl
         artwork.hashtags = req.body?.hashtags || []
         const savedArtwork = await this.artworkService.update(artwork)
         artwork.hashtags.forEach((hashtag) => {
-          this.eventService.emit('hashtag:added', hashtag)
+          this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
         })
         if (savedArtwork) {
           return new ApiServiceSuccessResult(savedArtwork)
@@ -149,6 +151,7 @@ export default class ArtworkApplicationServiceImpl
         }
       }
 
+
       await this.discoveryService.setLastArtworkViewedFromBatch(user.id, [
         ...(shouldResetLastViewedArtwork ? moreArtworks : artworks)
       ])
@@ -159,7 +162,7 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult(artworks)
     } catch (error) {
-      throw new UnknownError('ArtworkAppService->list(): ' + error.message)
+      throw new UnknownError(error.message)
     }
   }
 

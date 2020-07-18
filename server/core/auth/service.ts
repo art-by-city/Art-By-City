@@ -10,6 +10,8 @@ import jwt from 'jsonwebtoken'
 import { AuthenticationResult } from '../api/results/authenticationResult.interface'
 import { User, UserService } from '../user'
 import { AuthService } from './'
+import { EventService } from '../events'
+import { UserEvents } from '../events/user'
 
 @injectable()
 export default class AuthServiceImpl implements AuthService {
@@ -20,10 +22,17 @@ export default class AuthServiceImpl implements AuthService {
     secretOrKey: this.JWT_SECRET
   }
 
-  userService: UserService
+  private userService: UserService
+  private eventService: EventService
 
-  constructor(@inject(Symbol.for('UserService')) userService: UserService) {
+  constructor(
+    @inject(Symbol.for('UserService'))
+    userService: UserService,
+    @inject(Symbol.for('EventService'))
+    eventService: EventService
+  ) {
     this.userService = userService
+    this.eventService = eventService
   }
 
   getLocalAuthenticationStrategy(): LocalStrategy {
@@ -65,6 +74,8 @@ export default class AuthServiceImpl implements AuthService {
   }
 
   login(user: User): AuthenticationResult {
+    this.eventService.emit(UserEvents.Account.LoggedIn, user.id)
+
     return {
       user,
       token: this.sign({ id: user.id }),

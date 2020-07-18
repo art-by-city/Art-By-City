@@ -9,6 +9,7 @@ import { DiscoveryModule } from './core/discovery'
 import { HashtagModule } from './core/hashtag'
 import { ConfigModule } from './core/config'
 import { EventModule } from './core/events'
+import { AnalyticsModule } from './core/analytics'
 import DatabaseModule from './core/db/module'
 
 const container = new Container()
@@ -22,6 +23,7 @@ container.load(DiscoveryModule)
 container.load(HashtagModule)
 container.load(ConfigModule)
 container.load(EventModule)
+container.load(AnalyticsModule)
 container.load(DatabaseModule)
 
 export { container }

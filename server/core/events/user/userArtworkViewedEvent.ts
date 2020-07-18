@@ -1,4 +1,4 @@
-import { UserEvent, UserEvents } from '.'
+import { UserEvent, UserEvents } from './'
 
 export default class UserArtworkViewedEvent extends UserEvent {
   artworkId!: string

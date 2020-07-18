@@ -8,6 +8,7 @@ import NotFoundError from '../api/errors/notFoundError'
 import { EventService } from '../events'
 import UserValidator from './validator'
 import { User, UserService, UserRepository } from './'
+import { UserEvents } from '../events/user'
 
 @injectable()
 export default class UserServiceImpl implements UserService {
@@ -72,7 +73,7 @@ export default class UserServiceImpl implements UserService {
 
       const savedUser = await this.userRepository.create(user)
 
-      this.eventService.emit('user:account:registered', savedUser.id)
+      this.eventService.emit(UserEvents.Account.Registered, savedUser.id)
 
       return savedUser
     } catch (error) {

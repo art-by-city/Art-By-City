@@ -5,9 +5,12 @@ import {
   UserEventService,
   UserArtworkViewEvent,
   UserEventRepository,
+  UserEvent,
   UserEvents,
   UserEventType,
-  UserAccountRegisteredEvent
+  UserAccountRegisteredEvent,
+  UserAccountLoggedInEvent,
+  UserAccountForgotPasswordEvent
 } from './'
 
 @injectable()
@@ -21,6 +24,10 @@ export default class UserEventServiceImpl implements UserEventService {
     this.userEventRepository = userEventRepository
   }
 
+  fetchEvents(): Promise<UserEvent[]> {
+    return this.userEventRepository.list()
+  }
+
   on(eventEmitter: EventEmitter, type: UserEventType, listener: (...args: any[]) => void): void {
     eventEmitter.on(type, listener.bind(this))
   }
@@ -28,6 +35,8 @@ export default class UserEventServiceImpl implements UserEventService {
   registerEvents(eventEmitter: EventEmitter): void {
     this.on(eventEmitter, UserEvents.Artwork.Viewed, this.onUserArtworkView)
     this.on(eventEmitter, UserEvents.Account.Registered, this.onUserAccountRegistered)
+    this.on(eventEmitter, UserEvents.Account.LoggedIn, this.onUserAccountLoggedIn)
+    this.on(eventEmitter, UserEvents.Account.ForgotPassword, this.on)
   }
 
   onUserArtworkView(userId: string, artworkId: string) {
@@ -41,6 +50,22 @@ export default class UserEventServiceImpl implements UserEventService {
   onUserAccountRegistered(userId: string) {
     try {
       this.userEventRepository.create(new UserAccountRegisteredEvent(userId))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  onUserAccountLoggedIn(userId: string) {
+    try {
+      this.userEventRepository.create(new UserAccountLoggedInEvent(userId))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  onUserAccountForgotPassword(userId: string) {
+    try {
+      this.userEventRepository.create(new UserAccountForgotPasswordEvent(userId))
     } catch (error) {
       console.error(error)
     }

@@ -1,8 +1,8 @@
 import { injectable, inject } from 'inversify'
 import { Firestore, DocumentReference } from '@google-cloud/firestore'
 
-import BaseRepositoryImpl from '../common/repository'
-import DatabaseAdapter from '../db/adapter.interface'
+import BaseRepositoryImpl from '../../common/repository'
+import DatabaseAdapter from '../../db/adapter.interface'
 import { UserEvent, UserEventRepository, UserEventFilterOptions } from './'
 
 @injectable()

@@ -23,6 +23,10 @@
         Cities
         <v-icon>mdi-map</v-icon>
       </v-tab>
+      <v-tab class="text-lowercase">
+        User Event Log
+        <v-icon>mdi-table-clock</v-icon>
+      </v-tab>
 
       <v-tabs-items v-model="tab">
         <v-tab-item>
@@ -38,8 +42,8 @@
             </thead>
             <tbody>
               <tr v-for="user in users" :key="user.id">
-                <td>{{ user.id }}</td>
-                <td>{{ user.username }}</td>
+                <td class="text-lowercase">{{ user.id }}</td>
+                <td class="text-lowercase">{{ user.username }}</td>
                 <td>
                   <v-select
                     v-model="user.city"
@@ -146,6 +150,27 @@
             </tbody>
           </v-simple-table>
         </v-tab-item>
+        <v-tab-item>
+          <v-text-field
+            v-model="eventLogSearch"
+            append-icon="search"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+          <v-data-table
+            :headers="eventLogHeaders"
+            :items="events"
+            item-key="id"
+            :search="eventLogSearch"
+            calculate-widths
+            dense
+          >
+            <template v-slot:item.timestamp="{ item }">
+              {{ (new Date(item.timestamp)).toLocaleString() }}
+            </template>
+          </v-data-table>
+        </v-tab-item>
       </v-tabs-items>
     </v-tabs>
   </div>
@@ -164,13 +189,23 @@ export default class AdminIndexPage extends FormPageComponent {
   roles = ['admin', 'artist']
   users: any[] = []
   cities: any[] = []
+  events: any[] = []
   tab = 2
   editCity: null | number = null
+
+  eventLogHeaders = [
+    { text: 'id', value: 'id' },
+    { text: 'timestamp', value: 'timestamp' },
+    { text: 'user', value: 'userId' },
+    { text: 'type', value: 'type' },
+  ]
+  eventLogSearch = ''
 
   async asyncData({ $axios }: Context) {
     const errors = []
     let users = [] as any[]
     let cities = [] as any[]
+    let events = [] as any[]
 
     try {
       const usersResponse = await $axios.$get('/api/admin/users')
@@ -178,11 +213,14 @@ export default class AdminIndexPage extends FormPageComponent {
 
       const citiesResponse = await $axios.$get('/api/city')
       cities = citiesResponse.payload || []
+
+      const analyticsResponse = await $axios.$get('/api/analytics/events')
+      events = analyticsResponse.payload || []
     } catch (error) {
       errors.push(error.response?.data?.messages)
     }
 
-    return { errors, users, cities }
+    return { errors, users, cities, events }
   }
 
   async saveUser(user: any) {

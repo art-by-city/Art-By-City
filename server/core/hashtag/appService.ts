@@ -2,6 +2,7 @@ import { injectable, inject } from 'inversify'
 import { EventEmitter } from 'events'
 
 import { HashtagApplicationService, HashtagService } from './'
+import { ArtworkEvents } from '../events/artwork'
 
 @injectable()
 export default class HashtagApplicationServiceImpl implements HashtagApplicationService {
@@ -15,7 +16,7 @@ export default class HashtagApplicationServiceImpl implements HashtagApplication
   }
 
   registerEvents(eventEmitter: EventEmitter) {
-    eventEmitter.on('hashtag:added', this.onHashtagAdded.bind(this))
+    eventEmitter.on(ArtworkEvents.Hashtag.Added, this.onHashtagAdded.bind(this))
   }
 
   onHashtagAdded(hashtag: string) {

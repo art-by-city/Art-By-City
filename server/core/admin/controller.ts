@@ -7,11 +7,13 @@ import { AdminController, AdminService } from './'
 
 @injectable()
 export default class AdminControllerImpl implements AdminController {
+  private router!: Router
   private adminService: AdminService
 
-  private router!: Router
-
-  constructor(@inject(Symbol.for('AdminService')) adminService: AdminService) {
+  constructor(
+    @inject(Symbol.for('AdminService'))
+    adminService: AdminService
+  ) {
     this.adminService = adminService
   }
 

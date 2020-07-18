@@ -2,7 +2,8 @@ import { injectable, inject } from 'inversify'
 import { EventEmitter } from 'events'
 
 import { HashtagApplicationService } from '../hashtag'
-import { EventService, UserEventService, EventType } from './'
+import { EventService, EventType } from './'
+import { UserEventService } from './user'
 
 @injectable()
 export default class EventServiceImpl implements EventService {
