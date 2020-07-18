@@ -44,11 +44,13 @@
               <v-menu offset-y>
                 <template v-slot:activator="{ on }">
                   <v-btn class="avatar-menu-button" text right v-on="on">
-                    <v-avatar color="indigo" size="32">
-                      <span class="white--text text-lowercase">
-                        {{ avatar }}
-                      </span>
-                    </v-avatar>
+                    <v-badge avatar bottom overlap color="black" :icon="avatarBadge" :value="avatarBadge">
+                      <v-avatar color="indigo" size="32">
+                        <span class="white--text text-lowercase">
+                          {{ avatar }}
+                        </span>
+                      </v-avatar>
+                    </v-badge>
                   </v-btn>
                 </template>
                 <v-list dense>
@@ -154,6 +156,18 @@ export default class DefaultLayout extends Vue {
     } else {
       return 'u'
     }
+  }
+
+  get avatarBadge(): string {
+    if (this.isAdmin) {
+      return 'mdi-account-cowboy-hat'
+    }
+
+    if (this.isArtist) {
+      return 'mdi-brush'
+    }
+
+    return ''
   }
 
   private filterNavItemsForUserRoles(navItems: NavItem[]): NavItem[] {
