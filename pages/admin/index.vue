@@ -153,8 +153,8 @@
         <v-tab-item>
           <v-text-field
             v-model="eventLogSearch"
-            append-icon="search"
-            label="Search"
+            append-icon="mdi-filter"
+            label="Filter"
             single-line
             hide-details
           ></v-text-field>
@@ -194,10 +194,10 @@ export default class AdminIndexPage extends FormPageComponent {
   editCity: null | number = null
 
   eventLogHeaders = [
-    { text: 'id', value: 'id' },
-    { text: 'timestamp', value: 'timestamp' },
-    { text: 'user', value: 'userId' },
-    { text: 'type', value: 'type' },
+    { text: 'id', value: 'id', width: '250' },
+    { text: 'timestamp', value: 'timestamp', width: '250' },
+    { text: 'user', value: 'userId', width: '250' },
+    { text: 'type', value: 'type', width: '250' },
   ]
   eventLogSearch = ''
 
