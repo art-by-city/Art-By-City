@@ -95,6 +95,15 @@ export default class ArtworkApplicationServiceImpl
         artwork.type = req.body?.type || ''
         artwork.city = req.body?.city || ''
         artwork.hashtags = req.body?.hashtags || []
+
+        if (!artwork.created) {
+          artwork.created = new Date()
+        }
+
+        if (!artwork.likes) {
+          artwork.likes = []
+        }
+
         const savedArtwork = await this.artworkService.update(artwork)
         savedArtwork.hashtags.forEach((hashtag) => {
           this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)

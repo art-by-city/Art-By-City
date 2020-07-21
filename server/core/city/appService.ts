@@ -33,6 +33,8 @@ export default class CityApplicationServiceImpl
     city.code = req.body?.city?.code || ''
     city.name = req.body?.city?.name || ''
     city.country = req.body?.city?.country || ''
+    city.visible = req.body?.city?.visible || false
+    city.disabled = req.body?.city?.disabled === true ? true : false
 
     try {
       return new ApiServiceSuccessResult(await this.cityService.update(city))
@@ -54,6 +56,14 @@ export default class CityApplicationServiceImpl
   async list(): Promise<ApiServiceResult<City[]>> {
     try {
       return new ApiServiceSuccessResult(await this.cityService.list())
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  find(includeNonVisible?: boolean): Promise<City[]> {
+    try {
+      return this.cityService.find({ includeAll: includeNonVisible })
     } catch (error) {
       throw new UnknownError(error.message)
     }

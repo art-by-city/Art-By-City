@@ -28,7 +28,7 @@ export default class ConfigControllerImpl implements ConfigController {
   private buildRouter(): Router {
     const router = Router()
 
-    router.use(passport.authenticate('jwt', { session: false }))
+    // router.use(passport.authenticate('jwt', { session: false }))
 
     router.get('/', async (_req, res) => {
       const result = await this.configService.getConfig()

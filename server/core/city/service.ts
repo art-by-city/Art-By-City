@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify'
 
-import { City, CityService, CityRepository } from './'
+import { City, CityService, CityRepository, CityFilterOptions } from './'
 
 @injectable()
 export default class CityServiceImpl implements CityService {
@@ -30,5 +30,9 @@ export default class CityServiceImpl implements CityService {
 
   list(): Promise<City[]> {
     return this.cityRepository.list()
+  }
+
+  find(opts?: CityFilterOptions) {
+    return this.cityRepository.find(opts)
   }
 }

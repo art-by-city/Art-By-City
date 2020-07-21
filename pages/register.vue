@@ -20,6 +20,11 @@
                 class="text-lowercase"
               ></v-text-field>
 
+              <CitySelector
+                v-model="login.city"
+                :cities="$store.state.config.cities"
+              />
+
               <v-text-field
                 v-model="login.password"
                 type="password"
@@ -60,6 +65,7 @@
 </template>
 
 <script lang="ts">
+import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
@@ -68,16 +74,37 @@ import {
   passwordRules,
   repeatPasswordRules
 } from '~/models/user/validation'
+import { ConfigStoreState } from '~/store/config'
+import CitySelector from '~/components/forms/citySelector.component.vue'
 
-@Component
+@Component({
+  components: {
+    CitySelector
+  }
+})
 export default class RegisterPage extends FormPageComponent {
   login = {
     username: '',
-    password: ''
+    password: '',
+    city: ''
   }
   usernameRules = usernameRules
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
+
+  async asyncData({ $axios, store, $auth }: Context) {
+    let errors = []
+    let config: ConfigStoreState = { cities: [], hashtags: [] }
+    try {
+      config = await $axios.$get('/api/config')
+      store.commit('config/setConfig', config)
+    } catch (error) {
+      console.error(error)
+      errors = error.response?.data?.messages
+    }
+
+    return { errors, config }
+  }
 
   async register() {
     this.errors = []

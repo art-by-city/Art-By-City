@@ -2,7 +2,7 @@ import { injectable, inject } from 'inversify'
 
 import Config, { ConfigService } from './'
 import { HashtagService, Hashtag } from '../hashtag'
-import { CityService } from '../city'
+import { CityService, City } from '../city'
 
 @injectable()
 export default class ConfigServiceImpl implements ConfigService {
@@ -21,7 +21,15 @@ export default class ConfigServiceImpl implements ConfigService {
 
   async getConfig(): Promise<Config> {
     return {
-      cities: await this.cityService.list(),
+      cities: (await this.cityService.list()).sort((a: City, b: City) => {
+        if (a.disabled === b.disabled) {
+          return a.name.localeCompare(b.name)
+        } else if (a.disabled && !b.disabled) {
+          return 1
+        } else {
+          return -1
+        }
+      }),
       hashtags: (await this.hashtagService.list()).map((h: Hashtag) => h.hashtag)
     }
   }

@@ -2,26 +2,11 @@
   <v-container fluid class="pa-0">
     <v-row dense>
       <v-col cols="3">
-        <v-autocomplete
+        <CitySelector
           v-model="opts.city"
-          class="condensed-input text-lowercase"
-          name="city"
-          label="city"
-          :items="cities"
-          outlined
-          rounded
-          dense
-          single-line
-          prepend-icon="mdi-map"
-          item-text="name"
-          item-value="id"
-          item-disabled="disabled"
+          :cities="cities"
           @input="onRefresh"
-        >
-          <template v-slot:item="{ item }">
-            <span class="text-lowercase">{{ item.name }}</span>
-          </template>
-        </v-autocomplete>
+        />
       </v-col>
       <v-col offset="1" cols="4" class="text-center">
         <v-btn icon @click="onRefresh">
@@ -114,8 +99,13 @@ import { Vue, Component, Emit, Prop, PropSync } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
 import { artworkTypes } from '~/models/artwork/artworkOptions'
+import CitySelector from '~/components/forms/citySelector.component.vue'
 
-@Component
+@Component({
+  components: {
+    CitySelector
+  }
+})
 export default class ArtworkExplorerToolbar extends Vue {
   artworkTypes = ['Any'].concat(artworkTypes)
   cities = [{ id: 'Any', name: 'Any' }].concat(this.$store.state.config.cities)

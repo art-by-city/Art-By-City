@@ -55,10 +55,7 @@ export default class AuthControllerImpl implements AuthController {
 
     router.put('/register', async (req, res, next) => {
       try {
-        const user = await this.userService.register(
-          req.body.username,
-          req.body.password
-        )
+        const user = await this.userService.register(req)
 
         const result = this.authService.login(user)
 

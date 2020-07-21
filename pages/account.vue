@@ -22,6 +22,12 @@
                 disabled
               ></v-text-field>
 
+              <CitySelector
+                v-model="$auth.user.city"
+                :cities="cities"
+                disabled
+              />
+
               <v-text-field
                 v-model="login.password"
                 type="password"
@@ -78,13 +84,18 @@
 </template>
 
 <script lang="ts">
+import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
+import CitySelector from '~/components/forms/citySelector.component.vue'
 
 @Component({
-  middleware: 'auth'
+  middleware: 'auth',
+  components: {
+    CitySelector
+  }
 })
 export default class AccountPage extends FormPageComponent {
   newPassword = ''
@@ -96,6 +107,22 @@ export default class AccountPage extends FormPageComponent {
   }
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
+  cities: string[] = []
+
+  async asyncData({ $axios, store }: Context) {
+    const errors = []
+    let cities = [] as any[]
+
+    try {
+      const config = await $axios.$get('/api/config')
+      store.commit('config/setConfig', config)
+      cities = config.cities
+    } catch (error) {
+      errors.push(error.response?.data?.messages)
+    }
+
+    return { errors, cities }
+  }
 
   async save() {
     this.errors = []

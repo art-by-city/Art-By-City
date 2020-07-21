@@ -95,22 +95,11 @@
               <template v-if="!editMode">
                 <strong>City:</strong> {{ cityName }}
               </template>
-              <template v-if="editMode">
-                <v-select
+              <template v-else>
+                <CitySelector
                   v-model="artwork.city"
-                  name="city"
-                  label="City"
-                  item-text="name"
-                  item-value="id"
-                  item-disabled="disabled"
-                  :items="cities"
-                  class="text-lowercase"
-                  :rules="cityRules"
-                >
-                  <template v-slot:item="{ item }">
-                    <span class="text-lowercase">{{ item.name }}</span>
-                  </template>
-                </v-select>
+                  :cities="cities"
+                />
               </template>
             </v-col>
           </v-row>
@@ -172,16 +161,18 @@ import { Component } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
 import LikeButton from '~/components/likeButton.component.vue'
+import CitySelector from '~/components/forms/citySelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { artworkTypes } from '~/models/artwork/artworkOptions'
 
 @Component({
   components: {
-    LikeButton
+    LikeButton,
+    CitySelector
   }
 })
 export default class ArtworkPage extends FormPageComponent {
-  artwork: any = {}
+  artwork!: any
   artworkTypes: string[] = artworkTypes
   cities: any[] = this.$store.state.config.cities
   hashtags: string[] = this.$store.state.config.hashtags
@@ -257,6 +248,8 @@ export default class ArtworkPage extends FormPageComponent {
       if (value.length > 128) {
         return 'title must be no more than 128 characters'
       }
+
+      return true
     }]
   }
 
@@ -265,6 +258,8 @@ export default class ArtworkPage extends FormPageComponent {
       if (value.length > 1024) {
         return 'description must be no more than 1024 characters'
       }
+
+      return true
     }]
   }
 
@@ -273,6 +268,8 @@ export default class ArtworkPage extends FormPageComponent {
       if (!artworkTypes.includes(value)) {
         return `type is required`
       }
+
+      return true
     }]
   }
 
@@ -281,6 +278,8 @@ export default class ArtworkPage extends FormPageComponent {
       if (!this.cities.includes(value)) {
         return `city is required`
       }
+
+      return true
     }]
   }
 
