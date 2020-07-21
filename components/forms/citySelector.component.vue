@@ -3,7 +3,7 @@
     <v-autocomplete
       v-bind:value="value"
       v-on:input="$emit('input', $event)"
-      class="condensed-input text-lowercase"
+      class="text-lowercase"
       name="city"
       label="city"
       :items="cities"
@@ -46,7 +46,7 @@ export default class CitySelector extends Vue {
 </script>
 
 <style scoped>
-.city-selector >>> .v-menu__content {
+/* .city-selector >>> .v-menu__content {
   top: auto !important;
   left: auto !important;
 }
@@ -78,5 +78,5 @@ export default class CitySelector extends Vue {
   font-size: 14px;
   height: 24px;
   min-height: 24px;
-}
+} */
 </style>

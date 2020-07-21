@@ -181,7 +181,7 @@ export default class ArtworkExplorerToolbar extends Vue {
 </script>
 
 <style scoped>
-.condensed-input >>> .v-label {
+/* .condensed-input >>> .v-label {
   font-size: 14px;
   text-transform: lowercase;
   top: 6px;
@@ -203,5 +203,5 @@ export default class ArtworkExplorerToolbar extends Vue {
 }
 .condensed-input >>> .v-text-field__details {
   display: none;
-}
+} */
 </style>
