@@ -18,7 +18,7 @@ export interface UserRepository
 }
 
 export interface UserService {
-  register(username: string, password: string): Promise<User>
+  register(req: any): Promise<User>
   authenticate(username: string, password: string): Promise<User | null>
   getById(id: string): Promise<User | null>
   updatePassword(id: string, password: string): Promise<ApiServiceResult<void>>

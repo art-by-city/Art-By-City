@@ -24,13 +24,14 @@ export default class UserServiceImpl implements UserService {
     this.eventService = eventService
   }
 
-  async register(username: string, password: string): Promise<User> {
+  async register(req: any): Promise<User> {
     const user = new User()
     user.id = ''
     user.created = new Date()
     user.updated = new Date()
-    user.username = username
-    user.password = password
+    user.username = req.body?.username || ''
+    user.password = req.body?.password || ''
+    user.city = req.body?.city || ''
     user.roles = []
 
     await validateUser(user)
