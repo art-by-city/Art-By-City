@@ -26,18 +26,7 @@
                 class="text-lowercase"
               ></v-textarea>
 
-              <v-select
-                v-model="artwork.type"
-                name="type"
-                label="Type"
-                :items="artworkTypes"
-                :rules="typeRules"
-                class="text-lowercase"
-              >
-                <template v-slot:item="{ item }">
-                  <span class="text-lowercase">{{ item }}</span>
-                </template>
-              </v-select>
+              <ArtworkTypeSelector v-model="artwork.type" />
 
               <CitySelector
                 v-model="artwork.city"
@@ -113,6 +102,7 @@ import Fuse from 'fuse.js'
 import FormComponent from '~/components/pages/formPage.component'
 import { artworkTypes } from '~/models/artwork/artworkOptions'
 import CitySelector from '~/components/forms/citySelector.component.vue'
+import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 
 const MAX_ARTWORK_HASHTAGS = 12
 const MAX_ARTWORK_IMAGES = 12
@@ -120,7 +110,8 @@ const MAX_ARTWORK_IMAGES = 12
 @Component({
   middleware: 'role/artist',
   components: {
-    CitySelector
+    CitySelector,
+    ArtworkTypeSelector
   }
 })
 export default class ArtworkUploadPage extends FormComponent {
@@ -128,6 +119,7 @@ export default class ArtworkUploadPage extends FormComponent {
   cities: string[] = []
   artwork: any = {
     city: '',
+    type: '',
     images: []
   }
   hashtags: string[] = this.$store.state.config.hashtags

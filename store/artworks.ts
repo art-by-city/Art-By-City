@@ -7,14 +7,15 @@ export const state = () => ({
   slotB: [] as any[],
   visibleSlot: 'B',
   options: {
-    city: ''
+    city: '',
+    type: ''
   } as ArtworkOptions
 })
 
 export type ArtworkStoreState = ReturnType<typeof state>
 
 export const mutations: MutationTree<ArtworkStoreState> = {
-  set(state, artworks: any[]) {
+  set(state: ArtworkStoreState, artworks: any[]) {
     if (state.visibleSlot === 'A') {
       state.slotB = artworks
       state.visibleSlot = 'B'
@@ -24,7 +25,7 @@ export const mutations: MutationTree<ArtworkStoreState> = {
     }
   },
 
-  previous(state) {
+  previous(state: ArtworkStoreState) {
     if (state.visibleSlot === 'A' && state.slotB.length > 0) {
       state.visibleSlot = 'B'
     } else {
@@ -32,7 +33,7 @@ export const mutations: MutationTree<ArtworkStoreState> = {
     }
   },
 
-  options(state, options: any) {
+  options(state: ArtworkStoreState, options: any) {
     state.options = options
   }
 }
