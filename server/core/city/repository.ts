@@ -34,7 +34,7 @@ export default class CityRepositoryImpl implements CityRepository {
 
   list(): Promise<City[]> {
     try {
-      return this.repository.find()
+      return this.repository.orderByAscending('name').find()
     } catch (error) {
       throw new Error(`Error listing cities: ${error.message}`)
     }
