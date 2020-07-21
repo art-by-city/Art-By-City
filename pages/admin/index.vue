@@ -96,6 +96,8 @@
                 <th class="text-left text-lowercase">Country</th>
                 <th class="text-left text-lowercase">Code</th>
                 <th class="text-left text-lowercase">Name</th>
+                <th class="text-left text-lowercase">Visibility</th>
+                <th class="text-left text-lowercase">Disabled</th>
                 <th class="text-left text-lowercase">Actions</th>
               </tr>
             </thead>
@@ -127,6 +129,12 @@
                       class="text-lowercase"
                     ></v-text-field>
                   </template>
+                </td>
+                <td class="text-lowercase">
+                  <v-checkbox v-model="city.visible" :disabled="editCity !== idx"></v-checkbox>
+                </td>
+                <td class="text-lowercase">
+                  <v-checkbox v-model="city.disabled" :disabled="editCity !== idx"></v-checkbox>
                 </td>
                 <td class="text-lowercase">
                   <template v-if="editCity !== idx">
@@ -211,8 +219,8 @@ export default class AdminIndexPage extends FormPageComponent {
       const usersResponse = await $axios.$get('/api/admin/users')
       users = usersResponse.users || []
 
-      const citiesResponse = await $axios.$get('/api/city')
-      cities = citiesResponse.payload || []
+      const citiesResponse = await $axios.$get('/api/admin/cities')
+      cities = citiesResponse.cities || []
 
       const analyticsResponse = await $axios.$get('/api/analytics/events')
       events = analyticsResponse.payload || []
@@ -270,7 +278,7 @@ export default class AdminIndexPage extends FormPageComponent {
   }
 
   addCity() {
-    this.cities.push({ code: '', name: '', country: 'USA' })
+    this.cities.push({ code: '', name: '', country: 'USA', visible: false, disabled: true })
     this.editCity = this.cities.length - 1
   }
 }

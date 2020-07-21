@@ -7,4 +7,6 @@ export default class City extends Entity {
   code!: string
   name!: string
   country!: string
+  visible!: boolean
+  disabled!: boolean
 }

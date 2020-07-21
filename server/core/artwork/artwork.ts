@@ -33,53 +33,53 @@ export default class Artwork extends Entity {
 
   @IsString()
   @MinLength(1, {
-    message: 'Artwork Title must be at least 1 character'
+    message: 'title must be at least 1 character'
   })
   @MaxLength(128, {
-    message: 'Artwork Title must be less than $constraint1 characters'
+    message: 'title must be less than $constraint1 characters'
   })
   title!: string
 
   @IsString()
   @MaxLength(1024, {
-    message: 'Artwork Description must be less than $constraint1 characters'
+    message: 'description must be less than $constraint1 characters'
   })
   description!: string
 
   @IsString()
   @IsNotEmpty()
   @IsIn(artworkTypes, {
-    message: `Artwork Type must be one of ${artworkTypes.join(', ')}`
+    message: `type must be one of ${artworkTypes.join(', ')}`
   })
   type!: ArtworkType
 
   @IsString()
   @IsNotEmpty({
-    message: 'Artwork City is required'
+    message: 'city is required'
   })
   city!: string
 
   @ArrayUnique({
-    message: 'Artwork Hashtags must be unique'
+    message: 'hashtags must be unique'
   })
   @ArrayMaxSize(12, {
-    message: 'Artwork Hashtags must be no more than 12'
+    message: 'hashtags must be no more than 12'
   })
   @MinLength(1, {
     each: true,
-    message: 'Artwork Hashtags must be at least 1 character'
+    message: 'hashtags must be at least 1 character'
   })
   @MaxLength(32, {
     each: true,
-    message: 'Artwork Hashtags must be no more than $constraint1 characters'
+    message: 'hashtags must be no more than $constraint1 characters'
   })
   hashtags!: string[]
 
   @ArrayMinSize(1, {
-    message: 'Artwork Image is required'
+    message: 'image is required'
   })
   @ArrayMaxSize(12, {
-    message: 'Artwork Images must be no more than 12'
+    message: 'images must be no more than 12'
   })
   @ValidateNested({ each: true })
   images!: ArtworkImage[]

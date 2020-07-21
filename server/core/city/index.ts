@@ -13,12 +13,16 @@ import CityControllerImpl from './controller'
 
 export { default as City } from './city'
 
-export interface CityFilterOptions {}
+export interface CityFilterOptions {
+  includeAll?: boolean
+}
 
 export interface CityRepository
   extends BaseRepositoryInterface<City, CityFilterOptions> {}
 
-export interface CityService extends BaseDomainServiceInterface<City> {}
+export interface CityService extends BaseDomainServiceInterface<City> {
+  find(opts?: CityFilterOptions): Promise<City[]>
+}
 
 export interface CityApplicationService
   extends BaseApplicationServiceInterface {

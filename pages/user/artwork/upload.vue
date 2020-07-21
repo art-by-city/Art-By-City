@@ -39,22 +39,10 @@
                 </template>
               </v-select>
 
-              <v-select
+              <CitySelector
                 v-model="artwork.city"
-                name="city"
-                label="City"
-                :items="cities"
-                prepend-icon="mdi-map"
-                item-text="name"
-                item-value="id"
-                item-disabled="disabled"
-                :rules="cityRules"
-                class="text-lowercase"
-              >
-                <template v-slot:item="{ item }">
-                  <span class="text-lowercase">{{ item.name }}</span>
-                </template>
-              </v-select>
+                :cities="cities"
+              />
 
               <v-combobox
                 v-model="artwork.hashtags"
@@ -124,17 +112,22 @@ import Fuse from 'fuse.js'
 
 import FormComponent from '~/components/pages/formPage.component'
 import { artworkTypes } from '~/models/artwork/artworkOptions'
+import CitySelector from '~/components/forms/citySelector.component.vue'
 
 const MAX_ARTWORK_HASHTAGS = 12
 const MAX_ARTWORK_IMAGES = 12
 
 @Component({
-  middleware: 'role/artist'
+  middleware: 'role/artist',
+  components: {
+    CitySelector
+  }
 })
 export default class ArtworkUploadPage extends FormComponent {
   artworkTypes: string[] = artworkTypes
   cities: string[] = []
   artwork: any = {
+    city: '',
     images: []
   }
   hashtags: string[] = this.$store.state.config.hashtags
@@ -167,6 +160,8 @@ export default class ArtworkUploadPage extends FormComponent {
       if (value.length > 128) {
         return 'title must be no more than 128 characters'
       }
+
+      return true
     }]
   }
 
@@ -175,6 +170,8 @@ export default class ArtworkUploadPage extends FormComponent {
       if (value.length > 1024) {
         return 'description must be no more than 1024 characters'
       }
+
+      return true
     }]
   }
 
@@ -183,6 +180,8 @@ export default class ArtworkUploadPage extends FormComponent {
       if (!artworkTypes.includes(value)) {
         return `type is required`
       }
+
+      return true
     }]
   }
 
@@ -191,6 +190,8 @@ export default class ArtworkUploadPage extends FormComponent {
       if (!this.cities.includes(value)) {
         return `city is required`
       }
+
+      return true
     }]
   }
 

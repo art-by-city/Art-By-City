@@ -6,7 +6,9 @@ export const state = () => ({
   slotA: [] as any[],
   slotB: [] as any[],
   visibleSlot: 'B',
-  options: {} as ArtworkOptions
+  options: {
+    city: ''
+  } as ArtworkOptions
 })
 
 export type ArtworkStoreState = ReturnType<typeof state>

@@ -13,6 +13,7 @@
       item-value="id"
       item-disabled="disabled"
       attach="#citySelector"
+      :disabled="disabled"
     >
       <template v-slot:item="{ item }">
         <span class="text-lowercase">{{ item.name }}</span>
@@ -38,14 +39,16 @@ interface City {
 export default class CitySelector extends Vue {
   @Prop({ type: Array }) readonly cities!: City[]
 
+  @Prop({ type: Boolean }) readonly disabled!: boolean
+
   @Model('input', { type: String, required: true }) value!: string
 }
 </script>
 
 <style scoped>
 .city-selector >>> .v-menu__content {
-  top: 167px !important;
-  left: 16px !important;
+  top: auto !important;
+  left: auto !important;
 }
 
 .condensed-input >>> .v-label {

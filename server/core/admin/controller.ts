@@ -41,6 +41,15 @@ export default class AdminControllerImpl implements AdminController {
     })
 
     /**
+     * GET /cities - Get all cities
+     */
+    router.get('/cities', async (_req, res) => {
+      const cities = await this.adminService.listCities()
+
+      return res.json({ cities })
+    })
+
+    /**
      * POST /user - Update a user's roles
      * Temporary
      */
