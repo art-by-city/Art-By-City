@@ -25,7 +25,11 @@
     </v-row>
     <v-row dense>
       <v-col cols="3">
-        <v-select
+        <ArtworkTypeSelector
+          v-model="opts.type"
+          @input="onRefresh"
+        />
+        <!-- <v-select
           v-model="opts.type"
           class="condensed-input"
           name="type"
@@ -41,7 +45,7 @@
           <template v-slot:item="{ item }">
             <span class="text-lowercase">{{ item }}</span>
           </template>
-        </v-select>
+        </v-select> -->
       </v-col>
       <v-col offset="1" cols="4">
         <v-combobox
@@ -100,10 +104,12 @@ import Fuse from 'fuse.js'
 
 import { artworkTypes } from '~/models/artwork/artworkOptions'
 import CitySelector from '~/components/forms/citySelector.component.vue'
+import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 
 @Component({
   components: {
-    CitySelector
+    CitySelector,
+    ArtworkTypeSelector
   }
 })
 export default class ArtworkExplorerToolbar extends Vue {
@@ -179,29 +185,3 @@ export default class ArtworkExplorerToolbar extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.condensed-input >>> .v-label {
-  font-size: 14px;
-  text-transform: lowercase;
-  top: 6px;
-}
-.condensed-input >>> .v-select__selection {
-  font-size: 14px;
-  text-transform: lowercase;
-}
-.condensed-input >>> input {
-  font-size: 14px;
-  text-transform: lowercase;
-}
-.condensed-input >>> .v-input__slot {
-  min-height: 32px !important;
-  height: 32px !important;
-}
-.condensed-input >>> .v-input__append-inner {
-  margin-top: 3px !important;
-}
-.condensed-input >>> .v-text-field__details {
-  display: none;
-}
-</style>

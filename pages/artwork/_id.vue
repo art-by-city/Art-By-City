@@ -74,19 +74,10 @@
               <template v-if="!editMode">
                 <strong>Type:</strong> {{ artwork.type }}
               </template>
-              <template v-if="editMode">
-                <v-select
+              <template v-else>
+                <ArtworkTypeSelector
                   v-model="artwork.type"
-                  name="type"
-                  label="Type"
-                  :items="artworkTypes"
-                  class="text-lowercase"
-                  :rules="typeRules"
-                >
-                  <template v-slot:item="{ item }">
-                    <span class="text-lowercase">{{ item }}</span>
-                  </template>
-                </v-select>
+                />
               </template>
             </v-col>
           </v-row>
@@ -162,13 +153,15 @@ import Fuse from 'fuse.js'
 
 import LikeButton from '~/components/likeButton.component.vue'
 import CitySelector from '~/components/forms/citySelector.component.vue'
+import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { artworkTypes } from '~/models/artwork/artworkOptions'
 
 @Component({
   components: {
     LikeButton,
-    CitySelector
+    CitySelector,
+    ArtworkTypeSelector
   }
 })
 export default class ArtworkPage extends FormPageComponent {

@@ -1,0 +1,56 @@
+$condensed-input-font-size: 14px;
+$condensed-input-height: 24px;
+
+.condensed-input {
+  font-size: $condensed-input-font-size;
+  text-transform: lowercase;
+  .v-input {
+    .v-input__control {
+      height: $condensed-input-height !important;
+      min-height: $condensed-input-height !important;
+      max-height: $condensed-input-height !important;
+
+      .v-input__slot {
+        height: $condensed-input-height !important;
+        min-height: $condensed-input-height !important;
+        max-height: $condensed-input-height !important;
+
+        .v-select__slot {
+          height: $condensed-input-height !important;
+          min-height: $condensed-input-height !important;
+          max-height: $condensed-input-height !important;
+
+          .v-label {
+            font-size: $condensed-input-font-size;
+            text-transform: lowercase;
+            position: static !important;
+          }
+          .v-select__selections {
+            font-size: $condensed-input-font-size;
+            text-transform: lowercase;
+          }
+          .v-input__append-inner {
+            margin-top: 0px !important;
+          }
+        }
+      }
+
+      .v-text-field__details {
+        display: none;
+      }
+    }
+  }
+
+  .v-menu__content {
+    top: auto !important;
+    left: auto !important;
+    .v-select-list {
+      .v-list-item {
+        font-size: $condensed-input-font-size;
+        height: $condensed-input-height;
+        min-height: $condensed-input-height;
+        max-height: $condensed-input-height;
+      }
+    }
+  }
+}
