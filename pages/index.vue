@@ -1,5 +1,5 @@
 <template>
-  <v-layout column justify-center align-center>
+  <div style="height: 100%">
     <template v-if="$auth.loggedIn">
       <ArtworkExplorer :initial.sync="payload" :options.sync="options" />
     </template>
@@ -22,7 +22,7 @@
         </v-row>
       </v-expand-transition>
     </template>
-  </v-layout>
+  </div>
 </template>
 
 <script lang="ts">

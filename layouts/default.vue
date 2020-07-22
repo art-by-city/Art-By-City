@@ -86,8 +86,9 @@
         </v-col>
       </v-row>
     </v-app-bar>
+
     <v-content>
-      <v-container>
+      <v-container fluid style="height: 100%">
         <nuxt />
       </v-container>
     </v-content>
