@@ -14,6 +14,7 @@
       item-disabled="disabled"
       attach="#citySelector"
       :disabled="disabled"
+      :rules="rules"
     >
       <template v-slot:item="{ item }">
         <span class="text-lowercase">{{ item.name }}</span>
@@ -39,6 +40,27 @@ interface City {
 export default class CitySelector extends Vue {
   @Model('input', { type: String, required: true }) value!: string
   @Prop({ type: Boolean }) readonly disabled!: boolean
+  @Prop({ type: Boolean }) readonly required!: boolean
   @Prop({ type: Array }) readonly cities!: City[]
+
+  private isValidCity(cityId: string): boolean {
+    for (let i = 0; i < this.cities.length; i++) {
+      if (this.cities[i].id === cityId) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  get rules() {
+    return [(cityId: string = '') => {
+      if (this.required && !this.isValidCity(cityId)) {
+        return `city is required`
+      }
+
+      return true
+    }]
+  }
 }
 </script>

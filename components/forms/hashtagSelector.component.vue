@@ -16,6 +16,7 @@
       @input="onHashtagInput"
       @update:search-input="onHashtagUpdateSearchInput"
       attach="#hashtagSelector"
+      :rules="rules"
     >
       <template v-slot:selection="data">
         <v-chip
@@ -40,6 +41,8 @@
 import { Vue, Component, Prop, Model, Watch } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
+const MAX_HASHTAG_LENGTH = 32
+
 @Component
 export default class HashtagSelector extends Vue {
   @Model('input', { type: Array, required: true }) value!: string[]
@@ -50,6 +53,18 @@ export default class HashtagSelector extends Vue {
   filteredHashtags: string[] = this.hashtags
   fuzzyHashtags = new Fuse(this.filteredHashtags, { includeScore: true })
   hashtagSearchInput: string = ''
+
+  get rules() {
+    return [(hashtags: string[] = []) => {
+      for (let i = 0; i < hashtags.length; i++) {
+        if (hashtags[i].length > MAX_HASHTAG_LENGTH) {
+          return `hashtags must be no more than ${MAX_HASHTAG_LENGTH} characters`
+        }
+      }
+
+      return true
+    }]
+  }
 
   onHashtagInput(hashtags: string[]) {
     this.hashtagSearchInput = ''

@@ -77,6 +77,7 @@
               <template v-else>
                 <ArtworkTypeSelector
                   v-model="artwork.type"
+                  required
                 />
               </template>
             </v-col>
@@ -90,6 +91,7 @@
                 <CitySelector
                   v-model="artwork.city"
                   :cities="cities"
+                  required
                 />
               </template>
             </v-col>
@@ -214,26 +216,6 @@ export default class ArtworkPage extends FormPageComponent {
     return [(value: string = '') => {
       if (value.length > 1024) {
         return 'description must be no more than 1024 characters'
-      }
-
-      return true
-    }]
-  }
-
-  get typeRules() {
-    return [(value: string = '') => {
-      if (!artworkTypes.includes(value)) {
-        return `type is required`
-      }
-
-      return true
-    }]
-  }
-
-  get cityRules() {
-    return [(value: string = '') => {
-      if (!this.cities.includes(value)) {
-        return `city is required`
       }
 
       return true

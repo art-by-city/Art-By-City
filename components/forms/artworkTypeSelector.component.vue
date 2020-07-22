@@ -10,6 +10,7 @@
       outlined
       single-line
       :disabled="disabled"
+      :rules="rules"
       attach="#artworkTypeSelector"
     >
       <template v-slot:item="{ item }">
@@ -28,6 +29,17 @@ import { artworkTypes } from '~/models/artwork/artworkOptions'
 export default class ArtworkTypeSelector extends Vue {
   @Model('input', { type: String, required: true }) value!: string
   @Prop({ type: Boolean }) readonly disabled!: boolean
+  @Prop({ type: Boolean }) readonly required!: boolean
   artworkTypes = artworkTypes
+
+  get rules() {
+    return [(value: string = '') => {
+      if (this.required && !artworkTypes.includes(value)) {
+        return `type is required`
+      }
+
+      return true
+    }]
+  }
 }
 </script>
