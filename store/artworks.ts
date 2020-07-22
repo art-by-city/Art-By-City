@@ -8,7 +8,8 @@ export const state = () => ({
   visibleSlot: 'B',
   options: {
     city: '',
-    type: ''
+    type: '',
+    hashtags: [] as string[]
   } as ArtworkOptions
 })
 

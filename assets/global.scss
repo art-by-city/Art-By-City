@@ -4,6 +4,7 @@ $condensed-input-height: 24px;
 .condensed-input {
   font-size: $condensed-input-font-size;
   text-transform: lowercase;
+
   .v-input {
     .v-input__control {
       height: $condensed-input-height !important;
@@ -28,6 +29,16 @@ $condensed-input-height: 24px;
           .v-select__selections {
             font-size: $condensed-input-font-size;
             text-transform: lowercase;
+
+            .v-chip {
+              height: 16px;
+
+              .v-chip__content {
+                .v-icon {
+                  font-size: $condensed-input-font-size !important;
+                }
+              }
+            }
           }
           .v-input__append-inner {
             margin-top: 0px !important;
@@ -44,6 +55,7 @@ $condensed-input-height: 24px;
   .v-menu__content {
     top: auto !important;
     left: auto !important;
+
     .v-select-list {
       .v-list-item {
         font-size: $condensed-input-font-size;

@@ -101,31 +101,10 @@
                 {{ artwork.hashtags.map((h) => `#${h}`).join(', ') }}
               </template>
               <template v-if="editMode">
-                <v-combobox
+                <HashtagSelector
                   v-model="artwork.hashtags"
-                  name="hashtags"
-                  label="Hashtags"
-                  multiple
-                  chips
-                  :items="hashtags"
-                  no-filter
-                  hide-selected
-                  :search-input.sync="hashtagSearchInput"
-                  @input="onHashtagInput"
-                  @update:search-input="onHashtagUpdateSearchInput"
-                >
-                  <template v-slot:selection="data">
-                    <v-chip
-                      :key="JSON.stringify(data.item)"
-                      v-bind="data.attrs"
-                      :input-value="data.selected"
-                      :disabled="data.disabled"
-                      @click:close="data.parent.selectItem(data.item)"
-                    >
-                      # {{ data.item }}
-                    </v-chip>
-                  </template>
-                </v-combobox>
+                  :hashtags="hashtags"
+                />
               </template>
             </v-col>
           </v-row>
@@ -154,6 +133,7 @@ import Fuse from 'fuse.js'
 import LikeButton from '~/components/likeButton.component.vue'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
+import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { artworkTypes } from '~/models/artwork/artworkOptions'
 
@@ -161,7 +141,8 @@ import { artworkTypes } from '~/models/artwork/artworkOptions'
   components: {
     LikeButton,
     CitySelector,
-    ArtworkTypeSelector
+    ArtworkTypeSelector,
+    HashtagSelector
   }
 })
 export default class ArtworkPage extends FormPageComponent {
@@ -194,23 +175,6 @@ export default class ArtworkPage extends FormPageComponent {
     } catch (error) {
       console.error(error)
       return { errors: error.response?.data?.messages }
-    }
-  }
-
-  onHashtagInput(hashtags: string[]) {
-    this.artwork.hashtags = hashtags.map((h) => {
-      return h[0] === '#' ? h.slice(1) : h
-    })
-    this.hashtagSearchInput = ''
-  }
-
-  onHashtagUpdateSearchInput(value: string) {
-    if (!value) {
-      this.hashtags = this.$store.state.config.hashtags
-    } else {
-      const result = this.fuzzyHashtags.search(value)
-
-      this.hashtags = result.map((r: any) => r.item)
     }
   }
 
