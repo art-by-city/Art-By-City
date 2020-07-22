@@ -165,11 +165,6 @@ export default class ArtworkExplorer extends Vue {
     this.vh = window.innerHeight
   }
 
-  async refresh(opts: ArtworkOptions) {
-    this.$store.commit('artworks/options', opts)
-    await this.$store.dispatch('artworks/fetchArtworks')
-  }
-
   previous() {
     this.$store.commit('artworks/previous')
   }
@@ -191,30 +186,11 @@ export default class ArtworkExplorer extends Vue {
     return artworks.slice(0, this.gridSize)
   }
 
-  calcContainerClass() {
-    return { [`grid-size-${this.gridSize}`]: true }
-  }
-
-  artworkCardClass(i: number) {
-    const classes: any = { 'artwork-card': true }
-
-    if (this.gridSize === 1) {
-      switch (i) {
-        case 0:
-          classes.hide = true
-          classes.left = true
-          break
-        case 1:
-          classes.show = true
-          break
-        case 2:
-          classes.hide = true
-          classes.right = true
-          break
-      }
+  get artworkFlipCardClass() {
+    return {
+      'flip-card': true,
+      'show-back-card': this.$store.state.artworks.visibleSlot === 'B'
     }
-
-    return classes
   }
 
   isHighlighted(index: number) {
@@ -267,13 +243,6 @@ export default class ArtworkExplorer extends Vue {
     this.$forceUpdate()
   }
 
-  get artworkFlipCardClass() {
-    return {
-      'flip-card': true,
-      'show-back-card': this.$store.state.artworks.visibleSlot === 'B'
-    }
-  }
-
   showArtworkPreview(index: number) {
     this.artworkPreview.index = index
     this.toggleArtworkPreviewModal(true)
@@ -285,6 +254,11 @@ export default class ArtworkExplorer extends Vue {
     } else {
       this.artworkPreview.show = !this.artworkPreview.show
     }
+  }
+
+  async refresh(opts: ArtworkOptions) {
+    this.$store.commit('artworks/options', opts)
+    await this.$store.dispatch('artworks/fetchArtworks')
   }
 }
 </script>
@@ -331,6 +305,62 @@ export default class ArtworkExplorer extends Vue {
   padding-bottom: 2px;
 }
 
+.artwork-grid-row {
+  text-align: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.artwork-grid-col {
+  display: inline-block;
+}
+
+.artwork-explorer-container.grid-size-1 {
+  width: 100%;
+  height: 95%;
+}
+.grid-size-1 >>> .artwork-grid-col {
+  height: 45vw;
+  width: 45vw;
+  margin: 0 auto;
+}
+.grid-size-1 >>> .artwork-grid-col:nth-child(2) {
+  position: relative;
+  top: -22vw;
+  right: -22vw;
+}
+.grid-size-1 >>> .artwork-grid-col:nth-child(3) {
+  position: relative;
+  top: -22vw;
+  right: 22vw;
+}
+.grid-size-1 >>> .artwork-grid-col:not(:first-child) {
+  border: 1px solid blue;
+  height: 20px;
+  width: 20px;
+}
+
+.artwork-explorer-container.grid-size-3 {
+  width: 100%;
+  height: 95%;
+}
+.grid-size-3 >>> .artwork-grid-col {
+  height: 30vw;
+  width: 30vw;
+  padding: 5px;
+}
+
+.artwork-grid-col {
+  order: 3
+}
+.artwork-grid-col:first-child {
+  order: 2;
+}
+.artwork-grid-col:nth-child(2) {
+  order: 1;
+}
+
 .artwork-card {
   transition: all .5s ease-out;
   /* opacity: 1 */
@@ -355,40 +385,11 @@ export default class ArtworkExplorer extends Vue {
   margin: auto
 }
 
-.artwork-grid-row {
-  text-align: center;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-.artwork-grid-col {
-  display: inline-block;
-}
-
-.artwork-explorer-container.grid-size-1 {
-  width: 100%;
-  height: 95%;
-}
-.grid-size-1 >>> .artwork-grid-col {
-  height: 45vw;
-  width: 45vw;
-  margin: 0 auto;
-}
-.grid-size-1 >>> .artwork-grid-col:not(:first-child) {
-  display: none;
-}
-
-.artwork-explorer-container.grid-size-3 {
-  width: 100%;
-  height: 95%;
-}
-.grid-size-3 >>> .artwork-grid-col {
-  height: 30vw;
-  width: 30vw;
-  padding: 5px;
-}
-
-/* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
+/*
+  The flip card container - set the width and height to whatever you want.
+  We have added the border property to demonstrate that the flip itself goes
+  out of the box on hover (remove perspective if you don't want the 3D effect
+*/
 .flip-card {
   background-color: transparent;
   width: 100%;
@@ -437,7 +438,9 @@ export default class ArtworkExplorer extends Vue {
   border-top-left-radius:4px;
   border-top-right-radius:4px;
   border-top-width:0px;
-  box-shadow:rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
+  box-shadow:rgba(0, 0, 0, 0.2) 0px 3px 1px -2px,
+    rgba(0, 0, 0, 0.14) 0px 2px 2px 0px,
+    rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
   box-sizing:border-box;
 }
 
