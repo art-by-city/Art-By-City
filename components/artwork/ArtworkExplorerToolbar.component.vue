@@ -1,22 +1,23 @@
 <template>
   <v-container fluid class="pa-0">
     <v-row dense>
-      <v-col cols="3">
+      <v-col cols="3" class="pa-0">
         <CitySelector
           v-model="opts.city"
           :cities="cities"
           @input="onRefresh"
         />
       </v-col>
-      <v-col offset="1" cols="4" class="text-center">
-        <v-btn icon @click="onRefresh">
-          <v-icon x-large color="black">mdi-record-circle</v-icon>
+      <v-col offset="1" cols="4" class="text-center pa-0">
+        <v-btn icon @click="onRefresh" class="shift-icon-button-up-a-bit">
+          <v-icon x-large color="black">mdi-refresh</v-icon>
         </v-btn>
       </v-col>
-      <v-col offset="3">
+      <v-col offset="3" class="pa-0">
         <v-btn
           v-if="$store.state.artworks.slotB.length > 0"
           icon
+          class="shift-icon-button-up-a-bit"
           @click="onPreviousClicked"
         >
           <v-icon x-large color="black">mdi-arrow-left-circle</v-icon>
@@ -24,13 +25,13 @@
       </v-col>
     </v-row>
     <v-row dense>
-      <v-col cols="3">
+      <v-col cols="3" class="pa-0">
         <ArtworkTypeSelector
           v-model="opts.type"
           @input="onRefresh"
         />
       </v-col>
-      <v-col offset="1" cols="4">
+      <v-col offset="1" cols="4" class="pa-0">
         <HashtagSelector
           v-model="opts.hashtags"
           :hashtags="hashtags"
@@ -38,9 +39,9 @@
           @input="onRefresh"
         />
       </v-col>
-      <v-col offset="3" cols="1">
+      <v-col offset="3" cols="1" class="pa-0">
         <v-btn
-          class="d-none d-sm-none d-md-flex"
+          class="d-none d-sm-none d-md-flex shift-icon-button-up-a-bit"
           icon
           @click="onGridPreferenceClicked"
         >
@@ -124,3 +125,9 @@ export default class ArtworkExplorerToolbar extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.shift-icon-button-up-a-bit {
+  top: -6px;
+}
+</style>
