@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container fluid class="artwork-explorer-container">
     <v-dialog
       v-model="artworkPreview.show"
       max-width="80vw"
@@ -50,83 +50,71 @@
       @previous="previous"
     />
     <v-divider></v-divider>
-    <div class="artwork-explorer-container" :class="calcContainerClass()">
-      <v-container>
-        <v-row dense justify="center">
-          <v-col
-            v-for="(artwork, i) in sliceArtworks()"
-            :key="i"
-            justify="center"
-            xs="12"
-            :md="calcColMdCols(i)"
-          >
-            <v-hover>
-              <template v-slot:default="{ hover }">
-                <v-card
-                  :class="artworkCardClass(i)"
-                  :width="calcArtworkHeight(i)"
-                  :height="calcArtworkHeight(i)"
-                  flat
-                >
-                  <div :class="artworkFlipCardClass">
-                    <!-- {{ i }} -->
-                    <div class="flip-card-inner">
-                      <div class="flip-card-front">
-                        <!-- front -->
-                        <v-img
-                          v-if="artwork"
-                          :src="'/artwork-images/' + artwork.images[0].source"
-                          style="cursor: pointer"
-                          height="100%"
-                          width="100%"
-                          @click="showArtworkPreview(i)"
-                        >
-                          <v-fade-transition>
-                            <v-overlay v-if="hover" absolute class="artwork-overlay">
-                              <v-row align="end" class="fill-height pa-1">
-                                <v-col class="artwork-overlay-title-container">
-                                  <LikeButton :dark="true" :artwork="artwork" />
-                                  <a class="white--text text-lowercase">
-                                    {{ artwork.title }}
-                                  </a>
-                                </v-col>
-                              </v-row>
-                            </v-overlay>
-                          </v-fade-transition>
-                        </v-img>
-                      </div>
-                      <div class="flip-card-back">
-                        <!-- back -->
-                        <v-img
-                          v-if="sliceArtworks('B')[i]"
-                          :src="'/artwork-images/' + sliceArtworks('B')[i].images[0].source"
-                          style="cursor: pointer"
-                          height="100%"
-                          width="100%"
-                          @click="showArtworkPreview(i)"
-                        >
-                          <v-fade-transition>
-                            <v-overlay v-if="hover" absolute class="artwork-overlay">
-                              <v-row align="end" class="fill-height pa-1">
-                                <v-col class="artwork-overlay-title-container">
-                                  <LikeButton :dark="true" :artwork="artwork" />
-                                  <a class="white--text text-lowercase">
-                                    {{ artwork.title }}
-                                  </a>
-                                </v-col>
-                              </v-row>
-                            </v-overlay>
-                          </v-fade-transition>
-                        </v-img>
-                      </div>
+    <div class="artwork-explorer-container" :class="{ [`grid-size-${gridSize}`]: true }">
+      <div class="artwork-grid-row">
+        <div
+          class="artwork-grid-col"
+          v-for="(artwork, i) in sliceArtworks()"
+          :key="i"
+        >
+          <v-hover>
+            <template v-slot:default="{ hover }">
+              <v-card class="artwork-card" flat>
+                <div :class="artworkFlipCardClass">
+                  <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                      <!-- front -->
+                      <v-img
+                        v-if="artwork"
+                        :src="'/artwork-images/' + artwork.images[0].source"
+                        style="cursor: pointer"
+                        aspect-ratio="1"
+                        @click="showArtworkPreview(i)"
+                      >
+                        <v-fade-transition>
+                          <v-overlay v-if="hover" absolute class="artwork-overlay">
+                            <v-row align="end" class="fill-height pa-1">
+                              <v-col class="artwork-overlay-title-container">
+                                <LikeButton :dark="true" :artwork="artwork" />
+                                <a class="white--text text-lowercase">
+                                  {{ artwork.title }}
+                                </a>
+                              </v-col>
+                            </v-row>
+                          </v-overlay>
+                        </v-fade-transition>
+                      </v-img>
+                    </div>
+                    <div class="flip-card-back">
+                      <!-- back -->
+                      <v-img
+                        v-if="sliceArtworks('B')[i]"
+                        :src="'/artwork-images/' + sliceArtworks('B')[i].images[0].source"
+                        style="cursor: pointer"
+                        aspect-ratio="1"
+                        @click="showArtworkPreview(i)"
+                      >
+                        <v-fade-transition>
+                          <v-overlay v-if="hover" absolute class="artwork-overlay">
+                            <v-row align="end" class="fill-height pa-1">
+                              <v-col class="artwork-overlay-title-container">
+                                <LikeButton :dark="true" :artwork="artwork" />
+                                <a class="white--text text-lowercase">
+                                  {{ artwork.title }}
+                                </a>
+                              </v-col>
+                            </v-row>
+                          </v-overlay>
+                        </v-fade-transition>
+                      </v-img>
                     </div>
                   </div>
-                </v-card>
-              </template>
-            </v-hover>
-          </v-col>
-        </v-row>
-      </v-container>
+                </div>
+              </v-card>
+            </template>
+          </v-hover>
+        </div>
+      </div>
     </div>
   </v-container>
 </template>
@@ -229,54 +217,6 @@ export default class ArtworkExplorer extends Vue {
     return classes
   }
 
-  calcColMdCols(i: number) {
-    if (this.gridSize === 1) {
-      if (i === 0 || i === 2) {
-        return 3
-      }
-
-      return 6
-    }
-    return 4
-  }
-
-  calcArtworkHeight(i: number) {
-    if (this.vw < 960) {
-      return '70vh'
-    }
-
-    if (this.gridSize === 1 && (i === 0 || i === 2)) {
-      return '0px'
-    }
-
-    let available = this.vh
-    if (this.vh > this.vw) {
-      available = this.vw
-    }
-    let magic = 425
-    switch (this.gridSize) {
-      case 1:
-        magic = 300
-        break
-      case 3:
-        magic = 425
-        break
-      case 6:
-      case 9:
-        magic = 300
-    }
-
-    available = available - magic
-
-    const h = available / (this.gridSize / 3)
-
-    if (this.gridSize === 1) {
-      return available
-    }
-
-    return h
-  }
-
   isHighlighted(index: number) {
     return this.artworkPreview.imageIndex === index ? 'highlighted' : ''
   }
@@ -349,7 +289,7 @@ export default class ArtworkExplorer extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .clickable {
   cursor: pointer;
 }
@@ -385,6 +325,7 @@ export default class ArtworkExplorer extends Vue {
 
 .artwork-explorer-container {
   margin: auto;
+  height: 100%;
 }
 .artwork-overlay-title-container {
   padding-bottom: 2px;
@@ -414,17 +355,37 @@ export default class ArtworkExplorer extends Vue {
   margin: auto
 }
 
+.artwork-grid-row {
+  text-align: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.artwork-grid-col {
+  display: inline-block;
+}
+
 .artwork-explorer-container.grid-size-1 {
-  width: 96%
+  width: 100%;
+  height: 95%;
 }
+.grid-size-1 >>> .artwork-grid-col {
+  height: 45vw;
+  width: 45vw;
+  margin: 0 auto;
+}
+.grid-size-1 >>> .artwork-grid-col:not(:first-child) {
+  display: none;
+}
+
 .artwork-explorer-container.grid-size-3 {
-  width: 96%;
+  width: 100%;
+  height: 95%;
 }
-.artwork-explorer-container.grid-size-6 {
-  width: 60%;
-}
-.artwork-explorer-container.grid-size-9 {
-  width: 41%;
+.grid-size-3 >>> .artwork-grid-col {
+  height: 30vw;
+  width: 30vw;
+  padding: 5px;
 }
 
 /* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
