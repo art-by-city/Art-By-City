@@ -28,11 +28,13 @@
 
               <ArtworkTypeSelector
                 v-model="artwork.type"
+                required
               />
 
               <CitySelector
                 v-model="artwork.city"
                 :cities="cities"
+                required
               />
 
               <HashtagSelector
@@ -84,7 +86,6 @@ import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 
-const MAX_ARTWORK_HASHTAGS = 12
 const MAX_ARTWORK_IMAGES = 12
 
 @Component({
@@ -101,7 +102,8 @@ export default class ArtworkUploadPage extends FormComponent {
   artwork: any = {
     city: '',
     type: '',
-    images: []
+    images: [],
+    hashtags: []
   }
   hashtags: string[] = this.$store.state.config.hashtags
   fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
@@ -146,33 +148,6 @@ export default class ArtworkUploadPage extends FormComponent {
 
       return true
     }]
-  }
-
-  get typeRules() {
-    return [(value: string = '') => {
-      if (!artworkTypes.includes(value)) {
-        return `type is required`
-      }
-
-      return true
-    }]
-  }
-
-  get cityRules() {
-    return [(value: string = '') => {
-      if (!this.cities.includes(value)) {
-        return `city is required`
-      }
-
-      return true
-    }]
-  }
-
-  @Watch('artwork.hashtags')
-  enforceMaxHashtags(hashtags: string[]) {
-    if (hashtags.length > MAX_ARTWORK_HASHTAGS) {
-      this.$nextTick(() => this.artwork.hashtags.pop())
-    }
   }
 
   @Watch('artwork.images')

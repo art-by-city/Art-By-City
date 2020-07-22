@@ -47,7 +47,10 @@ $condensed-input-height: 24px;
       }
 
       .v-text-field__details {
-        display: none;
+        // display: none;
+        position: relative;
+        left: 15px;
+        top: 5px;
       }
     }
   }
