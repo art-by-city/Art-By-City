@@ -29,59 +29,14 @@
           v-model="opts.type"
           @input="onRefresh"
         />
-        <!-- <v-select
-          v-model="opts.type"
-          class="condensed-input"
-          name="type"
-          label="type"
-          :items="artworkTypes"
-          outlined
-          rounded
-          dense
-          single-line
-          prepend-icon="mdi-image-frame"
-          @input="onRefresh"
-        >
-          <template v-slot:item="{ item }">
-            <span class="text-lowercase">{{ item }}</span>
-          </template>
-        </v-select> -->
       </v-col>
       <v-col offset="1" cols="4">
-        <v-combobox
+        <HashtagSelector
           v-model="opts.hashtags"
-          class="condensed-input"
-          name="hashtags"
-          label="hashtags"
-          multiple
-          chips
-          outlined
-          rounded
-          dense
-          single-line
-          :items="hashtags"
-          no-filter
-          hide-selected
-          :search-input.sync="hashtagSearchInput"
-          @input="onHashtagInput"
-          @update:search-input="onHashtagUpdateSearchInput"
-        >
-          <template v-slot:selection="data">
-            <v-chip
-              :key="JSON.stringify(data.item)"
-              v-bind="data.attrs"
-              :input-value="data.selected"
-              :disabled="data.disabled"
-              close
-              pill
-              small
-              class="text-lowercase"
-              @click:close="data.parent.selectItem(data.item)"
-            >
-              # {{ data.item }}
-            </v-chip>
-          </template>
-        </v-combobox>
+          :hashtags="hashtags"
+          :maxSelectable="3"
+          @input="onRefresh"
+        />
       </v-col>
       <v-col offset="3" cols="1">
         <v-btn
@@ -105,11 +60,13 @@ import Fuse from 'fuse.js'
 import { artworkTypes } from '~/models/artwork/artworkOptions'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
+import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 
 @Component({
   components: {
     CitySelector,
-    ArtworkTypeSelector
+    ArtworkTypeSelector,
+    HashtagSelector
   }
 })
 export default class ArtworkExplorerToolbar extends Vue {
@@ -163,24 +120,6 @@ export default class ArtworkExplorerToolbar extends Vue {
         return 'mdi-view-module-outline'
       case 9:
         return 'mdi-grid'
-    }
-  }
-
-  onHashtagInput(hashtags: string[]) {
-    this.opts.hashtags = hashtags.map((h) => {
-      return h[0] === '#' ? h.slice(1) : h
-    })
-    this.hashtagSearchInput = ''
-    this.onRefresh()
-  }
-
-  onHashtagUpdateSearchInput(value: string) {
-    if (!value) {
-      this.hashtags = this.$store.state.config.hashtags
-    } else {
-      const result = this.fuzzyHashtags.search(value)
-
-      this.hashtags = result.map((r: any) => r.item)
     }
   }
 }

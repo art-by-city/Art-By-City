@@ -26,40 +26,19 @@
                 class="text-lowercase"
               ></v-textarea>
 
-              <ArtworkTypeSelector v-model="artwork.type" />
+              <ArtworkTypeSelector
+                v-model="artwork.type"
+              />
 
               <CitySelector
                 v-model="artwork.city"
                 :cities="cities"
               />
 
-              <v-combobox
+              <HashtagSelector
                 v-model="artwork.hashtags"
-                name="hashtags"
-                label="Hashtags"
-                class="text-lowercase"
-                multiple
-                chips
-                :items="hashtags"
-                no-filter
-                hide-selected
-                :search-input.sync="hashtagSearchInput"
-                @input="onHashtagInput"
-                @update:search-input="onHashtagUpdateSearchInput"
-              >
-                <template v-slot:selection="data">
-                  <v-chip
-                    :key="JSON.stringify(data.item)"
-                    v-bind="data.attrs"
-                    :input-value="data.selected"
-                    :disabled="data.disabled"
-                    class="text-lowercase"
-                    @click:close="data.parent.selectItem(data.item)"
-                  >
-                    # {{ data.item }}
-                  </v-chip>
-                </template>
-              </v-combobox>
+                :hashtags="hashtags"
+              />
 
               <v-file-input
                 v-model="artwork.images"
@@ -103,6 +82,7 @@ import FormComponent from '~/components/pages/formPage.component'
 import { artworkTypes } from '~/models/artwork/artworkOptions'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
+import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 
 const MAX_ARTWORK_HASHTAGS = 12
 const MAX_ARTWORK_IMAGES = 12
@@ -111,7 +91,8 @@ const MAX_ARTWORK_IMAGES = 12
   middleware: 'role/artist',
   components: {
     CitySelector,
-    ArtworkTypeSelector
+    ArtworkTypeSelector,
+    HashtagSelector
   }
 })
 export default class ArtworkUploadPage extends FormComponent {
@@ -198,23 +179,6 @@ export default class ArtworkUploadPage extends FormComponent {
   enforceMaxImages(images: File[]) {
     if (images.length > MAX_ARTWORK_IMAGES) {
       this.$nextTick(() => this.artwork.images.pop())
-    }
-  }
-
-  onHashtagInput(hashtags: string[]) {
-    this.artwork.hashtags = hashtags.map((h) => {
-      return h[0] === '#' ? h.slice(1) : h
-    })
-    this.hashtagSearchInput = ''
-  }
-
-  onHashtagUpdateSearchInput(value: string) {
-    if (!value) {
-      this.hashtags = this.$store.state.config.hashtags
-    } else {
-      const result = this.fuzzyHashtags.search(value)
-
-      this.hashtags = result.map((r: any) => r.item)
     }
   }
 
