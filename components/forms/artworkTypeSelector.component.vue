@@ -26,10 +26,8 @@ import { artworkTypes } from '~/models/artwork/artworkOptions'
 
 @Component
 export default class ArtworkTypeSelector extends Vue {
-  @Prop({ type: Boolean }) readonly disabled!: boolean
-
   @Model('input', { type: String, required: true }) value!: string
-
+  @Prop({ type: Boolean }) readonly disabled!: boolean
   artworkTypes = artworkTypes
 }
 </script>
