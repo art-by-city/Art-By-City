@@ -20,7 +20,13 @@
           class="shift-icon-button-up-a-bit"
           @click="onPreviousClicked"
         >
-          <v-icon x-large color="black">mdi-arrow-left-circle</v-icon>
+          <v-icon x-large color="black">
+            {{
+              this.$store.state.artworks.visibleSlot === 'B'
+                ? 'mdi-arrow-left-circle'
+                : 'mdi-arrow-right-circle'
+            }}
+          </v-icon>
         </v-btn>
       </v-col>
     </v-row>
