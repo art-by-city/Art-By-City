@@ -59,7 +59,7 @@
         >
           <v-hover>
             <template v-slot:default="{ hover }">
-              <v-card class="artwork-card" flat>
+              <v-card flat>
                 <div :class="artworkFlipCardClass">
                   <div class="flip-card-inner">
                     <div class="flip-card-front">
@@ -267,36 +267,28 @@ export default class ArtworkExplorer extends Vue {
 .clickable {
   cursor: pointer;
 }
-
 .highlighted {
   border: 2px solid yellow;
 }
-
 .clickable:not(.highlighted) {
   margin: 2px;
 }
-
 .overlay-title {
   color: white;
 }
-
 .artwork-overlay > div.v-overlay__content {
   height: 100%;
   width: 100%;
 }
-
 .artwork-overlay div.artwork-container {
   height: 100%;
 }
-
 .artwork-preview-dialog {
   width: auto;
 }
-
 .artwork-preview-dialog > * {
   width: auto;
 }
-
 .artwork-explorer-container {
   margin: auto;
   height: 100%;
@@ -304,7 +296,6 @@ export default class ArtworkExplorer extends Vue {
 .artwork-overlay-title-container {
   padding-bottom: 2px;
 }
-
 .artwork-grid-row {
   text-align: center;
   height: 100%;
@@ -315,74 +306,63 @@ export default class ArtworkExplorer extends Vue {
 .artwork-grid-col {
   display: inline-block;
 }
-
 .artwork-explorer-container.grid-size-1 {
   width: 100%;
   height: 95%;
 }
 .grid-size-1 >>> .artwork-grid-col {
-  height: 45vw;
-  width: 45vw;
+  height: 39vw;
+  width: 39vw;
   margin: 0 auto;
 }
 .grid-size-1 >>> .artwork-grid-col:nth-child(2) {
   position: relative;
-  top: -22vw;
-  right: -22vw;
+  right: -30vw;
+  height: 30vw;
+  width: 30vw;
+  opacity: 0;
+  transition: opacity .5s ease-out .5s, right .5s ease-out .5s;
 }
 .grid-size-1 >>> .artwork-grid-col:nth-child(3) {
   position: relative;
-  top: -22vw;
-  right: 22vw;
+  right: 30vw;
+  height: 30vw;
+  width: 30vw;
+  opacity: 0;
+  transition: opacity .5s ease-out .5s, right .5s ease-out .5s;
 }
-.grid-size-1 >>> .artwork-grid-col:not(:first-child) {
-  border: 1px solid blue;
-  height: 20px;
-  width: 20px;
-}
-
 .artwork-explorer-container.grid-size-3 {
   width: 100%;
   height: 95%;
 }
 .grid-size-3 >>> .artwork-grid-col {
-  height: 30vw;
-  width: 30vw;
   padding: 5px;
 }
-
+.grid-size-3 >>> .artwork-grid-col:first-child {
+  height: 30vw;
+  width: 30vw;
+}
 .artwork-grid-col {
-  order: 3
+  order: 3;
+  z-index: 1;
 }
 .artwork-grid-col:first-child {
   order: 2;
+  z-index: 3;
 }
 .artwork-grid-col:nth-child(2) {
   order: 1;
+  z-index: 2;
 }
-
-.artwork-card {
+.artwork-grid-col:first-child {
   transition: all .5s ease-out;
-  /* opacity: 1 */
 }
-
-.artwork-card.hide {
-  /* display: none; */
-  /* visibility: hidden; */
-  opacity: 0
-}
-.artwork-card.hide.left {
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-.artwork-card.hide.right {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-.artwork-card.show {
-  margin: auto
+.grid-size-3 >>> .artwork-grid-col:not(:first-child) {
+  position: relative;
+  right: 0vw;
+  height: 30vw;
+  width: 30vw;
+  transition: right .5s ease-out .5s;
 }
 
 /*
