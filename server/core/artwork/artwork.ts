@@ -87,4 +87,7 @@ export default class Artwork extends Entity {
   @ArrayUnique()
   @IsString({ each: true })
   likes!: string[]
+
+  published!: boolean
+  approved!: boolean
 }

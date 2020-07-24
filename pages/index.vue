@@ -5,18 +5,18 @@
     </template>
     <template v-if="!$auth.loggedIn">
       <v-row style="height: 45vh" align="end">
-        <v-col cols="12">
+        <v-col cols="12" style="text-align: center;">
           <span class="splash-logo" @click="expand = !expand">
             art x by x city
           </span>
         </v-col>
       </v-row>
       <v-expand-transition>
-        <v-row v-show="expand">
-          <v-col cols="auto">
+        <v-row v-show="expand" >
+          <v-col cols="1" offset="5" style="text-align: center;">
             <nuxt-link to="/login">login</nuxt-link>
           </v-col>
-          <v-col cols="auto">
+          <v-col cols="1" style="text-align: center;">
             <nuxt-link to="/register">sign up</nuxt-link>
           </v-col>
         </v-row>

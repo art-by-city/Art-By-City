@@ -59,58 +59,57 @@
         >
           <v-hover>
             <template v-slot:default="{ hover }">
-              <v-card flat>
-                <div :class="artworkFlipCardClass">
-                  <div class="flip-card-inner">
-                    <div class="flip-card-front">
-                      <!-- front -->
-                      <v-img
-                        v-if="artwork"
-                        :src="'/artwork-images/' + artwork.images[0].source"
-                        style="cursor: pointer"
-                        aspect-ratio="1"
-                        @click="showArtworkPreview(i)"
-                      >
-                        <v-fade-transition>
-                          <v-overlay v-if="hover" absolute class="artwork-overlay">
-                            <v-row align="end" class="fill-height pa-1">
-                              <v-col class="artwork-overlay-title-container">
-                                <LikeButton :dark="true" :artwork="artwork" />
-                                <a class="white--text text-lowercase">
-                                  {{ artwork.title }}
-                                </a>
-                              </v-col>
-                            </v-row>
-                          </v-overlay>
-                        </v-fade-transition>
-                      </v-img>
-                    </div>
-                    <div class="flip-card-back">
-                      <!-- back -->
-                      <v-img
-                        v-if="sliceArtworks('B')[i]"
-                        :src="'/artwork-images/' + sliceArtworks('B')[i].images[0].source"
-                        style="cursor: pointer"
-                        aspect-ratio="1"
-                        @click="showArtworkPreview(i)"
-                      >
-                        <v-fade-transition>
-                          <v-overlay v-if="hover" absolute class="artwork-overlay">
-                            <v-row align="end" class="fill-height pa-1">
-                              <v-col class="artwork-overlay-title-container">
-                                <LikeButton :dark="true" :artwork="artwork" />
-                                <a class="white--text text-lowercase">
-                                  {{ artwork.title }}
-                                </a>
-                              </v-col>
-                            </v-row>
-                          </v-overlay>
-                        </v-fade-transition>
-                      </v-img>
-                    </div>
+              <div :class="artworkFlipCardClass">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front">
+                    <!-- front -->
+                    <v-img
+                      v-if="artwork"
+                      :src="'/artwork-images/' + artwork.images[0].source"
+                      style="cursor: pointer"
+                      aspect-ratio="1"
+                      class="elevation-2"
+                      @click="showArtworkPreview(i)"
+                    >
+                      <v-fade-transition>
+                        <v-overlay v-if="hover" absolute class="artwork-overlay">
+                          <v-row align="end" class="fill-height pa-1">
+                            <v-col class="artwork-overlay-title-container">
+                              <LikeButton :dark="true" :artwork="artwork" />
+                              <a class="white--text text-lowercase">
+                                {{ artwork.title }}
+                              </a>
+                            </v-col>
+                          </v-row>
+                        </v-overlay>
+                      </v-fade-transition>
+                    </v-img>
+                  </div>
+                  <div class="flip-card-back">
+                    <!-- back -->
+                    <v-img
+                      v-if="sliceArtworks('B')[i]"
+                      :src="'/artwork-images/' + sliceArtworks('B')[i].images[0].source"
+                      style="cursor: pointer"
+                      aspect-ratio="1"
+                      @click="showArtworkPreview(i)"
+                    >
+                      <v-fade-transition>
+                        <v-overlay v-if="hover" absolute class="artwork-overlay">
+                          <v-row align="end" class="fill-height pa-1">
+                            <v-col class="artwork-overlay-title-container">
+                              <LikeButton :dark="true" :artwork="artwork" />
+                              <a class="white--text text-lowercase">
+                                {{ artwork.title }}
+                              </a>
+                            </v-col>
+                          </v-row>
+                        </v-overlay>
+                      </v-fade-transition>
+                    </v-img>
                   </div>
                 </div>
-              </v-card>
+              </div>
             </template>
           </v-hover>
         </div>
@@ -321,7 +320,7 @@ export default class ArtworkExplorer extends Vue {
   height: 30vw;
   width: 30vw;
   opacity: 0;
-  transition: opacity .5s ease-out .5s, right .5s ease-out .5s;
+  transition: opacity .5s ease-out 1s, right .5s ease-out .5s;
 }
 .grid-size-1 >>> .artwork-grid-col:nth-child(3) {
   position: relative;
@@ -329,7 +328,7 @@ export default class ArtworkExplorer extends Vue {
   height: 30vw;
   width: 30vw;
   opacity: 0;
-  transition: opacity .5s ease-out .5s, right .5s ease-out .5s;
+  transition: opacity .5s ease-out 1s, right .5s ease-out .5s;
 }
 .artwork-explorer-container.grid-size-3 {
   width: 100%;
@@ -405,23 +404,6 @@ export default class ArtworkExplorer extends Vue {
   height: 100%;
   -webkit-backface-visibility: hidden; /* Safari */
   backface-visibility: hidden;
-
-  border-bottom-color:rgb(255, 255, 255);
-  border-bottom-left-radius:4px;
-  border-bottom-right-radius:4px;
-  border-bottom-width:0px;
-  border-left-color:rgb(255, 255, 255);
-  border-left-width:0px;
-  border-right-color:rgb(255, 255, 255);
-  border-right-width:0px;
-  border-top-color:rgb(255, 255, 255);
-  border-top-left-radius:4px;
-  border-top-right-radius:4px;
-  border-top-width:0px;
-  box-shadow:rgba(0, 0, 0, 0.2) 0px 3px 1px -2px,
-    rgba(0, 0, 0, 0.14) 0px 2px 2px 0px,
-    rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
-  box-sizing:border-box;
 }
 
 .flip-enter-active {

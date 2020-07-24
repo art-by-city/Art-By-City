@@ -19,6 +19,8 @@ export default class CityApplicationServiceImpl
     city.code = req.body?.city?.code || ''
     city.name = req.body?.city?.name || ''
     city.country = req.body?.city?.country || ''
+    city.visible = req.body?.city?.visible || false
+    city.disabled = req.body?.city?.disabled === true ? true : false
 
     try {
       return new ApiServiceSuccessResult(await this.cityService.create(city))
