@@ -51,10 +51,19 @@ export default class AdminControllerImpl implements AdminController {
 
     /**
      * POST /user - Update a user's roles
-     * Temporary
+     * TODO -> Temporary?
      */
     router.post('/user', async (req, res) => {
       const result = await this.adminService.saveUser(req.body.user)
+
+      return res.send(result)
+    })
+
+    /**
+     * GET /artwork - Admin Artwork Fetch
+     */
+    router.get('/artwork', async (_req, res) => {
+      const result = await this.adminService.listArtwork()
 
       return res.send(result)
     })
