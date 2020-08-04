@@ -4,20 +4,25 @@ import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import { User, UserService } from '../user'
 import { AdminService } from './'
 import { CityService, City } from '../city'
+import { ArtworkService, Artwork } from '../artwork'
 
 @injectable()
 export default class AdminServiceImpl implements AdminService {
   private userService: UserService
   private cityService: CityService
+  private artworkService: ArtworkService
 
   constructor(
     @inject(Symbol.for('UserService'))
     userService: UserService,
     @inject(Symbol.for('CityService'))
-    cityService: CityService
+    cityService: CityService,
+    @inject(Symbol.for('ArtworkService'))
+    artworkService: ArtworkService
   ) {
     this.userService = userService
     this.cityService = cityService
+    this.artworkService = artworkService
   }
 
   listUsers(): Promise<User[]> {
@@ -26,6 +31,10 @@ export default class AdminServiceImpl implements AdminService {
 
   listCities(): Promise<City[]> {
     return this.cityService.find({ includeAll: true })
+  }
+
+  listArtwork(): Promise<Artwork[]> {
+    return this.artworkService.list()
   }
 
   setUserRoles(

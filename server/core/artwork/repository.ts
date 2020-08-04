@@ -35,9 +35,13 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
     }
   }
 
-  list(limit: number = 9): Promise<Artwork[]> {
+  list(limit?: number): Promise<Artwork[]> {
     try {
-      return this.repository.limit(limit).find()
+      if (limit) {
+        return this.repository.limit(limit).find()
+      } else {
+        return this.repository.find()
+      }
     } catch (error) {
       throw new Error(`Error listing artwork: ${error.message}`)
     }

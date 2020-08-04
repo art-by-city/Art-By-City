@@ -39,6 +39,7 @@ export default class AdminIndexPage extends FormPageComponent {
   adminPageLinks = [
     { text: 'Users', icon: 'mdi-table-account', to: '/admin/users' },
     { text: 'Cities', icon: 'mdi-map', to: '/admin/cities' },
+    { text: 'Artwork', icon: 'mdi-brush', to: '/admin/artwork' },
     { text: 'Event Log', icon: 'mdi-table-clock', to: '/admin/events' },
   ]
 }
