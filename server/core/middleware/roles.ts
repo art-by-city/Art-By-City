@@ -6,7 +6,7 @@ export default (roles: string[]) => {
 
     for (let i = 0; i < roles.length; i++) {
       if (!(user.roles || []).includes(roles[i])) {
-        res.send(401)
+        return res.sendStatus(401)
       }
     }
 

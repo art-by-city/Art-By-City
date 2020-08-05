@@ -74,6 +74,118 @@ export default class ArtworkApplicationServiceImpl
     return { success: false }
   }
 
+  async publish(req: any): Promise<ApiServiceResult<void>> {
+    const user = <User>req.user
+
+    try {
+      const artwork = await this.artworkService.get(req.params.id)
+
+      if (!artwork) {
+        throw new NotFoundError(new Artwork())
+      }
+
+      if (artwork.owner !== user.id && !user.roles.includes('admin')) {
+        throw new UnauthorizedError()
+      }
+
+      artwork.published = true
+
+      const savedArtwork = await this.artworkService.update(artwork)
+
+      if (savedArtwork) {
+        return new ApiServiceSuccessResult()
+      }
+
+      return { success: false }
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async unpublish(req: any): Promise<ApiServiceResult<void>> {
+    const user = <User>req.user
+
+    try {
+      const artwork = await this.artworkService.get(req.params.id)
+
+      if (!artwork) {
+        throw new NotFoundError(new Artwork())
+      }
+
+      if (artwork.owner !== user.id && !user.roles.includes('admin')) {
+        throw new UnauthorizedError()
+      }
+
+      artwork.published = false
+
+      const savedArtwork = await this.artworkService.update(artwork)
+
+      if (savedArtwork) {
+        return new ApiServiceSuccessResult()
+      }
+
+      return { success: false }
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async approve(req: any): Promise<ApiServiceResult<void>> {
+    const user = <User>req.user
+
+    try {
+      const artwork = await this.artworkService.get(req.params.id)
+
+      if (!artwork) {
+        throw new NotFoundError(new Artwork())
+      }
+
+      if (!user.roles.includes('admin')) {
+        throw new UnauthorizedError()
+      }
+
+      artwork.approved = true
+
+      const savedArtwork = await this.artworkService.update(artwork)
+
+      if (savedArtwork) {
+        return new ApiServiceSuccessResult()
+      }
+
+      return { success: false }
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async unapprove(req: any): Promise<ApiServiceResult<void>> {
+    const user = <User>req.user
+
+    try {
+      const artwork = await this.artworkService.get(req.params.id)
+
+      if (!artwork) {
+        throw new NotFoundError(new Artwork())
+      }
+
+      if (!user.roles.includes('admin')) {
+        throw new UnauthorizedError()
+      }
+
+      artwork.approved = false
+
+      const savedArtwork = await this.artworkService.update(artwork)
+
+      if (savedArtwork) {
+        return new ApiServiceSuccessResult()
+      }
+
+      return { success: false }
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
   async update(req: any): Promise<ApiServiceResult<Artwork>> {
     const user = <User>req.user
 

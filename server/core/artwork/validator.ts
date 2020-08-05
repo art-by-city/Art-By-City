@@ -10,6 +10,10 @@ import { Artwork } from './'
 export default async (artwork: Artwork): Promise<void> => {
   const internalProps = ['id', 'created', 'updated', 'owner', 'likes']
 
+  if (!artwork.likes) {
+    artwork.likes = []
+  }
+
   const validationErrors: ClassValidatorError[] = await validate(
     artwork,
     {

@@ -71,6 +71,46 @@ export default class ArtworkControllerImpl implements ArtworkController {
       }
     })
 
+    router.post('/:id/publish', async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.publish(req)
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
+    router.post('/:id/unpublish', async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.unpublish(req)
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
+    router.post('/:id/approve', roles(['admin']), async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.approve(req)
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
+    router.post('/:id/unapprove', roles(['admin']), async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.unapprove(req)
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
     router.get('/', async (req, res, next) => {
       try {
         const result = await this.artworkAppService.list(req)

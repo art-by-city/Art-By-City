@@ -34,7 +34,7 @@ export default class AdminServiceImpl implements AdminService {
   }
 
   listArtwork(): Promise<Artwork[]> {
-    return this.artworkService.list()
+    return this.artworkService.list({ includeUnapproved: true, includeUnpublished: true })
   }
 
   setUserRoles(

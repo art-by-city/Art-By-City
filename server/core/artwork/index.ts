@@ -62,6 +62,8 @@ export interface ArtworkFilterOptions {
   shuffle?: boolean
   userId?: string
   lastFetchedArtworkId?: string
+  includeUnpublished?: boolean
+  includeUnapproved?: boolean
 }
 
 export interface ArtworkController extends BaseControllerInterface {}
@@ -80,6 +82,10 @@ export interface ArtworkApplicationService
   listLikedByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
   like(user: User, id: string): Promise<ApiServiceResult<void>>
   unlike(user: User, id: string): Promise<ApiServiceResult<void>>
+  publish(request: any): Promise<ApiServiceResult<void>>
+  unpublish(request: any): Promise<ApiServiceResult<void>>
+  approve(request: any): Promise<ApiServiceResult<void>>
+  unapprove(request: any): Promise<ApiServiceResult<void>>
 }
 
 export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {

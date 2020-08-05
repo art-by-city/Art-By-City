@@ -44,7 +44,9 @@
           ></v-img>
         </td>
       </template>
-
+      <template v-slot:item.id="{ item }">
+        <nuxt-link :to="`/artwork/${item.id}`" >{{ item.id }}</nuxt-link>
+      </template>
       <template v-slot:item.created="{ item }">
         <span>{{ new Date(item.created).toLocaleString() }}</span>
       </template>
@@ -59,6 +61,10 @@
       </template>
       <template v-slot:item.hashtags="{ item }">
         <span>{{ item.hashtags.slice(0, 3).join(', ') }}</span>
+      </template>
+      <template v-slot:item.likes="{ item }">
+        <span v-if="item.likes">{{ item.likes.length }}</span>
+        <span v-else>0</span>
       </template>
       <template v-slot:item.published="{ item }">
         <v-simple-checkbox v-model="item.published" disabled></v-simple-checkbox>

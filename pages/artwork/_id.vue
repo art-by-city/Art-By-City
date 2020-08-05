@@ -110,14 +110,36 @@
               </template>
             </v-col>
           </v-row>
-          <v-row v-if="isOwner">
-            <v-col v-if="!editMode">
+          <v-row v-if="isOwnerOrAdmin">
+            <v-col class="text-lowercase">
+              <strong>Published: </strong>
+              <v-simple-checkbox v-model="artwork.published" disabled></v-simple-checkbox>
+            </v-col>
+          </v-row>
+          <v-row v-if="isOwnerOrAdmin">
+            <v-col class="text-lowercase">
+              <strong>Approved: </strong>
+              <v-simple-checkbox v-model="artwork.approved" disabled></v-simple-checkbox>
+            </v-col>
+          </v-row>
+          <v-row v-if="isOwnerOrAdmin">
+            <v-col v-if="!editMode && isOwner">
               <v-btn color="primary" @click="toggleEditMode">Edit</v-btn>
             </v-col>
-            <v-col v-if="editMode">
+            <v-col v-if="editMode && isOwner">
               <v-btn color="primary" @click="saveArtwork">Save</v-btn>
             </v-col>
-            <v-col v-if="editMode">
+            <v-col v-if="!editMode && isOwnerOrAdmin">
+              <v-btn color="primary" @click="publishArtwork">
+                {{ artwork.published ? 'Unpublish' : 'Publish' }}
+              </v-btn>
+            </v-col>
+            <v-col v-if="!editMode && isAdmin">
+              <v-btn color="primary" @click="approveArtwork">
+                {{ artwork.approved ? 'Unapprove' : 'Approve' }}
+              </v-btn>
+            </v-col>
+            <v-col v-if="editMode && isOwner">
               <v-btn color="error" @click="deleteArtwork">Delete</v-btn>
             </v-col>
           </v-row>
@@ -184,6 +206,14 @@ export default class ArtworkPage extends FormPageComponent {
     return this.$store.state?.auth?.user?.id === this.artwork?.owner.id
   }
 
+  get isAdmin() {
+    return this.$store.state?.auth?.user?.roles?.includes('admin')
+  }
+
+  get isOwnerOrAdmin() {
+    return this.isOwner || this.isAdmin
+  }
+
   get cityName() {
     for (let i = 0; i < this.cities.length; i++) {
       if (this.cities[i].id === this.artwork.city) {
@@ -247,6 +277,32 @@ export default class ArtworkPage extends FormPageComponent {
 
       if (success) {
         this.toggleEditMode(false)
+      }
+    } catch (error) {
+      this.errors = error.response.data.messages
+    }
+  }
+
+  async publishArtwork() {
+    try {
+      const action = this.artwork.published ? 'unpublish' : 'publish'
+      const { success } = await this.$axios.$post(`/api/artwork/${this.artwork.id}/${action}`)
+
+      if (success) {
+        this.artwork.published = !this.artwork.published
+      }
+    } catch (error) {
+      this.errors = error.response.data.messages
+    }
+  }
+
+  async approveArtwork() {
+    try {
+      const action = this.artwork.approved ? 'unapprove' : 'approve'
+      const { success } = await this.$axios.$post(`/api/artwork/${this.artwork.id}/${action}`)
+
+      if (success) {
+        this.artwork.approved = !this.artwork.approved
       }
     } catch (error) {
       this.errors = error.response.data.messages
