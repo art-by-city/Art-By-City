@@ -69,6 +69,14 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
         query = query.where('type', '==', filter.type)
       }
 
+      if (!filter.includeUnpublished) {
+        query = query.where('published', '==', true)
+      }
+
+      if (!filter.includeUnapproved) {
+        query = query.where('approved', '==', true)
+      }
+
       if (filter.hashtags) {
         query = query.where('hashtags', 'array-contains', filter.hashtags[0])
       }

@@ -75,7 +75,11 @@ export default class ArtworkServiceImpl implements ArtworkService {
   }
 
   async listByUser(user: User): Promise<Artwork[]> {
-    const artworks = await this.artworkRepository.find({ owner: user.id })
+    const artworks = await this.artworkRepository.find({
+      owner: user.id,
+      includeUnapproved: true,
+      includeUnpublished: true
+    })
 
     return Promise.all(
       artworks.map(async (a) => {
