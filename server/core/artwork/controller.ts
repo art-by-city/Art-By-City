@@ -48,7 +48,6 @@ export default class ArtworkControllerImpl implements ArtworkController {
 
     router.put(
       '/',
-      roles(['artist']),
       upload.array('images'),
       async (req, res, next) => {
         try {
@@ -61,7 +60,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
       }
     )
 
-    router.post('/:id', roles(['artist']), async (req, res, next) => {
+    router.post('/:id', async (req, res, next) => {
       try {
         const result = await this.artworkAppService.update(req)
 
@@ -131,7 +130,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
       }
     })
 
-    router.delete('/:id', roles(['artist']), async (req, res, next) => {
+    router.delete('/:id', async (req, res, next) => {
       try {
         const result = await this.artworkAppService.delete(
           <User>req.user,

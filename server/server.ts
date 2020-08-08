@@ -7,7 +7,7 @@ import DatabaseAdapter from './core/db/adapter.interface'
 import { AuthController, AuthService } from './core/auth'
 import { AdminController } from './core/admin'
 import { ArtworkController } from './core/artwork'
-import { UserController } from './core/user'
+import { UserController, UserApplicationService } from './core/user'
 import { CityController } from './core/city'
 import { ConfigController } from './core/config'
 import { EventService } from './core/events'
@@ -63,5 +63,6 @@ app.use(
 
 // Event Registration
 container.get<EventService>(Symbol.for('EventService')).registerEvents()
+container.get<UserApplicationService>(Symbol.for('UserApplicationService')).registerEvents()
 
 export default app

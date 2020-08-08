@@ -45,6 +45,8 @@ export default class User extends Entity {
   })
   city!: string
 
+  artworkCount!: number
+
   updatePassword(newPassword: string): void {
     this.password = newPassword
   }
@@ -61,6 +63,10 @@ export default class User extends Entity {
 
   setRoles(roles: string[]): void {
     this.roles = roles
+  }
+
+  hasRole(role: string): boolean {
+    return this.roles.includes(role)
   }
 
   toString() {

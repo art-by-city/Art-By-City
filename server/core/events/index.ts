@@ -16,6 +16,7 @@ export type EventType =
 
 export interface EventService {
   registerEvents(): void
+  on(type: EventType, listener: (...args: any[]) => void): void
   emit(event: EventType, ...args: any[]): void
 }
 
