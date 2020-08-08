@@ -74,7 +74,7 @@
                       <v-fade-transition>
                         <v-overlay v-if="hover" absolute class="artwork-overlay">
                           <v-row align="end" class="fill-height pa-1">
-                            <v-col class="artwork-overlay-title-container">
+                            <v-col cols="auto" class="artwork-overlay-title-container">
                               <LikeButton :dark="true" :artwork="artwork" />
                               <a class="white--text text-lowercase">
                                 {{ artwork.title }}
@@ -97,7 +97,7 @@
                       <v-fade-transition>
                         <v-overlay v-if="hover" absolute class="artwork-overlay">
                           <v-row align="end" class="fill-height pa-1">
-                            <v-col class="artwork-overlay-title-container">
+                            <v-col cols="auto" class="artwork-overlay-title-container">
                               <LikeButton :dark="true" :artwork="artwork" />
                               <a class="white--text text-lowercase">
                                 {{ artwork.title }}
@@ -275,7 +275,7 @@ export default class ArtworkExplorer extends Vue {
 .overlay-title {
   color: white;
 }
-.artwork-overlay > div.v-overlay__content {
+.artwork-overlay >>> div.v-overlay__content {
   height: 100%;
   width: 100%;
 }
