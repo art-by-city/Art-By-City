@@ -130,8 +130,7 @@ export default class DefaultLayout extends Vue {
     {
       icon: 'mdi-brush',
       title: 'my artwork',
-      to: '/user/artwork',
-      only: ['artist']
+      to: '/user/artwork'
     }
   ]
 

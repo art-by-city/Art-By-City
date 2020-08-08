@@ -2,7 +2,7 @@ import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import UnknownError from '../api/errors/unknownError'
-import { User } from '../user'
+import { User, UserService } from '../user'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
@@ -24,6 +24,7 @@ export default class ArtworkApplicationServiceImpl
   private artworkService: ArtworkService
   private discoveryService: DiscoveryService
   private eventService: EventService
+  private userService: UserService
 
   constructor(
     @inject(Symbol.for('ArtworkService'))
@@ -31,15 +32,23 @@ export default class ArtworkApplicationServiceImpl
     @inject(Symbol.for('DiscoveryService'))
     discoveryService: DiscoveryService,
     @inject(Symbol.for('EventService'))
-    eventService: EventService
+    eventService: EventService,
+    @inject(Symbol.for('UserService'))
+    userService: UserService
   ) {
     this.artworkService = artworkService
     this.discoveryService = discoveryService
     this.eventService = eventService
+    this.userService = userService
   }
 
   async create(req: any): Promise<ApiServiceResult<Artwork>> {
-    const user = <User>req.user
+    const user = await this.userService.getById((<User>req.user).id)
+
+    if (!user) {
+      throw new UnauthorizedError()
+    }
+
     const files = <Express.Multer.File[]>req.files
 
     const artwork = new Artwork()
@@ -61,14 +70,23 @@ export default class ArtworkApplicationServiceImpl
       })
     }
 
-    const savedArtwork = await this.artworkService.create(artwork)
+    // Non-artist users are restricted to max amount of artwork
+    // TODO -> Admin configurable
+    const maxArtworks = 10
+    if (!user.hasRole('artist') && user.artworkCount >= maxArtworks) {
+      throw new Error(`Maximum number of ${maxArtworks} Artworks reached`)
+    }
 
-    if (savedArtwork) {
-      savedArtwork.hashtags.forEach((hashtag) => {
+    const createdArtwork = await this.artworkService.create(artwork)
+
+    if (createdArtwork) {
+      this.eventService.emit(UserEvents.Artwork.Created, user.id, createdArtwork.id)
+
+      createdArtwork.hashtags.forEach((hashtag) => {
         this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
       })
 
-      return new ApiServiceSuccessResult(savedArtwork)
+      return new ApiServiceSuccessResult(createdArtwork)
     }
 
     return { success: false }
@@ -332,6 +350,8 @@ export default class ArtworkApplicationServiceImpl
       }
 
       await this.artworkService.delete(id)
+
+      this.eventService.emit(UserEvents.Artwork.Deleted, user.id, id)
 
       return new ApiServiceSuccessResult()
     } catch (error) {

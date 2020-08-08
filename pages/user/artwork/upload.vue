@@ -89,7 +89,6 @@ import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 const MAX_ARTWORK_IMAGES = 12
 
 @Component({
-  middleware: 'role/artist',
   components: {
     CitySelector,
     ArtworkTypeSelector,

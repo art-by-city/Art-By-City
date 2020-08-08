@@ -3,7 +3,9 @@ import { EventEmitter } from 'events'
 
 import {
   UserEventService,
-  UserArtworkViewEvent,
+  UserArtworkViewedEvent,
+  UserArtworkCreatedEvent,
+  UserArtworkDeletedEvent,
   UserEventRepository,
   UserEvent,
   UserEvents,
@@ -33,15 +35,33 @@ export default class UserEventServiceImpl implements UserEventService {
   }
 
   registerEvents(eventEmitter: EventEmitter): void {
-    this.on(eventEmitter, UserEvents.Artwork.Viewed, this.onUserArtworkView)
+    this.on(eventEmitter, UserEvents.Artwork.Viewed, this.onUserArtworkViewed)
+    this.on(eventEmitter, UserEvents.Artwork.Created, this.onUserArtworkCreated)
+    this.on(eventEmitter, UserEvents.Artwork.Deleted, this.onUserArtworkDeleted)
     this.on(eventEmitter, UserEvents.Account.Registered, this.onUserAccountRegistered)
     this.on(eventEmitter, UserEvents.Account.LoggedIn, this.onUserAccountLoggedIn)
-    this.on(eventEmitter, UserEvents.Account.ForgotPassword, this.on)
+    this.on(eventEmitter, UserEvents.Account.ForgotPassword, this.onUserAccountForgotPassword)
   }
 
-  onUserArtworkView(userId: string, artworkId: string) {
+  onUserArtworkViewed(userId: string, artworkId: string) {
     try {
-      this.userEventRepository.create(new UserArtworkViewEvent(userId, artworkId))
+      this.userEventRepository.create(new UserArtworkViewedEvent(userId, artworkId))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  onUserArtworkCreated(userId: string, artworkId: string) {
+    try {
+      this.userEventRepository.create(new UserArtworkCreatedEvent(userId, artworkId))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  onUserArtworkDeleted(userId: string, artworkId: string) {
+    try {
+      this.userEventRepository.create(new UserArtworkDeletedEvent(userId, artworkId))
     } catch (error) {
       console.error(error)
     }

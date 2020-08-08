@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify'
 import { getRepository } from 'fireorm'
-import { DocumentReference, Firestore } from '@google-cloud/firestore'
+import { DocumentReference, Firestore, FieldValue } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
 import { User, UserRepository } from './'
@@ -73,6 +73,14 @@ export default class UserRepositoryImpl implements UserRepository {
   }
 
   getDocumentReference(id: string): DocumentReference<User> {
-    return <DocumentReference<User>>this.client.doc(`Artworks/${id}`)
+    return <DocumentReference<User>>this.client.doc(`Users/${id}`)
+  }
+
+  async incrementUserArtworkCount(userId: string): Promise<void> {
+    const result = await this.getDocumentReference(userId).update({ artworkCount: FieldValue.increment(1) })
+  }
+
+  async decrementUserArtworkCount(userId: string): Promise<void> {
+    const result = await this.getDocumentReference(userId).update({ artworkCount: FieldValue.increment(-1) })
   }
 }

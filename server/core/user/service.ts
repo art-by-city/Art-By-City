@@ -33,6 +33,7 @@ export default class UserServiceImpl implements UserService {
     user.password = req.body?.password || ''
     user.city = req.body?.city || ''
     user.roles = []
+    user.artworkCount = 0
 
     await validateUser(user)
 
@@ -150,5 +151,13 @@ export default class UserServiceImpl implements UserService {
 
   listUsers(): Promise<User[]> {
     return this.userRepository.list()
+  }
+
+  incrementUserArtworkCount(userId: string): Promise<void> {
+    return this.userRepository.incrementUserArtworkCount(userId)
+  }
+
+  decrementUserArtworkCount(userId: string): Promise<void> {
+    return this.userRepository.decrementUserArtworkCount(userId)
   }
 }
