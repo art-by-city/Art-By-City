@@ -149,6 +149,10 @@ export default class UserServiceImpl implements UserService {
     return user
   }
 
+  getByUsername(username: string): Promise<User | null> {
+    return this.userRepository.getByUsername(username)
+  }
+
   listUsers(): Promise<User[]> {
     return this.userRepository.list()
   }

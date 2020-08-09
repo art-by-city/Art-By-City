@@ -30,7 +30,10 @@
           <v-row><LikeButton :artwork="artwork"/></v-row>
           <v-row>
             <v-col class="text-lowercase">
-              <strong>Artist:</strong> {{ artwork.owner.username }}
+              <strong>Artist:</strong>
+              <nuxt-link :to="`/user/${artwork.owner.username}`">
+                {{ artwork.owner.username }}
+              </nuxt-link>
             </v-col>
           </v-row>
           <v-row>

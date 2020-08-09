@@ -19,7 +19,12 @@
         </v-card-title>
         <v-card-subtitle class="text-lowercase">
           <v-icon>mdi-brush</v-icon>
-          {{ syncedArtwork.owner.username }}
+          <nuxt-link
+            class="white--text text-lowercase"
+            :to="`/user/${syncedArtwork.owner.username}`"
+          >
+            {{ syncedArtwork.owner.username }}
+          </nuxt-link>
         </v-card-subtitle>
         <v-card-actions>
           <v-container class="pa-0">

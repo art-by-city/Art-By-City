@@ -128,6 +128,11 @@ export default class DefaultLayout extends Vue {
       to: '/account'
     },
     {
+      icon: 'mdi-account',
+      title: 'my profile',
+      to: `/user/${this.$auth.user.username}`
+    },
+    {
       icon: 'mdi-brush',
       title: 'my artwork',
       to: '/user/artwork'
