@@ -1,6 +1,5 @@
 <template>
   <v-container fluid class="artwork-explorer-container">
-    {{ modalArtwork ? modalArtwork.id : 'no' }}
     <ArtworkModal :artwork.sync="modalArtwork" />
     <ArtworkExplorerToolbar
       :gridsize.sync="gridSize"
@@ -26,7 +25,6 @@
 <script lang="ts">
 import { Vue, Component, PropSync } from 'nuxt-property-decorator'
 
-import LikeButton from '../likeButton.component.vue'
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
 import ArtworkCard from './ArtworkCard.component.vue'
 import ArtworkModal from './ArtworkModal.component.vue'
@@ -34,7 +32,6 @@ import ArtworkOptions from '../../models/artwork/artworkOptions'
 
 @Component({
   components: {
-    LikeButton,
     ArtworkExplorerToolbar,
     ArtworkCard,
     ArtworkModal

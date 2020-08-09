@@ -25,7 +25,11 @@
       <tbody>
         <tr v-for="user in users" :key="user.id">
           <td class="text-lowercase">{{ user.id }}</td>
-          <td class="text-lowercase">{{ user.username }}</td>
+          <td class="text-lowercase">
+            <nuxt-link :to="`/user/${user.username}`">
+              {{ user.username }}
+            </nuxt-link>
+          </td>
           <td>
             <v-select
               v-model="user.city"

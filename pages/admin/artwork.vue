@@ -54,7 +54,9 @@
         <span>{{ new Date(item.updated).toLocaleString() }}</span>
       </template>
       <template v-slot:item.owner="{ item }">
-        <span>{{ item.owner.username }}</span>
+        <nuxt-link :to="`/user/${item.owner.username}`">
+          {{ item.owner.username }}
+        </nuxt-link>
       </template>
       <template v-slot:item.city="{ item }">
         <span>{{ resolveCityNameFromId(item.city) }}</span>

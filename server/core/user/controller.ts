@@ -2,21 +2,24 @@ import { injectable, inject } from 'inversify'
 import { Router } from 'express'
 import passport from 'passport'
 
-import roles from '../middleware/roles'
 import { ArtworkApplicationService } from '../artwork'
-import { User, UserController } from './'
+import { User, UserController, UserApplicationService } from './'
 
 @injectable()
 export default class UserControllerImpl implements UserController {
   private router!: Router
 
   private artworkAppService: ArtworkApplicationService
+  private userAppService: UserApplicationService
 
   constructor(
     @inject(Symbol.for('ArtworkApplicationService'))
-    artworkAppService: ArtworkApplicationService
+    artworkAppService: ArtworkApplicationService,
+    @inject(Symbol.for('UserApplicationService'))
+    userAppService: UserApplicationService
   ) {
     this.artworkAppService = artworkAppService
+    this.userAppService = userAppService
   }
 
   getRouter(): Router {
@@ -32,10 +35,24 @@ export default class UserControllerImpl implements UserController {
 
     router.use(passport.authenticate('jwt', { session: false }))
 
-    router.get('/artwork', async (req, res) => {
-      const result = await this.artworkAppService.listByUser(<User>req.user)
+    router.get('/artwork', async (req, res, next) => {
+      try {
+        const result = await this.artworkAppService.listByUser(<User>req.user)
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
+    router.get('/:username/profile', async (req, res, next) => {
+      try {
+        const result = await this.userAppService.getUserProfile(req.params.username)
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     return router
