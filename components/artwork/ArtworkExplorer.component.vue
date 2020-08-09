@@ -1,48 +1,7 @@
 <template>
   <v-container fluid class="artwork-explorer-container">
-    <v-dialog
-      v-model="artworkPreview.show"
-      max-width="80vw"
-      content-class="artwork-preview-dialog"
-      @click:outside="resetPreview"
-    >
-      <v-card flat dark>
-        <v-img :src="previewImageSource" max-height="65vh" contain></v-img>
-        <v-card-title>
-          <LikeButton :dark="true" :artwork="previewArtwork" />
-          <nuxt-link
-            class="white--text text-lowercase"
-            :to="`/artwork/${previewArtwork.id}`"
-          >
-            {{ previewArtwork.title }}
-          </nuxt-link>
-        </v-card-title>
-        <v-card-subtitle class="text-lowercase">
-          <v-icon>mdi-brush</v-icon>
-          {{ previewArtwork.owner.username }}
-        </v-card-subtitle>
-        <v-card-actions>
-          <v-container class="pa-0">
-            <v-row justify="center" dense>
-              <v-col
-                v-for="(image, i) in previewArtwork.images"
-                :key="i"
-                style="flex-grow: 0"
-              >
-                <v-img
-                  max-width="100"
-                  max-height="100"
-                  :src="'/artwork-images/' + image.source"
-                  class="clickable"
-                  :class="isHighlighted(i)"
-                  @click="previewImage(i)"
-                ></v-img>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    {{ modalArtwork ? modalArtwork.id : 'no' }}
+    <ArtworkModal :artwork.sync="modalArtwork" />
     <ArtworkExplorerToolbar
       :gridsize.sync="gridSize"
       :opts.sync="opts"
@@ -57,61 +16,7 @@
           v-for="(artwork, i) in sliceArtworks()"
           :key="i"
         >
-          <v-hover>
-            <template v-slot:default="{ hover }">
-              <div :class="artworkFlipCardClass">
-                <div class="flip-card-inner">
-                  <div class="flip-card-front">
-                    <!-- front -->
-                    <v-img
-                      v-if="artwork"
-                      :src="'/artwork-images/' + artwork.images[0].source"
-                      style="cursor: pointer"
-                      aspect-ratio="1"
-                      class="elevation-2"
-                      @click="showArtworkPreview(i)"
-                    >
-                      <v-fade-transition>
-                        <v-overlay v-if="hover" absolute class="artwork-overlay">
-                          <v-row align="end" class="fill-height pa-1">
-                            <v-col cols="auto" class="artwork-overlay-title-container">
-                              <LikeButton :dark="true" :artwork="artwork" />
-                              <a class="white--text text-lowercase">
-                                {{ artwork.title }}
-                              </a>
-                            </v-col>
-                          </v-row>
-                        </v-overlay>
-                      </v-fade-transition>
-                    </v-img>
-                  </div>
-                  <div class="flip-card-back">
-                    <!-- back -->
-                    <v-img
-                      v-if="sliceArtworks('B')[i]"
-                      :src="'/artwork-images/' + sliceArtworks('B')[i].images[0].source"
-                      style="cursor: pointer"
-                      aspect-ratio="1"
-                      @click="showArtworkPreview(i)"
-                    >
-                      <v-fade-transition>
-                        <v-overlay v-if="hover" absolute class="artwork-overlay">
-                          <v-row align="end" class="fill-height pa-1">
-                            <v-col cols="auto" class="artwork-overlay-title-container">
-                              <LikeButton :dark="true" :artwork="artwork" />
-                              <a class="white--text text-lowercase">
-                                {{ artwork.title }}
-                              </a>
-                            </v-col>
-                          </v-row>
-                        </v-overlay>
-                      </v-fade-transition>
-                    </v-img>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </v-hover>
+          <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork)" />
         </div>
       </div>
     </div>
@@ -123,30 +28,27 @@ import { Vue, Component, PropSync } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
+import ArtworkCard from './ArtworkCard.component.vue'
+import ArtworkModal from './ArtworkModal.component.vue'
 import ArtworkOptions from '../../models/artwork/artworkOptions'
 
 @Component({
   components: {
     LikeButton,
-    ArtworkExplorerToolbar
+    ArtworkExplorerToolbar,
+    ArtworkCard,
+    ArtworkModal
   }
 })
 export default class ArtworkExplorer extends Vue {
   @PropSync('initial', { type: Array }) artworks!: any[]
   @PropSync('options', { type: Object }) opts!: any
 
-  artworkPreview = {
-    show: false,
-    index: -1,
-    imageIndex: 0
-  }
+  modalArtwork: any | null = null
 
   gridSize = 1
 
   vw = 1000
-  vh = 1000
-
-  showBackCards = false
 
   mounted() {
     this.$nextTick(() => {
@@ -161,7 +63,6 @@ export default class ArtworkExplorer extends Vue {
 
   onResize() {
     this.vw = window.innerWidth
-    this.vh = window.innerHeight
   }
 
   previous() {
@@ -185,74 +86,8 @@ export default class ArtworkExplorer extends Vue {
     return artworks.slice(0, this.gridSize)
   }
 
-  get artworkFlipCardClass() {
-    return {
-      'flip-card': true,
-      'show-back-card': this.$store.state.artworks.visibleSlot === 'B'
-    }
-  }
-
-  isHighlighted(index: number) {
-    return this.artworkPreview.imageIndex === index ? 'highlighted' : ''
-  }
-
-  previewImage(index: number) {
-    this.artworkPreview.imageIndex = index
-  }
-
-  resetPreview() {
-    this.artworkPreview.imageIndex = 0
-  }
-
-  get previewImageSource() {
-    if (
-      this.artworkPreview.index >= 0 &&
-      this.artworks.length > this.artworkPreview.index
-    ) {
-      return (
-        '/artwork-images/' +
-        this.artworks[this.artworkPreview.index].images[
-          this.artworkPreview.imageIndex
-        ].source
-      )
-    } else {
-      return ''
-    }
-  }
-
-  get previewArtwork() {
-    if (
-      this.artworkPreview.index >= 0 &&
-      this.artworks.length > this.artworkPreview.index
-    ) {
-      return this.artworks[this.artworkPreview.index]
-    } else {
-      return { title: '', owner: { username: '' }, images: [] }
-    }
-  }
-
-  set previewArtwork(artwork) {
-    if (
-      this.artworkPreview.index >= 0 &&
-      this.artworks.length > this.artworkPreview.index
-    ) {
-      this.artworks[this.artworkPreview.index] = artwork
-    }
-
-    this.$forceUpdate()
-  }
-
-  showArtworkPreview(index: number) {
-    this.artworkPreview.index = index
-    this.toggleArtworkPreviewModal(true)
-  }
-
-  toggleArtworkPreviewModal(open?: boolean) {
-    if (typeof open !== 'undefined') {
-      this.artworkPreview.show = !!open
-    } else {
-      this.artworkPreview.show = !this.artworkPreview.show
-    }
+  onArtworkCardClicked(artwork: any) {
+    this.modalArtwork = artwork
   }
 
   async refresh(opts: ArtworkOptions) {
@@ -263,37 +98,9 @@ export default class ArtworkExplorer extends Vue {
 </script>
 
 <style scoped>
-.clickable {
-  cursor: pointer;
-}
-.highlighted {
-  border: 2px solid yellow;
-}
-.clickable:not(.highlighted) {
-  margin: 2px;
-}
-.overlay-title {
-  color: white;
-}
-.artwork-overlay >>> div.v-overlay__content {
-  height: 100%;
-  width: 100%;
-}
-.artwork-overlay div.artwork-container {
-  height: 100%;
-}
-.artwork-preview-dialog {
-  width: auto;
-}
-.artwork-preview-dialog > * {
-  width: auto;
-}
 .artwork-explorer-container {
   margin: auto;
   height: 100%;
-}
-.artwork-overlay-title-container {
-  padding-bottom: 2px;
 }
 .artwork-grid-row {
   text-align: center;
@@ -362,71 +169,5 @@ export default class ArtworkExplorer extends Vue {
   height: 30vw;
   width: 30vw;
   transition: right .5s ease-out .5s;
-}
-
-/*
-  The flip card container - set the width and height to whatever you want.
-  We have added the border property to demonstrate that the flip itself goes
-  out of the box on hover (remove perspective if you don't want the 3D effect
-*/
-.flip-card {
-  background-color: transparent;
-  width: 100%;
-  height: 100%;
-  perspective: 1000px; /* Remove this if you don't want the 3D effect */
-}
-
-/* This container is needed to position the front and back side */
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
-}
-
-/* Do an horizontal flip when you move the mouse over the flip box container */
-.flip-card.show-back-card .flip-card-inner {
-  transform: rotateY(180deg);
-  /* animation: flip-in .5s; */
-}
-/* Style the back side */
-.flip-card-back {
-  transform: rotateY(180deg);
-  /* animation: flip-in .5s; */
-}
-
-/* Position the front and back side */
-.flip-card-front, .flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  -webkit-backface-visibility: hidden; /* Safari */
-  backface-visibility: hidden;
-}
-
-.flip-enter-active {
-  animation: flip-in .5s;
-}
-.flip-leave-active {
-  animation: flip-in .5s reverse;
-}
-@keyframes flip-in {
-  0% {
-    transform: rotateY(180deg);
-  }
-  50% {
-    transform: rotateY(90deg);
-  }
-  100% {
-    transform: rotateY(0deg);
-  }
-}
-
-@keyframes flip {
-  0%   { transform: rotateY(0deg); }
-  50%  { transform: rotateY(180deg); }
-  100% { transform: rotateY(359deg); }
 }
 </style>
