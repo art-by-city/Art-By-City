@@ -112,13 +112,13 @@
           </v-row>
           <v-row v-if="isOwnerOrAdmin">
             <v-col class="text-lowercase">
-              <strong>Published: </strong>
+              <strong>Published: {{ artwork.published ? 'yes' : 'no' }}</strong>
               <v-simple-checkbox v-model="artwork.published" disabled></v-simple-checkbox>
             </v-col>
           </v-row>
           <v-row v-if="isOwnerOrAdmin">
             <v-col class="text-lowercase">
-              <strong>Approved: </strong>
+              <strong>Approved: {{ artwork.approved ? 'yes' : 'no' }}</strong>
               <v-simple-checkbox v-model="artwork.approved" disabled></v-simple-checkbox>
             </v-col>
           </v-row>
@@ -130,12 +130,12 @@
               <v-btn color="primary" @click="saveArtwork">Save</v-btn>
             </v-col>
             <v-col v-if="!editMode && isOwnerOrAdmin">
-              <v-btn color="primary" @click="publishArtwork">
+              <v-btn color="primary" @click="publishOrApproveArtwork('publish')">
                 {{ artwork.published ? 'Unpublish' : 'Publish' }}
               </v-btn>
             </v-col>
             <v-col v-if="!editMode && isAdmin">
-              <v-btn color="primary" @click="approveArtwork">
+              <v-btn color="primary" @click="publishOrApproveArtwork('approve')">
                 {{ artwork.approved ? 'Unapprove' : 'Approve' }}
               </v-btn>
             </v-col>
@@ -160,6 +160,7 @@ import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.componen
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { artworkTypes } from '~/models/artwork/artworkOptions'
+import Artwork from '~/models/artwork/artwork'
 
 @Component({
   components: {
@@ -170,7 +171,7 @@ import { artworkTypes } from '~/models/artwork/artworkOptions'
   }
 })
 export default class ArtworkPage extends FormPageComponent {
-  artwork!: any
+  artwork!: Artwork
   artworkTypes: string[] = artworkTypes
   cities: any[] = this.$store.state.config.cities
   hashtags: string[] = this.$store.state.config.hashtags
@@ -283,26 +284,25 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
-  async publishArtwork() {
+  async publishOrApproveArtwork(intent: 'publish' | 'approve') {
     try {
-      const action = this.artwork.published ? 'unpublish' : 'publish'
+      const action = intent === 'publish'
+        ? this.artwork.published
+          ? 'unpublish'
+          : 'publish'
+        : this.artwork.approved
+          ? 'unapprove'
+          : 'approve'
       const { success } = await this.$axios.$post(`/api/artwork/${this.artwork.id}/${action}`)
 
       if (success) {
-        this.artwork.published = !this.artwork.published
-      }
-    } catch (error) {
-      this.errors = error.response.data.messages
-    }
-  }
-
-  async approveArtwork() {
-    try {
-      const action = this.artwork.approved ? 'unapprove' : 'approve'
-      const { success } = await this.$axios.$post(`/api/artwork/${this.artwork.id}/${action}`)
-
-      if (success) {
-        this.artwork.approved = !this.artwork.approved
+        const published = intent === 'publish' ? !this.artwork.published : this.artwork.published
+        const approved = intent === 'approve' ? !this.artwork.approved : this.artwork.approved
+        this.artwork = {
+          ...this.artwork,
+          published,
+          approved
+        }
       }
     } catch (error) {
       this.errors = error.response.data.messages
