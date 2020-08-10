@@ -14,7 +14,9 @@ import {
   Artwork,
   ArtworkService,
   ArtworkApplicationService,
-  ArtworkFilterOptions
+  ArtworkFilterOptions,
+  ArtworkViewModel,
+  ArtworkMapper
 } from './'
 
 
@@ -42,7 +44,7 @@ export default class ArtworkApplicationServiceImpl
     this.userService = userService
   }
 
-  async create(req: any): Promise<ApiServiceResult<Artwork>> {
+  async create(req: any): Promise<ApiServiceResult<ArtworkViewModel>> {
     const user = await this.userService.getById((<User>req.user).id)
 
     if (!user) {
@@ -86,7 +88,7 @@ export default class ArtworkApplicationServiceImpl
         this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
       })
 
-      return new ApiServiceSuccessResult(createdArtwork)
+      return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(createdArtwork))
     }
 
     return { success: false }
@@ -204,7 +206,7 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
-  async update(req: any): Promise<ApiServiceResult<Artwork>> {
+  async update(req: any): Promise<ApiServiceResult<ArtworkViewModel>> {
     const user = <User>req.user
 
     try {
@@ -239,7 +241,7 @@ export default class ArtworkApplicationServiceImpl
           this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
         })
         if (savedArtwork) {
-          return new ApiServiceSuccessResult(savedArtwork)
+          return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(savedArtwork))
         }
 
         return { success: false }
@@ -251,7 +253,7 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
-  async list(req: any): Promise<ApiServiceResult<Artwork[]>> {
+  async list(req: any): Promise<ApiServiceResult<ArtworkViewModel[]>> {
     try {
       const opts: ArtworkFilterOptions = <ArtworkFilterOptions>req.query
       const user: User = <User>req.user
@@ -301,37 +303,47 @@ export default class ArtworkApplicationServiceImpl
         this.eventService.emit(UserEvents.Artwork.Viewed, user.id, artwork.id)
       })
 
-      return new ApiServiceSuccessResult(artworks)
+      return new ApiServiceSuccessResult(artworks.map((artwork) => {
+        return new ArtworkMapper().toViewModel(artwork)
+      }))
     } catch (error) {
       throw new UnknownError(error.message)
     }
   }
 
-  async listByUser(user: User): Promise<ApiServiceResult<Artwork[]>> {
+  async listByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>> {
     try {
       const artworks = await this.artworkService.listByUser(user)
 
-      return new ApiServiceSuccessResult(artworks)
+      return new ApiServiceSuccessResult(artworks.map((artwork) => {
+        return new ArtworkMapper().toViewModel(artwork)
+      }))
     } catch (error) {
       throw new UnknownError(error.message)
     }
   }
 
-  async listLikedByUser(user: User): Promise<ApiServiceResult<Artwork[]>> {
+  async listLikedByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>> {
     try {
       const artworks = await this.artworkService.listLikedByUser(user)
 
-      return new ApiServiceSuccessResult(artworks)
+      return new ApiServiceSuccessResult(artworks.map((artwork) => {
+        return new ArtworkMapper().toViewModel(artwork)
+      }))
     } catch (error) {
       throw new UnknownError(error.message)
     }
   }
 
-  async get(id: string): Promise<ApiServiceResult<Artwork>> {
+  async get(id: string): Promise<ApiServiceResult<ArtworkViewModel>> {
     try {
       const artwork = await this.artworkService.get(id, { hydrated: true })
 
-      return new ApiServiceSuccessResult(artwork)
+      if (!artwork) {
+        throw new NotFoundError(new Artwork())
+      }
+
+      return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(artwork))
     } catch (error) {
       throw new UnknownError(error.message)
     }

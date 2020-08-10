@@ -120,7 +120,7 @@ export default class AdminCitiesPage extends FormPageComponent {
 
     try {
       const citiesResponse = await $axios.$get('/api/admin/cities')
-      cities = citiesResponse.cities || []
+      cities = citiesResponse.payload || []
     } catch (error) {
       errors.push(error.response?.data?.messages)
     }

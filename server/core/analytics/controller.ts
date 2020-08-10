@@ -32,10 +32,14 @@ export default class AnalyticsControllerImpl implements AnalyticsController {
     router.use(passport.authenticate('jwt', { session: false }))
     router.use(roles(['admin']))
 
-    router.get('/events', async (_req, res) => {
-      const result = await this.analyticsService.fetchEvents()
+    router.get('/events', async (_req, res, next) => {
+      try {
+        const result = await this.analyticsService.fetchEvents()
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     return router

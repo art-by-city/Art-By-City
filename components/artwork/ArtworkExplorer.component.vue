@@ -208,7 +208,7 @@ export default class ArtworkExplorer extends Vue {
 .artwork-grid-col:first-child {
   position: relative;
   right: 0vw;
-  transition: right .5s ease-out;
+  transition: height .5s ease-out, width .5s ease-out, right .5s ease-out;
 }
 .grid-size-1 >>> .artwork-grid-col:first-child {
   transition: height .5s ease-out, width .5s ease-out, right .5s ease-out;

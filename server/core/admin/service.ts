@@ -1,10 +1,12 @@
 import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import { User, UserService } from '../user'
+import { User, UserViewModel, UserService, UserMapper } from '../user'
 import { AdminService } from './'
-import { CityService, City } from '../city'
-import { ArtworkService, Artwork } from '../artwork'
+import { CityService, CityViewModel } from '../city'
+import { ArtworkService, ArtworkViewModel, ArtworkMapper } from '../artwork'
+import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
+import CityMapper from '../city/mapper'
 
 @injectable()
 export default class AdminServiceImpl implements AdminService {
@@ -25,16 +27,27 @@ export default class AdminServiceImpl implements AdminService {
     this.artworkService = artworkService
   }
 
-  listUsers(): Promise<User[]> {
-    return this.userService.listUsers()
+  async listUsers(): Promise<ApiServiceResult<UserViewModel[]>> {
+    const users = await this.userService.listUsers()
+    return new ApiServiceSuccessResult(users.map((user) => {
+      return new UserMapper().toViewModel(user)
+    }))
   }
 
-  listCities(): Promise<City[]> {
-    return this.cityService.find({ includeAll: true })
+  async listCities(): Promise<ApiServiceResult<CityViewModel[]>> {
+    const cities = await this.cityService.find({ includeAll: true })
+    return new ApiServiceSuccessResult(cities.map((city) => {
+      return new CityMapper().toViewModel(city)
+    }))
   }
 
-  listArtwork(): Promise<Artwork[]> {
-    return this.artworkService.list({ includeUnapproved: true, includeUnpublished: true })
+  async listArtwork(): Promise<ApiServiceResult<ArtworkViewModel[]>> {
+    const artworks = await this.artworkService.list(
+      { includeUnapproved: true, includeUnpublished: true }
+    )
+    return new ApiServiceSuccessResult(artworks.map((artwork) => {
+      return new ArtworkMapper().toViewModel(artwork)
+    }))
   }
 
   setUserRoles(

@@ -12,6 +12,7 @@ import UserControllerImpl from './controller'
 import UserApplicationServiceImpl from './appService'
 
 export { default as User } from './user'
+export { default as UserMapper } from './mapper'
 
 export { default as UserViewModel } from './viewModels/userViewModel'
 export { default as UserProfileViewModel } from './viewModels/userProfileViewModel'
@@ -26,7 +27,7 @@ export interface UserRepository
 }
 
 export interface UserService {
-  register(req: any): Promise<User>
+  register(req: any): Promise<UserViewModel>
   authenticate(username: string, password: string): Promise<User | null>
   getById(id: string): Promise<User | null>
   getByUsername(username: string): Promise<User | null>

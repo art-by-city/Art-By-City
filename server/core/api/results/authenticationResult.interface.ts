@@ -1,7 +1,7 @@
-import { User } from '../../user'
+import { UserViewModel } from '../../user'
 import ApiServiceResult from './apiServiceResult.interface'
 
 export interface AuthenticationResult extends ApiServiceResult<void> {
-  user: User | null
+  user: UserViewModel | null
   token: string | null
 }

@@ -6,7 +6,7 @@ import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import NotFoundError from '../api/errors/notFoundError'
 import { EventService } from '../events'
 import validateUser from './validator'
-import { User, UserService, UserRepository } from './'
+import { User, UserViewModel, UserService, UserRepository, UserMapper } from './'
 import { UserEvents } from '../events/user'
 
 @injectable()
@@ -24,7 +24,7 @@ export default class UserServiceImpl implements UserService {
     this.eventService = eventService
   }
 
-  async register(req: any): Promise<User> {
+  async register(req: any): Promise<UserViewModel> {
     const user = new User()
     user.id = ''
     user.created = new Date()
@@ -42,7 +42,7 @@ export default class UserServiceImpl implements UserService {
 
       this.eventService.emit(UserEvents.Account.Registered, savedUser.id)
 
-      return savedUser
+      return new UserMapper().toViewModel(savedUser)
     } catch (error) {
       // TODO -> Other errors
       throw new UsernameAlreadyTakenError()

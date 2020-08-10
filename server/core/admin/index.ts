@@ -2,18 +2,18 @@ import { ContainerModule } from 'inversify'
 
 import BaseControllerInterface from '../controller.interface'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import { User } from '../user'
 import AdminServiceImpl from './service'
 import AdminControllerImpl from './controller'
-import { City } from '../city'
-import { Artwork } from '../artwork'
+import { UserViewModel } from '../user'
+import { CityViewModel } from '../city'
+import { ArtworkViewModel } from '../artwork'
 
 export interface AdminController extends BaseControllerInterface {}
 
 export interface AdminService {
-  listUsers(): Promise<User[]>
-  listCities(): Promise<City[]>
-  listArtwork(): Promise<Artwork[]>
+  listUsers(): Promise<ApiServiceResult<UserViewModel[]>>
+  listCities(): Promise<ApiServiceResult<CityViewModel[]>>
+  listArtwork(): Promise<ApiServiceResult<ArtworkViewModel[]>>
   setUserRoles(userId: string, roles: string[]): Promise<ApiServiceResult<void>>
   saveUser(user: any): Promise<ApiServiceResult<void>>
 }

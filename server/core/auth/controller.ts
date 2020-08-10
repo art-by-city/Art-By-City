@@ -3,7 +3,7 @@ import { Router } from 'express'
 import passport from 'passport'
 
 import { AuthService } from '../auth'
-import { User, UserService } from '../user'
+import { User, UserService, UserMapper } from '../user'
 import { AuthController } from './'
 
 @injectable()
@@ -37,20 +37,32 @@ export default class AuthControllerImpl implements AuthController {
     const localAuth = passport.authenticate('local')
     const jwtAuth = passport.authenticate('jwt', { session: false })
 
-    router.post('/login', localAuth, (req, res) => {
-      const result = this.authService.login(<User>req.user)
+    router.post('/login', localAuth, (req, res, next) => {
+      try {
+        const result = this.authService.login(new UserMapper().toViewModel(<User>req.user))
 
-      return res.json(result)
+        return res.json(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
-    router.post('/logout', (_req, res) => {
-      return res.send()
+    router.post('/logout', (_req, res, next) => {
+      try {
+        return res.send()
+      } catch (error) {
+        next(error)
+      }
     })
 
-    router.get('/user', jwtAuth, (req, res) => {
-      const user = <User>req.user
+    router.get('/user', jwtAuth, (req, res, next) => {
+      try {
+        const user = new UserMapper().toViewModel(<User>req.user)
 
-      return res.json({ user })
+        return res.json({ user })
+      } catch (error) {
+        next(error)
+      }
     })
 
     router.put('/register', async (req, res, next) => {
@@ -79,7 +91,7 @@ export default class AuthControllerImpl implements AuthController {
       }
     })
 
-    // TODO
+    // TODO ???????????????????????
     // router.post('/refresh', jwtAuth, async (req, res, next) => {
 
     // })

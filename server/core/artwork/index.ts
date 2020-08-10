@@ -11,12 +11,15 @@ import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import { User } from '../user'
 
 import Artwork from './artwork'
+import ArtworkViewModel from './viewModels/artworkViewModel'
 import ArtworkRepositoryImpl from './repository'
 import ArtworkServiceImpl from './service'
 import ArtworkApplicationServiceImpl from './appService'
 import ArtworkControllerImpl from './controller'
 
 export { default as Artwork } from './artwork'
+export { default as ArtworkViewModel } from './viewModels/artworkViewModel'
+export { default as ArtworkMapper } from './mapper'
 
 export type ArtworkType =
   | 'Painting'
@@ -70,16 +73,16 @@ export interface ArtworkController extends BaseControllerInterface {}
 
 export interface ArtworkApplicationService
   extends BaseApplicationServiceInterface {
-  get(id: string): Promise<ApiServiceResult<Artwork>>
+  get(id: string): Promise<ApiServiceResult<ArtworkViewModel>>
   delete(user: User, id: string): Promise<ApiServiceResult<void>>
   create(
     request: any,
     files?: Express.Multer.File[]
-  ): Promise<ApiServiceResult<Artwork>>
-  update(request: any): Promise<ApiServiceResult<Artwork>>
-  list(request: any): Promise<ApiServiceResult<Artwork[]>>
-  listByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
-  listLikedByUser(user: User): Promise<ApiServiceResult<Artwork[]>>
+  ): Promise<ApiServiceResult<ArtworkViewModel>>
+  update(request: any): Promise<ApiServiceResult<ArtworkViewModel>>
+  list(request: any): Promise<ApiServiceResult<ArtworkViewModel[]>>
+  listByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>>
+  listLikedByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>>
   like(user: User, id: string): Promise<ApiServiceResult<void>>
   unlike(user: User, id: string): Promise<ApiServiceResult<void>>
   publish(request: any): Promise<ApiServiceResult<void>>

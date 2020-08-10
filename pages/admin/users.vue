@@ -103,9 +103,9 @@ export default class AdminUserPage extends FormPageComponent {
 
     try {
       const usersResponse = await $axios.$get('/api/admin/users')
-      users = usersResponse.users || []
+      users = usersResponse.payload || []
       const citiesResponse = await $axios.$get('/api/admin/cities')
-      cities = citiesResponse.cities || []
+      cities = citiesResponse.payload || []
     } catch (error) {
       errors.push(error.response?.data?.messages)
     }
