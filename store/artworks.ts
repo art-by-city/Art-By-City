@@ -3,9 +3,9 @@ import { ActionTree, MutationTree } from 'vuex'
 import ArtworkOptions from '../models/artwork/artworkOptions'
 
 export const state = () => ({
-  slotA: [] as any[],
-  slotB: [] as any[],
-  visibleSlot: 'B',
+  list: [] as any[],
+  prev: [] as any[],
+  isPrevBeingViewed: false as boolean,
   options: {
     city: '',
     type: '',
@@ -17,21 +17,15 @@ export type ArtworkStoreState = ReturnType<typeof state>
 
 export const mutations: MutationTree<ArtworkStoreState> = {
   set(state: ArtworkStoreState, artworks: any[]) {
-    if (state.visibleSlot === 'A') {
-      state.slotB = artworks
-      state.visibleSlot = 'B'
-    } else {
-      state.slotA = artworks
-      state.visibleSlot = 'A'
-    }
+    state.prev = [ ...state.list ]
+    state.list = [ ...artworks ]
   },
 
   previous(state: ArtworkStoreState) {
-    if (state.visibleSlot === 'A' && state.slotB.length > 0) {
-      state.visibleSlot = 'B'
-    } else {
-      state.visibleSlot = 'A'
-    }
+    const temp = [ ...state.list ]
+    state.list = [ ...state.prev ]
+    state.prev = [ ...temp ]
+    state.isPrevBeingViewed = !state.isPrevBeingViewed
   },
 
   options(state: ArtworkStoreState, options: any) {

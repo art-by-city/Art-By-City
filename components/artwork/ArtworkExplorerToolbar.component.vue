@@ -15,16 +15,16 @@
       </v-col>
       <v-col offset="3" class="pa-0">
         <v-btn
-          v-if="$store.state.artworks.slotB.length > 0"
+          v-if="$store.state.artworks.prev.length > 0"
           icon
           class="shift-icon-button-up-a-bit"
           @click="onPreviousClicked"
         >
           <v-icon x-large color="black">
             {{
-              this.$store.state.artworks.visibleSlot === 'B'
-                ? 'mdi-arrow-left-circle'
-                : 'mdi-arrow-right-circle'
+              this.$store.state.artworks.isPrevBeingViewed
+                ? 'mdi-arrow-right-circle'
+                : 'mdi-arrow-left-circle'
             }}
           </v-icon>
         </v-btn>
