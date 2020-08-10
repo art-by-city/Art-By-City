@@ -4,6 +4,7 @@ import BaseRepositoryInterface from '../../repository.interface'
 import UserEvent from './userEvent'
 
 export { default as UserEvent } from './userEvent'
+export { default as UserEventViewModel } from './viewModels/userEventViewModel'
 export { default as UserArtworkViewedEvent } from './userArtworkViewedEvent'
 export { default as UserArtworkCreatedEvent } from './userArtworkCreatedEvent'
 export { default as UserArtworkDeletedEvent } from './userArtworkDeletedEvent'

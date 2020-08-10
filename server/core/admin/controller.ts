@@ -34,19 +34,27 @@ export default class AdminControllerImpl implements AdminController {
     /**
      * GET /users - List all users
      */
-    router.get('/users', async (_req, res) => {
-      const users = await this.adminService.listUsers()
+    router.get('/users', async (_req, res, next) => {
+      try {
+        const result = await this.adminService.listUsers()
 
-      return res.json({ users })
+        return res.json(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     /**
      * GET /cities - Get all cities
      */
-    router.get('/cities', async (_req, res) => {
-      const cities = await this.adminService.listCities()
+    router.get('/cities', async (_req, res, next) => {
+      try {
+        const result = await this.adminService.listCities()
 
-      return res.json({ cities })
+        return res.json(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     /**

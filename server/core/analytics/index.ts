@@ -4,13 +4,13 @@ import BaseControllerInterface from '../controller.interface'
 import BaseApplicationServiceInterface from '../applicationService.interface'
 import AnalyticsControllerImpl from './controller'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import { UserEvent } from '../events/user'
+import { UserEventViewModel } from '../events/user'
 import AnalyticsServiceImpl from './service'
 
 export interface AnalyticsController extends BaseControllerInterface {}
 
 export interface AnalyticsService extends BaseApplicationServiceInterface {
-  fetchEvents(): Promise<ApiServiceResult<UserEvent[]>>
+  fetchEvents(): Promise<ApiServiceResult<UserEventViewModel[]>>
 }
 
 export const AnalyticsModule = new ContainerModule((bind) => {

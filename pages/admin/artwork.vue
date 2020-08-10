@@ -127,7 +127,8 @@ export default class AdminEventsPage extends FormPageComponent {
     let artworks = [] as any[]
 
     try {
-      artworks = await $axios.$get('/api/admin/artwork')
+      const artworksResponse = await $axios.$get('/api/admin/artwork')
+      artworks = artworksResponse.payload || []
       config = await $axios.$get('/api/config')
       store.commit('config/setConfig', config)
     } catch (error) {

@@ -30,6 +30,9 @@
       <template v-slot:item.timestamp="{ item }">
         {{ (new Date(item.timestamp)).toLocaleString() }}
       </template>
+      <template v-slot:item.user="{ item }">
+        {{ item.user.id }}
+      </template>
     </v-data-table>
   </div>
 </template>
@@ -60,7 +63,7 @@ export default class AdminEventsPage extends FormPageComponent {
   eventLogHeaders = [
     { text: 'id', value: 'id', width: '250' },
     { text: 'timestamp', value: 'timestamp', width: '250' },
-    { text: 'user', value: 'userId', width: '250' },
+    { text: 'user', value: 'user', width: '250' },
     { text: 'type', value: 'type', width: '250' },
   ]
   eventLogSearch = ''

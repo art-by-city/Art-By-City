@@ -1,6 +1,9 @@
 import ApiServiceResult from './apiServiceResult.interface'
+import ViewModel from '../viewModel'
 
-export default class ApiServiceSuccessResult<T> implements ApiServiceResult<T> {
+type ViewModelOrVoid = ViewModel | void
+
+export default class ApiServiceSuccessResult<T extends ViewModelOrVoid> implements ApiServiceResult<ViewModelOrVoid> {
   success = true
   payload?: T | null | undefined
 

@@ -8,6 +8,7 @@ import { ArtworkService } from '../artwork'
 import NotFoundError from '../api/errors/notFoundError'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import { CityService, City } from '../city'
+import UserMapper from './mapper'
 
 @injectable()
 export default class UserApplicationServiceImpl implements UserApplicationService {
@@ -43,13 +44,7 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
       }
 
       const userProfile: UserProfileViewModel = {
-        // TODO -> use a got darn mapper
-        user: {
-          id: user.id,
-          username: user.username,
-          city: city.name,
-          roles: user.roles
-        },
+        user: new UserMapper().toViewModel(user, { cityName: city.name }),
         artworks: await this.artworkService.listByUser(user)
       }
 

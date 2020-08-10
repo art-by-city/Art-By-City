@@ -1,5 +1,5 @@
 export default interface ApiServiceResult<T> {
   success: boolean
   messages?: string[]
-  payload?: T | null
+  payload?: T | null | undefined
 }

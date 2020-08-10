@@ -8,7 +8,7 @@ import { Strategy as LocalStrategy } from 'passport-local'
 import jwt from 'jsonwebtoken'
 
 import { AuthenticationResult } from '../api/results/authenticationResult.interface'
-import { User, UserService } from '../user'
+import { UserViewModel, UserService } from '../user'
 import { AuthService } from './'
 import { EventService } from '../events'
 import { UserEvents } from '../events/user'
@@ -65,7 +65,7 @@ export default class AuthServiceImpl implements AuthService {
     return jwt.sign(thing, this.JWT_SECRET)
   }
 
-  serializeUser(user: User, callback: Function) {
+  serializeUser(user: UserViewModel, callback: Function) {
     callback(null, user.id)
   }
 
@@ -73,7 +73,7 @@ export default class AuthServiceImpl implements AuthService {
     callback(null, { id })
   }
 
-  login(user: User): AuthenticationResult {
+  login(user: UserViewModel): AuthenticationResult {
     this.eventService.emit(UserEvents.Account.LoggedIn, user.id)
 
     return {

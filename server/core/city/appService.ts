@@ -3,7 +3,9 @@ import { injectable, inject } from 'inversify'
 import UnknownError from '../api/errors/unknownError'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import { CityApplicationService, CityService, City } from './'
+import { CityApplicationService, CityService, City, CityViewModel } from './'
+import CityMapper from './mapper'
+import NotFoundError from '../api/errors/notFoundError'
 
 @injectable()
 export default class CityApplicationServiceImpl
@@ -14,7 +16,7 @@ export default class CityApplicationServiceImpl
     this.cityService = cityService
   }
 
-  async create(req: any): Promise<ApiServiceResult<City>> {
+  async create(req: any): Promise<ApiServiceResult<CityViewModel>> {
     const city = new City()
     city.code = req.body?.city?.code || ''
     city.name = req.body?.city?.name || ''
@@ -23,13 +25,17 @@ export default class CityApplicationServiceImpl
     city.disabled = req.body?.city?.disabled === true ? true : false
 
     try {
-      return new ApiServiceSuccessResult(await this.cityService.create(city))
+      const createdCity = await this.cityService.create(city)
+      if (createdCity) {
+        return new ApiServiceSuccessResult(new CityMapper().toViewModel(createdCity))
+      }
+      throw new UnknownError()
     } catch (error) {
       throw new UnknownError(error.message)
     }
   }
 
-  async update(req: any): Promise<ApiServiceResult<City>> {
+  async update(req: any): Promise<ApiServiceResult<CityViewModel>> {
     const city = new City()
     city.id = req.body?.city?.id || ''
     city.code = req.body?.city?.code || ''
@@ -39,7 +45,12 @@ export default class CityApplicationServiceImpl
     city.disabled = req.body?.city?.disabled === true ? true : false
 
     try {
-      return new ApiServiceSuccessResult(await this.cityService.update(city))
+      const savedCity = await this.cityService.update(city)
+
+      if (savedCity) {
+        return new ApiServiceSuccessResult(new CityMapper().toViewModel(savedCity))
+      }
+      throw new NotFoundError(new City())
     } catch (error) {
       throw new UnknownError(error.message)
     }
@@ -55,17 +66,24 @@ export default class CityApplicationServiceImpl
     }
   }
 
-  async list(): Promise<ApiServiceResult<City[]>> {
+  async list(): Promise<ApiServiceResult<CityViewModel[]>> {
     try {
-      return new ApiServiceSuccessResult(await this.cityService.list())
+      const cities = await this.cityService.list()
+
+      return new ApiServiceSuccessResult(cities.map((city) => {
+        return new CityMapper().toViewModel(city)
+      }))
     } catch (error) {
       throw new UnknownError(error.message)
     }
   }
 
-  find(includeNonVisible?: boolean): Promise<City[]> {
+  async find(includeNonVisible?: boolean): Promise<CityViewModel[]> {
     try {
-      return this.cityService.find({ includeAll: includeNonVisible })
+      const cities = await this.cityService.find({ includeAll: includeNonVisible })
+      return cities.map((city) => {
+        return new CityMapper().toViewModel(city)
+      })
     } catch (error) {
       throw new UnknownError(error.message)
     }

@@ -1,10 +1,11 @@
 import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import { UserEvent, UserEventService } from '../events/user'
+import { UserEventViewModel, UserEventService } from '../events/user'
 import { AnalyticsService } from './'
 import UnknownError from '../api/errors/unknownError'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
+import UserEventMapper from '../events/user/mapper'
 
 @injectable()
 export default class AnalyticsServiceImpl implements AnalyticsService {
@@ -17,11 +18,13 @@ export default class AnalyticsServiceImpl implements AnalyticsService {
     this.userEventService = userEventService
   }
 
-  async fetchEvents(): Promise<ApiServiceResult<UserEvent[]>> {
+  async fetchEvents(): Promise<ApiServiceResult<UserEventViewModel[]>> {
     try {
       const events = await this.userEventService.fetchEvents()
 
-      return new ApiServiceSuccessResult(events)
+      return new ApiServiceSuccessResult(events.map((event) => {
+        return new UserEventMapper().toViewModel(event)
+      }))
     } catch (error) {
       throw new UnknownError(error.message)
     }
