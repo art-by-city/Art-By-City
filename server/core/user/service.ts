@@ -38,14 +38,19 @@ export default class UserServiceImpl implements UserService {
     await validateUser(user)
 
     try {
+      const existingUser = await this.userRepository.getByUsername(user.username)
+
+      if (existingUser) {
+        throw new UsernameAlreadyTakenError()
+      }
+
       const savedUser = await this.userRepository.create(user)
 
       this.eventService.emit(UserEvents.Account.Registered, savedUser.id)
 
       return new UserMapper().toViewModel(savedUser)
     } catch (error) {
-      // TODO -> Other errors
-      throw new UsernameAlreadyTakenError()
+      throw new UnknownError(error.message)
     }
   }
 

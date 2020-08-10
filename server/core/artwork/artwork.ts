@@ -29,7 +29,7 @@ const artworkTypes = [
 @Collection()
 export default class Artwork extends Entity {
   @IsNotEmpty({ message: 'Artwork Owner is required' })
-  owner!: string | User // TODO -> remove User type when refactoring to view entities
+  owner!: string
 
   @IsString()
   @MinLength(1, {
