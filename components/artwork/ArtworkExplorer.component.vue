@@ -12,6 +12,11 @@
       <div class="artwork-grid-row">
         <div
           class="artwork-grid-col"
+          :class="{
+            ['artwork-card-out-left']: isFetching,
+            ['artwork-card-out-right']: isLoading,
+            ['artwork-card-no-animate']: !shouldAnimate
+          }"
           v-for="(artwork, i) in sliceArtworks()"
           :key="i"
         >
@@ -47,6 +52,10 @@ export default class ArtworkExplorer extends Vue {
 
   vw = 1000
 
+  isFetching: boolean = false
+  isLoading: boolean = false
+  shouldAnimate: boolean = true
+
   mounted() {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize)
@@ -63,24 +72,52 @@ export default class ArtworkExplorer extends Vue {
   }
 
   previous() {
-    this.$store.commit('artworks/previous')
+    if (!this.$store.state.artworks.isPrevBeingViewed) {
+      // BACKWARDS
+      this.shouldAnimate = true
+      this.isLoading = true
+      setTimeout((() => {
+        this.$store.commit('artworks/previous')
+        this.shouldAnimate = false
+        this.isFetching = true
+        this.isLoading = false
+        setTimeout((() => {
+          this.shouldAnimate = true
+          this.isFetching = false
+        }).bind(this), 500)
+      }).bind(this), 500)
+    } else {
+      // FORWARDS
+      this.shouldAnimate = true
+      this.isFetching = true
+      setTimeout((() => {
+        this.$store.commit('artworks/previous')
+        this.shouldAnimate = false
+        this.isLoading = true
+        this.isFetching = false
+        setTimeout((() => {
+          this.shouldAnimate = true
+          this.isLoading = false
+        }).bind(this), 500)
+      }).bind(this), 500)
+    }
   }
 
   sliceArtworks(slot?: string) {
-    const artworks = !slot || slot === 'A'
-      ? this.$store.state.artworks.slotA
-      : this.$store.state.artworks.slotB
+    const artworks = this.$store.state.artworks.list
 
-    if (this.vw < 960) {
-      return artworks.slice(0, 1)
-    }
+    return artworks.slice(0, 3)
 
-    if (this.gridSize === 1) {
-      // return [ artworks.length > 1 ? artworks[1] : artworks[0] ]
-      return artworks.slice(0, 3)
-    }
+    // if (this.vw < 960) {
+    //   return artworks.slice(0, 1)
+    // }
 
-    return artworks.slice(0, this.gridSize)
+    // if (this.gridSize === 1) {
+    //   // return [ artworks.length > 1 ? artworks[1] : artworks[0] ]
+    //   return artworks.slice(0, 3)
+    // }
+
+    // return artworks.slice(0, this.gridSize)
   }
 
   onArtworkCardClicked(artwork: any) {
@@ -88,8 +125,19 @@ export default class ArtworkExplorer extends Vue {
   }
 
   async refresh(opts: ArtworkOptions) {
+    this.shouldAnimate = true
+    this.isFetching = true
     this.$store.commit('artworks/options', opts)
-    await this.$store.dispatch('artworks/fetchArtworks')
+    setTimeout((async () => {
+      await this.$store.dispatch('artworks/fetchArtworks')
+      this.shouldAnimate = false
+      this.isLoading = true
+      this.isFetching = false
+      setTimeout((() => {
+        this.shouldAnimate = true
+        this.isLoading = false
+      }).bind(this), 500)
+    }).bind(this), 500)
   }
 }
 </script>
@@ -158,13 +206,33 @@ export default class ArtworkExplorer extends Vue {
   z-index: 2;
 }
 .artwork-grid-col:first-child {
-  transition: all .5s ease-out;
+  position: relative;
+  right: 0vw;
+  transition: right .5s ease-out;
+}
+.grid-size-1 >>> .artwork-grid-col:first-child {
+  transition: height .5s ease-out, width .5s ease-out, right .5s ease-out;
 }
 .grid-size-3 >>> .artwork-grid-col:not(:first-child) {
   position: relative;
   right: 0vw;
   height: 30vw;
   width: 30vw;
-  transition: right .5s ease-out .5s;
+  transition: right .5s ease-out;
+}
+
+/* Timeline Transitions */
+.artwork-card-out-left {
+  position: relative !important;
+  right: 100vw !important;
+  transition: right .5s ease-out;
+}
+.artwork-card-out-right {
+  position: relative !important;
+  right: -100vw !important;
+}
+.artwork-card-no-animate {
+  animation: none !important;
+  transition: none !important;
 }
 </style>
