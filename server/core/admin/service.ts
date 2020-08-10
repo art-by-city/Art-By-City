@@ -45,9 +45,15 @@ export default class AdminServiceImpl implements AdminService {
     const artworks = await this.artworkService.list(
       { includeUnapproved: true, includeUnpublished: true }
     )
-    return new ApiServiceSuccessResult(artworks.map((artwork) => {
-      return new ArtworkMapper().toViewModel(artwork)
-    }))
+
+    const mappedArtworks = await Promise.all(
+      artworks.map(async (artwork) => {
+        const user = await this.userService.getById(artwork.owner)
+        return new ArtworkMapper().toViewModel(artwork, user || undefined)
+      })
+    )
+
+    return new ApiServiceSuccessResult(mappedArtworks)
   }
 
   setUserRoles(

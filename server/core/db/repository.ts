@@ -1,12 +1,13 @@
 import { getRepository, BaseFirestoreRepository, IEntity, Instantiable } from 'fireorm'
 import { injectable } from 'inversify'
 
-type Abstract<T> = Function & {prototype: T};
-type Constructor<T> = new (...args: any[]) => T;
-type Class<T> = Abstract<T> | Constructor<T>;
+interface TrackableEntity extends IEntity {
+  created: Date
+  updated: Date
+}
 
 @injectable()
-export default class BaseRepositoryImpl<T extends IEntity> {
+export default class BaseRepositoryImpl<T extends TrackableEntity> {
   private x: Instantiable<T>
   protected repository: BaseFirestoreRepository<T>
 
@@ -17,6 +18,7 @@ export default class BaseRepositoryImpl<T extends IEntity> {
 
   create(thing: T): Promise<T> {
     try {
+      thing.created = new Date()
       return this.repository.create(thing)
     } catch (error) {
       throw new Error(`Error creating new ${this.x.name}: ${error.message}`)
@@ -49,6 +51,7 @@ export default class BaseRepositoryImpl<T extends IEntity> {
 
   update(thing: T): Promise<T> {
     try {
+      thing.updated = new Date()
       return this.repository.update(thing)
     } catch (error) {
       throw new Error(`Error updating ${this.x.name}: ${error.message}`)

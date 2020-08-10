@@ -1,50 +1,23 @@
 import _ from 'lodash'
 import { injectable, inject } from 'inversify'
-import { getRepository } from 'fireorm'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
-import { User } from '../user'
 import { Artwork, ArtworkRepository, ArtworkFilterOptions } from './'
+import BaseRepositoryImpl from '../db/repository'
 
 @injectable()
-export default class ArtworkRepositoryImpl implements ArtworkRepository {
+export default class ArtworkRepositoryImpl
+  extends BaseRepositoryImpl<Artwork>
+  implements ArtworkRepository {
   private collectionName = 'Artworks'
-  private repository = getRepository(Artwork)
   private client: Firestore
 
   constructor(
     @inject(Symbol.for('DatabaseAdapter')) databaseAdapter: DatabaseAdapter
   ) {
+    super(Artwork)
     this.client = databaseAdapter.getClient()
-  }
-
-  create(artwork: Artwork): Promise<Artwork> {
-    try {
-      return this.repository.create(artwork)
-    } catch (error) {
-      throw new Error(`Error creating new artwork: ${error.message}`)
-    }
-  }
-
-  get(id: string): Promise<Artwork | null> {
-    try {
-      return this.repository.findById(id)
-    } catch (error) {
-      throw new Error(`Error getting artwork by id: ${error.message}`)
-    }
-  }
-
-  list(limit?: number): Promise<Artwork[]> {
-    try {
-      if (limit) {
-        return this.repository.limit(limit).find()
-      } else {
-        return this.repository.find()
-      }
-    } catch (error) {
-      throw new Error(`Error listing artwork: ${error.message}`)
-    }
   }
 
   async find(filter?: ArtworkFilterOptions): Promise<Artwork[]> {
@@ -109,26 +82,6 @@ export default class ArtworkRepositoryImpl implements ArtworkRepository {
       return matches
     } catch (error) {
       throw new Error(`Error finding artwork: ${error.message}`)
-    }
-  }
-
-  update(artwork: Artwork): Promise<Artwork> {
-    try {
-      if ((<User>artwork.owner).id) {
-        artwork.owner = (<User>artwork.owner).id
-      }
-
-      return this.repository.update(artwork)
-    } catch (error) {
-      throw new Error(`Error updating artwork: ${error.message}`)
-    }
-  }
-
-  delete(id: string): Promise<void> {
-    try {
-      return this.repository.delete(id)
-    } catch (error) {
-      throw new Error(`Error deleting artwork: ${error.message}`)
     }
   }
 

@@ -88,10 +88,249 @@ export default class ArtworkApplicationServiceImpl
         this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
       })
 
-      return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(createdArtwork))
+      return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(createdArtwork, user))
     }
 
     return { success: false }
+  }
+
+  async update(req: any): Promise<ApiServiceResult<ArtworkViewModel>> {
+    const user = await this.userService.getById((<User>req.user).id)
+
+    if (!user) {
+      throw new UnauthorizedError()
+    }
+
+    try {
+      const artwork = await this.artworkService.get(req.body.id)
+
+      if (!artwork) {
+        throw new NotFoundError(new Artwork())
+      }
+
+      if (artwork.owner !== user.id) {
+        throw new UnauthorizedError()
+      }
+
+      if (artwork && artwork.owner === user.id) {
+        artwork.updated = new Date()
+        artwork.title = req.body?.title || ''
+        artwork.description = req.body?.description || ''
+        artwork.type = req.body?.type || ''
+        artwork.city = req.body?.city || ''
+        artwork.hashtags = req.body?.hashtags || []
+
+        if (!artwork.created) {
+          artwork.created = new Date()
+        }
+
+        if (!artwork.likes) {
+          artwork.likes = []
+        }
+
+        const savedArtwork = await this.artworkService.update(artwork)
+        savedArtwork.hashtags.forEach((hashtag) => {
+          this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
+        })
+        if (savedArtwork) {
+          return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(savedArtwork, user))
+        }
+
+        return { success: false }
+      } else {
+        throw new UnknownError('Artwork not found or permission denied')
+      }
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async list(req: any): Promise<ApiServiceResult<ArtworkViewModel[]>> {
+    try {
+      const opts: ArtworkFilterOptions = <ArtworkFilterOptions>req.query
+      const user = await this.userService.getById((<User>req.user).id)
+
+      if (!user) {
+        throw new UnauthorizedError()
+      }
+
+      opts.userId = user.id
+
+      const userArtworkViews = await this.discoveryService.getLastArtworkViewed(
+        user.id
+      )
+
+      if (userArtworkViews && userArtworkViews.lastFetchedArtworkId) {
+        opts.lastFetchedArtworkId = userArtworkViews.lastFetchedArtworkId
+      }
+
+      if (opts.shuffle !== false) {
+        opts.shuffle = true
+      }
+      if (!opts.limit) {
+        opts.limit = 9
+      }
+
+      let artworks = await this.artworkService.list(opts)
+
+      let shouldResetLastViewedArtwork = false
+      let moreArtworks: Artwork[] = []
+      if (artworks.length < opts.limit) {
+        const moreOpts = { ...opts }
+        const amountNeeded = opts.limit - artworks.length
+
+        moreOpts.limit = amountNeeded
+        delete moreOpts.lastFetchedArtworkId
+
+        moreArtworks = await this.artworkService.list(moreOpts)
+
+        if (moreArtworks.length > 0) {
+          shouldResetLastViewedArtwork = true
+          artworks = artworks.concat(moreArtworks)
+        }
+      }
+
+      await this.discoveryService.setLastArtworkViewedFromBatch(user.id, [
+        ...(shouldResetLastViewedArtwork ? moreArtworks : artworks)
+      ])
+
+      artworks.forEach((artwork) => {
+        this.eventService.emit(UserEvents.Artwork.Viewed, user.id, artwork.id)
+      })
+
+      const mappedArtworks = await Promise.all(
+        artworks.map(async (artwork) => {
+          const user = await this.userService.getById(artwork.owner)
+          return new ArtworkMapper().toViewModel(artwork, user || undefined)
+        })
+      )
+
+      return new ApiServiceSuccessResult(mappedArtworks)
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async listByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>> {
+    try {
+      const artworks = await this.artworkService.listByUser(user)
+
+      const mappedArtworks = await Promise.all(
+        artworks.map(async (artwork) => {
+          const user = await this.userService.getById(artwork.owner)
+          return new ArtworkMapper().toViewModel(artwork, user || undefined)
+        })
+      )
+
+      return new ApiServiceSuccessResult(mappedArtworks)
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async listLikedByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>> {
+    try {
+      const artworks = await this.artworkService.listLikedByUser(user)
+
+      const mappedArtworks = await Promise.all(
+        artworks.map(async (artwork) => {
+          const user = await this.userService.getById(artwork.owner)
+          return new ArtworkMapper().toViewModel(artwork, user || undefined)
+        })
+      )
+
+      return new ApiServiceSuccessResult(mappedArtworks)
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async get(id: string): Promise<ApiServiceResult<ArtworkViewModel>> {
+    try {
+      const artwork = await this.artworkService.get(id)
+
+      if (!artwork) {
+        throw new NotFoundError(new Artwork())
+      }
+
+      const user = await this.userService.getById(artwork.owner)
+
+      return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(artwork, user || undefined))
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async delete(user: User, id: string): Promise<ApiServiceResult<void>> {
+    try {
+      const artwork = await this.artworkService.get(id)
+
+      if (artwork) {
+        if (artwork.owner !== user.id) {
+          throw new UnauthorizedError()
+        }
+      } else {
+        throw new NotFoundError(new Artwork())
+      }
+
+      await this.artworkService.delete(id)
+
+      this.eventService.emit(UserEvents.Artwork.Deleted, user.id, id)
+
+      return new ApiServiceSuccessResult()
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async like(user: User, id: string): Promise<ApiServiceResult<void>> {
+    try {
+      const artwork = await this.artworkService.get(id)
+
+      if (artwork) {
+        if (!artwork.likes) {
+          artwork.likes = []
+        }
+
+        if (!artwork.likes.includes(user.id)) {
+          artwork.likes.push(user.id)
+        }
+      } else {
+        throw new NotFoundError(new Artwork())
+      }
+
+      await this.artworkService.update(artwork)
+
+      return new ApiServiceSuccessResult()
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
+  }
+
+  async unlike(user: User, id: string): Promise<ApiServiceResult<void>> {
+    try {
+      const artwork = await this.artworkService.get(id)
+
+      if (artwork) {
+        if (!artwork.likes) {
+          artwork.likes = []
+        }
+
+        if (artwork.likes.includes(user.id)) {
+          artwork.likes = artwork.likes.filter((id: string) => {
+            return id !== user.id
+          })
+        }
+      } else {
+        throw new NotFoundError(new Artwork())
+      }
+
+      await this.artworkService.update(artwork)
+
+      return new ApiServiceSuccessResult()
+    } catch (error) {
+      throw new UnknownError(error.message)
+    }
   }
 
   async publish(req: any): Promise<ApiServiceResult<void>> {
@@ -201,221 +440,6 @@ export default class ArtworkApplicationServiceImpl
       }
 
       return { success: false }
-    } catch (error) {
-      throw new UnknownError(error.message)
-    }
-  }
-
-  async update(req: any): Promise<ApiServiceResult<ArtworkViewModel>> {
-    const user = <User>req.user
-
-    try {
-      const artwork = await this.artworkService.get(req.body.id)
-
-      if (!artwork) {
-        throw new NotFoundError(new Artwork())
-      }
-
-      if (artwork.owner !== user.id) {
-        throw new UnauthorizedError()
-      }
-
-      if (artwork && artwork.owner === user.id) {
-        artwork.updated = new Date()
-        artwork.title = req.body?.title || ''
-        artwork.description = req.body?.description || ''
-        artwork.type = req.body?.type || ''
-        artwork.city = req.body?.city || ''
-        artwork.hashtags = req.body?.hashtags || []
-
-        if (!artwork.created) {
-          artwork.created = new Date()
-        }
-
-        if (!artwork.likes) {
-          artwork.likes = []
-        }
-
-        const savedArtwork = await this.artworkService.update(artwork)
-        savedArtwork.hashtags.forEach((hashtag) => {
-          this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
-        })
-        if (savedArtwork) {
-          return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(savedArtwork))
-        }
-
-        return { success: false }
-      } else {
-        throw new UnknownError('Artwork not found or permission denied')
-      }
-    } catch (error) {
-      throw new UnknownError(error.message)
-    }
-  }
-
-  async list(req: any): Promise<ApiServiceResult<ArtworkViewModel[]>> {
-    try {
-      const opts: ArtworkFilterOptions = <ArtworkFilterOptions>req.query
-      const user: User = <User>req.user
-
-      opts.userId = user.id
-
-      const userArtworkViews = await this.discoveryService.getLastArtworkViewed(
-        user.id
-      )
-
-      if (userArtworkViews && userArtworkViews.lastFetchedArtworkId) {
-        opts.lastFetchedArtworkId = userArtworkViews.lastFetchedArtworkId
-      }
-
-      if (opts.shuffle !== false) {
-        opts.shuffle = true
-      }
-      if (!opts.limit) {
-        opts.limit = 9
-      }
-
-      let artworks = await this.artworkService.list(opts)
-
-      let shouldResetLastViewedArtwork = false
-      let moreArtworks: Artwork[] = []
-      if (artworks.length < opts.limit) {
-        const moreOpts = { ...opts }
-        const amountNeeded = opts.limit - artworks.length
-
-        moreOpts.limit = amountNeeded
-        delete moreOpts.lastFetchedArtworkId
-
-        moreArtworks = await this.artworkService.list(moreOpts)
-
-        if (moreArtworks.length > 0) {
-          shouldResetLastViewedArtwork = true
-          artworks = artworks.concat(moreArtworks)
-        }
-      }
-
-
-      await this.discoveryService.setLastArtworkViewedFromBatch(user.id, [
-        ...(shouldResetLastViewedArtwork ? moreArtworks : artworks)
-      ])
-
-      artworks.forEach((artwork) => {
-        this.eventService.emit(UserEvents.Artwork.Viewed, user.id, artwork.id)
-      })
-
-      return new ApiServiceSuccessResult(artworks.map((artwork) => {
-        return new ArtworkMapper().toViewModel(artwork)
-      }))
-    } catch (error) {
-      throw new UnknownError(error.message)
-    }
-  }
-
-  async listByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>> {
-    try {
-      const artworks = await this.artworkService.listByUser(user)
-
-      return new ApiServiceSuccessResult(artworks.map((artwork) => {
-        return new ArtworkMapper().toViewModel(artwork)
-      }))
-    } catch (error) {
-      throw new UnknownError(error.message)
-    }
-  }
-
-  async listLikedByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>> {
-    try {
-      const artworks = await this.artworkService.listLikedByUser(user)
-
-      return new ApiServiceSuccessResult(artworks.map((artwork) => {
-        return new ArtworkMapper().toViewModel(artwork)
-      }))
-    } catch (error) {
-      throw new UnknownError(error.message)
-    }
-  }
-
-  async get(id: string): Promise<ApiServiceResult<ArtworkViewModel>> {
-    try {
-      const artwork = await this.artworkService.get(id, { hydrated: true })
-
-      if (!artwork) {
-        throw new NotFoundError(new Artwork())
-      }
-
-      return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(artwork))
-    } catch (error) {
-      throw new UnknownError(error.message)
-    }
-  }
-
-  async delete(user: User, id: string): Promise<ApiServiceResult<void>> {
-    try {
-      const artwork = await this.artworkService.get(id)
-
-      if (artwork) {
-        if (artwork.owner !== user.id) {
-          throw new UnauthorizedError()
-        }
-      } else {
-        throw new NotFoundError(new Artwork())
-      }
-
-      await this.artworkService.delete(id)
-
-      this.eventService.emit(UserEvents.Artwork.Deleted, user.id, id)
-
-      return new ApiServiceSuccessResult()
-    } catch (error) {
-      throw new UnknownError(error.message)
-    }
-  }
-
-  async like(user: User, id: string): Promise<ApiServiceResult<void>> {
-    try {
-      const artwork = await this.artworkService.get(id)
-
-      if (artwork) {
-        if (!artwork.likes) {
-          artwork.likes = []
-        }
-
-        if (!artwork.likes.includes(user.id)) {
-          artwork.likes.push(user.id)
-        }
-      } else {
-        throw new NotFoundError(new Artwork())
-      }
-
-      await this.artworkService.update(artwork)
-
-      return new ApiServiceSuccessResult()
-    } catch (error) {
-      throw new UnknownError(error.message)
-    }
-  }
-
-  async unlike(user: User, id: string): Promise<ApiServiceResult<void>> {
-    try {
-      const artwork = await this.artworkService.get(id)
-
-      if (artwork) {
-        if (!artwork.likes) {
-          artwork.likes = []
-        }
-
-        if (artwork.likes.includes(user.id)) {
-          artwork.likes = artwork.likes.filter((id: string) => {
-            return id !== user.id
-          })
-        }
-      } else {
-        throw new NotFoundError(new Artwork())
-      }
-
-      await this.artworkService.update(artwork)
-
-      return new ApiServiceSuccessResult()
     } catch (error) {
       throw new UnknownError(error.message)
     }

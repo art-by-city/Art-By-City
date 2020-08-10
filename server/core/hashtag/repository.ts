@@ -3,7 +3,7 @@ import { Firestore, DocumentReference } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
 import { HashtagRepository, Hashtag, HashtagFilterOptions } from '.'
-import BaseRepositoryImpl from '../common/repository'
+import BaseRepositoryImpl from '../db/repository'
 
 @injectable()
 export default class HashtagRepositoryImpl
@@ -16,7 +16,6 @@ export default class HashtagRepositoryImpl
     databaseAdapter: DatabaseAdapter
   ) {
     super(Hashtag)
-
     this.client = databaseAdapter.getClient()
   }
 

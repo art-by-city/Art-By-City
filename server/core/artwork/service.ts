@@ -11,7 +11,6 @@ import {
   ArtworkFilterOptions
 } from './'
 
-
 @injectable()
 export default class ArtworkServiceImpl implements ArtworkService {
   private artworkRepository: ArtworkRepository
@@ -31,7 +30,7 @@ export default class ArtworkServiceImpl implements ArtworkService {
     await validateArtwork(artwork)
 
     try {
-      return await this.artworkRepository.create(artwork)
+      return this.artworkRepository.create(artwork)
     } catch (error) {
       throw new UnknownError(error.message)
     }
@@ -41,65 +40,33 @@ export default class ArtworkServiceImpl implements ArtworkService {
     await validateArtwork(artwork)
 
     try {
-      return await this.artworkRepository.update(artwork)
+      return this.artworkRepository.update(artwork)
     } catch (error) {
       throw new UnknownError(error.message)
     }
 
   }
 
-  async get(id: string, opts?: DomainServiceOptions): Promise<Artwork | null> {
-    const artwork = await this.artworkRepository.get(id)
-
-    if (artwork && opts?.hydrated) {
-      artwork.owner = <User>(
-        await this.userRepository.get(<string>artwork?.owner)
-      )
-    }
-
-    return artwork
+  get(id: string): Promise<Artwork | null> {
+    return this.artworkRepository.get(id)
   }
 
-  async list(opts?: ArtworkFilterOptions): Promise<Artwork[]> {
-    const artworks = opts
-      ? await this.artworkRepository.find(opts)
-      : await this.artworkRepository.list()
-
-    return Promise.all(
-      artworks.map(async (a) => {
-        a.owner = <User>await this.userRepository.get(<string>a.owner)
-
-        return a
-      })
-    )
+  list(opts?: ArtworkFilterOptions): Promise<Artwork[]> {
+    return opts
+      ? this.artworkRepository.find(opts)
+      : this.artworkRepository.list()
   }
 
-  async listByUser(user: User): Promise<Artwork[]> {
-    const artworks = await this.artworkRepository.find({
+  listByUser(user: User): Promise<Artwork[]> {
+    return this.artworkRepository.find({
       owner: user.id,
       includeUnapproved: true,
       includeUnpublished: true
     })
-
-    return Promise.all(
-      artworks.map(async (a) => {
-        a.owner = <User>await this.userRepository.get(<string>a.owner)
-
-        return a
-      })
-    )
   }
 
-  async listLikedByUser(user: User): Promise<Artwork[]> {
-    const artworks = await this.artworkRepository.find({ likes: [user.id] })
-
-    return Promise.all(
-      artworks.map(async (a) => {
-        a.owner = <User>await this.userRepository.get(<string>a.owner)
-
-        return a
-      })
-    )
+  listLikedByUser(user: User): Promise<Artwork[]> {
+    return this.artworkRepository.find({ likes: [user.id] })
   }
 
   delete(id: string): Promise<void> {
