@@ -64,7 +64,7 @@ export default class HomePage extends PageComponent {
         if (!(store.state.artworks.list?.length > 0)) {
           const artworksResult = await $axios.$get('/api/artwork', { params })
           payload = artworksResult.payload
-          store.commit('artworks/set', payload)
+          store.commit('artworks/add', payload)
         } else {
           payload = store.state.artworks.list
         }
