@@ -14,4 +14,11 @@ export default class UserMapper implements EntityMapper<User, UserViewModel> {
       roles: domainEntity.roles
     }
   }
+  toUserAccountViewModel(domainEntity: User, opts?: UserMapperOptions) {
+    const userViewModel = this.toViewModel(domainEntity, opts)
+    return {
+      ...userViewModel,
+      email: domainEntity.email
+    }
+  }
 }

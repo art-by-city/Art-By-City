@@ -13,7 +13,7 @@
                 label="Title"
                 :rules="titleRules"
                 class="text-lowercase"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-text-field>
 
               <v-textarea
@@ -25,7 +25,7 @@
                 rows="1"
                 :rules="descriptionRules"
                 class="text-lowercase"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-textarea>
 
               <ArtworkTypeSelector

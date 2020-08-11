@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import { User, UserViewModel, UserService, UserMapper } from '../user'
+import { User, UserViewModel, UserService, UserMapper, UserAccountViewModel } from '../user'
 import { AdminService } from './'
 import { CityService, CityViewModel } from '../city'
 import { ArtworkService, ArtworkViewModel, ArtworkMapper } from '../artwork'
@@ -27,10 +27,10 @@ export default class AdminServiceImpl implements AdminService {
     this.artworkService = artworkService
   }
 
-  async listUsers(): Promise<ApiServiceResult<UserViewModel[]>> {
+  async listUsers(): Promise<ApiServiceResult<UserAccountViewModel[]>> {
     const users = await this.userService.listUsers()
     return new ApiServiceSuccessResult(users.map((user) => {
-      return new UserMapper().toViewModel(user)
+      return new UserMapper().toUserAccountViewModel(user)
     }))
   }
 

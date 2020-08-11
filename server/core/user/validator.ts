@@ -38,17 +38,17 @@ export default async (
       }
     })
 
-    // const internalErrors = validationErrors.filter((validationError) => {
-    //   return internalProps.includes(validationError.property)
-    // })
-    // internalErrors.forEach((validationError) => {
-    //   console.log('INTERNAL VALIDATION ERROR', validationError)
-    // })
+    const internalErrors = validationErrors.filter((validationError) => {
+      return internalProps.includes(validationError.property)
+    })
+    internalErrors.forEach((validationError) => {
+      console.log('INTERNAL VALIDATION ERROR', validationError)
+    })
 
     if (messages.length > 0) {
       throw new ValidationError(messages)
     }
 
-    throw new UnknownError()
+    throw new UnknownError('Validation')
   }
 }

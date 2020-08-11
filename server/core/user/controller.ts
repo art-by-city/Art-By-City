@@ -45,6 +45,16 @@ export default class UserControllerImpl implements UserController {
       }
     })
 
+    router.get('/:id/account', async (req, res, next) => {
+      try {
+        const result = await this.userAppService.getUserAccount(req.params.id)
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
     router.get('/:username/profile', async (req, res, next) => {
       try {
         const result = await this.userAppService.getUserProfile(req.params.username)

@@ -17,6 +17,7 @@
         <tr>
           <th class="text-left text-lowercase">ID</th>
           <th class="text-left text-lowercase">Username</th>
+          <th class="text-left text-lowercase">Email</th>
           <th class="text-left text-lowercase">City</th>
           <th class="text-left text-lowercase">Roles</th>
           <th class="text-left text-lowercase">Actions</th>
@@ -29,6 +30,9 @@
             <nuxt-link :to="`/user/${user.username}`">
               {{ user.username }}
             </nuxt-link>
+          </td>
+          <td class="text-lowercase">
+            {{ user.email }}
           </td>
           <td>
             <v-select

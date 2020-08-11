@@ -49,7 +49,7 @@
                   label="Title"
                   class="text-lowercase"
                   :rules="titleRules"
-                  autocomplete="off"
+                  autocomplete="new-password"
                 ></v-text-field>
               </template>
             </v-col>
@@ -69,7 +69,7 @@
                   rows="1"
                   class="text-lowercase"
                   :rules="descriptionRules"
-                  autocomplete="off"
+                  autocomplete="new-password"
                 ></v-textarea>
               </template>
             </v-col>

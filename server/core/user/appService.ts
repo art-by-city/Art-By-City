@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify'
 
-import { UserApplicationService, UserService, UserProfileViewModel, User } from './'
+import { UserApplicationService, UserService, UserProfileViewModel, User, UserAccountViewModel } from './'
 import { UserEvents } from '../events/user'
 import { EventService } from '../events'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
@@ -49,6 +49,21 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
           })
         )
       }
+
+      return new ApiServiceSuccessResult(userProfile)
+    } else {
+      throw new NotFoundError(new User())
+    }
+  }
+
+  async getUserAccount(id: string): Promise<ApiServiceResult<UserAccountViewModel>> {
+    const user = await this.userService.getById(id)
+
+    if (user) {
+      const city = await this.cityService.get(user.city)
+
+      const userProfile = new UserMapper()
+        .toUserAccountViewModel(user, { cityName: city?.name || undefined })
 
       return new ApiServiceSuccessResult(userProfile)
     } else {

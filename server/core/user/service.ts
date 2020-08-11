@@ -8,6 +8,7 @@ import { EventService } from '../events'
 import validateUser from './validator'
 import { User, UserViewModel, UserService, UserRepository, UserMapper } from './'
 import { UserEvents } from '../events/user'
+import EmailAlreadyTakenError from '../api/errors/emailAlreadyTakenError'
 
 @injectable()
 export default class UserServiceImpl implements UserService {
@@ -30,6 +31,7 @@ export default class UserServiceImpl implements UserService {
     user.created = new Date()
     user.updated = new Date()
     user.username = req.body?.username || ''
+    user.email = req.body?.email || ''
     user.password = req.body?.password || ''
     user.city = req.body?.city || ''
     user.roles = []
@@ -37,13 +39,19 @@ export default class UserServiceImpl implements UserService {
 
     await validateUser(user)
 
+    const existingUsernameUser = await this.userRepository.getByUsername(user.username)
+
+    if (existingUsernameUser) {
+      throw new UsernameAlreadyTakenError()
+    }
+
+    const existingEmailUser = await this.userRepository.getByEmail(user.email)
+
+    if (existingEmailUser) {
+      throw new EmailAlreadyTakenError()
+    }
+
     try {
-      const existingUser = await this.userRepository.getByUsername(user.username)
-
-      if (existingUser) {
-        throw new UsernameAlreadyTakenError()
-      }
-
       const savedUser = await this.userRepository.create(user)
 
       this.eventService.emit(UserEvents.Account.Registered, savedUser.id)
@@ -135,13 +143,23 @@ export default class UserServiceImpl implements UserService {
   }
 
   async authenticate(username: string, password: string): Promise<User | null> {
-    const user = await this.userRepository.getByUsername(username)
+    const usernameUser = await this.userRepository.getByUsername(username)
 
-    if (!user || !user.verifyPassword(password)) {
+    if (!usernameUser) {
+      const emailUser = await this.userRepository.getByEmail(username)
+
+      if (!emailUser || !emailUser.verifyPassword(password)) {
+        return null
+      }
+
+      return emailUser
+    }
+
+    if (!usernameUser.verifyPassword(password)) {
       return null
     }
 
-    return user
+    return usernameUser
   }
 
   async getById(id: string): Promise<User | null> {

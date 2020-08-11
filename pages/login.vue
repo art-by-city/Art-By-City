@@ -14,10 +14,10 @@
               <v-text-field
                 v-model="login.username"
                 type="text"
-                label="Username"
+                label="Username or Email"
                 class="text-lowercase"
                 :rules="required"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-text-field>
 
               <v-text-field
@@ -26,7 +26,7 @@
                 label="Password"
                 class="text-lowercase"
                 :rules="required"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-text-field>
 
               <template v-if="hasErrors">

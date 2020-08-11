@@ -10,15 +10,29 @@
         <v-card>
           <v-card-title class="text-lowercase">Sign Up</v-card-title>
           <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="register">
+            <v-form ref="form" v-model="valid" @submit.prevent="register" autocomplete="off">
               <v-text-field
                 v-model="login.username"
                 type="text"
+                name="username"
                 label="Username"
                 :rules="usernameRules"
                 required
                 class="text-lowercase"
                 autocomplete="off"
+                aria-autocomplete="off"
+              ></v-text-field>
+
+              <v-text-field
+                v-model="login.email"
+                type="email"
+                label="Email"
+                name="email"
+                :rules="emailRules"
+                required
+                class="text-lowercase"
+                autocomplete="off"
+                aria-autocomplete="off"
               ></v-text-field>
 
               <CitySelector
@@ -33,7 +47,7 @@
                 :rules="passwordRules"
                 required
                 class="text-lowercase"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-text-field>
 
               <v-text-field
@@ -42,7 +56,7 @@
                 :rules="repeatPasswordRules(login.password)"
                 required
                 class="text-lowercase"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-text-field>
 
               <template v-if="hasErrors">
@@ -74,6 +88,7 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import {
   usernameRules,
+  emailRules,
   passwordRules,
   repeatPasswordRules
 } from '~/models/user/validation'
@@ -88,10 +103,12 @@ import CitySelector from '~/components/forms/citySelector.component.vue'
 export default class RegisterPage extends FormPageComponent {
   login = {
     username: '',
+    email: '',
     password: '',
     city: ''
   }
   usernameRules = usernameRules
+  emailRules = emailRules
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
 
