@@ -94,8 +94,9 @@
     </v-content>
 
     <v-footer dark>
+      <nuxt-link class="white--text text-lowercase" to="/about">About</nuxt-link>
       <v-spacer></v-spacer>
-      <div>&copy; {{ new Date().getFullYear() }}</div>
+      <div>&copy; art x by x city {{ new Date().getFullYear() }}</div>
     </v-footer>
   </v-app>
 </template>
@@ -118,6 +119,11 @@ export default class DefaultLayout extends Vue {
       title: 'admin',
       to: '/admin',
       only: ['admin']
+    },
+    {
+      icon: 'mdi-information',
+      title: 'about',
+      to: '/about'
     }
   ]
 
