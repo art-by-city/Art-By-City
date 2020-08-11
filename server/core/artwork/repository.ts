@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _, { slice } from 'lodash'
 import { injectable, inject } from 'inversify'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
@@ -51,7 +51,7 @@ export default class ArtworkRepositoryImpl
       }
 
       if (filter.hashtags) {
-        query = query.where('hashtags', 'array-contains', filter.hashtags[0])
+        query = query.where('hashtags', 'array-contains-any', filter.hashtags.slice(0, 10))
       }
 
       if (filter.lastFetchedArtworkId) {
@@ -63,13 +63,6 @@ export default class ArtworkRepositoryImpl
       let matches: Artwork[] = found.docs.map((doc) => {
         return <Artwork>doc.data()
       })
-      if (filter.hashtags && filter.hashtags.length > 0) {
-        filter.hashtags.forEach((hashtag) => {
-          matches = matches.filter((doc) => {
-            return doc.hashtags.includes(hashtag)
-          })
-        })
-      }
 
       // Limit
       if (filter.limit) {
