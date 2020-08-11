@@ -17,6 +17,7 @@
                 label="Username"
                 class="text-lowercase"
                 :rules="required"
+                autocomplete="off"
               ></v-text-field>
 
               <v-text-field
@@ -25,6 +26,7 @@
                 label="Password"
                 class="text-lowercase"
                 :rules="required"
+                autocomplete="off"
               ></v-text-field>
 
               <template v-if="hasErrors">

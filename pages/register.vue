@@ -18,6 +18,7 @@
                 :rules="usernameRules"
                 required
                 class="text-lowercase"
+                autocomplete="off"
               ></v-text-field>
 
               <CitySelector
@@ -32,6 +33,7 @@
                 :rules="passwordRules"
                 required
                 class="text-lowercase"
+                autocomplete="off"
               ></v-text-field>
 
               <v-text-field
@@ -40,6 +42,7 @@
                 :rules="repeatPasswordRules(login.password)"
                 required
                 class="text-lowercase"
+                autocomplete="off"
               ></v-text-field>
 
               <template v-if="hasErrors">
