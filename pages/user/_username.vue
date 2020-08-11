@@ -24,11 +24,13 @@
         <v-row>
           <v-col
             class="artwork-grid-col"
-            v-for="(artwork, i) in profile.artworks.slice(0, 9)"
+            v-for="(artwork, i) in profile.artworks"
             :key="i"
             cols="4"
           >
-            <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork)" />
+            <v-lazy transition="fade-transition">
+              <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork)" />
+            </v-lazy>
           </v-col>
         </v-row>
       </v-col>
