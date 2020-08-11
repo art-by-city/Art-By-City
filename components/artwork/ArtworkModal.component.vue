@@ -7,7 +7,9 @@
       @click:outside="close"
     >
       <v-card flat dark>
-        <v-img :src="previewImageSource" max-height="65vh" contain></v-img>
+        <div class="img-container">
+          <v-img :src="previewImageSource" max-height="65vh" contain></v-img>
+        </div>
         <v-card-title>
           <LikeButton :dark="true" :artwork="syncedArtwork" />
           <nuxt-link
@@ -98,5 +100,8 @@ export default class ArtworkModal extends Vue {
 }
 .artwork-preview-dialog > * {
   width: auto;
+}
+.img-container {
+  height: 65vh;
 }
 </style>

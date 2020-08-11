@@ -1,6 +1,6 @@
 <template>
-  <v-container fluid class="pa-0">
-    <v-row dense>
+  <v-container fluid class="pa-0 pb-5">
+    <v-row>
       <v-col cols="3" class="pa-0">
         <CitySelector
           v-model="opts.city"
@@ -8,35 +8,16 @@
           @input="onRefresh"
         />
       </v-col>
-      <v-col offset="1" cols="4" class="text-center pa-0">
-        <v-btn icon @click="onRefresh" class="shift-icon-button-up-a-bit">
-          <v-icon x-large color="black">mdi-refresh</v-icon>
-        </v-btn>
-      </v-col>
-      <v-col offset="3" class="pa-0">
+      <!-- <v-col cols="1">
         <v-btn
           v-if="$store.state.artworks.prev.length > 0"
           icon
           class="shift-icon-button-up-a-bit"
           @click="onPreviousClicked"
         >
-          <v-icon x-large color="black">
-            {{
-              this.$store.state.artworks.isPrevBeingViewed
-                ? 'mdi-arrow-right-circle'
-                : 'mdi-arrow-left-circle'
-            }}
-          </v-icon>
+          <v-icon x-large color="black">{{ 'mdi-arrow-left-circle' }}</v-icon>
         </v-btn>
-      </v-col>
-    </v-row>
-    <v-row dense>
-      <v-col cols="3" class="pa-0">
-        <ArtworkTypeSelector
-          v-model="opts.type"
-          @input="onRefresh"
-        />
-      </v-col>
+      </v-col> -->
       <v-col offset="1" cols="4" class="pa-0">
         <HashtagSelector
           v-model="opts.hashtags"
@@ -45,17 +26,11 @@
           @input="onRefresh"
         />
       </v-col>
-      <v-col offset="3" cols="1" class="pa-0">
-        <v-btn
-          class="d-none d-sm-none d-md-flex shift-icon-button-up-a-bit"
-          icon
-          @click="onGridPreferenceClicked"
-        >
-          <v-icon x-large color="black">
-            {{ gridIcon }}
-          </v-icon>
+      <!-- <v-col cols="1">
+        <v-btn icon @click="onRefresh" class="shift-icon-button-up-a-bit">
+          <v-icon x-large color="black">mdi-arrow-right-circle</v-icon>
         </v-btn>
-      </v-col>
+      </v-col> -->
     </v-row>
   </v-container>
 </template>
@@ -97,8 +72,7 @@ export default class ArtworkExplorerToolbar extends Vue {
     return {
       type: this.opts.type,
       city: this.opts.city,
-      hashtags: this.opts.hashtags,
-      limit: 3
+      hashtags: this.opts.hashtags
     }
   }
 

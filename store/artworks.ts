@@ -2,10 +2,11 @@ import { ActionTree, MutationTree } from 'vuex'
 
 import ArtworkOptions from '../models/artwork/artworkOptions'
 
+const maxArtworkHistory = 5
+
 export const state = () => ({
   list: [] as any[],
-  prev: [] as any[],
-  isPrevBeingViewed: false as boolean,
+  currentArtworkIndex: 0 as number,
   options: {
     city: '',
     type: '',
@@ -16,16 +17,30 @@ export const state = () => ({
 export type ArtworkStoreState = ReturnType<typeof state>
 
 export const mutations: MutationTree<ArtworkStoreState> = {
+  add(state: ArtworkStoreState, artworks: any[]) {
+    state.list.push(...artworks)
+  },
+
   set(state: ArtworkStoreState, artworks: any[]) {
-    state.prev = [ ...state.list ]
-    state.list = [ ...artworks ]
+    state.list = [...artworks]
+    state.currentArtworkIndex = 0
+  },
+
+  next(state: ArtworkStoreState) {
+    const nextIndex = state.currentArtworkIndex + 1
+    if (nextIndex >= maxArtworkHistory) {
+      // this is what we want to do, but it doesn't animate
+      // state.list.shift()
+
+      // for now do this and don't enforce max history
+      state.currentArtworkIndex = nextIndex
+    } else {
+      state.currentArtworkIndex = nextIndex
+    }
   },
 
   previous(state: ArtworkStoreState) {
-    const temp = [ ...state.list ]
-    state.list = [ ...state.prev ]
-    state.prev = [ ...temp ]
-    state.isPrevBeingViewed = !state.isPrevBeingViewed
+    state.currentArtworkIndex = state.currentArtworkIndex - 1
   },
 
   options(state: ArtworkStoreState, options: any) {
@@ -34,7 +49,7 @@ export const mutations: MutationTree<ArtworkStoreState> = {
 }
 
 export const actions: ActionTree<ArtworkStoreState, any> = {
-  async fetchArtworks({ state, commit }): Promise<void> {
+  async fetch({ state, commit }): Promise<void> {
     const params = { ...state.options }
 
     if (params.type === 'All') {
@@ -49,6 +64,26 @@ export const actions: ActionTree<ArtworkStoreState, any> = {
       const { payload } = await this.$axios.$get('/api/artwork', { params })
 
       commit('set', payload)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  async fetchMore({ state, commit }): Promise<void> {
+    const params = { ...state.options }
+
+    if (params.type === 'All') {
+      delete params.type
+    }
+
+    if (params.city === 'All') {
+      delete params.city
+    }
+
+    try {
+      const { payload } = await this.$axios.$get('/api/artwork', { params })
+
+      commit('add', payload)
     } catch (error) {
       console.error(error)
     }

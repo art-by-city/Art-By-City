@@ -8,9 +8,9 @@
       @previous="previous"
     />
     <v-divider></v-divider>
-    <div class="artwork-explorer-container" :class="{ [`grid-size-${gridSize}`]: true }">
+    <div class="artwork-explorer-container">
       <div class="artwork-grid-row">
-        <div
+        <!-- <div
           class="artwork-grid-col"
           :class="{
             ['artwork-card-out-left']: isFetching,
@@ -19,8 +19,20 @@
           }"
           v-for="(artwork, i) in sliceArtworks()"
           :key="i"
+        > -->
+        <div
+          v-for="(artwork, i) in _artworks"
+          :key="i"
+          class="artwork-grid-col"
+          :class="{
+            'left-artwork': i < $store.state.artworks.currentArtworkIndex,
+            [`left-${$store.state.artworks.currentArtworkIndex - i}`]: i < $store.state.artworks.currentArtworkIndex,
+            'current-artwork': i === $store.state.artworks.currentArtworkIndex,
+            'right-artwork': i > $store.state.artworks.currentArtworkIndex,
+            [`right-${i - $store.state.artworks.currentArtworkIndex}`]: i > $store.state.artworks.currentArtworkIndex
+          }"
         >
-          <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork)" />
+          <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork, i)" />
         </div>
       </div>
     </div>
@@ -56,6 +68,10 @@ export default class ArtworkExplorer extends Vue {
   isLoading: boolean = false
   shouldAnimate: boolean = true
 
+  get _artworks() {
+    return this.$store.state.artworks.list
+  }
+
   mounted() {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize)
@@ -72,56 +88,50 @@ export default class ArtworkExplorer extends Vue {
   }
 
   previous() {
-    if (!this.$store.state.artworks.isPrevBeingViewed) {
-      // BACKWARDS
-      this.shouldAnimate = true
-      this.isLoading = true
-      setTimeout((() => {
-        this.$store.commit('artworks/previous')
-        this.shouldAnimate = false
-        this.isFetching = true
-        this.isLoading = false
-        setTimeout((() => {
-          this.shouldAnimate = true
-          this.isFetching = false
-        }).bind(this), 500)
-      }).bind(this), 500)
-    } else {
-      // FORWARDS
-      this.shouldAnimate = true
-      this.isFetching = true
-      setTimeout((() => {
-        this.$store.commit('artworks/previous')
-        this.shouldAnimate = false
-        this.isLoading = true
-        this.isFetching = false
-        setTimeout((() => {
-          this.shouldAnimate = true
-          this.isLoading = false
-        }).bind(this), 500)
-      }).bind(this), 500)
+    this.$store.commit('artworks/previous')
+    // if (!this.$store.state.artworks.isPrevBeingViewed) {
+    //   // BACKWARDS
+    //   this.shouldAnimate = true
+    //   this.isLoading = true
+    //   setTimeout((() => {
+    //     this.$store.commit('artworks/previous')
+    //     this.shouldAnimate = false
+    //     this.isFetching = true
+    //     this.isLoading = false
+    //     setTimeout((() => {
+    //       this.shouldAnimate = true
+    //       this.isFetching = false
+    //     }).bind(this), 500)
+    //   }).bind(this), 500)
+    // } else {
+    //   // FORWARDS
+    //   this.shouldAnimate = true
+    //   this.isFetching = true
+    //   setTimeout((() => {
+    //     this.$store.commit('artworks/previous')
+    //     this.shouldAnimate = false
+    //     this.isLoading = true
+    //     this.isFetching = false
+    //     setTimeout((() => {
+    //       this.shouldAnimate = true
+    //       this.isLoading = false
+    //     }).bind(this), 500)
+    //   }).bind(this), 500)
+    // }
+  }
+
+  onArtworkCardClicked(artwork: any, index: number) {
+    const requestNewArtworkThreshold = 5
+    if (index === this.$store.state.artworks.currentArtworkIndex) {
+      this.modalArtwork = artwork
+    } else if (index < this.$store.state.artworks.currentArtworkIndex) {
+      this.$store.commit('artworks/previous')
+    } else if (index > this.$store.state.artworks.currentArtworkIndex) {
+      this.$store.commit('artworks/next')
+      if (this.$store.state.artworks.list.length - index < requestNewArtworkThreshold) {
+        this.$store.dispatch('artworks/fetchMore')
+      }
     }
-  }
-
-  sliceArtworks(slot?: string) {
-    const artworks = this.$store.state.artworks.list
-
-    return artworks.slice(0, 3)
-
-    // if (this.vw < 960) {
-    //   return artworks.slice(0, 1)
-    // }
-
-    // if (this.gridSize === 1) {
-    //   // return [ artworks.length > 1 ? artworks[1] : artworks[0] ]
-    //   return artworks.slice(0, 3)
-    // }
-
-    // return artworks.slice(0, this.gridSize)
-  }
-
-  onArtworkCardClicked(artwork: any) {
-    this.modalArtwork = artwork
   }
 
   async refresh(opts: ArtworkOptions) {
@@ -129,7 +139,7 @@ export default class ArtworkExplorer extends Vue {
     this.isFetching = true
     this.$store.commit('artworks/options', opts)
     setTimeout((async () => {
-      await this.$store.dispatch('artworks/fetchArtworks')
+      await this.$store.dispatch('artworks/fetch')
       this.shouldAnimate = false
       this.isLoading = true
       this.isFetching = false
@@ -145,7 +155,7 @@ export default class ArtworkExplorer extends Vue {
 <style scoped>
 .artwork-explorer-container {
   margin: auto;
-  height: 100%;
+  height: 99%;
 }
 .artwork-grid-row {
   text-align: center;
@@ -156,83 +166,41 @@ export default class ArtworkExplorer extends Vue {
 }
 .artwork-grid-col {
   display: inline-block;
+  position: absolute;
+  transition: all .5s ease-out;
+  height: 10vw;
+  width: 10vw;
 }
-.artwork-explorer-container.grid-size-1 {
-  width: 100%;
-  height: 95%;
+.artwork-grid-col.current-artwork {
+  left: 29vw;
+  height: 41vw;
+  width: 41vw;
 }
-.grid-size-1 >>> .artwork-grid-col {
-  height: 39vw;
-  width: 39vw;
-  margin: 0 auto;
+.artwork-grid-col:not(.current-artwork) {
+  opacity: 0.25;
 }
-.grid-size-1 >>> .artwork-grid-col:nth-child(2) {
-  position: relative;
-  right: -30vw;
-  height: 30vw;
-  width: 30vw;
-  opacity: 0;
-  transition: opacity .5s ease-out 1s, right .5s ease-out .5s;
+.artwork-grid-col.left-artwork {
+  left: -100vw;
 }
-.grid-size-1 >>> .artwork-grid-col:nth-child(3) {
-  position: relative;
-  right: 30vw;
-  height: 30vw;
-  width: 30vw;
-  opacity: 0;
-  transition: opacity .5s ease-out 1s, right .5s ease-out .5s;
+.artwork-grid-col.left-artwork.left-1 {
+  left: 18vw;
 }
-.artwork-explorer-container.grid-size-3 {
-  width: 100%;
-  height: 95%;
+.artwork-grid-col.left-artwork.left-2 {
+  left: 7vw;
 }
-.grid-size-3 >>> .artwork-grid-col {
-  padding: 5px;
+.artwork-grid-col.left-artwork.left-3 {
+  left: -4vw;
 }
-.grid-size-3 >>> .artwork-grid-col:first-child {
-  height: 30vw;
-  width: 30vw;
+.artwork-grid-col.right-artwork {
+  left: 100vw;
 }
-.artwork-grid-col {
-  order: 3;
-  z-index: 1;
+.artwork-grid-col.right-artwork.right-1 {
+  left: 71vw;
 }
-.artwork-grid-col:first-child {
-  order: 2;
-  z-index: 3;
+.artwork-grid-col.right-artwork.right-2 {
+  left: 82vw;
 }
-.artwork-grid-col:nth-child(2) {
-  order: 1;
-  z-index: 2;
-}
-.artwork-grid-col:first-child {
-  position: relative;
-  right: 0vw;
-  transition: height .5s ease-out, width .5s ease-out, right .5s ease-out;
-}
-.grid-size-1 >>> .artwork-grid-col:first-child {
-  transition: height .5s ease-out, width .5s ease-out, right .5s ease-out;
-}
-.grid-size-3 >>> .artwork-grid-col:not(:first-child) {
-  position: relative;
-  right: 0vw;
-  height: 30vw;
-  width: 30vw;
-  transition: right .5s ease-out;
-}
-
-/* Timeline Transitions */
-.artwork-card-out-left {
-  position: relative !important;
-  right: 100vw !important;
-  transition: right .5s ease-out;
-}
-.artwork-card-out-right {
-  position: relative !important;
-  right: -100vw !important;
-}
-.artwork-card-no-animate {
-  animation: none !important;
-  transition: none !important;
+.artwork-grid-col.right-artwork.right-3 {
+  left: 93vw;
 }
 </style>

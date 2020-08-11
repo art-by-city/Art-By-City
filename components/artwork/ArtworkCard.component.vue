@@ -2,33 +2,27 @@
   <div v-if="artwork">
     <v-hover>
       <template v-slot:default="{ hover }">
-        <div class="flip-card">
-          <div class="flip-card-inner">
-            <div class="flip-card-front">
-              <v-img
-                v-if="artwork"
-                :src="'/artwork-images/' + artwork.images[0].source"
-                style="cursor: pointer"
-                aspect-ratio="1"
-                class="elevation-2"
-                @click="onArtworkCardClicked"
-              >
-                <v-fade-transition>
-                  <v-overlay v-if="hover" absolute class="artwork-overlay">
-                    <v-row align="end" class="fill-height pa-1">
-                      <v-col cols="auto" class="artwork-overlay-title-container">
-                        <LikeButton :dark="true" :artwork="artwork" />
-                        <a class="white--text text-lowercase">
-                          {{ artwork.title }}
-                        </a>
-                      </v-col>
-                    </v-row>
-                  </v-overlay>
-                </v-fade-transition>
-              </v-img>
-            </div>
-          </div>
-        </div>
+        <v-img
+          v-if="artwork"
+          :src="'/artwork-images/' + artwork.images[0].source"
+          style="cursor: pointer"
+          aspect-ratio="1"
+          class="elevation-2"
+          @click="onArtworkCardClicked"
+        >
+          <v-fade-transition>
+            <v-overlay v-if="hover" absolute class="artwork-overlay">
+              <v-row align="end" class="fill-height pa-1">
+                <v-col cols="auto" class="artwork-overlay-title-container">
+                  <LikeButton :dark="true" :artwork="artwork" />
+                  <a class="white--text text-lowercase">
+                    {{ artwork.title }}
+                  </a>
+                </v-col>
+              </v-row>
+            </v-overlay>
+          </v-fade-transition>
+        </v-img>
       </template>
     </v-hover>
   </div>
