@@ -77,8 +77,8 @@ import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
   }
 })
 export default class ArtworkExplorerToolbar extends Vue {
-  artworkTypes = ['Any'].concat(artworkTypes)
-  cities = [{ id: 'Any', name: 'Any' }].concat(this.$store.state.config.cities)
+  artworkTypes = ['All'].concat(artworkTypes)
+  cities = [{ id: 'All', name: 'All' }].concat(this.$store.state.config.cities)
   hashtags = this.$store.state.config.hashtags
   fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
   hashtagSearchInput: string = ''
@@ -86,8 +86,8 @@ export default class ArtworkExplorerToolbar extends Vue {
 
   @Prop({
     default: {
-      type: 'Any',
-      city: 'Any',
+      type: 'All',
+      city: 'All',
       hashtags: [] as string[]
     }
   })

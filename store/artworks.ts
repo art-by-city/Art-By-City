@@ -37,11 +37,11 @@ export const actions: ActionTree<ArtworkStoreState, any> = {
   async fetchArtworks({ state, commit }): Promise<void> {
     const params = { ...state.options }
 
-    if (params.type === 'Any') {
+    if (params.type === 'All') {
       delete params.type
     }
 
-    if (params.city === 'Any') {
+    if (params.city === 'All') {
       delete params.city
     }
 
