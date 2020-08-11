@@ -4,7 +4,7 @@ import { UserApplicationService, UserService, UserProfileViewModel, User } from 
 import { UserEvents } from '../events/user'
 import { EventService } from '../events'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
-import { ArtworkService } from '../artwork'
+import { ArtworkService, ArtworkMapper } from '../artwork'
 import NotFoundError from '../api/errors/notFoundError'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import { CityService, City } from '../city'
@@ -38,14 +38,16 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
 
     if (user) {
       const city = await this.cityService.get(user.city)
-
-      if (!city) {
-        throw new NotFoundError(new City())
-      }
+      const artworks = await this.artworkService.listByUser(user)
 
       const userProfile: UserProfileViewModel = {
-        user: new UserMapper().toViewModel(user, { cityName: city.name }),
-        artworks: await this.artworkService.listByUser(user)
+        user: new UserMapper().toViewModel(user, { cityName: city?.name || undefined }),
+        artworks: await Promise.all(
+          artworks.map(async (artwork) => {
+            const user = await this.userService.getById(artwork.owner)
+            return new ArtworkMapper().toViewModel(artwork, user || undefined)
+          })
+        )
       }
 
       return new ApiServiceSuccessResult(userProfile)
