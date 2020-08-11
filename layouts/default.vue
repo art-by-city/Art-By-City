@@ -121,23 +121,25 @@ export default class DefaultLayout extends Vue {
     }
   ]
 
-  rightNavItems: NavItem[] = [
-    {
-      icon: 'mdi-account',
-      title: 'my account',
-      to: '/account'
-    },
-    {
-      icon: 'mdi-account',
-      title: 'my profile',
-      to: `/user/${this.$auth.user?.username || ''}`
-    },
-    {
-      icon: 'mdi-brush',
-      title: 'my artwork',
-      to: '/user/artwork'
-    }
-  ]
+  get rightNavItems(): NavItem[] {
+    return [
+      {
+        icon: 'mdi-account',
+        title: 'my account',
+        to: '/account'
+      },
+      {
+        icon: 'mdi-account',
+        title: 'my profile',
+        to: `/user/${this.$auth.user?.username || ''}`
+      },
+      {
+        icon: 'mdi-brush',
+        title: 'my artwork',
+        to: '/user/artwork'
+      }
+    ]
+  }
 
   get isAdmin(): boolean {
     if (this.$auth.user && this.$auth.user.roles) {
