@@ -53,11 +53,11 @@ export default class HomePage extends PageComponent {
       try {
         const params = { ...options }
 
-        if (params.type === 'Any') {
+        if (params.type === 'All') {
           delete params.type
         }
 
-        if (params.city === 'Any') {
+        if (params.city === 'All') {
           delete params.city
         }
 
