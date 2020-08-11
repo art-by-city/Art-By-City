@@ -79,7 +79,7 @@ export default class HashtagSelector extends Vue {
 
   onHashtagUpdateSearchInput(value: string) {
     if (!value) {
-      this.filteredHashtags = this.hashtags
+      this.filteredHashtags = []
     } else {
       const result = this.fuzzyHashtags.search(value)
 
