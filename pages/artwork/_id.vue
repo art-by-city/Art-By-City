@@ -49,6 +49,7 @@
                   label="Title"
                   class="text-lowercase"
                   :rules="titleRules"
+                  autocomplete="off"
                 ></v-text-field>
               </template>
             </v-col>
@@ -68,6 +69,7 @@
                   rows="1"
                   class="text-lowercase"
                   :rules="descriptionRules"
+                  autocomplete="off"
                 ></v-textarea>
               </template>
             </v-col>
