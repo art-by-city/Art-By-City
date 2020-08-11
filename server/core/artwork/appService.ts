@@ -19,7 +19,6 @@ import {
   ArtworkMapper
 } from './'
 
-
 @injectable()
 export default class ArtworkApplicationServiceImpl
   implements ArtworkApplicationService {
