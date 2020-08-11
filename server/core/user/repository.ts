@@ -26,6 +26,14 @@ export default class UserRepositoryImpl
     }
   }
 
+  getByEmail(email: string): Promise<User | null> {
+    try {
+      return this.repository.whereEqualTo('email', email).findOne()
+    } catch (error) {
+      throw new Error(`Error getting user by email: ${error.message}`)
+    }
+  }
+
   find(): Promise<User[]> {
     try {
       return this.repository.find()

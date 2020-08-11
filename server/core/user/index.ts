@@ -5,6 +5,7 @@ import BaseRepositoryInterface from '../repository.interface'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import User from './user'
 import UserViewModel from './viewModels/userViewModel'
+import UserAccountViewModel from './viewModels/userAccountViewModel'
 import UserProfileViewModel from './viewModels/userProfileViewModel'
 import UserRepositoryImpl from './repository'
 import UserServiceImpl from './service'
@@ -15,6 +16,7 @@ export { default as User } from './user'
 export { default as UserMapper } from './mapper'
 
 export { default as UserViewModel } from './viewModels/userViewModel'
+export { default as UserAccountViewModel } from './viewModels/userAccountViewModel'
 export { default as UserProfileViewModel } from './viewModels/userProfileViewModel'
 
 export interface UserFilterOptions {}
@@ -22,6 +24,7 @@ export interface UserFilterOptions {}
 export interface UserRepository
   extends BaseRepositoryInterface<User, UserFilterOptions> {
   getByUsername(username: string): Promise<User | null>
+  getByEmail(email: string): Promise<User | null>
   incrementUserArtworkCount(userId: string): Promise<void>
   decrementUserArtworkCount(userId: string): Promise<void>
 }
@@ -42,6 +45,7 @@ export interface UserService {
 export interface UserApplicationService {
   registerEvents(): void
   getUserProfile(username: string): Promise<ApiServiceResult<UserProfileViewModel>>
+  getUserAccount(id: string): Promise<ApiServiceResult<UserAccountViewModel>>
 }
 
 export interface UserController extends BaseControllerInterface {}

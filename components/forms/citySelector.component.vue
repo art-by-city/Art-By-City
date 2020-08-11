@@ -4,7 +4,7 @@
       v-bind:value="value"
       v-on:input="$emit('input', $event)"
       class="text-lowercase"
-      name="city"
+      name="NOAUTOCOMPLETE-city-NOAUTOCOMPLETE"
       label="city"
       :items="cities"
       outlined
@@ -15,6 +15,8 @@
       attach="#citySelector"
       :disabled="disabled"
       :rules="rules"
+      autocomplete="new-password"
+      aria-autocomplete="new-password"
     >
       <template v-slot:item="{ item }">
         <span class="text-lowercase">{{ item.name }}</span>

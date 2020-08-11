@@ -1,10 +1,23 @@
-export const usernameRules = [(value: string = '') => {
-  if (value.length < 3) {
-    return 'Usernames must be at least 3 characters'
-  }
+export const usernameRules = [
+  (value: string = '') => {
+    if (value.length < 3) {
+      return 'Usernames must be at least 3 characters'
+    }
 
-  return true
-}]
+    return true
+  }
+]
+
+const emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+export const emailRules = [
+  (value: string = '') => {
+    if (!emailRegex.test(value)) {
+      return 'A valid email address is required'
+    }
+
+    return true
+  }
+]
 
 export const passwordRules = [
   (value: string = '') => {
@@ -35,13 +48,13 @@ export const passwordRules = [
 
     return true
   },
-  (value: string = '') => {
-    if (!/[\s!"#$%&'()*+,-./\\:;<=>?@[\]^_`{|}~]/.test(value)) {
-      return 'Passwords must contain at least 1 symbol'
-    }
+  // (value: string = '') => {
+  //   if (!/[\s!"#$%&'()*+,-./\\:;<=>?@[\]^_`{|}~]/.test(value)) {
+  //     return 'Passwords must contain at least 1 symbol'
+  //   }
 
-    return true
-  }
+  //   return true
+  // }
 ]
 
 export const repeatPasswordRules = (repeatPassword: string) => {

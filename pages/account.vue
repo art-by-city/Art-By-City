@@ -12,7 +12,6 @@
                 label="Id"
                 class="text-lowercase"
                 disabled
-                autocomplete="off"
               ></v-text-field>
 
               <v-text-field
@@ -21,7 +20,14 @@
                 label="Username"
                 class="text-lowercase"
                 disabled
-                autocomplete="off"
+              ></v-text-field>
+
+              <v-text-field
+                v-model="login.email"
+                type="text"
+                label="Email"
+                class="text-lowercase"
+                disabled
               ></v-text-field>
 
               <CitySelector
@@ -36,7 +42,7 @@
                 label="Current Password"
                 class="text-lowercase"
                 :rules="required"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-text-field>
 
               <v-text-field
@@ -45,7 +51,7 @@
                 label="New Password"
                 class="text-lowercase"
                 :rules="passwordRules"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-text-field>
 
               <v-text-field
@@ -54,7 +60,7 @@
                 label="Repeat New Password"
                 class="text-lowercase"
                 :rules="repeatPasswordRules(newPassword)"
-                autocomplete="off"
+                autocomplete="new-password"
               ></v-text-field>
 
               <template v-if="hasErrors">
@@ -108,17 +114,21 @@ export default class AccountPage extends FormPageComponent {
   login = {
     id: this.$auth.user.id,
     username: this.$auth.user.username,
+    email: this.$auth.user.email,
     password: ''
   }
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
   cities: string[] = []
 
-  async asyncData({ $axios, store }: Context) {
+  async asyncData({ $axios, store, $auth }: Context) {
     const errors = []
     let cities = [] as any[]
-
+    let user = {} as any
     try {
+      const { payload } = await $axios.$get(`/api/user/${$auth.user.id}/account`)
+      user = payload
+
       const config = await $axios.$get('/api/config')
       store.commit('config/setConfig', config)
       cities = config.cities
@@ -126,7 +136,7 @@ export default class AccountPage extends FormPageComponent {
       errors.push(error.response?.data?.messages)
     }
 
-    return { errors, cities }
+    return { errors, cities, login: user }
   }
 
   async save() {
