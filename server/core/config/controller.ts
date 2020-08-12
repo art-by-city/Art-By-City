@@ -29,7 +29,9 @@ export default class ConfigControllerImpl implements ConfigController {
   private buildRouter(): Router {
     const router = Router()
 
-    router.use(passport.authenticate('jwt', { session: false }))
+    const loggedInAuth = passport.authenticate('jwt', { session: false })
+
+    // router.use(loggedInAuth)
 
     router.get('/', async (_req, res, next) => {
       try {
@@ -41,7 +43,7 @@ export default class ConfigControllerImpl implements ConfigController {
       }
     })
 
-    router.post('/', roles(['admin']), async (req, res, next) => {
+    router.post('/', loggedInAuth, roles(['admin']), async (req, res, next) => {
       try {
         const result = await this.configService.updateConfig(req.body)
 

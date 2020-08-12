@@ -103,10 +103,10 @@ export default class ArtworkExplorer extends Vue {
   width: 41vw;
 }
 .artwork-grid-col:not(.current-artwork) {
-  opacity: 0.25;
+  opacity: 0.5;
 }
 .artwork-grid-col.left-artwork {
-  left: -100vw;
+  left: -15vw;
 }
 .artwork-grid-col.left-artwork.left-1 {
   left: 18vw;
@@ -118,7 +118,7 @@ export default class ArtworkExplorer extends Vue {
   left: -4vw;
 }
 .artwork-grid-col.right-artwork {
-  left: 100vw;
+  left: 104vw;
 }
 .artwork-grid-col.right-artwork.right-1 {
   left: 71vw;
