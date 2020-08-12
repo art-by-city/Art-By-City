@@ -18,6 +18,7 @@ import {
   ArtworkViewModel,
   ArtworkMapper
 } from './'
+import { ConfigService } from '../config'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
@@ -26,6 +27,7 @@ export default class ArtworkApplicationServiceImpl
   private discoveryService: DiscoveryService
   private eventService: EventService
   private userService: UserService
+  private configService: ConfigService
 
   constructor(
     @inject(Symbol.for('ArtworkService'))
@@ -35,12 +37,15 @@ export default class ArtworkApplicationServiceImpl
     @inject(Symbol.for('EventService'))
     eventService: EventService,
     @inject(Symbol.for('UserService'))
-    userService: UserService
+    userService: UserService,
+    @inject(Symbol.for('ConfigService'))
+    configService: ConfigService
   ) {
     this.artworkService = artworkService
     this.discoveryService = discoveryService
     this.eventService = eventService
     this.userService = userService
+    this.configService = configService
   }
 
   async create(req: any): Promise<ApiServiceResult<ArtworkViewModel>> {
@@ -72,8 +77,8 @@ export default class ArtworkApplicationServiceImpl
     }
 
     // Non-artist users are restricted to max amount of artwork
-    // TODO -> Admin configurable
-    const maxArtworks = 10
+    const config = await this.configService.getConfig()
+    const maxArtworks = config ? config.maxUserArtworks : 10
     if (!user.hasRole('artist') && user.artworkCount >= maxArtworks) {
       throw new Error(`Maximum number of ${maxArtworks} Artworks reached`)
     }

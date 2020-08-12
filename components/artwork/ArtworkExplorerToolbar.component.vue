@@ -8,16 +8,6 @@
           @input="onRefresh"
         />
       </v-col>
-      <!-- <v-col cols="1">
-        <v-btn
-          v-if="$store.state.artworks.prev.length > 0"
-          icon
-          class="shift-icon-button-up-a-bit"
-          @click="onPreviousClicked"
-        >
-          <v-icon x-large color="black">{{ 'mdi-arrow-left-circle' }}</v-icon>
-        </v-btn>
-      </v-col> -->
       <v-col offset="1" cols="4" class="pa-0">
         <HashtagSelector
           v-model="opts.hashtags"
@@ -26,11 +16,6 @@
           @input="onRefresh"
         />
       </v-col>
-      <!-- <v-col cols="1">
-        <v-btn icon @click="onRefresh" class="shift-icon-button-up-a-bit">
-          <v-icon x-large color="black">mdi-arrow-right-circle</v-icon>
-        </v-btn>
-      </v-col> -->
     </v-row>
   </v-container>
 </template>
@@ -57,7 +42,6 @@ export default class ArtworkExplorerToolbar extends Vue {
   hashtags = this.$store.state.config.hashtags
   fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
   hashtagSearchInput: string = ''
-  gridSizes = [1,3]
 
   @Prop({
     default: {
@@ -77,37 +61,5 @@ export default class ArtworkExplorerToolbar extends Vue {
   }
 
   @Emit('previous') onPreviousClicked() {}
-
-  @PropSync('gridsize', { type: Number }) syncedGridSize!: number
-
-  onGridPreferenceClicked() {
-    let nextIndex = this.gridSizes.indexOf(this.syncedGridSize) + 1
-    if (nextIndex >= this.gridSizes.length) {
-      this.syncedGridSize = this.gridSizes[0]
-    } else {
-      this.syncedGridSize = this.gridSizes[nextIndex]
-    }
-  }
-
-  get gridIcon() {
-    switch (this.syncedGridSize) {
-      case 1:
-        // return 'mdi-square-outline'
-        return 'mdi-circle-small'
-      case 3:
-        // return 'mdi-view-week-outline'
-        return 'mdi-dots-horizontal'
-      case 6:
-        return 'mdi-view-module-outline'
-      case 9:
-        return 'mdi-grid'
-    }
-  }
 }
 </script>
-
-<style scoped>
-.shift-icon-button-up-a-bit {
-  top: -6px;
-}
-</style>

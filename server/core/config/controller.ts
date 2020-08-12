@@ -3,6 +3,7 @@ import { Router } from 'express'
 import passport from 'passport'
 
 import { ConfigController, ConfigService } from './'
+import roles from '../middleware/roles'
 
 
 @injectable()
@@ -28,12 +29,28 @@ export default class ConfigControllerImpl implements ConfigController {
   private buildRouter(): Router {
     const router = Router()
 
-    // router.use(passport.authenticate('jwt', { session: false }))
+    const loggedInAuth = passport.authenticate('jwt', { session: false })
 
-    router.get('/', async (_req, res) => {
-      const result = await this.configService.getConfig()
+    // router.use(loggedInAuth)
 
-      return res.send(result)
+    router.get('/', async (_req, res, next) => {
+      try {
+        const result = await this.configService.getConfig()
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
+    router.post('/', loggedInAuth, roles(['admin']), async (req, res, next) => {
+      try {
+        const result = await this.configService.updateConfig(req.body)
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     return router

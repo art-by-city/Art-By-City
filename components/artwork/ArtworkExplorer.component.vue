@@ -2,7 +2,6 @@
   <v-container fluid class="artwork-explorer-container">
     <ArtworkModal :artwork.sync="modalArtwork" />
     <ArtworkExplorerToolbar
-      :gridsize.sync="gridSize"
       :opts.sync="opts"
       @refresh="refresh"
       @previous="previous"
@@ -10,16 +9,6 @@
     <v-divider></v-divider>
     <div class="artwork-explorer-container">
       <div class="artwork-grid-row">
-        <!-- <div
-          class="artwork-grid-col"
-          :class="{
-            ['artwork-card-out-left']: isFetching,
-            ['artwork-card-out-right']: isLoading,
-            ['artwork-card-no-animate']: !shouldAnimate
-          }"
-          v-for="(artwork, i) in sliceArtworks()"
-          :key="i"
-        > -->
         <div
           v-for="(artwork, i) in _artworks"
           :key="i"
@@ -60,64 +49,12 @@ export default class ArtworkExplorer extends Vue {
 
   modalArtwork: any | null = null
 
-  gridSize = 1
-
-  vw = 1000
-
-  isFetching: boolean = false
-  isLoading: boolean = false
-  shouldAnimate: boolean = true
-
   get _artworks() {
     return this.$store.state.artworks.list
   }
 
-  mounted() {
-    this.$nextTick(() => {
-      window.addEventListener('resize', this.onResize)
-      this.onResize()
-    })
-  }
-
-  beforeDestroy() {
-    window.removeEventListener('resize', this.onResize)
-  }
-
-  onResize() {
-    this.vw = window.innerWidth
-  }
-
   previous() {
     this.$store.commit('artworks/previous')
-    // if (!this.$store.state.artworks.isPrevBeingViewed) {
-    //   // BACKWARDS
-    //   this.shouldAnimate = true
-    //   this.isLoading = true
-    //   setTimeout((() => {
-    //     this.$store.commit('artworks/previous')
-    //     this.shouldAnimate = false
-    //     this.isFetching = true
-    //     this.isLoading = false
-    //     setTimeout((() => {
-    //       this.shouldAnimate = true
-    //       this.isFetching = false
-    //     }).bind(this), 500)
-    //   }).bind(this), 500)
-    // } else {
-    //   // FORWARDS
-    //   this.shouldAnimate = true
-    //   this.isFetching = true
-    //   setTimeout((() => {
-    //     this.$store.commit('artworks/previous')
-    //     this.shouldAnimate = false
-    //     this.isLoading = true
-    //     this.isFetching = false
-    //     setTimeout((() => {
-    //       this.shouldAnimate = true
-    //       this.isLoading = false
-    //     }).bind(this), 500)
-    //   }).bind(this), 500)
-    // }
   }
 
   onArtworkCardClicked(artwork: any, index: number) {
@@ -135,19 +72,8 @@ export default class ArtworkExplorer extends Vue {
   }
 
   async refresh(opts: ArtworkOptions) {
-    this.shouldAnimate = true
-    this.isFetching = true
     this.$store.commit('artworks/options', opts)
-    setTimeout((async () => {
-      await this.$store.dispatch('artworks/fetch')
-      this.shouldAnimate = false
-      this.isLoading = true
-      this.isFetching = false
-      setTimeout((() => {
-        this.shouldAnimate = true
-        this.isLoading = false
-      }).bind(this), 500)
-    }).bind(this), 500)
+    await this.$store.dispatch('artworks/fetch')
   }
 }
 </script>
@@ -177,10 +103,10 @@ export default class ArtworkExplorer extends Vue {
   width: 41vw;
 }
 .artwork-grid-col:not(.current-artwork) {
-  opacity: 0.25;
+  opacity: 0.5;
 }
 .artwork-grid-col.left-artwork {
-  left: -100vw;
+  left: -15vw;
 }
 .artwork-grid-col.left-artwork.left-1 {
   left: 18vw;
@@ -192,7 +118,7 @@ export default class ArtworkExplorer extends Vue {
   left: -4vw;
 }
 .artwork-grid-col.right-artwork {
-  left: 100vw;
+  left: 104vw;
 }
 .artwork-grid-col.right-artwork.right-1 {
   left: 71vw;
