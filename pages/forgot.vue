@@ -57,6 +57,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
+import ProgressService from '~/services/progress/service'
 
 @Component
 export default class ForgotPasswordPage extends FormPageComponent {
@@ -69,6 +70,7 @@ export default class ForgotPasswordPage extends FormPageComponent {
   repeatPasswordRules = repeatPasswordRules
 
   async save() {
+    ProgressService.start()
     this.errors = []
     const result = await this.$axios
       .$post('/api/auth/forgot', {
@@ -78,6 +80,8 @@ export default class ForgotPasswordPage extends FormPageComponent {
       .catch((error) => {
         this.errors = error.response.data.messages
       })
+
+    ProgressService.stop()
 
     if (result) {
       this.$router.push({ path: '/login' })

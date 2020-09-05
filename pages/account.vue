@@ -82,6 +82,7 @@ import FormPageComponent from '~/components/pages/formPage.component'
 import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ToastService from '~/services/toast/service'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   middleware: 'auth',
@@ -120,6 +121,8 @@ export default class AccountPage extends FormPageComponent {
   }
 
   async save() {
+    ProgressService.start()
+
     try {
       const success = await this.$axios.$post('/api/auth/update', {
         username: this.login.username,
@@ -137,6 +140,8 @@ export default class AccountPage extends FormPageComponent {
         ToastService.error('an error has occurred')
       }
     }
+
+    ProgressService.stop()
   }
 }
 </script>

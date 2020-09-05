@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app dense>
+    <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app dense elevation="0">
       <v-row>
         <v-col cols="4">
           <v-menu offset-y>
@@ -87,6 +87,12 @@
       </v-row>
     </v-app-bar>
 
+    <v-progress-linear
+      class="progress-bar"
+      color="black"
+      :indeterminate="ProgressService.isInProgress"
+    ></v-progress-linear>
+
     <v-content>
       <v-container fluid style="height: 100%">
         <nuxt />
@@ -120,10 +126,12 @@ import { Vue, Component } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
 import ToastService from '../services/toast/service'
+import ProgressService from '../services/progress/service'
 
 @Component
 export default class DefaultLayout extends Vue {
   ToastService = ToastService
+  ProgressService = ProgressService
   leftNavItems: NavItem[] = [
     {
       icon: 'mdi-apps',
@@ -233,5 +241,9 @@ div.v-toolbar__content div.v-toolbar__title a {
   position: absolute;
   bottom: 32px;
   right: 32px;
+}
+
+.progress-bar {
+  top: 48px;
 }
 </style>

@@ -85,6 +85,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import ToastService from '~/services/toast/service'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   middleware: 'role/admin'
@@ -118,6 +119,7 @@ export default class AdminCitiesPage extends FormPageComponent {
   }
 
   async saveCity(city: any) {
+    ProgressService.start()
     try {
       let success = false
       if (!city.id) {
@@ -133,9 +135,11 @@ export default class AdminCitiesPage extends FormPageComponent {
     } catch (error) {
       ToastService.error(`Error saving city: ${error}`)
     }
+    ProgressService.stop()
   }
 
   async deleteCity(city: any, idx: number) {
+    ProgressService.start()
     try {
       let success = false
       if (city.id) {
@@ -152,6 +156,7 @@ export default class AdminCitiesPage extends FormPageComponent {
     } catch (error) {
       ToastService.error(`Error saving city: ${error}`)
     }
+    ProgressService.stop()
   }
 
   addCity() {
