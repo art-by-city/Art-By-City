@@ -82,6 +82,7 @@
               <template v-else>
                 <ArtworkTypeSelector
                   v-model="artwork.type"
+                  :artworkTypes="artworkTypes"
                   required
                 />
               </template>
@@ -164,8 +165,8 @@ import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
-import { artworkTypes } from '~/models/artwork/artworkOptions'
 import Artwork from '~/models/artwork/artwork'
+import ArtworkType from '~/models/artwork/artworkType'
 
 @Component({
   components: {
@@ -177,9 +178,9 @@ import Artwork from '~/models/artwork/artwork'
 })
 export default class ArtworkPage extends FormPageComponent {
   artwork!: Artwork
-  artworkTypes: string[] = artworkTypes
   cities: any[] = this.$store.state.config.cities
   hashtags: string[] = this.$store.state.config.hashtags
+  artworkTypes: ArtworkType[] = this.$store.state.config.artworkTypes
   fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
   hashtagSearchInput: string = ''
 
@@ -200,7 +201,8 @@ export default class ArtworkPage extends FormPageComponent {
       return {
         artwork: payload,
         cities: config.cities,
-        hashtags: config.hashtags
+        hashtags: config.hashtags,
+        artworkTypes: config.artworkTypes
       }
     } catch (error) {
       console.error(error)

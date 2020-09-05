@@ -1,9 +1,13 @@
-export const state = () => ({
-  cities: [] as any[],
-  hashtags: [] as string[]
-})
+import ArtworkType from '~/models/artwork/artworkType'
 
+const defaultState = {
+  cities: [] as any[],
+  hashtags: [] as string[],
+  artworkTypes: [] as ArtworkType[]
+}
+export const state = () => ({...defaultState})
 export type ConfigStoreState = ReturnType<typeof state>
+export const DefaultConfigStoreState: ConfigStoreState = {...defaultState}
 
 export const mutations = {
   setConfig(state: ConfigStoreState, newState: ConfigStoreState) {

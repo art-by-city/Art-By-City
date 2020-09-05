@@ -31,7 +31,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
 import ArtworkExplorer from '~/components/artwork/ArtworkExplorer.component.vue'
-import { ConfigStoreState } from '~/store/config'
+import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
 
 @Component({
   components: {
@@ -40,7 +40,7 @@ import { ConfigStoreState } from '~/store/config'
 })
 export default class HomePage extends PageComponent {
   payload: any[] = []
-  config: ConfigStoreState = { cities: [], hashtags: [] }
+  config: ConfigStoreState = DefaultConfigStoreState
   options: any
   expand: boolean = false
 
@@ -49,7 +49,7 @@ export default class HomePage extends PageComponent {
       const options = { ...store.state.artworks.options }
       let payload = []
       let errors = []
-      let config: ConfigStoreState = { cities: [], hashtags: [] }
+      let config: ConfigStoreState = DefaultConfigStoreState
       try {
         const params = { ...options }
 

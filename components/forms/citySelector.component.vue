@@ -41,8 +41,16 @@ interface City {
 @Component
 export default class CitySelector extends Vue {
   @Model('input', { type: String, required: true }) value!: string
-  @Prop({ type: Boolean }) readonly disabled!: boolean
-  @Prop({ type: Boolean }) readonly required!: boolean
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly disabled: boolean | undefined
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly required: boolean | undefined
   @Prop({ type: Array }) readonly cities!: City[]
 
   private isValidCity(cityId: string): boolean {

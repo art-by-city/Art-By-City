@@ -6,39 +6,57 @@
       class="text-lowercase"
       name="type"
       label="type"
-      :items="artworkTypes"
+      :items="types"
       outlined
       single-line
       :disabled="disabled"
       :rules="rules"
       attach="#artworkTypeSelector"
-    >
-      <template v-slot:item="{ item }">
-        <span class="text-lowercase">{{ item }}</span>
-      </template>
-    </v-select>
+    ></v-select>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
 
-import { artworkTypes } from '~/models/artwork/artworkOptions'
+import ArtworkType from '~/models/artwork/artworkType'
 
 @Component
 export default class ArtworkTypeSelector extends Vue {
   @Model('input', { type: String, required: true }) value!: string
-  @Prop({ type: Boolean }) readonly disabled!: boolean
-  @Prop({ type: Boolean }) readonly required!: boolean
-  artworkTypes = artworkTypes
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly disabled: boolean | undefined
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly required: boolean | undefined
+  @Prop({ type: Array }) readonly artworkTypes!: ArtworkType[]
+
+  get types() {
+    return this.artworkTypes.map((type) => {
+      return {
+        text: type.name,
+        value: type.name,
+        disabled: !type.enabled
+      }
+    })
+  }
+
+  get artworkTypeNames() {
+    return this.artworkTypes.map((type) => { return type.name })
+  }
 
   get rules() {
-    return [(value: string = '') => {
-      if (this.required && !artworkTypes.includes(value)) {
+    return [(value?: string) => {
+      if (value && this.artworkTypes && this.required && !this.artworkTypeNames.includes(value)) {
         return `type is required`
       }
 
-      return true
+      return !!value
     }]
   }
 }

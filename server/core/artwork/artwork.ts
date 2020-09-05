@@ -1,12 +1,10 @@
 import { Collection } from 'fireorm'
 
 import Entity from '../common/entity'
-import { User } from '../user'
-import { ArtworkType, ArtworkImage } from './'
+import { ArtworkImage } from './'
 import {
   IsString,
   MaxLength,
-  IsIn,
   ArrayUnique,
   ArrayMinSize,
   ArrayMaxSize,
@@ -14,17 +12,6 @@ import {
   IsNotEmpty,
   MinLength
 } from 'class-validator'
-
-const artworkTypes = [
-  'Painting',
-  'Illustration',
-  'Drawing',
-  'Sculpture',
-  'Photograph',
-  'Mixed-Media',
-  'Digital',
-  'Other'
-]
 
 @Collection()
 export default class Artwork extends Entity {
@@ -48,10 +35,7 @@ export default class Artwork extends Entity {
 
   @IsString()
   @IsNotEmpty()
-  @IsIn(artworkTypes, {
-    message: `type must be one of ${artworkTypes.join(', ')}`
-  })
-  type!: ArtworkType
+  type!: string
 
   @IsString()
   @IsNotEmpty({
