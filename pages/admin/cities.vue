@@ -2,16 +2,6 @@
   <div>
     <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
 
-    <template v-if="hasErrors">
-      <v-alert v-for="(error, i) in errors" :key="i" type="error" dense>
-        {{ error }}
-      </v-alert>
-    </template>
-
-    <v-alert v-if="success" type="success" dense>
-      Success
-    </v-alert>
-
     <v-simple-table fixed-header>
       <thead>
         <tr>
@@ -94,6 +84,7 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
+import ToastService from '~/services/toast/service'
 
 @Component({
   middleware: 'role/admin'
@@ -115,51 +106,51 @@ export default class AdminCitiesPage extends FormPageComponent {
   editCity: null | number = null
 
   async asyncData({ $axios }: Context) {
-    const errors = []
     let cities = [] as any[]
 
     try {
       const citiesResponse = await $axios.$get('/api/admin/cities')
       cities = citiesResponse.payload || []
     } catch (error) {
-      errors.push(error.response?.data?.messages)
+      ToastService.error(`error fetching cities: ${error}`)
     }
-
-    return { errors, cities}
+    return { cities }
   }
 
   async saveCity(city: any) {
-    this.errors = []
-    this.success = false
     try {
+      let success = false
       if (!city.id) {
-        this.success = await this.$axios.$put('/api/city', { city })
+        success = await this.$axios.$put('/api/city', { city })
       } else {
-        this.success = await this.$axios.$post(`/api/city/${city.id}`, { city })
+        success = await this.$axios.$post(`/api/city/${city.id}`, { city })
       }
-      if (this.success) {
+
+      if (success) {
         this.editCity = null
+        ToastService.success('city saved')
       }
     } catch (error) {
-      console.error(`Error saving city: ${error}`)
-      this.errors = error?.response?.data?.messages
+      ToastService.error(`Error saving city: ${error}`)
     }
   }
 
   async deleteCity(city: any, idx: number) {
-    this.errors = []
-    this.success = false
     try {
+      let success = false
       if (city.id) {
-        this.success = await this.$axios.$delete(`/api/city/${city.id}`)
+        success = await this.$axios.$delete(`/api/city/${city.id}`)
       } else {
-        this.success = true
+        success = true
       }
 
-      this.cities.splice(idx, 1)
+      if (success) {
+        this.editCity = null
+        this.cities.splice(idx, 1)
+        ToastService.success('city deleted')
+      }
     } catch (error) {
-      console.error(`Error saving city: ${error}`)
-      this.errors = error?.response?.data?.messages
+      ToastService.error(`Error saving city: ${error}`)
     }
   }
 

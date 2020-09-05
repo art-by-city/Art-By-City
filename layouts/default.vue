@@ -98,6 +98,20 @@
       <v-spacer></v-spacer>
       <div>&copy; art x by x city {{ new Date().getFullYear() }}</div>
     </v-footer>
+
+    <div class="toast-alerts-container">
+      <v-alert
+        v-for="(toast, i) in ToastService.toasts"
+        :key="i"
+        v-model="toast.show"
+        :type="toast.type"
+        dismissible
+        transition="fade-transition"
+        width="20vw"
+      >
+        {{ toast.message }}
+      </v-alert>
+    </div>
   </v-app>
 </template>
 
@@ -105,9 +119,11 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
+import ToastService from '../services/toast/service'
 
 @Component
 export default class DefaultLayout extends Vue {
+  ToastService = ToastService
   leftNavItems: NavItem[] = [
     {
       icon: 'mdi-apps',
@@ -211,5 +227,11 @@ div.v-toolbar__content div.v-toolbar__title a {
   position: absolute;
   right: 0px;
   top: 0px;
+}
+
+.toast-alerts-container {
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
 }
 </style>

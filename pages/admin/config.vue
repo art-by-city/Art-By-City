@@ -2,16 +2,6 @@
   <div>
     <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
 
-    <template v-if="hasErrors">
-      <v-alert v-for="(error, i) in errors" :key="i" type="error" dense>
-        {{ error }}
-      </v-alert>
-    </template>
-
-    <v-alert v-if="success" type="success" dense>
-      Success
-    </v-alert>
-
     <v-container fluid>
       <v-row justify="center">
         <v-dialog v-model="artworkTypeModalShown" persistent max-width="600px">
@@ -121,6 +111,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkType from '~/models/artwork/artworkType'
+import ToastService from '~/services/toast/service'
 
 @Component({
   middleware: 'role/admin'
@@ -185,16 +176,17 @@ export default class AdminConfigPage extends FormPageComponent {
   }
 
   async save() {
-    this.errors = []
-    this.success = false
     try {
-      this.success = await this.$axios.$post('/api/config', {
+      const success = await this.$axios.$post('/api/config', {
         maxUserArtworks: this.maxUserArtworks,
         artworkTypes: this.artworkTypes
       })
+
+      if (success) {
+        ToastService.success('config saved')
+      }
     } catch (error) {
-      console.error(`Error saving config: ${error}`)
-      this.errors = error?.response?.data?.messages
+      ToastService.error(`error saving config: ${error}`)
     }
   }
 }
