@@ -23,6 +23,9 @@
         >
           <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork, i)" />
         </div>
+        <div v-if="searched && _artworks.length < 1" class="text-h1">
+          no results <v-icon class="very-big-icon" color="black">mdi-emoticon-frown</v-icon>
+        </div>
       </div>
     </div>
   </v-container>
@@ -48,6 +51,7 @@ export default class ArtworkExplorer extends Vue {
   @PropSync('options', { type: Object }) opts!: any
 
   modalArtwork: any | null = null
+  searched: boolean = false
 
   get _artworks() {
     return this.$store.state.artworks.list
@@ -72,6 +76,7 @@ export default class ArtworkExplorer extends Vue {
   }
 
   async refresh(opts: ArtworkOptions) {
+    this.searched = true
     this.$store.commit('artworks/options', opts)
     await this.$store.dispatch('artworks/fetch')
   }
@@ -79,6 +84,18 @@ export default class ArtworkExplorer extends Vue {
 </script>
 
 <style scoped>
+.text-h1 {
+  font-family: Roboto;
+  font-weight: 300;
+  font-size: 6rem;
+  letter-spacing: -0.09375rem;
+}
+.very-big-icon {
+  font-size: 6rem;
+  position: relative;
+  top: -10px;
+}
+
 .artwork-explorer-container {
   margin: auto;
   height: 99%;
