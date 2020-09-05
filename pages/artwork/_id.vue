@@ -168,6 +168,7 @@ import FormPageComponent from '~/components/pages/formPage.component'
 import Artwork from '~/models/artwork/artwork'
 import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   components: {
@@ -277,6 +278,7 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   async saveArtwork() {
+    ProgressService.start()
     try {
       const { success } = await this.$axios.$post(
         `/api/artwork/${this.artwork.id}`,
@@ -290,9 +292,11 @@ export default class ArtworkPage extends FormPageComponent {
     } catch (error) {
       ToastService.error('error saving artwork')
     }
+    ProgressService.stop()
   }
 
   async publishOrApproveArtwork(intent: 'publish' | 'approve') {
+    ProgressService.start()
     try {
       const action = intent === 'publish'
         ? this.artwork.published
@@ -316,10 +320,12 @@ export default class ArtworkPage extends FormPageComponent {
     } catch (error) {
       ToastService.error(`error updating artwork`)
     }
+    ProgressService.stop()
   }
 
   async deleteArtwork() {
     if (confirm('Are you sure you want to delete this artwork?')) {
+      ProgressService.start()
       try {
         const { success } = await this.$axios.$delete(
           `/api/artwork/${this.artwork.id}`
@@ -332,6 +338,7 @@ export default class ArtworkPage extends FormPageComponent {
       } catch (error) {
         ToastService.error('error deleting artwork')
       }
+      ProgressService.stop()
     }
   }
 }

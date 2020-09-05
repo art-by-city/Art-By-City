@@ -112,6 +112,7 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   middleware: 'role/admin'
@@ -176,6 +177,7 @@ export default class AdminConfigPage extends FormPageComponent {
   }
 
   async save() {
+    ProgressService.start()
     try {
       const success = await this.$axios.$post('/api/config', {
         maxUserArtworks: this.maxUserArtworks,
@@ -188,6 +190,7 @@ export default class AdminConfigPage extends FormPageComponent {
     } catch (error) {
       ToastService.error(`error saving config: ${error}`)
     }
+    ProgressService.stop()
   }
 }
 </script>

@@ -13,6 +13,9 @@
 <script lang="ts">
 import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
 
+import ToastService from '~/services/toast/service'
+import ProgressService from '~/services/progress/service'
+
 interface Artwork {
   id: string
   likes: string[]
@@ -38,13 +41,13 @@ export default class LikeButton extends Vue {
       try {
         this.$axios.$put(`/api/artwork/${this.artwork.id}/like`)
       } catch (error) {
-        console.error(error)
+        ToastService.error('error liking artwork')
       }
     } else {
       try {
         this.$axios.$delete(`/api/artwork/${this.artwork.id}/like`)
       } catch (error) {
-        console.error(error)
+        ToastService.error('error unliking artwork')
       }
       this.artwork.likes = this.artwork.likes.filter((id: string) => {
         return id !== this.$auth.user.id

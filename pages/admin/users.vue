@@ -70,6 +70,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import ToastService from '~/services/toast/service'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   middleware: 'role/admin'
@@ -108,6 +109,7 @@ export default class AdminUserPage extends FormPageComponent {
   }
 
   async saveUser(user: any) {
+    ProgressService.start()
     try {
       const success = await this.$axios.$post('/api/admin/user', { user })
 
@@ -117,6 +119,7 @@ export default class AdminUserPage extends FormPageComponent {
     } catch (error) {
       ToastService.error(`Error saving user: ${error}`)
     }
+    ProgressService.stop()
   }
 }
 </script>

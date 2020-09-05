@@ -78,6 +78,7 @@ import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.componen
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
+import ProgressService from '~/services/progress/service'
 
 const MAX_ARTWORK_IMAGES = 12
 
@@ -151,6 +152,7 @@ export default class ArtworkUploadPage extends FormComponent {
   }
 
   async upload() {
+    ProgressService.start()
     const formDataConfig = {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -192,6 +194,7 @@ export default class ArtworkUploadPage extends FormComponent {
       ToastService.error('error uploading artwork')
       this.errors = [error?.response?.data?.error?.message]
     }
+    ProgressService.stop()
   }
 }
 </script>
