@@ -12,6 +12,7 @@ import { CityController } from './core/city'
 import { ConfigController } from './core/config'
 import { EventService } from './core/events'
 import { AnalyticsController } from './core/analytics'
+import { InvitationController } from './core/invitation'
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(
@@ -59,6 +60,10 @@ app.use(
 app.use(
   '/analytics',
   container.get<AnalyticsController>(Symbol.for('AnalyticsController')).getRouter()
+)
+app.use(
+  '/invitation',
+  container.get<InvitationController>(Symbol.for('InvitationController')).getRouter()
 )
 
 // Event Registration

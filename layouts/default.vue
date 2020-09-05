@@ -88,6 +88,7 @@
     </v-app-bar>
 
     <v-progress-linear
+      v-if="$auth.loggedIn"
       class="progress-bar"
       color="black"
       :indeterminate="ProgressService.isInProgress"
