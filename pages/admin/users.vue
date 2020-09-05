@@ -2,16 +2,6 @@
   <div>
     <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
 
-    <template v-if="hasErrors">
-      <v-alert v-for="(error, i) in errors" :key="i" type="error" dense>
-        {{ error }}
-      </v-alert>
-    </template>
-
-    <v-alert v-if="success" type="success" dense>
-      Success
-    </v-alert>
-
     <v-simple-table dense fixed-header>
       <thead>
         <tr>
@@ -79,6 +69,7 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
+import ToastService from '~/services/toast/service'
 
 @Component({
   middleware: 'role/admin'
@@ -101,7 +92,6 @@ export default class AdminUserPage extends FormPageComponent {
   cities: any[] = []
 
   async asyncData({ $axios }: Context) {
-    const errors = []
     let users = [] as any[]
     let cities = [] as any[]
 
@@ -111,20 +101,21 @@ export default class AdminUserPage extends FormPageComponent {
       const citiesResponse = await $axios.$get('/api/admin/cities')
       cities = citiesResponse.payload || []
     } catch (error) {
-      errors.push(error.response?.data?.messages)
+      ToastService.error(`error fetching: ${error}`)
     }
 
-    return { errors, users, cities }
+    return { users, cities }
   }
 
   async saveUser(user: any) {
-    this.errors = []
-    this.success = false
     try {
-      this.success = await this.$axios.$post('/api/admin/user', { user })
+      const success = await this.$axios.$post('/api/admin/user', { user })
+
+      if (success) {
+        ToastService.success('user saved')
+      }
     } catch (error) {
-      console.error(`Error saving user: ${error}`)
-      this.errors = error?.response?.data?.messages
+      ToastService.error(`Error saving user: ${error}`)
     }
   }
 }

@@ -45,6 +45,7 @@ import { Component } from 'nuxt-property-decorator'
 import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 import ArtworkModal from '~/components/artwork/ArtworkModal.component.vue'
+import ToastService from '~/services/toast/service'
 
 @Component({
   components: {
@@ -62,8 +63,7 @@ export default class UserProfilePage extends PageComponent {
 
       return { profile: payload }
     } catch (error) {
-      console.error(error)
-      return { errors: error.response?.data?.messages }
+      ToastService.error('error fetching user profile')
     }
   }
 

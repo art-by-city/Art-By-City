@@ -167,6 +167,7 @@ import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import Artwork from '~/models/artwork/artwork'
 import ArtworkType from '~/models/artwork/artworkType'
+import ToastService from '~/services/toast/service'
 
 @Component({
   components: {
@@ -205,8 +206,7 @@ export default class ArtworkPage extends FormPageComponent {
         artworkTypes: config.artworkTypes
       }
     } catch (error) {
-      console.error(error)
-      return { errors: error.response?.data?.messages }
+      ToastService.error(`error fetching artwork or app config: ${error}`)
     }
   }
 
@@ -285,9 +285,10 @@ export default class ArtworkPage extends FormPageComponent {
 
       if (success) {
         this.toggleEditMode(false)
+        ToastService.success('artwork saved')
       }
     } catch (error) {
-      this.errors = error.response.data.messages
+      ToastService.error('error saving artwork')
     }
   }
 
@@ -310,9 +311,10 @@ export default class ArtworkPage extends FormPageComponent {
           published,
           approved
         }
+        ToastService.success(`artwork updated`)
       }
     } catch (error) {
-      this.errors = error.response.data.messages
+      ToastService.error(`error updating artwork`)
     }
   }
 
@@ -324,10 +326,11 @@ export default class ArtworkPage extends FormPageComponent {
         )
 
         if (success) {
+          ToastService.success('artwork deleted')
           this.$router.push(`/`)
         }
       } catch (error) {
-        this.errors = error.response.data.messages
+        ToastService.error('error deleting artwork')
       }
     }
   }

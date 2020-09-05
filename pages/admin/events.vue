@@ -2,16 +2,6 @@
   <div>
     <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
 
-    <template v-if="hasErrors">
-      <v-alert v-for="(error, i) in errors" :key="i" type="error" dense>
-        {{ error }}
-      </v-alert>
-    </template>
-
-    <v-alert v-if="success" type="success" dense>
-      Success
-    </v-alert>
-
     <v-text-field
       v-model="eventLogSearch"
       append-icon="mdi-filter"
@@ -42,6 +32,7 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
+import ToastService from '~/services/toast/service'
 
 @Component({
   middleware: 'role/admin'
@@ -69,17 +60,16 @@ export default class AdminEventsPage extends FormPageComponent {
   eventLogSearch = ''
 
   async asyncData({ $axios }: Context) {
-    const errors = []
     let events = [] as any[]
 
     try {
       const analyticsResponse = await $axios.$get('/api/analytics/events')
       events = analyticsResponse.payload || []
     } catch (error) {
-      errors.push(error.response?.data?.messages)
+      ToastService.error(`error fetching events: ${error}`)
     }
 
-    return { errors, events }
+    return { events }
   }
 }
 </script>

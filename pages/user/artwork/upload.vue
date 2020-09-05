@@ -56,17 +56,6 @@
                 class="text-lowercase"
               ></v-file-input>
 
-              <template v-if="hasErrors">
-                <v-alert
-                  v-for="(error, i) in errors"
-                  :key="i"
-                  type="error"
-                  class="text-lowercase"
-                >
-                  {{ error }}
-                </v-alert>
-              </template>
-
               <v-btn type="submit" color="primary" class="text-lowercase">
                 Upload
               </v-btn>
@@ -88,6 +77,7 @@ import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import ArtworkType from '~/models/artwork/artworkType'
+import ToastService from '~/services/toast/service'
 
 const MAX_ARTWORK_IMAGES = 12
 
@@ -112,7 +102,6 @@ export default class ArtworkUploadPage extends FormComponent {
   hashtagSearchInput: string = ''
 
   async asyncData({ $axios, store }: Context) {
-    const errors = []
     let cities = [] as any[]
     let hashtags = [] as string[]
     let artworkTypes = [] as ArtworkType[]
@@ -124,10 +113,10 @@ export default class ArtworkUploadPage extends FormComponent {
       hashtags = config.hashtags
       artworkTypes = config.artworkTypes
     } catch (error) {
-      errors.push(error.response?.data?.messages)
+      ToastService.error('error fetching config')
     }
 
-    return { errors, cities, hashtags, artworkTypes }
+    return { cities, hashtags, artworkTypes }
   }
 
   get titleRules() {
@@ -196,9 +185,11 @@ export default class ArtworkUploadPage extends FormComponent {
       )
 
       if (result.success && result.payload) {
+        ToastService.success('artwork upload successful')
         this.$router.push(`/artwork/${result.payload.id}`)
       }
     } catch (error) {
+      ToastService.error('error uploading artwork')
       this.errors = [error?.response?.data?.error?.message]
     }
   }

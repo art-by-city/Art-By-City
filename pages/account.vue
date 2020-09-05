@@ -63,26 +63,6 @@
                 autocomplete="new-password"
               ></v-text-field>
 
-              <template v-if="hasErrors">
-                <v-alert
-                  v-for="(error, i) in errors"
-                  :key="i"
-                  type="error"
-                  dense
-                >
-                  {{ error }}
-                </v-alert>
-              </template>
-
-              <v-alert
-                v-if="success"
-                type="success"
-                dense
-                class="text-lowercase"
-              >
-                Account saved
-              </v-alert>
-
               <v-btn type="submit" color="primary" class="text-lowercase">
                 Save
               </v-btn>
@@ -101,6 +81,7 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
 import CitySelector from '~/components/forms/citySelector.component.vue'
+import ToastService from '~/services/toast/service'
 
 @Component({
   middleware: 'auth',
@@ -122,7 +103,6 @@ export default class AccountPage extends FormPageComponent {
   cities: string[] = []
 
   async asyncData({ $axios, store, $auth }: Context) {
-    const errors = []
     let cities = [] as any[]
     let user = {} as any
     try {
@@ -133,27 +113,30 @@ export default class AccountPage extends FormPageComponent {
       store.commit('config/setConfig', config)
       cities = config.cities
     } catch (error) {
-      errors.push(error.response?.data?.messages)
+      ToastService.error('error fetching account')
     }
 
-    return { errors, cities, login: user }
+    return { cities, login: user }
   }
 
   async save() {
-    this.errors = []
-    this.success = await this.$axios
-      .$post('/api/auth/update', {
+    try {
+      const success = await this.$axios.$post('/api/auth/update', {
         username: this.login.username,
         password: this.login.password,
         newPassword: this.newPassword
       })
-      .catch((error) => {
-        if (error.response.status === 401) {
-          this.errors = ['Incorrect password']
-        } else {
-          this.errors = ['Error']
-        }
-      })
+
+      if (success) {
+        ToastService.success('account saved')
+      }
+    } catch (error) {
+      if (error.response.status === 401) {
+        ToastService.error('invalid credentials')
+      } else {
+        ToastService.error('an error has occurred')
+      }
+    }
   }
 }
 </script>

@@ -2,16 +2,6 @@
   <div>
     <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
 
-    <template v-if="hasErrors">
-      <v-alert v-for="(error, i) in errors" :key="i" type="error" dense>
-        {{ error }}
-      </v-alert>
-    </template>
-
-    <v-alert v-if="success" type="success" dense>
-      Success
-    </v-alert>
-
     <v-text-field
       v-model="artworkSearchTerm"
       append-icon="mdi-filter"
@@ -84,6 +74,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
+import ToastService from '~/services/toast/service'
 
 @Component({
   middleware: 'role/admin'
@@ -122,7 +113,6 @@ export default class AdminEventsPage extends FormPageComponent {
   config: ConfigStoreState = DefaultConfigStoreState
 
   async asyncData({ $axios, store }: Context) {
-    const errors = []
     let config: ConfigStoreState = DefaultConfigStoreState
     let artworks = [] as any[]
 
@@ -132,10 +122,10 @@ export default class AdminEventsPage extends FormPageComponent {
       config = await $axios.$get('/api/config')
       store.commit('config/setConfig', config)
     } catch (error) {
-      errors.push(error.response?.data?.messages)
+      ToastService.error(`error fetching artwork: ${error}`)
     }
 
-    return { errors, artworks, config }
+    return { artworks, config }
   }
 
   _citiesById: any = null
