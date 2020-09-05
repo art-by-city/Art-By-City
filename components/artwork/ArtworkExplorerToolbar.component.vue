@@ -24,7 +24,6 @@
 import { Vue, Component, Emit, Prop, PropSync } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
-import { artworkTypes } from '~/models/artwork/artworkOptions'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
@@ -37,7 +36,6 @@ import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
   }
 })
 export default class ArtworkExplorerToolbar extends Vue {
-  artworkTypes = ['All'].concat(artworkTypes)
   cities = [{ id: 'All', name: 'All' }].concat(this.$store.state.config.cities)
   hashtags = this.$store.state.config.hashtags
   fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })

@@ -20,7 +20,11 @@ interface Artwork {
 
 @Component
 export default class LikeButton extends Vue {
-  @Prop({ type: Boolean }) readonly dark!: boolean
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly dark: boolean | undefined
 
   @Model('change', { type: Object, required: true }) artwork!: Artwork
 

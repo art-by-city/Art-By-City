@@ -2,8 +2,8 @@ import { injectable, inject } from 'inversify'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
-import { City, CityRepository, CityFilterOptions } from './'
 import BaseRepositoryImpl from '../db/repository'
+import { City, CityRepository, CityFilterOptions } from './'
 
 @injectable()
 export default class CityRepositoryImpl

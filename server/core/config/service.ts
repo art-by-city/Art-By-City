@@ -3,9 +3,9 @@ import { injectable, inject } from 'inversify'
 import { Config, ConfigService, ConfigViewModel, ConfigRepository } from './'
 import { HashtagService, Hashtag } from '../hashtag'
 import { CityService, City } from '../city'
+import { ArtworkType } from '../artwork'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import UnknownError from '../api/errors/unknownError'
-import NotFoundError from '../api/errors/notFoundError'
 
 @injectable()
 export default class ConfigServiceImpl implements ConfigService {
@@ -39,7 +39,16 @@ export default class ConfigServiceImpl implements ConfigService {
         }
       }),
       hashtags: (await this.hashtagService.list()).map((h: Hashtag) => h.hashtag),
-      maxUserArtworks: config?.maxUserArtworks || 10
+      maxUserArtworks: config?.maxUserArtworks || 10,
+      artworkTypes: config?.artworkTypes.sort((a: ArtworkType, b: ArtworkType) => {
+        if (a.enabled === b.enabled) {
+          return a.name.localeCompare(b.name)
+        } else if (!a.enabled && b.enabled) {
+          return 1
+        } else {
+          return -1
+        }
+      }) || []
     }
   }
 
@@ -51,9 +60,11 @@ export default class ConfigServiceImpl implements ConfigService {
         newConfig.created = new Date()
         newConfig.updated = new Date()
         newConfig.maxUserArtworks = config.maxUserArtworks
+        newConfig.artworkTypes = []
         await this.configRepository.create(newConfig)
       } else {
         dbConfig.maxUserArtworks = config.maxUserArtworks
+        dbConfig.artworkTypes = config.artworkTypes
         await this.configRepository.update(dbConfig)
       }
 

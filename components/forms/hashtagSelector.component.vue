@@ -46,7 +46,11 @@ const MAX_HASHTAG_LENGTH = 32
 @Component
 export default class HashtagSelector extends Vue {
   @Model('input', { type: Array, required: true }) value!: string[]
-  @Prop({ type: Boolean }) readonly disabled!: boolean
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly disabled!: boolean
   @Prop({ type: Number, default: 12 }) readonly maxSelectable!: number
   @Prop({ type: Array }) readonly hashtags!: string[]
 

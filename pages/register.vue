@@ -92,7 +92,7 @@ import {
   passwordRules,
   repeatPasswordRules
 } from '~/models/user/validation'
-import { ConfigStoreState } from '~/store/config'
+import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 
 @Component({
@@ -114,7 +114,7 @@ export default class RegisterPage extends FormPageComponent {
 
   async asyncData({ $axios, store, $auth }: Context) {
     let errors = []
-    let config: ConfigStoreState = { cities: [], hashtags: [] }
+    let config: ConfigStoreState = DefaultConfigStoreState
     try {
       config = await $axios.$get('/api/config')
       store.commit('config/setConfig', config)

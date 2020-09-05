@@ -4,9 +4,7 @@ import { IsString, Matches } from 'class-validator'
 import BaseControllerInterface from '../controller.interface'
 import BaseApplicationServiceInterface from '../applicationService.interface'
 import BaseRepositoryInterface from '../repository.interface'
-import BaseDomainServiceInterface, {
-  DomainServiceOptions
-} from '../domainService.interface'
+import BaseDomainServiceInterface from '../domainService.interface'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import { User } from '../user'
 
@@ -20,34 +18,7 @@ import ArtworkControllerImpl from './controller'
 export { default as Artwork } from './artwork'
 export { default as ArtworkViewModel } from './viewModels/artworkViewModel'
 export { default as ArtworkMapper } from './mapper'
-
-export type ArtworkType =
-  | 'Painting'
-  | 'Illustration'
-  | 'Drawing'
-  | 'Sculpture'
-  | 'Photograph'
-  | 'Mixed-Media'
-  | 'Digital'
-  | 'Other'
-
-export type Region =
-  | 'Austin'
-  | 'Boston'
-  | 'Chicago'
-  | 'Dallas'
-  | 'Denver'
-  | 'Houston'
-  | 'Los Angeles'
-  | 'New York City'
-  | 'Philadelphia'
-  | 'Phoenix'
-  | 'Portland'
-  | 'San Antonio'
-  | 'San Diego'
-  | 'San Jose'
-  | 'Seattle'
-  | 'Washington D.C.'
+export { default as ArtworkType } from './artworkType/artworkType'
 
 export class ArtworkImage {
   @IsString()
@@ -68,9 +39,7 @@ export interface ArtworkFilterOptions {
   includeUnpublished?: boolean
   includeUnapproved?: boolean
 }
-
 export interface ArtworkController extends BaseControllerInterface {}
-
 export interface ArtworkApplicationService
   extends BaseApplicationServiceInterface {
   get(id: string): Promise<ApiServiceResult<ArtworkViewModel>>
@@ -90,7 +59,6 @@ export interface ArtworkApplicationService
   approve(request: any): Promise<ApiServiceResult<void>>
   unapprove(request: any): Promise<ApiServiceResult<void>>
 }
-
 export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
   create(artwork: Artwork): Promise<Artwork | null>
   get(id: string): Promise<Artwork | null>
@@ -100,7 +68,6 @@ export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
   listByUser(user: User): Promise<Artwork[]>
   listLikedByUser(user: User): Promise<Artwork[]>
 }
-
 export interface ArtworkRepository
   extends BaseRepositoryInterface<Artwork, ArtworkFilterOptions> {}
 

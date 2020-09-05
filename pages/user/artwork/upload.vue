@@ -30,6 +30,7 @@
 
               <ArtworkTypeSelector
                 v-model="artwork.type"
+                :artworkTypes="artworkTypes"
                 required
               />
 
@@ -83,10 +84,10 @@ import { Component, Watch } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
 import FormComponent from '~/components/pages/formPage.component'
-import { artworkTypes } from '~/models/artwork/artworkOptions'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
+import ArtworkType from '~/models/artwork/artworkType'
 
 const MAX_ARTWORK_IMAGES = 12
 
@@ -98,7 +99,7 @@ const MAX_ARTWORK_IMAGES = 12
   }
 })
 export default class ArtworkUploadPage extends FormComponent {
-  artworkTypes: string[] = artworkTypes
+  artworkTypes: string[] = this.$store.state.config.artworkTypes
   cities: string[] = []
   artwork: any = {
     city: '',
@@ -114,17 +115,19 @@ export default class ArtworkUploadPage extends FormComponent {
     const errors = []
     let cities = [] as any[]
     let hashtags = [] as string[]
+    let artworkTypes = [] as ArtworkType[]
 
     try {
       const config = await $axios.$get('/api/config')
       store.commit('config/setConfig', config)
       cities = config.cities
       hashtags = config.hashtags
+      artworkTypes = config.artworkTypes
     } catch (error) {
       errors.push(error.response?.data?.messages)
     }
 
-    return { errors, cities, hashtags }
+    return { errors, cities, hashtags, artworkTypes }
   }
 
   get titleRules() {

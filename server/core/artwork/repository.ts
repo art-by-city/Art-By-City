@@ -1,4 +1,4 @@
-import _, { slice } from 'lodash'
+import _ from 'lodash'
 import { injectable, inject } from 'inversify'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 

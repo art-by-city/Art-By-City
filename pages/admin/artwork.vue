@@ -83,7 +83,7 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
-import { ConfigStoreState } from '~/store/config'
+import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
 
 @Component({
   middleware: 'role/admin'
@@ -119,11 +119,11 @@ export default class AdminEventsPage extends FormPageComponent {
   ]
   artworks: any[] = []
   artworkSearchTerm: string = ''
-  config: ConfigStoreState = { cities: [], hashtags: [] }
+  config: ConfigStoreState = DefaultConfigStoreState
 
   async asyncData({ $axios, store }: Context) {
     const errors = []
-    let config: ConfigStoreState = { cities: [], hashtags: [] }
+    let config: ConfigStoreState = DefaultConfigStoreState
     let artworks = [] as any[]
 
     try {
