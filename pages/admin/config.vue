@@ -6,12 +6,16 @@
       <v-row justify="center">
         <v-dialog v-model="artworkTypeModalShown" persistent max-width="600px">
           <v-card>
-            <v-card-title>Artwork Type</v-card-title>
+            <v-card-title>artwork type</v-card-title>
             <v-card-text>
               <v-container>
                 <v-row>
                   <v-col cols="12">
-                    <v-text-field v-model="artworkTypeModalObj.name" label="label" required></v-text-field>
+                    <v-text-field
+                      v-model="artworkTypeModalObj.name"
+                      label="label"
+                      required
+                    ></v-text-field>
                     <v-switch v-model="artworkTypeModalObj.visible">
                       <template v-slot:label>
                         <template v-if="artworkTypeModalObj.visible">

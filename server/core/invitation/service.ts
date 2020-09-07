@@ -5,6 +5,7 @@ import {
   InvitationService,
   InvitationRepository
 } from './'
+import { User } from '../user'
 
 @injectable()
 export default class InvitationServiceImpl implements InvitationService {
@@ -15,6 +16,17 @@ export default class InvitationServiceImpl implements InvitationService {
     invitationRepository: InvitationRepository
   ) {
     this.invitationRepository = invitationRepository
+  }
+
+  generate(user: User): Promise<Invitation | null> {
+    const invitation = {
+      id: '',
+      created: new Date(),
+      updated: new Date(),
+      createdByUser: user.id,
+    }
+
+    return this.create(invitation)
   }
 
   create(invitation: Invitation): Promise<Invitation | null> {

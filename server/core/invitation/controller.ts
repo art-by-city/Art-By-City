@@ -30,7 +30,15 @@ export default class InvitationControllerImpl implements InvitationController {
 
     router.use(passport.authenticate('jwt', { session: false }))
 
+    router.post('/', roles(['admin']), async (req, res, next) => {
+      try {
+        const result = await this.invitationAppService.requestNewInvitation(req)
 
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
 
     return router
   }

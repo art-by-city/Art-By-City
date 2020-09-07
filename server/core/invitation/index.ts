@@ -5,10 +5,13 @@ import BaseApplicationServiceInterface from '../applicationService.interface'
 import BaseRepositoryInterface from '../repository.interface'
 import BaseDomainServiceInterface from '../domainService.interface'
 import Invitation from './invitation'
+import InvitationViewModel from './viewModels/invitationViewModel'
 import InvitationRepositoryImpl from './repository'
 import InvitationServiceImpl from './service'
 import InvitationApplicationServiceImpl from './appService'
 import InvitationControllerImpl from './controller'
+import ApiServiceResult from '../api/results/apiServiceResult.interface'
+import { User } from '../user'
 
 export { default as Invitation } from './invitation'
 export { default as InvitationViewModel } from './viewModels/invitationViewModel'
@@ -19,10 +22,14 @@ export interface InvitationRepository
   extends BaseRepositoryInterface<Invitation, InvitationFilterOptions> {}
 
 export interface InvitationService
-  extends BaseDomainServiceInterface<Invitation> {}
+  extends BaseDomainServiceInterface<Invitation> {
+    generate(user: User): Promise<Invitation | null>
+  }
 
 export interface InvitationApplicationService
-  extends BaseApplicationServiceInterface {}
+  extends BaseApplicationServiceInterface {
+    requestNewInvitation(req: any): Promise<ApiServiceResult<InvitationViewModel>>
+  }
 
 export interface InvitationController
   extends BaseControllerInterface {}
