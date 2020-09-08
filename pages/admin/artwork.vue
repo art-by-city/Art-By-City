@@ -2,13 +2,6 @@
   <div>
     <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
 
-    <v-text-field
-      v-model="artworkSearchTerm"
-      append-icon="mdi-filter"
-      label="Filter"
-      single-line
-      hide-details
-    ></v-text-field>
     <v-data-table
       :headers="artworkHeaders"
       :items="artworks"
@@ -18,6 +11,19 @@
       dense
       show-expand
     >
+      <template v-slot:top>
+        <v-toolbar dense elevation="0">
+          <v-toolbar-title>artwork</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="artworkSearchTerm"
+            append-icon="mdi-filter"
+            label="filter artwork"
+            single-line
+            hide-details
+          ></v-text-field>
+        </v-toolbar>
+      </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length">
           <strong>Description:</strong> {{ item.description }}

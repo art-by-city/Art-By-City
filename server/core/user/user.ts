@@ -51,6 +51,8 @@ export default class User extends Entity {
 
   artworkCount!: number
 
+  invitation?: string
+
   updatePassword(newPassword: string): void {
     this.password = newPassword
   }
