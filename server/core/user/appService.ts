@@ -7,7 +7,7 @@ import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import { ArtworkService, ArtworkMapper } from '../artwork'
 import NotFoundError from '../api/errors/notFoundError'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
-import { CityService, City } from '../city'
+import { CityService } from '../city'
 import UserMapper from './mapper'
 
 @injectable()

@@ -28,7 +28,9 @@ export interface InvitationService
 
 export interface InvitationApplicationService
   extends BaseApplicationServiceInterface {
+    registerEvents(): void
     requestNewInvitation(req: any): Promise<ApiServiceResult<InvitationViewModel>>
+    fetchInvitations(): Promise<ApiServiceResult<InvitationViewModel[]>>
   }
 
 export interface InvitationController

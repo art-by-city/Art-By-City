@@ -46,6 +46,9 @@ export default {
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv'
   ],
+  env: {
+    baseUrl: process.env.BASE_URL || 'http://localhost:3000'
+  },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     redirect: {

@@ -59,6 +59,18 @@
                 autocomplete="new-password"
               ></v-text-field>
 
+              <v-text-field
+                v-model="login.inviteCode"
+                :rules="inviteCodeRules"
+                type="text"
+                name="inviteCode"
+                label="Invite Code"
+                required
+                class="text-lowercase"
+                autocomplete="off"
+                aria-autocomplete="off"
+              ></v-text-field>
+
               <template v-if="hasErrors">
                 <v-alert
                   v-for="(error, i) in errors"
@@ -90,7 +102,8 @@ import {
   usernameRules,
   emailRules,
   passwordRules,
-  repeatPasswordRules
+  repeatPasswordRules,
+  inviteCodeRules
 } from '~/models/user/validation'
 import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
 import CitySelector from '~/components/forms/citySelector.component.vue'
@@ -102,6 +115,7 @@ import CitySelector from '~/components/forms/citySelector.component.vue'
 })
 export default class RegisterPage extends FormPageComponent {
   login = {
+    inviteCode: '',
     username: '',
     email: '',
     password: '',
@@ -111,10 +125,18 @@ export default class RegisterPage extends FormPageComponent {
   emailRules = emailRules
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
+  inviteCodeRules = inviteCodeRules
 
-  async asyncData({ $axios, store, $auth }: Context) {
+  async asyncData({ $axios, store, $auth, query }: Context) {
     let errors = []
     let config: ConfigStoreState = DefaultConfigStoreState
+    let login = {
+      inviteCode: query.invite || '',
+      username: '',
+      email: '',
+      password: '',
+      city: ''
+    }
     try {
       config = await $axios.$get('/api/config')
       store.commit('config/setConfig', config)
@@ -123,7 +145,7 @@ export default class RegisterPage extends FormPageComponent {
       errors = error.response?.data?.messages
     }
 
-    return { errors, config }
+    return { errors, config, login }
   }
 
   async register() {

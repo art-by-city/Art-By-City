@@ -12,7 +12,7 @@ import { CityController } from './core/city'
 import { ConfigController } from './core/config'
 import { EventService } from './core/events'
 import { AnalyticsController } from './core/analytics'
-import { InvitationController } from './core/invitation'
+import { InvitationController, InvitationApplicationService } from './core/invitation'
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(
@@ -62,12 +62,13 @@ app.use(
   container.get<AnalyticsController>(Symbol.for('AnalyticsController')).getRouter()
 )
 app.use(
-  '/invitation',
+  '/invitations',
   container.get<InvitationController>(Symbol.for('InvitationController')).getRouter()
 )
 
 // Event Registration
 container.get<EventService>(Symbol.for('EventService')).registerEvents()
 container.get<UserApplicationService>(Symbol.for('UserApplicationService')).registerEvents()
+container.get<InvitationApplicationService>(Symbol.for('InvitationApplicationService')).registerEvents()
 
 export default app

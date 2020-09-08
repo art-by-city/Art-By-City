@@ -40,6 +40,16 @@ export default class InvitationControllerImpl implements InvitationController {
       }
     })
 
+    router.get('/', roles(['admin']), async (req, res, next) => {
+      try {
+        const result = await this.invitationAppService.fetchInvitations()
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
     return router
   }
 }

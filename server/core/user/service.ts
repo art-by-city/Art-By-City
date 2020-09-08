@@ -9,20 +9,26 @@ import validateUser from './validator'
 import { User, UserViewModel, UserService, UserRepository, UserMapper } from './'
 import { UserEvents } from '../events/user'
 import EmailAlreadyTakenError from '../api/errors/emailAlreadyTakenError'
+import { InvitationService } from '../invitation'
+import InvalidInvitationCodeError from '../api/errors/invalidInvitationCodeError'
 
 @injectable()
 export default class UserServiceImpl implements UserService {
   private userRepository: UserRepository
   private eventService: EventService
+  private invitationService: InvitationService
 
   constructor(
     @inject(Symbol.for('UserRepository'))
     userRepository: UserRepository,
     @inject(Symbol.for('EventService'))
-    eventService: EventService
+    eventService: EventService,
+    @inject(Symbol.for('InvitationService'))
+    invitationService: InvitationService
   ) {
     this.userRepository = userRepository
     this.eventService = eventService
+    this.invitationService = invitationService
   }
 
   async register(req: any): Promise<UserViewModel> {
@@ -36,6 +42,21 @@ export default class UserServiceImpl implements UserService {
     user.city = req.body?.city || ''
     user.roles = []
     user.artworkCount = 0
+    user.invitation = req.body?.inviteCode
+
+    // TODO -> make this admin configurable
+    if (user.invitation) {
+      const invitation = await this.invitationService.get(user.invitation)
+      if (invitation) {
+        if (invitation.used) {
+          throw new InvalidInvitationCodeError()
+        }
+      } else {
+        throw new InvalidInvitationCodeError()
+      }
+    } else {
+      throw new InvalidInvitationCodeError()
+    }
 
     await validateUser(user)
 
