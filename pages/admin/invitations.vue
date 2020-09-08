@@ -32,7 +32,12 @@
               </v-toolbar>
             </template>
             <template v-slot:item.created="props">
-              <span>{{ new Date(props.item.created).toLocaleString() }}</span>
+              <v-tooltip top>
+                <template v-slot:activator="activator">
+                  <span v-on="activator.on">{{ props.item.created | humanDateDiff }}</span>
+                </template>
+                <span>{{ props.item.created | localeDate }}</span>
+              </v-tooltip>
             </template>
             <template v-slot:item.createdByUser="props">
               <nuxt-link :to="`/user/${props.item.createdByUser.username}`">
@@ -43,17 +48,23 @@
               <v-simple-checkbox v-model="props.item.sent" disabled></v-simple-checkbox>
             </template>
             <template v-slot:item.sentOn="props">
-              <span v-if="props.item.sentOn">
-                {{ new Date(props.item.sentOn).toLocaleString() }}
-              </span>
+              <v-tooltip top>
+                <template v-slot:activator="activator">
+                  <span v-on="activator.on">{{ props.item.sentOn | humanDateDiff }}</span>
+                </template>
+                <span>{{ props.item.sentOn | localeDate }}</span>
+              </v-tooltip>
             </template>
             <template v-slot:item.used="props">
               <v-simple-checkbox v-model="props.item.used" disabled></v-simple-checkbox>
             </template>
             <template v-slot:item.usedOn="props">
-              <span v-if="props.item.usedOn">
-                {{ new Date(props.item.usedOn).toLocaleString() }}
-              </span>
+              <v-tooltip top>
+                <template v-slot:activator="activator">
+                  <span v-on="activator.on">{{ props.item.usedOn | humanDateDiff }}</span>
+                </template>
+                <span>{{ props.item.usedOn | localeDate }}</span>
+              </v-tooltip>
             </template>
             <template v-slot:item.usedByUser="props">
               <nuxt-link

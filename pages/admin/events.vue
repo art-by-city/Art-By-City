@@ -17,11 +17,16 @@
       calculate-widths
       dense
     >
-      <template v-slot:item.timestamp="{ item }">
-        {{ (new Date(item.timestamp)).toLocaleString() }}
+      <template v-slot:item.timestamp="props">
+        <v-tooltip top>
+          <template v-slot:activator="activator">
+            <span v-on="activator.on">{{ props.item.timestamp | humanDateDiff }}</span>
+          </template>
+          <span>{{ props.item.timestamp | localeDate }}</span>
+        </v-tooltip>
       </template>
-      <template v-slot:item.user="{ item }">
-        {{ item.user.id }}
+      <template v-slot:item.user="props">
+        {{ props.item.user.id }}
       </template>
     </v-data-table>
   </div>

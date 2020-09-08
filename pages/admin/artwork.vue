@@ -24,15 +24,15 @@
           ></v-text-field>
         </v-toolbar>
       </template>
-      <template v-slot:expanded-item="{ headers, item }">
-        <td :colspan="headers.length">
-          <strong>Description:</strong> {{ item.description }}
+      <template v-slot:expanded-item="props">
+        <td :colspan="props.headers.length">
+          <strong>Description:</strong> {{ props.item.description }}
           <br />
-          <strong>Hashtags: </strong> {{ item.hashtags.join(', ') }}
+          <strong>Hashtags: </strong> {{ props.item.hashtags.join(', ') }}
           <br />
           <strong>Images:</strong>
           <v-img
-            v-for="(image, i) in item.images"
+            v-for="(image, i) in props.item.images"
             :key="i"
             :src="`/artwork-images/${image.source}`"
             width="100"
@@ -40,35 +40,45 @@
           ></v-img>
         </td>
       </template>
-      <template v-slot:item.id="{ item }">
-        <nuxt-link :to="`/artwork/${item.id}`" >{{ item.id }}</nuxt-link>
+      <template v-slot:item.id="props">
+        <nuxt-link :to="`/artwork/${props.item.id}`" >{{ props.item.id }}</nuxt-link>
       </template>
-      <template v-slot:item.created="{ item }">
-        <span>{{ new Date(item.created).toLocaleString() }}</span>
+      <template v-slot:item.created="props">
+        <v-tooltip top>
+          <template v-slot:activator="activator">
+            <span v-on="activator.on">{{ props.item.created | humanDateDiff }}</span>
+          </template>
+          <span>{{ props.item.created | localeDate }}</span>
+        </v-tooltip>
       </template>
-      <template v-slot:item.updated="{ item }">
-        <span>{{ new Date(item.updated).toLocaleString() }}</span>
+      <template v-slot:item.updated="props">
+        <v-tooltip top>
+          <template v-slot:activator="activator">
+            <span v-on="activator.on">{{ props.item.updated | humanDateDiff }}</span>
+          </template>
+          <span>{{ props.item.updated | localeDate }}</span>
+        </v-tooltip>
       </template>
-      <template v-slot:item.owner="{ item }">
-        <nuxt-link :to="`/user/${item.owner.username}`">
-          {{ item.owner.username }}
+      <template v-slot:item.owner="props">
+        <nuxt-link :to="`/user/${props.item.owner.username}`">
+          {{ props.item.owner.username }}
         </nuxt-link>
       </template>
-      <template v-slot:item.city="{ item }">
-        <span>{{ resolveCityNameFromId(item.city) }}</span>
+      <template v-slot:item.city="props">
+        <span>{{ resolveCityNameFromId(props.item.city) }}</span>
       </template>
-      <template v-slot:item.hashtags="{ item }">
-        <span>{{ item.hashtags.slice(0, 3).join(', ') }}</span>
+      <template v-slot:item.hashtags="props">
+        <span>{{ props.item.hashtags.slice(0, 3).join(', ') }}</span>
       </template>
-      <template v-slot:item.likes="{ item }">
-        <span v-if="item.likes">{{ item.likes.length }}</span>
+      <template v-slot:item.likes="props">
+        <span v-if="props.item.likes">{{ props.item.likes.length }}</span>
         <span v-else>0</span>
       </template>
-      <template v-slot:item.published="{ item }">
-        <v-simple-checkbox v-model="item.published" disabled></v-simple-checkbox>
+      <template v-slot:item.published="props">
+        <v-simple-checkbox v-model="props.item.published" disabled></v-simple-checkbox>
       </template>
-      <template v-slot:item.approved="{ item }">
-        <v-simple-checkbox v-model="item.approved" disabled></v-simple-checkbox>
+      <template v-slot:item.approved="props">
+        <v-simple-checkbox v-model="props.item.approved" disabled></v-simple-checkbox>
       </template>
     </v-data-table>
   </div>
