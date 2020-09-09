@@ -6,6 +6,20 @@ interface ToastMessage {
   show: boolean
 }
 
+interface AxiosError {
+  response: {
+    data: {
+      error: {
+        message: string
+      }
+    }
+  }
+}
+
+function isAxiosError(thing: any): thing is AxiosError {
+  return (thing as AxiosError).response !== undefined
+}
+
 const TOAST_TIMEOUT_MS = 5000
 
 class ToastService {
@@ -31,8 +45,12 @@ class ToastService {
     this.alert(message, 'warning')
   }
 
-  error(message: string) {
-    this.alert(message, 'error')
+  error(message: string | AxiosError) {
+    if (isAxiosError(message)) {
+      return this.alert(message.response?.data?.error?.message, 'error')
+    }
+
+    return this.alert(message, 'error')
   }
 }
 

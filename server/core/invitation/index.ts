@@ -31,6 +31,7 @@ export interface InvitationApplicationService
     registerEvents(): void
     requestNewInvitation(req: any): Promise<ApiServiceResult<InvitationViewModel>>
     fetchInvitations(): Promise<ApiServiceResult<InvitationViewModel[]>>
+    sendInvitationEmail(req: any): Promise<ApiServiceResult<InvitationViewModel>>
   }
 
 export interface InvitationController

@@ -20,6 +20,7 @@ export default class InvitationMapper implements EntityMapper<Invitation, Invita
       },
       sent: domainEntity.sent,
       sentOn: domainEntity.sentOn,
+      sentToEmail: domainEntity.sentToEmail,
       used: domainEntity.used,
       usedOn: domainEntity.usedOn,
       usedByUser: usedBy

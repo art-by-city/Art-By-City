@@ -158,11 +158,11 @@ export default class AdminConfigPage extends FormPageComponent {
   }
 
   async onArtworkTypeEditModalSaveClicked() {
+    await this.save()
+    // TODO -> check for successful result
     if (!this.artworkTypes.includes(this.artworkTypeModalObj)) {
       this.artworkTypes.push({ ...this.artworkTypeModalObj })
     }
-
-    await this.save()
     this.closeArtworkTypeEditModal()
   }
 

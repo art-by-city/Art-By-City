@@ -8,6 +8,7 @@ export default interface InvitationViewModel extends ViewModel {
   createdByUser: UserViewModel
   sent?: boolean
   sentOn?: Date
+  sentToEmail?: string
   used?: boolean
   usedOn?: Date
   usedByUser?: UserViewModel

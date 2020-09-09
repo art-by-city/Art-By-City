@@ -40,4 +40,25 @@ export default class InvitationService {
       ProgressService.stop()
     }
   }
+
+  async sendInvitationEmail(invitation: Invitation): Promise<Invitation | undefined> {
+    ProgressService.start()
+    try {
+      const { success, payload } = await this._context.$axios.$post(
+        `/api/invitations/${invitation.id}/send`,
+        { email: invitation.sentToEmail }
+      )
+
+      if (success) {
+        ToastService.success('invitation email sent')
+
+        return payload
+      }
+    } catch (error) {
+      console.log(error.response)
+      ToastService.error(error)
+    } finally {
+      ProgressService.stop()
+    }
+  }
 }
