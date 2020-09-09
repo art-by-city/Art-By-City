@@ -44,20 +44,10 @@
         <nuxt-link :to="`/artwork/${props.item.id}`" >{{ props.item.id }}</nuxt-link>
       </template>
       <template v-slot:item.created="props">
-        <v-tooltip top>
-          <template v-slot:activator="activator">
-            <span v-on="activator.on">{{ props.item.created | humanDateDiff }}</span>
-          </template>
-          <span>{{ props.item.created | localeDate }}</span>
-        </v-tooltip>
+        <DateWithTooltip :date="props.item.created" />
       </template>
       <template v-slot:item.updated="props">
-        <v-tooltip top>
-          <template v-slot:activator="activator">
-            <span v-on="activator.on">{{ props.item.updated | humanDateDiff }}</span>
-          </template>
-          <span>{{ props.item.updated | localeDate }}</span>
-        </v-tooltip>
+        <DateWithTooltip :date="props.item.updated" />
       </template>
       <template v-slot:item.owner="props">
         <nuxt-link :to="`/user/${props.item.owner.username}`">
