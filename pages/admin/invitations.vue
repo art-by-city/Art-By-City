@@ -4,7 +4,56 @@
 
     <v-container fluid>
       <v-row justify="center">
-        <v-col cols="8">
+        <v-dialog v-model="sendInviteEmailModalShown" persistent max-width="600px">
+          <v-form ref="form" v-model="valid" @submit.prevent="onInviteEmailModalSaveClicked">
+            <v-card v-if="invitationToSend">
+              <v-card-title>{{ invitationToSend.sent ? 're-' : '' }}send invitation email</v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="invitationToSend.id"
+                        label="code"
+                        disabled
+                      ></v-text-field>
+                      <v-checkbox
+                        v-model="invitationToSend.sent"
+                        label="sent"
+                        disabled
+                      ></v-checkbox>
+                      <v-tooltip top>
+                        <template v-slot:activator="activator">
+                          <span v-on="activator.on" v-if="invitationToSend">
+                            {{ invitationToSend.sentOn | humanDateDiff }}
+                          </span>
+                        </template>
+                        <span>{{ invitationToSend.sentOn | localeDate }}</span>
+                      </v-tooltip>
+                      <v-text-field
+                        v-model="invitationToSend.sentToEmail"
+                        label="email"
+                        required
+                        :rules="emailRules"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn icon color="red" @click="closeInviteEmailModal">
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-btn icon color="green" type="submit">
+                  <v-icon>mdi-email-send</v-icon>
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-form>
+        </v-dialog>
+
+        <v-col cols="10">
           <v-data-table
             :headers="invitationHeaders"
             :items="invitations"
@@ -78,6 +127,9 @@
               <v-btn icon @click="onCopyInviteLinkClicked(props.item)">
                 <v-icon>mdi-link-variant</v-icon>
               </v-btn>
+              <v-btn icon @click="onSendInviteEmailClicked(props.item)">
+                <v-icon>mdi-email-send</v-icon>
+              </v-btn>
             </template>
           </v-data-table>
         </v-col>
@@ -95,12 +147,12 @@ import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 import Invitation from '~/models/invitation'
 import InvitationService from '~/services/invitation/service'
+import { emailRules } from '~/models/user/validation'
 
 @Component({
   middleware: 'role/admin'
 })
 export default class AdminInvitationsPage extends FormPageComponent {
-  $invitationService!: InvitationService
   breadcrumbs = [
     {
       text: 'Admin',
@@ -119,13 +171,17 @@ export default class AdminInvitationsPage extends FormPageComponent {
     { text: 'created by', value: 'createdByUser' },
     { text: 'sent', value: 'sent' },
     { text: 'sent on', value: 'sentOn', },
+    { text: 'sent to', value: 'sentToEmail' },
     { text: 'used', value: 'used', },
     { text: 'used on', value: 'usedOn', },
     { text: 'used by', value: 'usedByUser', },
     { text: '', value: 'actions', sortable: false }
   ]
+  emailRules = emailRules
   invitations: Invitation[] = []
   invitationSearchTerm: string = ''
+  sendInviteEmailModalShown: boolean = false
+  invitationToSend: Invitation | null = null
 
   async asyncData({ app }: Context) {
     try {
@@ -135,7 +191,7 @@ export default class AdminInvitationsPage extends FormPageComponent {
         return { invitations }
       }
 
-      return { invitations: [] }
+      return { invitations: [], invitationToSend: null }
     } catch (error) {
       ToastService.error(error)
     }
@@ -156,9 +212,47 @@ export default class AdminInvitationsPage extends FormPageComponent {
 
   async onCopyInviteLinkClicked(invitation: Invitation) {
     try {
-      await navigator.clipboard.writeText(`${process.env.baseUrl}/register?invite=${invitation.id}`)
+      await navigator.clipboard.writeText(
+        `${process.env.baseUrl}/register?invite=${invitation.id}`
+      )
       ToastService.info('invitation link copied to clipboard')
     } catch (error) {}
+  }
+
+  async sendInviteEmail(invitation: Invitation) {
+    try {
+      const sentInvitation = await this.$invitationService.sendInvitationEmail(invitation)
+
+      if (sentInvitation) {
+        for (let i = 0; i < this.invitations.length; i++) {
+          if (this.invitations[i].id === sentInvitation.id) {
+            this.invitations.splice(i, 1, sentInvitation)
+            continue
+          }
+        }
+      }
+
+      this.closeInviteEmailModal()
+    } catch (error) {}
+  }
+
+  async onSendInviteEmailClicked(invitation: Invitation) {
+    this.openInviteEmailModal(invitation)
+  }
+
+  async onInviteEmailModalSaveClicked() {
+    if (this.invitationToSend) {
+      await this.sendInviteEmail(this.invitationToSend)
+    }
+  }
+
+  openInviteEmailModal(invitation: Invitation) {
+    this.invitationToSend = invitation
+    this.sendInviteEmailModalShown = true
+  }
+
+  closeInviteEmailModal() {
+    this.sendInviteEmailModalShown = false
   }
 }
 

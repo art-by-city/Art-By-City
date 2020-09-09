@@ -8,6 +8,12 @@ import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import InvitationMapper from './mapper'
 import { EventService } from '../events'
 import { UserEvents } from '../events/user'
+import InvalidEmailError from '../api/errors/invalidEmailError'
+import InvitationNotFoundError from './errors/invitationNotFoundError'
+import InvitationAlreadySentError from './errors/InvitationAlreadySentError'
+import InvitationEmailSendError from './errors/InvitationEmailSendError'
+import InvitationAlreadyUsedError from './errors/InvitationAlreadyUsedError'
+import { EmailApplicationService } from '../email'
 
 @injectable()
 export default class InvitationApplicationServiceImpl
@@ -15,6 +21,7 @@ export default class InvitationApplicationServiceImpl
   private invitationService: InvitationService
   private userService: UserService
   private eventService: EventService
+  private emailAppService: EmailApplicationService
 
   constructor(
     @inject(Symbol.for('InvitationService'))
@@ -22,11 +29,14 @@ export default class InvitationApplicationServiceImpl
     @inject(Symbol.for('UserService'))
     userService: UserService,
     @inject(Symbol.for('EventService'))
-    eventService: EventService
+    eventService: EventService,
+    @inject(Symbol.for('EmailApplicationService'))
+    emailAppService: EmailApplicationService
   ) {
     this.invitationService = invitationService
     this.userService = userService
     this.eventService = eventService
+    this.emailAppService = emailAppService
   }
 
   async requestNewInvitation(req: any): Promise<ApiServiceResult<InvitationViewModel>> {
@@ -75,8 +85,53 @@ export default class InvitationApplicationServiceImpl
 
       return new ApiServiceSuccessResult(mappedInvitations)
     } catch (error) {
-      throw new UnknownError(error)
+      throw new UnknownError(error.message)
     }
+  }
+
+  async sendInvitationEmail(req: any): Promise<ApiServiceResult<InvitationViewModel>> {
+    const recipientEmail = req.body?.email || ''
+
+    if (!recipientEmail) {
+      throw new InvalidEmailError()
+    }
+
+    const invitation = await this.invitationService.get(req.params.id)
+
+    if (!invitation) {
+      throw new InvitationNotFoundError()
+    }
+
+    if (invitation.used) {
+      throw new InvitationAlreadyUsedError()
+    }
+
+    if (invitation.sent && invitation.sentToEmail !== recipientEmail) {
+      throw new InvitationAlreadySentError()
+    }
+
+    // TODO -> send email
+    const sendEmailResult = await this.emailAppService.sendInvitationEmail(
+      recipientEmail,
+      invitation.id
+    )
+
+    if (!sendEmailResult) {
+      throw new InvitationEmailSendError()
+    }
+
+    invitation.sent = true
+    invitation.sentToEmail = recipientEmail
+    invitation.sentOn = new Date() // TODO -> get this from email send result?
+
+    const savedInvitation = await this.invitationService.update(invitation)
+    const createdByUser = await this.userService.getById(invitation.createdByUser)
+
+    if (savedInvitation) {
+      return new ApiServiceSuccessResult(new InvitationMapper().toViewModel(savedInvitation, createdByUser || undefined))
+    }
+
+    return { success: false }
   }
 
   registerEvents() {

@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify'
-import { Router } from 'express'
+import { Router, response } from 'express'
 import passport from 'passport'
 
 import roles from '../middleware/roles'
@@ -40,9 +40,19 @@ export default class InvitationControllerImpl implements InvitationController {
       }
     })
 
-    router.get('/', roles(['admin']), async (req, res, next) => {
+    router.get('/', roles(['admin']), async (_req, res, next) => {
       try {
         const result = await this.invitationAppService.fetchInvitations()
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
+    router.post('/:id/send', roles(['admin']), async (req, res, next) => {
+      try {
+        const result = await this.invitationAppService.sendInvitationEmail(req)
 
         return res.send(result)
       } catch (error) {
