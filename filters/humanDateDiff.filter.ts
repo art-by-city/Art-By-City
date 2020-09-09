@@ -5,5 +5,11 @@ export default (value: string) => {
     return ''
   }
 
+  const date = moment(value)
+
+  if (!date.isValid()) {
+    return ''
+  }
+
   return moment(value).fromNow()
 }

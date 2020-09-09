@@ -18,12 +18,7 @@
       dense
     >
       <template v-slot:item.timestamp="props">
-        <v-tooltip top>
-          <template v-slot:activator="activator">
-            <span v-on="activator.on">{{ props.item.timestamp | humanDateDiff }}</span>
-          </template>
-          <span>{{ props.item.timestamp | localeDate }}</span>
-        </v-tooltip>
+        <DateWithTooltip :date="props.item.timestamp" />
       </template>
       <template v-slot:item.user="props">
         {{ props.item.user.id }}
