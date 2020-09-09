@@ -12,6 +12,7 @@ import { EventModule } from './core/events'
 import { AnalyticsModule } from './core/analytics'
 import { InvitationModule } from './core/invitation'
 import { EmailModule } from './core/email'
+import { FileModule } from './core/file'
 import DatabaseModule from './core/db/module'
 
 const container = new Container()
@@ -28,6 +29,7 @@ container.load(EventModule)
 container.load(AnalyticsModule)
 container.load(InvitationModule)
 container.load(EmailModule)
+container.load(FileModule)
 container.load(DatabaseModule)
 
 export { container }

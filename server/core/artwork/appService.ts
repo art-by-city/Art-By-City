@@ -69,7 +69,6 @@ export default class ArtworkApplicationServiceImpl
     artwork.hashtags = req.body?.hashtags?.split(',') || []
     artwork.likes = []
 
-    // TODO -> Refactor out to a FileService
     if (files) {
       artwork.images = files.map((file) => {
         return { source: file.filename }
@@ -277,9 +276,9 @@ export default class ArtworkApplicationServiceImpl
         throw new NotFoundError(new Artwork())
       }
 
-      await this.artworkService.delete(id)
+      this.eventService.emit(UserEvents.Artwork.Deleted, user.id, artwork)
 
-      this.eventService.emit(UserEvents.Artwork.Deleted, user.id, id)
+      await this.artworkService.delete(id)
 
       return new ApiServiceSuccessResult()
     } catch (error) {

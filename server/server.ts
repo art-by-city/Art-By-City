@@ -13,6 +13,7 @@ import { ConfigController } from './core/config'
 import { EventService } from './core/events'
 import { AnalyticsController } from './core/analytics'
 import { InvitationController, InvitationApplicationService } from './core/invitation'
+import { FileApplicationService } from './core/file'
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(
@@ -67,8 +68,17 @@ app.use(
 )
 
 // Event Registration
-container.get<EventService>(Symbol.for('EventService')).registerEvents()
-container.get<UserApplicationService>(Symbol.for('UserApplicationService')).registerEvents()
-container.get<InvitationApplicationService>(Symbol.for('InvitationApplicationService')).registerEvents()
+container
+  .get<EventService>(Symbol.for('EventService'))
+  .registerEvents()
+container
+  .get<UserApplicationService>(Symbol.for('UserApplicationService'))
+  .registerEvents()
+container
+  .get<InvitationApplicationService>(Symbol.for('InvitationApplicationService'))
+  .registerEvents()
+container
+  .get<FileApplicationService>(Symbol.for('FileApplicationService'))
+  .registerEvents()
 
 export default app
