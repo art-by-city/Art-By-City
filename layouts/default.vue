@@ -246,5 +246,7 @@ div.v-toolbar__content div.v-toolbar__title a {
 
 .progress-bar {
   top: 48px;
+  position: fixed;
+  z-index: 5;
 }
 </style>
