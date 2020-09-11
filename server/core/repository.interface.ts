@@ -8,4 +8,5 @@ export default interface Repository<T, X> {
   delete(id: string): Promise<void>
   getDocumentReference(id: string): DocumentReference<T>
   find(filter?: X): Promise<T[]>
+  findOne(filter?: X): Promise<T | null>
 }

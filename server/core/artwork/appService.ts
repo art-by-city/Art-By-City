@@ -69,7 +69,6 @@ export default class ArtworkApplicationServiceImpl
     artwork.hashtags = req.body?.hashtags?.split(',') || []
     artwork.likes = []
 
-    // TODO -> Refactor out to a FileService
     if (files) {
       artwork.images = files.map((file) => {
         return { source: file.filename }
@@ -107,6 +106,7 @@ export default class ArtworkApplicationServiceImpl
 
     try {
       const artwork = await this.artworkService.get(req.body.id)
+      const oldArtwork = { ...artwork }
 
       if (!artwork) {
         throw new NotFoundError(new Artwork())
@@ -133,10 +133,13 @@ export default class ArtworkApplicationServiceImpl
         }
 
         const savedArtwork = await this.artworkService.update(artwork)
-        savedArtwork.hashtags.forEach((hashtag) => {
-          this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
-        })
         if (savedArtwork) {
+          this.eventService.emit(UserEvents.Artwork.Updated, user.id, oldArtwork, savedArtwork)
+
+          savedArtwork.hashtags.forEach((hashtag) => {
+            this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
+          })
+
           return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(savedArtwork, user))
         }
 
@@ -277,9 +280,9 @@ export default class ArtworkApplicationServiceImpl
         throw new NotFoundError(new Artwork())
       }
 
-      await this.artworkService.delete(id)
+      this.eventService.emit(UserEvents.Artwork.Deleted, user.id, artwork)
 
-      this.eventService.emit(UserEvents.Artwork.Deleted, user.id, id)
+      await this.artworkService.delete(id)
 
       return new ApiServiceSuccessResult()
     } catch (error) {

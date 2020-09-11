@@ -14,6 +14,7 @@ import {
   UserAccountLoggedInEvent,
   UserAccountForgotPasswordEvent
 } from './'
+import { Artwork } from '../../artwork'
 
 @injectable()
 export default class UserEventServiceImpl implements UserEventService {
@@ -59,9 +60,9 @@ export default class UserEventServiceImpl implements UserEventService {
     }
   }
 
-  onUserArtworkDeleted(userId: string, artworkId: string) {
+  onUserArtworkDeleted(userId: string, artwork: Artwork) {
     try {
-      this.userEventRepository.create(new UserArtworkDeletedEvent(userId, artworkId))
+      this.userEventRepository.create(new UserArtworkDeletedEvent(userId, artwork.id))
     } catch (error) {
       console.error(error)
     }

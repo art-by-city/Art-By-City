@@ -15,6 +15,7 @@ export { default as UserAccountForgotPasswordEvent } from './userAccountForgotPa
 export type UserArtworkViewed = 'user:artwork:viewed'
 export type UserArtworkCreated = 'user:artwork:created'
 export type UserArtworkDeleted = 'user:artwork:deleted'
+export type UserArtworkUpdated = 'user:artwork:updated'
 export type UserAccountRegistered = 'user:account:registered'
 export type UserAccountLoggedIn = 'user:account:loggedin'
 export type UserAccountForgotPassword = 'user:account:forgotpw'
@@ -22,28 +23,22 @@ export type UserEventType =
   | UserArtworkViewed
   | UserArtworkCreated
   | UserArtworkDeleted
+  | UserArtworkUpdated
   | UserAccountRegistered
   | UserAccountLoggedIn
   | UserAccountForgotPassword
 
 export const UserEvents = {
   Artwork: {
-    Viewed: 'user:artwork:viewed',
-    Created: 'user:artwork:created',
-    Deleted: 'user:artwork:deleted'
-  } as {
-    Viewed: UserArtworkViewed,
-    Created: UserArtworkCreated,
-    Deleted: UserArtworkDeleted
+    Viewed: 'user:artwork:viewed' as UserArtworkViewed,
+    Created: 'user:artwork:created' as UserArtworkCreated,
+    Deleted: 'user:artwork:deleted' as UserArtworkDeleted,
+    Updated: 'user:artwork:updated' as UserArtworkUpdated
   },
   Account: {
-    Registered: 'user:account:registered',
-    ForgotPassword: 'user:account:forgotpw',
-    LoggedIn: 'user:account:loggedin'
-  } as {
-    Registered: UserAccountRegistered,
-    ForgotPassword: UserAccountForgotPassword,
-    LoggedIn: UserAccountLoggedIn
+    Registered: 'user:account:registered' as UserAccountRegistered,
+    ForgotPassword: 'user:account:forgotpw' as UserAccountForgotPassword,
+    LoggedIn: 'user:account:loggedin' as UserAccountLoggedIn
   }
 }
 

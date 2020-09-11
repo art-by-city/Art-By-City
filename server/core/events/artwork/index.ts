@@ -4,8 +4,6 @@ export type ArtworkEventType =
 
 export const ArtworkEvents = {
   Hashtag: {
-    Added: 'artwork:hashtag:added'
-  } as {
-    Added: ArtworkHashtagAdded
+    Added: 'artwork:hashtag:added' as ArtworkHashtagAdded
   }
 }
