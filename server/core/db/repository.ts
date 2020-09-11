@@ -19,6 +19,7 @@ export default class BaseRepositoryImpl<T extends TrackableEntity> {
   create(thing: T): Promise<T> {
     try {
       thing.created = new Date()
+      thing.updated = thing.created
       return this.repository.create(thing)
     } catch (error) {
       throw new Error(`Error creating new ${this.x.name}: ${error.message}`)

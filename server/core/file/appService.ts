@@ -32,21 +32,11 @@ export default class FileApplicationServiceImpl
   registerEvents() {
     this.eventService.on(UserEvents.Artwork.Created, this.onArtworkCreated.bind(this))
     this.eventService.on(UserEvents.Artwork.Deleted, this.onArtworkDeleted.bind(this))
+    this.eventService.on(UserEvents.Artwork.Updated, this.onArtworkUpdated.bind(this))
   }
 
   getByFilename(filename: string): Promise<File | null> {
     return this.fileService.getByName(filename)
-  }
-
-  async removeFileAsset(path: string): Promise<boolean> {
-    try {
-      await fs.promises.unlink(path)
-
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
-    }
   }
 
   async onArtworkCreated(_userId: string, artworkId: string) {
@@ -73,19 +63,60 @@ export default class FileApplicationServiceImpl
     try {
       if (artwork) {
         await Promise.all(artwork.images.map(async (image: ArtworkImage) => {
-          const file = await this.fileService.getByName(image.source)
-          if (file) {
-            const isFileAssetDeleted = await this.removeFileAsset(
-              `${this.artworkImageDirectory}/${image.source}`
-            )
-            if (isFileAssetDeleted) {
-              await this.fileService.delete(file.id)
-            }
-          }
+          await this.deleteFileByName(image.source)
         }))
       }
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  async onArtworkUpdated(_userId: string, oldArtwork: Artwork, newArtwork: Artwork) {
+    try {
+      const abandonedImages: ArtworkImage[] = []
+
+      for (let i=0; i < oldArtwork.images.length; i++) {
+        let found = false
+        for (let j=0; j < newArtwork.images.length; j++) {
+          if (oldArtwork.images[i].source === newArtwork.images[j].source) {
+            found = true
+            continue
+          }
+        }
+
+        if (!found) {
+          abandonedImages.push(oldArtwork.images[i])
+        }
+      }
+
+      await Promise.all(abandonedImages.map(async (image: ArtworkImage) => {
+        await this.deleteFileByName(image.source)
+      }))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  private async deleteFileByName(filename: string): Promise<void> {
+    const file = await this.fileService.getByName(filename)
+    if (file) {
+      const isFileAssetDeleted = await this.removeFileAsset(
+        `${this.artworkImageDirectory}/${filename}`
+      )
+      if (isFileAssetDeleted) {
+        await this.fileService.delete(file.id)
+      }
+    }
+  }
+
+  private async removeFileAsset(path: string): Promise<boolean> {
+    try {
+      await fs.promises.unlink(path)
+
+      return true
+    } catch (error) {
+      console.log(error)
+      return false
     }
   }
 }
