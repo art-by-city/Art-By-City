@@ -1,6 +1,13 @@
 import { injectable, inject } from 'inversify'
 
-import { UserApplicationService, UserService, UserProfileViewModel, User, UserAccountViewModel } from './'
+import {
+  UserApplicationService,
+  UserService,
+  UserProfileViewModel,
+  User,
+  UserAccountViewModel,
+  UserAvatarViewModel
+} from './'
 import { UserEvents } from '../events/user'
 import { EventService } from '../events'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
@@ -9,6 +16,8 @@ import NotFoundError from '../api/errors/notFoundError'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import { CityService } from '../city'
 import UserMapper from './mapper'
+import { FileApplicationService } from '../file'
+import UnknownError from '../api/errors/unknownError'
 
 @injectable()
 export default class UserApplicationServiceImpl implements UserApplicationService {
@@ -16,6 +25,7 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
   private eventService: EventService
   private artworkService: ArtworkService
   private cityService: CityService
+  private fileAppService: FileApplicationService
 
   constructor(
     @inject(Symbol.for('UserService'))
@@ -25,15 +35,19 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
     @inject(Symbol.for('ArtworkService'))
     artworkService: ArtworkService,
     @inject(Symbol.for('CityService'))
-    cityService: CityService
+    cityService: CityService,
+    @inject(Symbol.for('FileApplicationService'))
+    fileAppService: FileApplicationService
   ) {
     this.userService = userService
     this.eventService = eventService
     this.artworkService = artworkService
     this.cityService = cityService
+    this.fileAppService = fileAppService
   }
 
-  async getUserProfile(username: string): Promise<ApiServiceResult<UserProfileViewModel>> {
+  async getUserProfile(username: string):
+    Promise<ApiServiceResult<UserProfileViewModel>> {
     const user = await this.userService.getByUsername(username)
 
     if (user) {
@@ -45,7 +59,10 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
         artworks: await Promise.all(
           artworks.map(async (artwork) => {
             const user = await this.userService.getById(artwork.owner)
-            return new ArtworkMapper().toViewModel(artwork, user || undefined)
+            return new ArtworkMapper().toViewModel(
+              artwork,
+              user ? new UserMapper().toViewModel(user) : undefined
+            )
           })
         )
       }
@@ -56,7 +73,8 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
     }
   }
 
-  async getUserAccount(id: string): Promise<ApiServiceResult<UserAccountViewModel>> {
+  async getUserAccount(id: string):
+    Promise<ApiServiceResult<UserAccountViewModel>> {
     const user = await this.userService.getById(id)
 
     if (user) {
@@ -71,12 +89,30 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
     }
   }
 
+  async uploadAvatar(user: User, imageData: string, imageType: string):
+    Promise<ApiServiceResult<UserAvatarViewModel>> {
+    const avatarFile = await this.fileAppService.createUserAvatarFromFileData(
+      user.id,
+      imageData,
+      imageType
+    )
+
+    if (avatarFile) {
+      const avatar = { source: `${avatarFile.name}?${Date.now()}` }
+      if (await this.userService.updateUserAvatar(user.id, avatar)) {
+        return new ApiServiceSuccessResult(avatar)
+      }
+    }
+
+    throw new UnknownError()
+  }
+
   registerEvents() {
     this.eventService.on(UserEvents.Artwork.Created, this.onUserArtworkCreated.bind(this))
     this.eventService.on(UserEvents.Artwork.Deleted, this.onUserArtworkDeleted.bind(this))
   }
 
-  onUserArtworkCreated(userId: string) {
+  private onUserArtworkCreated(userId: string) {
     try {
       this.userService.incrementUserArtworkCount(userId)
     } catch (error) {
@@ -84,7 +120,7 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
     }
   }
 
-  onUserArtworkDeleted(userId: string) {
+  private onUserArtworkDeleted(userId: string) {
     try {
       this.userService.decrementUserArtworkCount(userId)
     } catch (error) {

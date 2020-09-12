@@ -65,6 +65,20 @@ export default class UserControllerImpl implements UserController {
       }
     })
 
+    router.post('/avatar', async (req, res, next) => {
+      try {
+        const result = await this.userAppService.uploadAvatar(
+          <User>req.user,
+          req.body.image,
+          req.body.type
+        )
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
     return router
   }
 }

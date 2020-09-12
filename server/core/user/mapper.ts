@@ -11,7 +11,8 @@ export default class UserMapper implements EntityMapper<User, UserViewModel> {
       id: domainEntity.id,
       username: domainEntity.username,
       city: opts?.cityName || domainEntity.city,
-      roles: domainEntity.roles
+      roles: domainEntity.roles,
+      avatar: domainEntity.avatar
     }
   }
   toUserAccountViewModel(domainEntity: User, opts?: UserMapperOptions) {

@@ -3,11 +3,12 @@
     <ArtworkModal :artwork.sync="modalArtwork" />
     <v-row align="end">
       <v-col cols="2" offset="3">
-        <v-avatar class="user-profile-avatar" color="indigo" size="192">
-          <span class="white--text text-lowercase">
-            {{ avatar }}
-          </span>
-        </v-avatar>
+        <UserAvatar
+          class="user-profile-avatar"
+          :user="profile.user"
+          :disabled="$auth.user.id !== profile.user.id"
+          @onChange="onUserAvatarChanged"
+        />
       </v-col>
       <v-col cols="4">
         <div class="user-profile-username text-lowercase">{{ profile.user.username }}</div>
@@ -67,16 +68,15 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
-  get avatar(): string {
-    if (this.profile?.user?.username) {
-      return this.profile?.user?.username
-    } else {
-      return 'u'
-    }
-  }
-
   onArtworkCardClicked(artwork: any) {
     this.modalArtwork = artwork
+  }
+
+  async onUserAvatarChanged(image: File) {
+    const avatar = await this.$profileService.uploadUserAvatar(image)
+    if (avatar) {
+      this.profile = Object.assign({}, this.profile, { user: { ...this.profile.user, avatar } } )
+    }
   }
 }
 </script>

@@ -10,6 +10,10 @@ import {
 
 import Entity from '../common/entity'
 
+export interface UserAvatar {
+  source: string
+}
+
 @Collection()
 export default class User extends Entity {
   @IsString()
@@ -52,6 +56,8 @@ export default class User extends Entity {
   artworkCount!: number
 
   invitation?: string
+
+  avatar?: UserAvatar
 
   updatePassword(newPassword: string): void {
     this.password = newPassword

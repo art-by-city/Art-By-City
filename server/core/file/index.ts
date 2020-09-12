@@ -10,11 +10,6 @@ import FileApplicationServiceImpl from './appService'
 
 export { default as File } from './file'
 
-export interface FileApplicationService
-  extends BaseApplicationServiceInterface {
-    registerEvents(): void
-  }
-
 export interface FileFilterOptions {
   name?: string
 }
@@ -22,10 +17,19 @@ export interface FileFilterOptions {
 export interface FileRepository
   extends BaseRepositoryInterface<File, FileFilterOptions> {}
 
-export interface FileService
-  extends BaseDomainServiceInterface<File> {
+export interface FileService extends BaseDomainServiceInterface<File> {
     getByName(name: string): Promise<File | null>
-  }
+}
+
+export interface FileApplicationService
+  extends BaseApplicationServiceInterface {
+  registerEvents(): void
+  createUserAvatarFromFileData(
+    userId: string,
+    fileData: string,
+    fileType: string
+  ): Promise<File | null>
+}
 
 export const FileModule = new ContainerModule((bind) => {
   bind<FileRepository>(Symbol.for('FileRepository'))

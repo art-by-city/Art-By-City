@@ -5,7 +5,7 @@ import { File, FileService, FileApplicationService } from './'
 import { EventService } from '../events'
 import { UserEvents } from '../events/user'
 import { ArtworkService, ArtworkImage, Artwork } from '../artwork'
-import { create } from 'lodash'
+import UnknownError from '../api/errors/unknownError'
 
 @injectable()
 export default class FileApplicationServiceImpl
@@ -15,6 +15,7 @@ export default class FileApplicationServiceImpl
   private artworkService: ArtworkService
 
   artworkImageDirectory: string = './static/artwork-images/'
+  avatarImageDirectory: string = './static/avatar-images/'
 
   constructor(
     @inject(Symbol.for('FileService'))
@@ -29,17 +30,38 @@ export default class FileApplicationServiceImpl
     this.artworkService = artworkService
   }
 
+  async createUserAvatarFromFileData(
+    userId: string,
+    fileData: string,
+    fileType: string
+  ): Promise<File | null> {
+    try {
+      const ext = fileType === 'image/jpeg' ? '.jpg' : '.png'
+      const filename = `${userId}${ext}`
+      await fs.promises.mkdir(this.avatarImageDirectory, { recursive: true })
+      await fs.promises.writeFile(
+        `${this.avatarImageDirectory}/${filename}`,
+        fileData,
+        'binary'
+      )
+
+      const file = new File()
+      file.name = filename
+      file.location = this.avatarImageDirectory
+      return await this.fileService.create(file)
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
+    }
+  }
+
   registerEvents() {
     this.eventService.on(UserEvents.Artwork.Created, this.onArtworkCreated.bind(this))
     this.eventService.on(UserEvents.Artwork.Deleted, this.onArtworkDeleted.bind(this))
     this.eventService.on(UserEvents.Artwork.Updated, this.onArtworkUpdated.bind(this))
   }
 
-  getByFilename(filename: string): Promise<File | null> {
-    return this.fileService.getByName(filename)
-  }
-
-  async onArtworkCreated(_userId: string, artworkId: string) {
+  private async onArtworkCreated(_userId: string, artworkId: string) {
     try {
       const artwork = await this.artworkService.get(artworkId);
 
@@ -55,11 +77,11 @@ export default class FileApplicationServiceImpl
         }))
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
-  async onArtworkDeleted(_userId: string, artwork: Artwork) {
+  private async onArtworkDeleted(_userId: string, artwork: Artwork) {
     try {
       if (artwork) {
         await Promise.all(artwork.images.map(async (image: ArtworkImage) => {
@@ -67,11 +89,11 @@ export default class FileApplicationServiceImpl
         }))
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
-  async onArtworkUpdated(_userId: string, oldArtwork: Artwork, newArtwork: Artwork) {
+  private async onArtworkUpdated(_userId: string, oldArtwork: Artwork, newArtwork: Artwork) {
     try {
       const abandonedImages: ArtworkImage[] = []
 
