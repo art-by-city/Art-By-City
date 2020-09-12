@@ -96,7 +96,7 @@ export default class UserServiceImpl implements UserService {
     const user = await this.userRepository.get(id)
 
     if (!user) {
-      throw new NotFoundError(new User())
+      throw new NotFoundError('user')
     }
 
     try {
@@ -137,7 +137,7 @@ export default class UserServiceImpl implements UserService {
       const savedUser = await this.userRepository.update(user)
 
       if (!savedUser) {
-        throw new NotFoundError(new User())
+        throw new NotFoundError('user')
       }
 
       return { success: true }
@@ -154,7 +154,7 @@ export default class UserServiceImpl implements UserService {
       const savedUser = await this.userRepository.update(user)
 
       if (!savedUser) {
-        throw new NotFoundError(new User())
+        throw new NotFoundError('user')
       }
 
       return { success: true }

@@ -74,4 +74,30 @@ export default class Artwork extends Entity {
 
   published!: boolean
   approved!: boolean
+
+  setProps(data: {
+    userId: string,
+    title: string,
+    description: string,
+    type: string,
+    cityId: string,
+    hashtags: string[],
+    images: ArtworkImage[]
+  }): Artwork {
+    this.id = ''
+    this.created = new Date()
+    this.updated = new Date()
+    this.owner = data.userId
+    this.title = data.title
+    this.description = data.description
+    this.type = data.type
+    this.city = data.cityId
+    this.hashtags = data.hashtags
+    this.images = data.images
+    this.likes = []
+    this.published = false
+    this.approved = false
+
+    return this
+  }
 }

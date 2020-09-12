@@ -75,7 +75,11 @@ export default class UserProfilePage extends PageComponent {
   async onUserAvatarChanged(image: File) {
     const avatar = await this.$profileService.uploadUserAvatar(image)
     if (avatar) {
-      this.profile = Object.assign({}, this.profile, { user: { ...this.profile.user, avatar } } )
+      this.profile = Object.assign(
+        {},
+        this.profile,
+        { user: { ...this.profile.user, avatar } }
+      )
     }
   }
 }

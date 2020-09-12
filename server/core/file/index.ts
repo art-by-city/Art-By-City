@@ -10,6 +10,13 @@ import FileApplicationServiceImpl from './appService'
 
 export { default as File } from './file'
 
+export interface FileUploadRequest {
+  data: string
+  type: string
+}
+
+export type AssetType = 'avatar' | 'artwork'
+
 export interface FileFilterOptions {
   name?: string
 }
@@ -24,10 +31,12 @@ export interface FileService extends BaseDomainServiceInterface<File> {
 export interface FileApplicationService
   extends BaseApplicationServiceInterface {
   registerEvents(): void
-  createUserAvatarFromFileData(
+  createFromFileData(
     userId: string,
+    assetType: AssetType,
     fileData: string,
-    fileType: string
+    fileType: string,
+    fileName?: string
   ): Promise<File | null>
 }
 

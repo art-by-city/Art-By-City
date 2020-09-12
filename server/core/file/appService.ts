@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify'
 import fs from 'fs'
 
-import { File, FileService, FileApplicationService } from './'
+import { File, FileService, FileApplicationService, AssetType } from './'
 import { EventService } from '../events'
 import { UserEvents } from '../events/user'
 import { ArtworkService, ArtworkImage, Artwork } from '../artwork'
@@ -30,24 +30,33 @@ export default class FileApplicationServiceImpl
     this.artworkService = artworkService
   }
 
-  async createUserAvatarFromFileData(
+  async createFromFileData(
     userId: string,
+    assetType: AssetType,
     fileData: string,
-    fileType: string
+    fileType: string,
+    fileName?: string
   ): Promise<File | null> {
     try {
       const ext = fileType === 'image/jpeg' ? '.jpg' : '.png'
-      const filename = `${userId}${ext}`
-      await fs.promises.mkdir(this.avatarImageDirectory, { recursive: true })
+      const filename = assetType === 'artwork'
+        ? `${fileName}${ext}`
+        : `${userId}${ext}`
+      const dir = assetType === 'artwork'
+        ? this.artworkImageDirectory
+        : this.avatarImageDirectory
+
+      await fs.promises.mkdir(dir, { recursive: true })
       await fs.promises.writeFile(
-        `${this.avatarImageDirectory}/${filename}`,
+        `${dir}/${filename}`,
         fileData,
         'binary'
       )
 
       const file = new File()
       file.name = filename
-      file.location = this.avatarImageDirectory
+      file.location = dir
+
       return await this.fileService.create(file)
     } catch (error) {
       console.error(error)
@@ -56,29 +65,8 @@ export default class FileApplicationServiceImpl
   }
 
   registerEvents() {
-    this.eventService.on(UserEvents.Artwork.Created, this.onArtworkCreated.bind(this))
     this.eventService.on(UserEvents.Artwork.Deleted, this.onArtworkDeleted.bind(this))
     this.eventService.on(UserEvents.Artwork.Updated, this.onArtworkUpdated.bind(this))
-  }
-
-  private async onArtworkCreated(_userId: string, artworkId: string) {
-    try {
-      const artwork = await this.artworkService.get(artworkId);
-
-      if (artwork) {
-        await Promise.all(artwork.images.map(async (image: ArtworkImage) => {
-          const file = new File()
-          file.id = ''
-          file.created = new Date()
-          file.updated = new Date()
-          file.location = 'artwork-images'
-          file.name = image.source
-          await this.fileService.create(file)
-        }))
-      }
-    } catch (error) {
-      console.error(error)
-    }
   }
 
   private async onArtworkDeleted(_userId: string, artwork: Artwork) {
@@ -115,7 +103,7 @@ export default class FileApplicationServiceImpl
         await this.deleteFileByName(image.source)
       }))
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
@@ -137,7 +125,7 @@ export default class FileApplicationServiceImpl
 
       return true
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return false
     }
   }
