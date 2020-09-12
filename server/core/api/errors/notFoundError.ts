@@ -5,7 +5,7 @@ export default class NotFoundError implements ApiServiceError {
   name = this.constructor.name
   message: string
 
-  constructor(thing: any) {
-    this.message = `${thing.constructor.name} not found`
+  constructor(thing: string) {
+    this.message = `${thing} not found`
   }
 }

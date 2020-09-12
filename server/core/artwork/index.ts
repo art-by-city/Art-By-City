@@ -14,6 +14,7 @@ import ArtworkRepositoryImpl from './repository'
 import ArtworkServiceImpl from './service'
 import ArtworkApplicationServiceImpl from './appService'
 import ArtworkControllerImpl from './controller'
+import { FileUploadRequest } from '../file'
 
 export { default as Artwork } from './artwork'
 export { default as ArtworkViewModel } from './viewModels/artworkViewModel'
@@ -25,7 +26,15 @@ export class ArtworkImage {
   @Matches(/\.(png|jpg)$/)
   source!: string
 }
-
+export interface ArtworkCreateRequest {
+  userId: string
+  title: string
+  description: string
+  type: string
+  city: string
+  hashtags: string[]
+  images: FileUploadRequest[]
+}
 export interface ArtworkFilterOptions {
   city?: string
   type?: string
@@ -44,10 +53,7 @@ export interface ArtworkApplicationService
   extends BaseApplicationServiceInterface {
   get(id: string): Promise<ApiServiceResult<ArtworkViewModel>>
   delete(user: User, id: string): Promise<ApiServiceResult<void>>
-  create(
-    request: any,
-    files?: Express.Multer.File[]
-  ): Promise<ApiServiceResult<ArtworkViewModel>>
+  create(req: ArtworkCreateRequest): Promise<ApiServiceResult<ArtworkViewModel>>
   update(request: any): Promise<ApiServiceResult<ArtworkViewModel>>
   list(request: any): Promise<ApiServiceResult<ArtworkViewModel[]>>
   listByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>>

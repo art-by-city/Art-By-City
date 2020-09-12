@@ -7,7 +7,7 @@
           <v-row justify="center">
             <v-col cols="12">
               <v-img
-                :src="previewImageSource"
+                :src="getImageSource(artwork.images[imagePreviewIndex])"
                 max-width="500"
                 max-height="500"
                 contain
@@ -20,7 +20,7 @@
                 max-width="250"
                 max-height="250"
                 aspect-ratio="1.7"
-                :src="'/artwork-images/' + image.source"
+                :src="getImageSource(image)"
                 class="clickable"
                 :class="isHighlighted(i)"
                 @click="previewImage(i)"
@@ -106,7 +106,7 @@
             <v-col class="text-lowercase">
               <template v-if="!editMode">
                 <strong>Hashtags:</strong>
-                {{ artwork.hashtags.map((h) => `#${h}`).join(', ') }}
+                {{ artwork.hashtags.map((h) => { return `#${h}` }).join(', ') }}
               </template>
               <template v-if="editMode">
                 <HashtagSelector
@@ -165,7 +165,7 @@ import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
-import Artwork from '~/models/artwork/artwork'
+import Artwork, { ArtworkImageFile, ImageFileRef } from '~/models/artwork/artwork'
 import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
@@ -231,10 +231,10 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
-  get previewImageSource() {
-    return (
-      '/artwork-images/' + this.artwork.images[this.imagePreviewIndex].source
-    )
+  getImageSource(image: ArtworkImageFile) {
+    const src = (<ImageFileRef>image).source
+
+    return `/artwork-images/${src}`
   }
 
   get titleRules() {
@@ -280,7 +280,7 @@ export default class ArtworkPage extends FormPageComponent {
   async saveArtwork() {
     ProgressService.start()
     try {
-      const { success } = await this.$axios.$post(
+      const { success } = await this.$axios.$put(
         `/api/artwork/${this.artwork.id}`,
         this.artwork
       )

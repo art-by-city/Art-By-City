@@ -93,10 +93,12 @@ export default class ArtworkUploadPage extends FormComponent {
   artworkTypes: string[] = this.$store.state.config.artworkTypes
   cities: string[] = []
   artwork: any = {
-    city: '',
+    title: '',
+    description: '',
     type: '',
-    images: [],
-    hashtags: []
+    city: '',
+    hashtags: [],
+    images: []
   }
   hashtags: string[] = this.$store.state.config.hashtags
   fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
@@ -152,49 +154,11 @@ export default class ArtworkUploadPage extends FormComponent {
   }
 
   async upload() {
-    ProgressService.start()
-    const formDataConfig = {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }
-    const formData = new FormData()
-    if (this.artwork.title) {
-      formData.append('title', this.artwork.title)
-    }
-    if (this.artwork.description) {
-      formData.append('description', this.artwork.description)
-    }
-    if (this.artwork.type) {
-      formData.append('type', this.artwork.type)
-    }
-    if (this.artwork.city) {
-      formData.append('city', this.artwork.city)
-    }
-    if (this.artwork.hashtags?.length > 0) {
-      formData.append('hashtags', this.artwork.hashtags.join(','))
-    }
-    if (this.artwork.images?.length > 0) {
-      this.artwork.images.forEach((i: File) => formData.append('images', i))
-    }
+    const artwork = await this.$artworkService.createArtwork(this.artwork)
 
-    this.errors = []
-    try {
-      const result = await this.$axios.$put(
-        '/api/artwork/',
-        formData,
-        formDataConfig
-      )
-
-      if (result.success && result.payload) {
-        ToastService.success('artwork upload successful')
-        this.$router.push(`/artwork/${result.payload.id}`)
-      }
-    } catch (error) {
-      ToastService.error('error uploading artwork')
-      this.errors = [error?.response?.data?.error?.message]
+    if (artwork) {
+      this.$router.push(`/artwork/${artwork.id}`)
     }
-    ProgressService.stop()
   }
 }
 </script>

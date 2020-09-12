@@ -16,9 +16,12 @@ import {
   ArtworkApplicationService,
   ArtworkFilterOptions,
   ArtworkViewModel,
-  ArtworkMapper
+  ArtworkMapper,
+  ArtworkCreateRequest,
+  ArtworkImage
 } from './'
 import { ConfigService } from '../config'
+import { FileApplicationService } from '../file'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
@@ -28,6 +31,7 @@ export default class ArtworkApplicationServiceImpl
   private eventService: EventService
   private userService: UserService
   private configService: ConfigService
+  private fileAppService: FileApplicationService
 
   constructor(
     @inject(Symbol.for('ArtworkService'))
@@ -39,40 +43,23 @@ export default class ArtworkApplicationServiceImpl
     @inject(Symbol.for('UserService'))
     userService: UserService,
     @inject(Symbol.for('ConfigService'))
-    configService: ConfigService
+    configService: ConfigService,
+    @inject(Symbol.for('FileApplicationService'))
+    fileAppService: FileApplicationService
   ) {
     this.artworkService = artworkService
     this.discoveryService = discoveryService
     this.eventService = eventService
     this.userService = userService
     this.configService = configService
+    this.fileAppService = fileAppService
   }
 
-  async create(req: any): Promise<ApiServiceResult<ArtworkViewModel>> {
-    const user = await this.userService.getById((<User>req.user).id)
+  async create(req: ArtworkCreateRequest): Promise<ApiServiceResult<ArtworkViewModel>> {
+    const user = await this.userService.getById(req.userId)
 
     if (!user) {
       throw new UnauthorizedError()
-    }
-
-    const files = <Express.Multer.File[]>req.files
-
-    const artwork = new Artwork()
-    artwork.id = ''
-    artwork.created = new Date()
-    artwork.updated = new Date()
-    artwork.owner = user.id
-    artwork.title = req.body?.title || ''
-    artwork.description = req.body?.description || ''
-    artwork.type = req.body?.type || ''
-    artwork.city = req.body?.city || ''
-    artwork.hashtags = req.body?.hashtags?.split(',') || []
-    artwork.likes = []
-
-    if (files) {
-      artwork.images = files.map((file) => {
-        return { source: file.filename }
-      })
     }
 
     // Non-artist users are restricted to max amount of artwork
@@ -81,6 +68,33 @@ export default class ArtworkApplicationServiceImpl
     if (!user.hasRole('artist') && user.artworkCount >= maxArtworks) {
       throw new Error(`Maximum number of ${maxArtworks} Artworks reached`)
     }
+
+    const artwork = new Artwork().setProps({
+      userId: user.id,
+      title: req.title,
+      description: req.description,
+      type: req.type,
+      cityId: req.city,
+      hashtags: req.hashtags,
+      images: await Promise.all(req.images.map(async (image) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+        const file = await this.fileAppService.createFromFileData(
+          user.id,
+          'artwork',
+          image.data,
+          image.type,
+          `artwork-${uniqueSuffix}`
+        )
+
+        if (!file) {
+          throw new Error('error creating artwork')
+        }
+
+        return {
+          source: `${file.name}?${Date.now()}`
+        } as ArtworkImage
+      }))
+    })
 
     const createdArtwork = await this.artworkService.create(artwork)
 
@@ -114,7 +128,7 @@ export default class ArtworkApplicationServiceImpl
       const oldArtwork = { ...artwork }
 
       if (!artwork) {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       if (artwork.owner !== user.id) {
@@ -275,7 +289,7 @@ export default class ArtworkApplicationServiceImpl
       const artwork = await this.artworkService.get(id)
 
       if (!artwork) {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       const user = await this.userService.getById(artwork.owner)
@@ -287,6 +301,7 @@ export default class ArtworkApplicationServiceImpl
         )
       )
     } catch (error) {
+      console.error(error)
       throw new UnknownError(error.message)
     }
   }
@@ -300,7 +315,7 @@ export default class ArtworkApplicationServiceImpl
           throw new UnauthorizedError()
         }
       } else {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       this.eventService.emit(UserEvents.Artwork.Deleted, user.id, artwork)
@@ -326,7 +341,7 @@ export default class ArtworkApplicationServiceImpl
           artwork.likes.push(user.id)
         }
       } else {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       await this.artworkService.update(artwork)
@@ -352,7 +367,7 @@ export default class ArtworkApplicationServiceImpl
           })
         }
       } else {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       await this.artworkService.update(artwork)
@@ -370,7 +385,7 @@ export default class ArtworkApplicationServiceImpl
       const artwork = await this.artworkService.get(req.params.id)
 
       if (!artwork) {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       if (artwork.owner !== user.id && !user.roles.includes('admin')) {
@@ -398,7 +413,7 @@ export default class ArtworkApplicationServiceImpl
       const artwork = await this.artworkService.get(req.params.id)
 
       if (!artwork) {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       if (artwork.owner !== user.id && !user.roles.includes('admin')) {
@@ -426,7 +441,7 @@ export default class ArtworkApplicationServiceImpl
       const artwork = await this.artworkService.get(req.params.id)
 
       if (!artwork) {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       if (!user.roles.includes('admin')) {
@@ -454,7 +469,7 @@ export default class ArtworkApplicationServiceImpl
       const artwork = await this.artworkService.get(req.params.id)
 
       if (!artwork) {
-        throw new NotFoundError(new Artwork())
+        throw new NotFoundError('artwork')
       }
 
       if (!user.roles.includes('admin')) {

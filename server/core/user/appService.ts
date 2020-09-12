@@ -69,7 +69,7 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
 
       return new ApiServiceSuccessResult(userProfile)
     } else {
-      throw new NotFoundError(new User())
+      throw new NotFoundError('user')
     }
   }
 
@@ -85,14 +85,15 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
 
       return new ApiServiceSuccessResult(userProfile)
     } else {
-      throw new NotFoundError(new User())
+      throw new NotFoundError('user')
     }
   }
 
   async uploadAvatar(user: User, imageData: string, imageType: string):
     Promise<ApiServiceResult<UserAvatarViewModel>> {
-    const avatarFile = await this.fileAppService.createUserAvatarFromFileData(
+    const avatarFile = await this.fileAppService.createFromFileData(
       user.id,
+      'avatar',
       imageData,
       imageType
     )

@@ -50,7 +50,7 @@ export default class CityApplicationServiceImpl
       if (savedCity) {
         return new ApiServiceSuccessResult(new CityMapper().toViewModel(savedCity))
       }
-      throw new NotFoundError(new City())
+      throw new NotFoundError('city')
     } catch (error) {
       throw new UnknownError(error.message)
     }

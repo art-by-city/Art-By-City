@@ -1,3 +1,17 @@
+export interface ImageFileRef {
+  source: string
+}
+
+export interface ImageUploadRequest {
+  data: string
+  type: string
+}
+
+export type ArtworkImageFile =
+  | ImageFileRef
+  | ImageUploadRequest
+  | File
+
 export default interface Artwork {
   id: string
   created: Date
@@ -11,7 +25,7 @@ export default interface Artwork {
   type: string
   city: string
   hashtags: string[]
-  images: any[]
+  images: ArtworkImageFile[]
   likes: string[]
   published: boolean
   approved: boolean
