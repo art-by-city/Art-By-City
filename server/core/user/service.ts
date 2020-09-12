@@ -11,6 +11,7 @@ import { UserEvents } from '../events/user'
 import EmailAlreadyTakenError from '../api/errors/emailAlreadyTakenError'
 import { InvitationService } from '../invitation'
 import InvalidInvitationCodeError from '../api/errors/invalidInvitationCodeError'
+import { UserAvatar } from './user'
 
 @injectable()
 export default class UserServiceImpl implements UserService {
@@ -145,7 +146,6 @@ export default class UserServiceImpl implements UserService {
     }
   }
 
-  // Admin only?
   async saveUser(user: User): Promise<ApiServiceResult<void>> {
     await validateUser(user)
 
@@ -161,6 +161,23 @@ export default class UserServiceImpl implements UserService {
     } catch (error) {
       return { success: false, messages: ['Could not save user'] }
     }
+  }
+
+  async updateUserAvatar(userId: string, avatar: UserAvatar): Promise<boolean> {
+    try {
+      const user = await this.userRepository.get(userId)
+      if (user) {
+        user.avatar = avatar
+        const savedUser = await this.userRepository.update(user)
+        if (savedUser) {
+          return true
+        }
+      }
+    } catch (error) {
+      console.error(error)
+    }
+
+    return false
   }
 
   async authenticate(username: string, password: string): Promise<User | null> {

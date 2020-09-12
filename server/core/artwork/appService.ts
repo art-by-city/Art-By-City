@@ -2,7 +2,7 @@ import { injectable, inject } from 'inversify'
 
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import UnknownError from '../api/errors/unknownError'
-import { User, UserService } from '../user'
+import { User, UserService, UserMapper } from '../user'
 import ApiServiceSuccessResult from '../api/results/apiServiceSuccessResult'
 import NotFoundError from '../api/errors/notFoundError'
 import UnauthorizedError from '../api/errors/unauthorizedError'
@@ -91,7 +91,12 @@ export default class ArtworkApplicationServiceImpl
         this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
       })
 
-      return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(createdArtwork, user))
+      return new ApiServiceSuccessResult(
+        new ArtworkMapper().toViewModel(
+          createdArtwork,
+          new UserMapper().toViewModel(user)
+        )
+      )
     }
 
     return { success: false }
@@ -140,7 +145,11 @@ export default class ArtworkApplicationServiceImpl
             this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
           })
 
-          return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(savedArtwork, user))
+          return new ApiServiceSuccessResult(
+            new ArtworkMapper().toViewModel(
+              savedArtwork, new UserMapper().toViewModel(user)
+            )
+          )
         }
 
         return { success: false }
@@ -208,7 +217,10 @@ export default class ArtworkApplicationServiceImpl
       const mappedArtworks = await Promise.all(
         artworks.map(async (artwork) => {
           const user = await this.userService.getById(artwork.owner)
-          return new ArtworkMapper().toViewModel(artwork, user || undefined)
+          return new ArtworkMapper().toViewModel(
+            artwork,
+            user ? new UserMapper().toViewModel(user) : undefined
+          )
         })
       )
 
@@ -225,7 +237,10 @@ export default class ArtworkApplicationServiceImpl
       const mappedArtworks = await Promise.all(
         artworks.map(async (artwork) => {
           const user = await this.userService.getById(artwork.owner)
-          return new ArtworkMapper().toViewModel(artwork, user || undefined)
+          return new ArtworkMapper().toViewModel(
+            artwork,
+            user ? new UserMapper().toViewModel(user) : undefined
+          )
         })
       )
 
@@ -242,7 +257,10 @@ export default class ArtworkApplicationServiceImpl
       const mappedArtworks = await Promise.all(
         artworks.map(async (artwork) => {
           const user = await this.userService.getById(artwork.owner)
-          return new ArtworkMapper().toViewModel(artwork, user || undefined)
+          return new ArtworkMapper().toViewModel(
+            artwork,
+            user ? new UserMapper().toViewModel(user) : undefined
+          )
         })
       )
 
@@ -262,7 +280,12 @@ export default class ArtworkApplicationServiceImpl
 
       const user = await this.userService.getById(artwork.owner)
 
-      return new ApiServiceSuccessResult(new ArtworkMapper().toViewModel(artwork, user || undefined))
+      return new ApiServiceSuccessResult(
+        new ArtworkMapper().toViewModel(
+          artwork,
+          user ? new UserMapper().toViewModel(user) : undefined
+        )
+      )
     } catch (error) {
       throw new UnknownError(error.message)
     }

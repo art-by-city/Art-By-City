@@ -4,8 +4,8 @@
       <v-row>
         <v-col cols="4">
           <v-menu offset-y>
-            <template v-slot:activator="{ on }">
-              <v-app-bar-nav-icon v-on="on" />
+            <template v-slot:activator="props">
+              <v-app-bar-nav-icon v-on="props.on" />
             </template>
             <v-list dense>
               <v-list-item
@@ -42,14 +42,21 @@
             </template>
             <template v-if="$auth.loggedIn">
               <v-menu offset-y>
-                <template v-slot:activator="{ on }">
-                  <v-btn class="avatar-menu-button" text right v-on="on">
-                    <v-badge avatar bottom overlap color="black" :icon="avatarBadge" :value="avatarBadge">
-                      <v-avatar color="indigo" size="32">
-                        <span class="white--text text-lowercase">
-                          {{ avatar }}
-                        </span>
-                      </v-avatar>
+                <template v-slot:activator="props">
+                  <v-btn class="avatar-menu-button" text right v-on="props.on">
+                    <v-badge
+                      avatar
+                      bottom
+                      overlap
+                      color="black"
+                      :icon="avatarBadge"
+                      :value="avatarBadge"
+                    >
+                      <UserAvatar
+                        :user="$auth.user"
+                        small
+                        disabled
+                      />
                     </v-badge>
                   </v-btn>
                 </template>
@@ -186,14 +193,6 @@ export default class DefaultLayout extends Vue {
     }
 
     return false
-  }
-
-  get avatar(): string {
-    if (this.$auth.user.username) {
-      return this.$auth.user?.username[0]
-    } else {
-      return 'u'
-    }
   }
 
   get avatarBadge(): string {

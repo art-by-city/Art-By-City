@@ -55,7 +55,6 @@ export default class InvitationService {
         return payload
       }
     } catch (error) {
-      console.log(error.response)
       ToastService.error(error)
     } finally {
       ProgressService.stop()

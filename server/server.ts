@@ -31,7 +31,7 @@ passport.deserializeUser(authService.deserializeUser)
 // Express Config
 const app = express()
 app.use(passport.initialize())
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '5mb' }))
 
 // Express Routing
 app.use(
