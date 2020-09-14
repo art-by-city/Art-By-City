@@ -26,6 +26,11 @@ export class ArtworkImage {
   @Matches(/\.(png|jpg)$/)
   source!: string
 }
+export type ArtworkImageRequest = ArtworkImage | FileUploadRequest
+export function isArtworkImage(image: ArtworkImageRequest):
+  image is ArtworkImage {
+  return (image as ArtworkImage).source !== undefined
+}
 export interface ArtworkCreateRequest {
   userId: string
   title: string
@@ -34,6 +39,16 @@ export interface ArtworkCreateRequest {
   city: string
   hashtags: string[]
   images: FileUploadRequest[]
+}
+export interface ArtworkUpdateRequest {
+  userId: string
+  id: string
+  title: string
+  description: string
+  type: string
+  city: string
+  hashtags: string[]
+  images: ArtworkImageRequest[]
 }
 export interface ArtworkFilterOptions {
   city?: string
@@ -54,7 +69,7 @@ export interface ArtworkApplicationService
   get(id: string): Promise<ApiServiceResult<ArtworkViewModel>>
   delete(user: User, id: string): Promise<ApiServiceResult<void>>
   create(req: ArtworkCreateRequest): Promise<ApiServiceResult<ArtworkViewModel>>
-  update(request: any): Promise<ApiServiceResult<ArtworkViewModel>>
+  update(req: ArtworkUpdateRequest): Promise<ApiServiceResult<ArtworkViewModel>>
   list(request: any): Promise<ApiServiceResult<ArtworkViewModel[]>>
   listByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>>
   listLikedByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>>

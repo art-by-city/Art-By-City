@@ -30,7 +30,6 @@
       "@nuxt/types",
       "nuxtjs__auth",
       "reflect-metadata",
-      "@types/multer",
       "@nuxtjs/axios",
       "vuetify"
     ]

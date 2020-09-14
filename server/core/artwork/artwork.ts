@@ -100,4 +100,39 @@ export default class Artwork extends Entity {
 
     return this
   }
+
+  update(data: {
+    title?: string,
+    description?: string,
+    type?: string,
+    cityId?: string,
+    hashtags?: string[],
+    images?: ArtworkImage[]
+  }): Artwork {
+    if (data.title) {
+      this.title = data.title
+    }
+
+    if (data.description) {
+      this.description = data.description
+    }
+
+    if (data.type) {
+      this.type = data.type
+    }
+
+    if (data.cityId) {
+      this.city = data.cityId
+    }
+
+    if (data.hashtags) {
+      this.hashtags = data.hashtags
+    }
+
+    if (data.images) {
+      this.images = data.images
+    }
+
+    return this
+  }
 }

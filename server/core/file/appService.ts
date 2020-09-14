@@ -73,7 +73,7 @@ export default class FileApplicationServiceImpl
     try {
       if (artwork) {
         await Promise.all(artwork.images.map(async (image: ArtworkImage) => {
-          await this.deleteFileByName(image.source)
+          await this.deleteFileByName(image.source.split('?')[0])
         }))
       }
     } catch (error) {
@@ -100,7 +100,7 @@ export default class FileApplicationServiceImpl
       }
 
       await Promise.all(abandonedImages.map(async (image: ArtworkImage) => {
-        await this.deleteFileByName(image.source)
+        await this.deleteFileByName(image.source.split('?')[0])
       }))
     } catch (error) {
       console.error(error)

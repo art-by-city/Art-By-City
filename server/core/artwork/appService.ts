@@ -18,10 +18,12 @@ import {
   ArtworkViewModel,
   ArtworkMapper,
   ArtworkCreateRequest,
-  ArtworkImage
+  ArtworkImage,
+  ArtworkUpdateRequest,
+  isArtworkImage
 } from './'
 import { ConfigService } from '../config'
-import { FileApplicationService } from '../file'
+import { FileApplicationService, isFileUploadRequest } from '../file'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
@@ -116,63 +118,69 @@ export default class ArtworkApplicationServiceImpl
     return { success: false }
   }
 
-  async update(req: any): Promise<ApiServiceResult<ArtworkViewModel>> {
-    const user = await this.userService.getById((<User>req.user).id)
+  async update(req: ArtworkUpdateRequest): Promise<ApiServiceResult<ArtworkViewModel>> {
+    const user = await this.userService.getById(req.userId)
 
     if (!user) {
       throw new UnauthorizedError()
     }
 
-    try {
-      const artwork = await this.artworkService.get(req.body.id)
-      const oldArtwork = { ...artwork }
+    const artwork = await this.artworkService.get(req.id)
+    const oldArtwork = { ...artwork }
 
-      if (!artwork) {
-        throw new NotFoundError('artwork')
-      }
-
-      if (artwork.owner !== user.id) {
-        throw new UnauthorizedError()
-      }
-
-      if (artwork && artwork.owner === user.id) {
-        artwork.updated = new Date()
-        artwork.title = req.body?.title || ''
-        artwork.description = req.body?.description || ''
-        artwork.type = req.body?.type || ''
-        artwork.city = req.body?.city || ''
-        artwork.hashtags = req.body?.hashtags || []
-
-        if (!artwork.created) {
-          artwork.created = new Date()
-        }
-
-        if (!artwork.likes) {
-          artwork.likes = []
-        }
-
-        const savedArtwork = await this.artworkService.update(artwork)
-        if (savedArtwork) {
-          this.eventService.emit(UserEvents.Artwork.Updated, user.id, oldArtwork, savedArtwork)
-
-          savedArtwork.hashtags.forEach((hashtag) => {
-            this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
-          })
-
-          return new ApiServiceSuccessResult(
-            new ArtworkMapper().toViewModel(
-              savedArtwork, new UserMapper().toViewModel(user)
-            )
-          )
-        }
-
-        return { success: false }
-      } else {
-        throw new UnknownError('Artwork not found or permission denied')
-      }
-    } catch (error) {
-      throw new UnknownError(error.message)
+    if (!artwork) {
+      throw new NotFoundError('artwork')
     }
+
+    if (artwork.owner !== user.id) {
+      throw new UnauthorizedError()
+    }
+
+    artwork.title = req.title,
+    artwork.description = req.description,
+    artwork.type = req.type,
+    artwork.city = req.city,
+    artwork.hashtags = req.hashtags,
+    artwork.images = await Promise.all(req.images.map(async (image) => {
+      if (isFileUploadRequest(image)) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+        const file = await this.fileAppService.createFromFileData(
+          user.id,
+          'artwork',
+          image.data,
+          image.type,
+          `artwork-${uniqueSuffix}`
+        )
+
+        if (!file) {
+          throw new Error('error updating artwork')
+        }
+
+        return {
+          source: `${file.name}?${Date.now()}`
+        } as ArtworkImage
+      } else {
+        return image
+      }
+    }))
+
+    const savedArtwork = await this.artworkService.update(artwork)
+
+    if (savedArtwork) {
+      this.eventService.emit(UserEvents.Artwork.Updated, user.id, oldArtwork, savedArtwork)
+
+      savedArtwork.hashtags.forEach((hashtag) => {
+        this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
+      })
+
+      return new ApiServiceSuccessResult(
+        new ArtworkMapper().toViewModel(
+          savedArtwork, new UserMapper().toViewModel(user)
+        )
+      )
+    }
+
+    return { success: false }
   }
 
   async list(req: any): Promise<ApiServiceResult<ArtworkViewModel[]>> {
