@@ -82,9 +82,17 @@ export default class UserAvatar extends Vue {
 <style scoped>
 .avatar-upload-button {
   margin-top: 6em;
-  margin-left: 8px;
+}
+.avatar-upload-button.v-text-field {
+  padding-top: 0px;
 }
 .avatar-upload-button >>> .v-input__control {
   display: none;
+}
+.avatar-upload-button >>> .v-input__prepend-outer {
+  margin-right: 0px;
+  margin-left: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 </style>

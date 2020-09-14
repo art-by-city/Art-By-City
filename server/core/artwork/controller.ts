@@ -1,25 +1,10 @@
 import { injectable, inject } from 'inversify'
 import { Router } from 'express'
-// import multer from 'multer'
 import passport from 'passport'
 
 import roles from '../middleware/roles'
 import { User } from '../user'
 import { ArtworkApplicationService, ArtworkController } from './'
-
-// TODO -> service
-// const uploadDir = './static/artwork-images/'
-// const storage = multer.diskStorage({
-//   destination: uploadDir,
-//   filename(_req, file, cb) {
-//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
-//     // TODO -> allowed image extensions
-//     const extension = file.mimetype === 'image/jpeg' ? '.jpg' : '.png'
-//     cb(null, file.fieldname + '-' + uniqueSuffix + extension)
-//   }
-// })
-
-// const upload = multer({ storage })
 
 @injectable()
 export default class ArtworkControllerImpl implements ArtworkController {
@@ -61,7 +46,10 @@ export default class ArtworkControllerImpl implements ArtworkController {
 
     router.put('/:id', async (req, res, next) => {
       try {
-        const result = await this.artworkAppService.update(req)
+        const result = await this.artworkAppService.update({
+          userId: (<User>req.user).id,
+          ...req.body.artwork
+        })
 
         return res.send(result)
       } catch (error) {

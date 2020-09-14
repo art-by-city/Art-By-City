@@ -14,6 +14,9 @@ export interface FileUploadRequest {
   data: string
   type: string
 }
+export function isFileUploadRequest(thing: any): thing is FileUploadRequest {
+  return (thing as FileUploadRequest).type !== undefined
+}
 
 export type AssetType = 'avatar' | 'artwork'
 

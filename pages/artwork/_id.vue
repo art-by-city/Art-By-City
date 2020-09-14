@@ -12,22 +12,67 @@
                 max-height="500"
                 contain
               ></v-img>
+              {{ artwork.images.length }}
             </v-col>
           </v-row>
           <v-row>
-            <v-col v-for="(image, i) in artwork.images" :key="i">
-              <v-img
+            <v-col cols="4" v-for="(image, i) in artwork.images" :key="i">
+              <v-hover v-slot:default="hoverProps">
+                <v-img
+                  max-width="250"
+                  max-height="250"
+                  aspect-ratio="1.7"
+                  :src="getImageSource(image)"
+                  class="clickable"
+                  :class="isHighlighted(i)"
+                  @click="previewImage(i)"
+                >
+                  <v-overlay absolute :value="editMode && hoverProps.hover">
+                    <v-file-input
+                      class="artwork-upload-button"
+                      accept="image/*"
+                      hide-input
+                      prepend-icon="mdi-camera"
+                      @change="onArtworkImageChanged(i, $event)"
+                    ></v-file-input>
+                    <div style="display: inline-flex;">
+                      <v-btn
+                        icon
+                        small
+                        @click="onDeleteArtworkImageClicked(i)"
+                      >
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                      <!-- <v-btn
+                        icon
+                        small
+                      >
+                        <v-icon>mdi-drag-variant</v-icon>
+                      </v-btn> -->
+                    </div>
+                  </v-overlay>
+                </v-img>
+              </v-hover>
+            </v-col>
+            <v-col cols="4" v-if="editMode && !isAtMaxImages">
+              <v-responsive
+                aspect-ratio="1.7"
                 max-width="250"
                 max-height="250"
-                aspect-ratio="1.7"
-                :src="getImageSource(image)"
-                class="clickable"
-                :class="isHighlighted(i)"
-                @click="previewImage(i)"
-              ></v-img>
+                style="border: 1px dashed black;">
+                <v-file-input
+                  class="artwork-upload-button add-artwork-image-button"
+                  accept="image/*"
+                  hide-input
+                  prepend-icon="mdi-camera"
+                  @change="onAddArtworkImageClicked"
+                ></v-file-input>
+              </v-responsive>
             </v-col>
           </v-row>
-          <v-row><LikeButton :artwork="artwork"/></v-row>
+          <v-row>
+            <LikeButton :artwork="artwork"/>
+          </v-row>
           <v-row>
             <v-col class="text-lowercase">
               <strong>Artist:</strong>
@@ -82,7 +127,7 @@
               <template v-else>
                 <ArtworkTypeSelector
                   v-model="artwork.type"
-                  :artworkTypes="artworkTypes"
+                  :artworkTypes="config.artworkTypes"
                   required
                 />
               </template>
@@ -96,7 +141,7 @@
               <template v-else>
                 <CitySelector
                   v-model="artwork.city"
-                  :cities="cities"
+                  :cities="config.cities"
                   required
                 />
               </template>
@@ -106,12 +151,12 @@
             <v-col class="text-lowercase">
               <template v-if="!editMode">
                 <strong>Hashtags:</strong>
-                {{ artwork.hashtags.map((h) => { return `#${h}` }).join(', ') }}
+                {{ hashtagsString }}
               </template>
               <template v-if="editMode">
                 <HashtagSelector
                   v-model="artwork.hashtags"
-                  :hashtags="hashtags"
+                  :hashtags="config.hashtags"
                 />
               </template>
             </v-col>
@@ -134,6 +179,7 @@
             </v-col>
             <v-col v-if="editMode && isOwner">
               <v-btn color="primary" @click="saveArtwork">Save</v-btn>
+              <v-btn color="warning" @click="onCancelClicked">Cancel</v-btn>
             </v-col>
             <v-col v-if="!editMode && isOwnerOrAdmin">
               <v-btn color="primary" @click="publishOrApproveArtwork('publish')">
@@ -165,10 +211,20 @@ import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
-import Artwork, { ArtworkImageFile, ImageFileRef } from '~/models/artwork/artwork'
+import Artwork, {
+  ArtworkImageFile,
+  ImageFileRef,
+  isImageFileRef,
+  isFile,
+  ImageUploadRequest,
+  isImageUploadPreview,
+  ImageUploadPreview
+} from '~/models/artwork/artwork'
 import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
+import { ConfigStoreState } from '~/store/config'
+import { readFileAsBinaryStringAsync } from '~/helpers/helpers'
 
 @Component({
   components: {
@@ -180,14 +236,13 @@ import ProgressService from '~/services/progress/service'
 })
 export default class ArtworkPage extends FormPageComponent {
   artwork!: Artwork
-  cities: any[] = this.$store.state.config.cities
-  hashtags: string[] = this.$store.state.config.hashtags
-  artworkTypes: ArtworkType[] = this.$store.state.config.artworkTypes
-  fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
+  config: ConfigStoreState = this.$store.state.config
+  fuzzyHashtags = new Fuse(this.config.hashtags, { includeScore: true })
   hashtagSearchInput: string = ''
 
   editMode = false
   imagePreviewIndex = 0
+  cachedArtwork!: Artwork
 
   async asyncData({ $axios, store, params }: Context) {
     try {
@@ -202,9 +257,7 @@ export default class ArtworkPage extends FormPageComponent {
 
       return {
         artwork: payload,
-        cities: config.cities,
-        hashtags: config.hashtags,
-        artworkTypes: config.artworkTypes
+        config: config
       }
     } catch (error) {
       ToastService.error(`error fetching artwork or app config: ${error}`)
@@ -224,17 +277,15 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   get cityName() {
-    for (let i = 0; i < this.cities.length; i++) {
-      if (this.cities[i].id === this.artwork.city) {
-        return this.cities[i].name
+    for (let i = 0; i < this.config.cities.length; i++) {
+      if (this.config.cities[i].id === this.artwork.city) {
+        return this.config.cities[i].name
       }
     }
   }
 
-  getImageSource(image: ArtworkImageFile) {
-    const src = (<ImageFileRef>image).source
-
-    return `/artwork-images/${src}`
+  get hashtagsString() {
+    return this.artwork.hashtags.map((h) => { return `#${h}` }).join(', ')
   }
 
   get titleRules() {
@@ -261,38 +312,87 @@ export default class ArtworkPage extends FormPageComponent {
     }]
   }
 
+  get isAtMaxImages(): Boolean {
+    // TODO -> Get from admin configuration
+    if (this.artwork.images.length >= 12) {
+      return true
+    }
+
+    return false
+  }
+
   isHighlighted(i: number) {
     return this.imagePreviewIndex === i ? 'highlighted' : ''
   }
 
-  previewImage(index: number) {
-    this.imagePreviewIndex = index
+  getImageSource(image: ArtworkImageFile) {
+    if (isImageFileRef(image)) {
+      return `/artwork-images/${(<ImageFileRef>image).source}`
+    }
+
+    if (isImageUploadPreview(image)) {
+      return `data:${image.type};base64, ${image.ascii}`
+    }
+
+    return ''
   }
 
-  toggleEditMode(enabled?: boolean) {
-    if (typeof enabled !== 'undefined') {
-      this.editMode = !!enabled
+  previewImage(index: number) {
+    if (!this.editMode) {
+      this.imagePreviewIndex = index
+    }
+  }
+
+  toggleEditMode(forceState?: boolean) {
+    if (!this.editMode) {
+      this.cachedArtwork = { ...this.artwork }
+      this.cachedArtwork.images = [ ...this.artwork.images ]
+    }
+    if (typeof forceState !== 'undefined') {
+      this.editMode = !!forceState
     } else {
       this.editMode = !this.editMode
     }
   }
 
-  async saveArtwork() {
-    ProgressService.start()
-    try {
-      const { success } = await this.$axios.$put(
-        `/api/artwork/${this.artwork.id}`,
-        this.artwork
-      )
+  onCancelClicked() {
+    this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
+    this.toggleEditMode(false)
+  }
 
-      if (success) {
-        this.toggleEditMode(false)
-        ToastService.success('artwork saved')
-      }
-    } catch (error) {
-      ToastService.error('error saving artwork')
+  async onArtworkImageChanged(index: number, image: File) {
+    this.artwork.images.splice(
+      index,
+      1,
+      {
+        ascii: btoa(await readFileAsBinaryStringAsync(image)),
+        type: image.type
+      } as ImageUploadPreview
+    )
+  }
+
+  async onAddArtworkImageClicked(image: File) {
+    this.artwork.images.splice(
+      this.artwork.images.length,
+      0,
+      {
+        ascii: btoa(await readFileAsBinaryStringAsync(image)),
+        type: image.type
+      } as ImageUploadPreview
+    )
+  }
+
+  async onDeleteArtworkImageClicked(index: number) {
+    this.artwork.images.splice(index, 1)
+  }
+
+  async saveArtwork() {
+    const artwork = await this.$artworkService.updateArtwork(this.artwork)
+
+    if (artwork) {
+      this.artwork = Object.assign({}, this.artwork, artwork)
+      this.toggleEditMode(false)
     }
-    ProgressService.stop()
   }
 
   async publishOrApproveArtwork(intent: 'publish' | 'approve') {
@@ -348,8 +448,29 @@ export default class ArtworkPage extends FormPageComponent {
 .clickable {
   cursor: pointer;
 }
-
 .highlighted {
   border: 2px solid black;
+}
+.artwork-upload-button.v-text-field {
+  margin-top: 0px;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+}
+.artwork-upload-button >>> .v-input__control {
+  display: none;
+}
+.artwork-upload-button >>> .v-input__prepend-outer {
+  margin-right: 0px;
+  margin-left: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.add-artwork-image-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 </style>
