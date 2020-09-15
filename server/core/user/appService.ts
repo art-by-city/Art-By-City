@@ -103,7 +103,6 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
     if (avatarFile) {
       const avatar = { source: `${avatarFile.name}?${Date.now()}` }
       if (await this.userService.updateUserAvatar(user.id, avatar)) {
-        console.log('UserAppService->uploadAvatar() type, type', existingAvatarFile?.type, avatarFile.type)
         if (existingAvatarFile && existingAvatarFile.type !== avatarFile.type) {
           await this.fileAppService.deleteFileAndAsset(existingAvatarFile)
         } else if (existingAvatarFile) {

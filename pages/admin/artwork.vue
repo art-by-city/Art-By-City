@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
-
-    <v-data-table
+  <v-data-table
       :headers="artworkHeaders"
       :items="artworks"
       item-key="id"
@@ -70,8 +67,7 @@
       <template v-slot:item.approved="props">
         <v-simple-checkbox v-model="props.item.approved" disabled></v-simple-checkbox>
       </template>
-    </v-data-table>
-  </div>
+  </v-data-table>
 </template>
 
 <script lang="ts">
@@ -83,21 +79,10 @@ import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
 import ToastService from '~/services/toast/service'
 
 @Component({
-  middleware: 'role/admin'
+  middleware: 'role/admin',
+  layout: 'admin'
 })
 export default class AdminEventsPage extends FormPageComponent {
-  breadcrumbs = [
-    {
-      text: 'Admin',
-      disabled: false,
-      href: '/admin'
-    },
-    {
-      text: 'Artwork',
-      disabled: true,
-      href: '/admin/artwork'
-    }
-  ]
   artworkHeaders = [
     { text: 'id',          value: 'id'          },
     { text: 'created',     value: 'created',    },

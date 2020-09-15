@@ -1,67 +1,63 @@
 <template>
-  <div>
-    <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
-
-    <v-simple-table dense fixed-header>
-      <thead>
-        <tr>
-          <th class="text-left text-lowercase">ID</th>
-          <th class="text-left text-lowercase">Username</th>
-          <th class="text-left text-lowercase">Email</th>
-          <th class="text-left text-lowercase">City</th>
-          <th class="text-left text-lowercase">Roles</th>
-          <th class="text-left text-lowercase">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td class="text-lowercase">{{ user.id }}</td>
-          <td class="text-lowercase">
-            <nuxt-link :to="`/user/${user.username}`">
-              {{ user.username }}
-            </nuxt-link>
-          </td>
-          <td class="text-lowercase">
-            {{ user.email }}
-          </td>
-          <td>
-            <v-select
-              v-model="user.city"
-              name="city"
-              label="City"
-              class="text-lowercase"
-              :items="cities"
-              prepend-icon="mdi-map"
-              item-text="name"
-              item-value="id"
-              item-disabled="disabled"
-            >
-              <template v-slot:item="{ item }">
-                <span class="text-lowercase">{{ item.name }}</span>
-              </template>
-            </v-select>
-          </td>
-          <td>
-            <v-combobox
-              v-model="user.roles"
-              :items="roles"
-              multiple
-            ></v-combobox>
-          </td>
-          <td>
-            <v-btn
-              text
-              color="primary"
-              class="text-lowercase"
-              @click="saveUser(user)"
-            >
-              Save
-            </v-btn>
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
-  </div>
+  <v-simple-table dense fixed-header>
+    <thead>
+      <tr>
+        <th class="text-left text-lowercase">ID</th>
+        <th class="text-left text-lowercase">Username</th>
+        <th class="text-left text-lowercase">Email</th>
+        <th class="text-left text-lowercase">City</th>
+        <th class="text-left text-lowercase">Roles</th>
+        <th class="text-left text-lowercase">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="user in users" :key="user.id">
+        <td class="text-lowercase">{{ user.id }}</td>
+        <td class="text-lowercase">
+          <nuxt-link :to="`/user/${user.username}`">
+            {{ user.username }}
+          </nuxt-link>
+        </td>
+        <td class="text-lowercase">
+          {{ user.email }}
+        </td>
+        <td>
+          <v-select
+            v-model="user.city"
+            name="city"
+            label="City"
+            class="text-lowercase"
+            :items="cities"
+            prepend-icon="mdi-map"
+            item-text="name"
+            item-value="id"
+            item-disabled="disabled"
+          >
+            <template v-slot:item="{ item }">
+              <span class="text-lowercase">{{ item.name }}</span>
+            </template>
+          </v-select>
+        </td>
+        <td>
+          <v-combobox
+            v-model="user.roles"
+            :items="roles"
+            multiple
+          ></v-combobox>
+        </td>
+        <td>
+          <v-btn
+            text
+            color="primary"
+            class="text-lowercase"
+            @click="saveUser(user)"
+          >
+            Save
+          </v-btn>
+        </td>
+      </tr>
+    </tbody>
+  </v-simple-table>
 </template>
 
 <script lang="ts">
@@ -73,21 +69,10 @@ import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 
 @Component({
-  middleware: 'role/admin'
+  middleware: 'role/admin',
+  layout: 'admin'
 })
 export default class AdminUserPage extends FormPageComponent {
-  breadcrumbs = [
-    {
-      text: 'Admin',
-      disabled: false,
-      href: '/admin'
-    },
-    {
-      text: 'Users',
-      disabled: true,
-      href: '/admin/users'
-    }
-  ]
   roles = ['admin', 'artist']
   users: any[] = []
   cities: any[] = []

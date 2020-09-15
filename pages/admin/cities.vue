@@ -1,82 +1,78 @@
 <template>
-  <div>
-    <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
-
-    <v-simple-table fixed-header>
-      <thead>
-        <tr>
-          <th>
-            <v-btn icon @click="addCity()">
-              <v-icon>mdi-plus-box</v-icon>
+  <v-simple-table fixed-header>
+    <thead>
+      <tr>
+        <th>
+          <v-btn icon @click="addCity()">
+            <v-icon>mdi-plus-box</v-icon>
+          </v-btn>
+        </th>
+      </tr>
+      <tr>
+        <th class="text-left text-lowercase">Country</th>
+        <th class="text-left text-lowercase">Code</th>
+        <th class="text-left text-lowercase">Name</th>
+        <th class="text-left text-lowercase">Visibility</th>
+        <th class="text-left text-lowercase">Disabled</th>
+        <th class="text-left text-lowercase">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(city, idx) in cities" :key="city.id">
+        <td style="width: 100px" class="text-lowercase">
+          {{ city.country }}
+        </td>
+        <td style="width: 100px" class="text-lowercase">
+          <template v-if="editCity !== idx">
+            {{ city.code }}
+          </template>
+          <template v-else>
+            <v-text-field
+              v-model="city.code"
+              type="text"
+              class="text-lowercase"
+            ></v-text-field>
+          </template>
+        </td>
+        <td class="text-lowercase">
+          <template v-if="editCity !== idx">
+            {{ city.name }}
+          </template>
+          <template v-else>
+            <v-text-field
+              v-model="city.name"
+              type="text"
+              class="text-lowercase"
+            ></v-text-field>
+          </template>
+        </td>
+        <td class="text-lowercase">
+          <v-checkbox v-model="city.visible" :disabled="editCity !== idx"></v-checkbox>
+        </td>
+        <td class="text-lowercase">
+          <v-checkbox v-model="city.disabled" :disabled="editCity !== idx"></v-checkbox>
+        </td>
+        <td class="text-lowercase">
+          <template v-if="editCity !== idx">
+            <v-btn icon @click="editCity = idx">
+              <v-icon>mdi-square-edit-outline</v-icon>
             </v-btn>
-          </th>
-        </tr>
-        <tr>
-          <th class="text-left text-lowercase">Country</th>
-          <th class="text-left text-lowercase">Code</th>
-          <th class="text-left text-lowercase">Name</th>
-          <th class="text-left text-lowercase">Visibility</th>
-          <th class="text-left text-lowercase">Disabled</th>
-          <th class="text-left text-lowercase">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(city, idx) in cities" :key="city.id">
-          <td style="width: 100px" class="text-lowercase">
-            {{ city.country }}
-          </td>
-          <td style="width: 100px" class="text-lowercase">
-            <template v-if="editCity !== idx">
-              {{ city.code }}
-            </template>
-            <template v-else>
-              <v-text-field
-                v-model="city.code"
-                type="text"
-                class="text-lowercase"
-              ></v-text-field>
-            </template>
-          </td>
-          <td class="text-lowercase">
-            <template v-if="editCity !== idx">
-              {{ city.name }}
-            </template>
-            <template v-else>
-              <v-text-field
-                v-model="city.name"
-                type="text"
-                class="text-lowercase"
-              ></v-text-field>
-            </template>
-          </td>
-          <td class="text-lowercase">
-            <v-checkbox v-model="city.visible" :disabled="editCity !== idx"></v-checkbox>
-          </td>
-          <td class="text-lowercase">
-            <v-checkbox v-model="city.disabled" :disabled="editCity !== idx"></v-checkbox>
-          </td>
-          <td class="text-lowercase">
-            <template v-if="editCity !== idx">
-              <v-btn icon @click="editCity = idx">
-                <v-icon>mdi-square-edit-outline</v-icon>
-              </v-btn>
-            </template>
-            <template v-else>
-              <v-btn icon @click="saveCity(city)">
-                <v-icon>mdi-content-save</v-icon>
-              </v-btn>
-              <v-btn icon @click="editCity = null">
-                <v-icon>mdi-cancel</v-icon>
-              </v-btn>
-              <v-btn icon @click="deleteCity(city, idx)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </template>
-          </td>
-        </tr>
-      </tbody>
-    </v-simple-table>
-  </div>
+          </template>
+          <template v-else>
+            <v-btn icon @click="saveCity(city)">
+              <v-icon>mdi-content-save</v-icon>
+            </v-btn>
+            <v-btn icon @click="editCity = null">
+              <v-icon>mdi-cancel</v-icon>
+            </v-btn>
+            <v-btn icon @click="deleteCity(city, idx)">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </template>
+        </td>
+      </tr>
+    </tbody>
+  </v-simple-table>
 </template>
 
 <script lang="ts">
@@ -88,21 +84,10 @@ import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 
 @Component({
-  middleware: 'role/admin'
+  middleware: 'role/admin',
+  layout: 'admin'
 })
 export default class AdminCitiesPage extends FormPageComponent {
-  breadcrumbs = [
-    {
-      text: 'Admin',
-      disabled: false,
-      href: '/admin'
-    },
-    {
-      text: 'Cities',
-      disabled: true,
-      href: '/admin/cities'
-    }
-  ]
   cities: any[] = []
   editCity: null | number = null
 

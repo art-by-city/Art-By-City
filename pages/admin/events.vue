@@ -1,7 +1,5 @@
 <template>
   <div>
-    <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
-
     <v-text-field
       v-model="eventLogSearch"
       append-icon="mdi-filter"
@@ -35,21 +33,10 @@ import FormPageComponent from '~/components/pages/formPage.component'
 import ToastService from '~/services/toast/service'
 
 @Component({
-  middleware: 'role/admin'
+  middleware: 'role/admin',
+  layout: 'admin'
 })
 export default class AdminEventsPage extends FormPageComponent {
-  breadcrumbs = [
-    {
-      text: 'Admin',
-      disabled: false,
-      href: '/admin'
-    },
-    {
-      text: 'Event Log',
-      disabled: true,
-      href: '/admin/events'
-    }
-  ]
   events: any[] = []
   eventLogHeaders = [
     { text: 'id', value: 'id', width: '250' },
