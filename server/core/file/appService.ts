@@ -1,10 +1,10 @@
 import { injectable, inject } from 'inversify'
 import fs from 'fs'
 
-import { File, FileService, FileApplicationService, AssetType } from './'
+import { File, FileService, FileApplicationService, FileAssetType } from './'
 import { EventService } from '../events'
 import { UserEvents } from '../events/user'
-import { ArtworkService, ArtworkImage, Artwork } from '../artwork'
+import { ArtworkImage, Artwork } from '../artwork'
 import UnknownError from '../api/errors/unknownError'
 
 @injectable()
@@ -12,7 +12,6 @@ export default class FileApplicationServiceImpl
   implements FileApplicationService {
   private fileService: FileService
   private eventService: EventService
-  private artworkService: ArtworkService
 
   artworkImageDirectory: string = './static/artwork-images/'
   avatarImageDirectory: string = './static/avatar-images/'
@@ -21,18 +20,15 @@ export default class FileApplicationServiceImpl
     @inject(Symbol.for('FileService'))
     fileService: FileService,
     @inject(Symbol.for('EventService'))
-    eventService: EventService,
-    @inject(Symbol.for('ArtworkService'))
-    artworkService: ArtworkService
+    eventService: EventService
   ) {
     this.fileService = fileService
     this.eventService = eventService
-    this.artworkService = artworkService
   }
 
   async createFromFileData(
     userId: string,
-    assetType: AssetType,
+    assetType: FileAssetType,
     fileData: string,
     fileType: string,
     fileName?: string
@@ -56,12 +52,36 @@ export default class FileApplicationServiceImpl
       const file = new File()
       file.name = filename
       file.location = dir
+      file.type = fileType
+      file.owner = userId
+      file.assetType = assetType
 
       return await this.fileService.create(file)
     } catch (error) {
       console.error(error)
       throw new UnknownError()
     }
+  }
+
+  getExistingUserAvatarFile(userId: string): Promise<File | null> {
+    return this.fileService.findOne({
+      owner: userId,
+      assetType: 'avatar'
+    })
+  }
+
+  async deleteFileAndAsset(file: File): Promise<void> {
+    const isAssetDeleted = await this.removeFileAsset(`${this.avatarImageDirectory}/${file.name}`)
+    if (isAssetDeleted) {
+      await this.fileService.delete(file.id)
+    } else {
+      console.error('error deleting file asset')
+      throw new UnknownError()
+    }
+  }
+
+  deleteFile(file: File): Promise<void> {
+    return this.fileService.delete(file.id)
   }
 
   registerEvents() {
@@ -73,7 +93,7 @@ export default class FileApplicationServiceImpl
     try {
       if (artwork) {
         await Promise.all(artwork.images.map(async (image: ArtworkImage) => {
-          await this.deleteFileByName(image.source.split('?')[0])
+          await this.deleteFileByName(image.source.split('?')[0], 'artwork')
         }))
       }
     } catch (error) {
@@ -100,18 +120,21 @@ export default class FileApplicationServiceImpl
       }
 
       await Promise.all(abandonedImages.map(async (image: ArtworkImage) => {
-        await this.deleteFileByName(image.source.split('?')[0])
+        await this.deleteFileByName(image.source.split('?')[0], 'artwork')
       }))
     } catch (error) {
       console.error(error)
     }
   }
 
-  private async deleteFileByName(filename: string): Promise<void> {
-    const file = await this.fileService.getByName(filename)
+  private async deleteFileByName(filename: string, assetType: FileAssetType): Promise<void> {
+    const file = await this.fileService.findOne({ name: filename })
+    const dir = assetType === 'artwork'
+      ? this.artworkImageDirectory
+      : this.avatarImageDirectory
     if (file) {
       const isFileAssetDeleted = await this.removeFileAsset(
-        `${this.artworkImageDirectory}/${filename}`
+        `${dir}/${filename}`
       )
       if (isFileAssetDeleted) {
         await this.fileService.delete(file.id)

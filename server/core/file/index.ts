@@ -18,25 +18,30 @@ export function isFileUploadRequest(thing: any): thing is FileUploadRequest {
   return (thing as FileUploadRequest).type !== undefined
 }
 
-export type AssetType = 'avatar' | 'artwork'
+export type FileAssetType = 'avatar' | 'artwork'
 
 export interface FileFilterOptions {
   name?: string
+  owner?: string
+  assetType?: FileAssetType
 }
 
 export interface FileRepository
   extends BaseRepositoryInterface<File, FileFilterOptions> {}
 
 export interface FileService extends BaseDomainServiceInterface<File> {
-    getByName(name: string): Promise<File | null>
+  findOne(opts?: FileFilterOptions): Promise<File | null>
 }
 
 export interface FileApplicationService
   extends BaseApplicationServiceInterface {
   registerEvents(): void
+  getExistingUserAvatarFile(userId: string): Promise<File | null>
+  deleteFileAndAsset(file: File): Promise<void>
+  deleteFile(file: File): Promise<void>
   createFromFileData(
     userId: string,
-    assetType: AssetType,
+    assetType: FileAssetType,
     fileData: string,
     fileType: string,
     fileName?: string

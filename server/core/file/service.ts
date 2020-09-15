@@ -3,7 +3,8 @@ import { injectable, inject } from 'inversify'
 import {
   File,
   FileService,
-  FileRepository
+  FileRepository,
+  FileFilterOptions
 } from './'
 
 @injectable()
@@ -37,7 +38,7 @@ export default class FileServiceImpl implements FileService {
     return this.fileRepository.list()
   }
 
-  getByName(name: string): Promise<File | null> {
-    return this.fileRepository.findOne({ name })
+  findOne(opts?: FileFilterOptions): Promise<File | null> {
+    return this.fileRepository.findOne(opts)
   }
 }
