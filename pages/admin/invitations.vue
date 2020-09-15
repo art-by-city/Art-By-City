@@ -1,119 +1,115 @@
 <template>
-  <div>
-    <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
-
-    <v-container fluid>
-      <v-row justify="center">
-        <v-dialog v-model="sendInviteEmailModalShown" persistent max-width="600px">
-          <v-form ref="form" v-model="valid" @submit.prevent="onInviteEmailModalSaveClicked">
-            <v-card v-if="invitationToSend">
-              <v-card-title>{{ invitationToSend.sent ? 're-' : '' }}send invitation email</v-card-title>
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="invitationToSend.id"
-                        label="code"
-                        disabled
-                      ></v-text-field>
-                      <v-checkbox
-                        v-model="invitationToSend.sent"
-                        label="sent"
-                        disabled
-                      ></v-checkbox>
-                      <DateWithTooltip :date="invitationToSend.sentOn" />
-                      <v-text-field
-                        v-model="invitationToSend.sentToEmail"
-                        label="email"
-                        required
-                        :rules="emailRules"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn icon color="red" @click="closeInviteEmailModal">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-                <v-btn icon color="green" type="submit">
-                  <v-icon>mdi-email-send</v-icon>
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-form>
-        </v-dialog>
-
-        <v-col cols="10">
-          <v-data-table
-            :headers="invitationHeaders"
-            :items="invitations"
-            :search="invitationSearchTerm"
-            item-key="id"
-            sort-by="created"
-            sort-desc
-            calculate-widths
-            dense
-          >
-            <template v-slot:top>
-              <v-toolbar dense elevation="0">
-                <v-toolbar-title>invitations</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn icon color="green" @click="onNewInvitationButtonClicked">
-                  <v-icon>mdi-email-plus</v-icon>
-                </v-btn>
-                <v-text-field
-                  v-model="invitationSearchTerm"
-                  append-icon="mdi-filter"
-                  label="filter invitations"
-                  single-line
-                  hide-details
-                ></v-text-field>
-              </v-toolbar>
-            </template>
-            <template v-slot:item.created="props">
-              <DateWithTooltip :date="props.item.created" />
-            </template>
-            <template v-slot:item.createdByUser="props">
-              <nuxt-link :to="`/user/${props.item.createdByUser.username}`">
-                {{ props.item.createdByUser.username }}
-              </nuxt-link>
-            </template>
-            <template v-slot:item.sent="props">
-              <v-simple-checkbox v-model="props.item.sent" disabled></v-simple-checkbox>
-            </template>
-            <template v-slot:item.sentOn="props">
-              <DateWithTooltip :date="props.item.sentOn" />
-            </template>
-            <template v-slot:item.used="props">
-              <v-simple-checkbox v-model="props.item.used" disabled></v-simple-checkbox>
-            </template>
-            <template v-slot:item.usedOn="props">
-              <DateWithTooltip :date="props.item.usedOn" />
-            </template>
-            <template v-slot:item.usedByUser="props">
-              <nuxt-link
-                v-if="props.item.usedByUser"
-                :to="`/user/${props.item.usedByUser.username}`"
-              >
-                {{ props.item.usedByUser.username }}
-              </nuxt-link>
-            </template>
-            <template v-slot:item.actions="props">
-              <v-btn icon @click="onCopyInviteLinkClicked(props.item)">
-                <v-icon>mdi-link-variant</v-icon>
+  <v-container fluid>
+    <v-row justify="center">
+      <v-dialog v-model="sendInviteEmailModalShown" persistent max-width="600px">
+        <v-form ref="form" v-model="valid" @submit.prevent="onInviteEmailModalSaveClicked">
+          <v-card v-if="invitationToSend">
+            <v-card-title>{{ invitationToSend.sent ? 're-' : '' }}send invitation email</v-card-title>
+            <v-card-text>
+              <v-container>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="invitationToSend.id"
+                      label="code"
+                      disabled
+                    ></v-text-field>
+                    <v-checkbox
+                      v-model="invitationToSend.sent"
+                      label="sent"
+                      disabled
+                    ></v-checkbox>
+                    <DateWithTooltip :date="invitationToSend.sentOn" />
+                    <v-text-field
+                      v-model="invitationToSend.sentToEmail"
+                      label="email"
+                      required
+                      :rules="emailRules"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn icon color="red" @click="closeInviteEmailModal">
+                <v-icon>mdi-close</v-icon>
               </v-btn>
-              <v-btn icon @click="onSendInviteEmailClicked(props.item)">
+              <v-btn icon color="green" type="submit">
                 <v-icon>mdi-email-send</v-icon>
               </v-btn>
-            </template>
-          </v-data-table>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
+            </v-card-actions>
+          </v-card>
+        </v-form>
+      </v-dialog>
+
+      <v-col cols="10">
+        <v-data-table
+          :headers="invitationHeaders"
+          :items="invitations"
+          :search="invitationSearchTerm"
+          item-key="id"
+          sort-by="created"
+          sort-desc
+          calculate-widths
+          dense
+        >
+          <template v-slot:top>
+            <v-toolbar dense elevation="0">
+              <v-toolbar-title>invitations</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon color="green" @click="onNewInvitationButtonClicked">
+                <v-icon>mdi-email-plus</v-icon>
+              </v-btn>
+              <v-text-field
+                v-model="invitationSearchTerm"
+                append-icon="mdi-filter"
+                label="filter invitations"
+                single-line
+                hide-details
+              ></v-text-field>
+            </v-toolbar>
+          </template>
+          <template v-slot:item.created="props">
+            <DateWithTooltip :date="props.item.created" />
+          </template>
+          <template v-slot:item.createdByUser="props">
+            <nuxt-link :to="`/user/${props.item.createdByUser.username}`">
+              {{ props.item.createdByUser.username }}
+            </nuxt-link>
+          </template>
+          <template v-slot:item.sent="props">
+            <v-simple-checkbox v-model="props.item.sent" disabled></v-simple-checkbox>
+          </template>
+          <template v-slot:item.sentOn="props">
+            <DateWithTooltip :date="props.item.sentOn" />
+          </template>
+          <template v-slot:item.used="props">
+            <v-simple-checkbox v-model="props.item.used" disabled></v-simple-checkbox>
+          </template>
+          <template v-slot:item.usedOn="props">
+            <DateWithTooltip :date="props.item.usedOn" />
+          </template>
+          <template v-slot:item.usedByUser="props">
+            <nuxt-link
+              v-if="props.item.usedByUser"
+              :to="`/user/${props.item.usedByUser.username}`"
+            >
+              {{ props.item.usedByUser.username }}
+            </nuxt-link>
+          </template>
+          <template v-slot:item.actions="props">
+            <v-btn icon @click="onCopyInviteLinkClicked(props.item)">
+              <v-icon>mdi-link-variant</v-icon>
+            </v-btn>
+            <v-btn icon @click="onSendInviteEmailClicked(props.item)">
+              <v-icon>mdi-email-send</v-icon>
+            </v-btn>
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -128,21 +124,10 @@ import InvitationService from '~/services/invitation/service'
 import { emailRules } from '~/models/user/validation'
 
 @Component({
-  middleware: 'role/admin'
+  middleware: 'role/admin',
+  layout: 'admin'
 })
 export default class AdminInvitationsPage extends FormPageComponent {
-  breadcrumbs = [
-    {
-      text: 'Admin',
-      disabled: false,
-      href: '/admin'
-    },
-    {
-      text: 'Invitations',
-      disabled: true,
-      href: '/admin/invitations'
-    }
-  ]
   invitationHeaders = [
     { text: 'code', value: 'id' },
     { text: 'created on', value: 'created' },

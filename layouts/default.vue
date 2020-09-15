@@ -103,7 +103,8 @@
 
     <v-content>
       <v-container fluid style="height: 100%">
-        <nuxt />
+        <nuxt v-if="!$slots.default" />
+        <slot />
       </v-container>
     </v-content>
 

@@ -42,7 +42,7 @@ export default async (artwork: Artwork): Promise<void> => {
     //   return internalProps.includes(validationError.property)
     // })
     // internalErrors.forEach((validationError) => {
-    //   console.log('INTERNAL VALIDATION ERROR', validationError)
+    //   console.error('INTERNAL VALIDATION ERROR', validationError)
     // })
 
     if (messages.length > 0) {
