@@ -38,6 +38,14 @@ export default class FileRepositoryImpl
         query = query.whereEqualTo('name', filter.name)
       }
 
+      if (filter && filter.owner) {
+        query = query.whereEqualTo('owner', filter.owner)
+      }
+
+      if (filter && filter.assetType) {
+        query = query.whereEqualTo('assetType', filter.assetType)
+      }
+
       return query.findOne()
     } catch (error) {
       throw new Error(`Error finding file: ${error.message}`)
