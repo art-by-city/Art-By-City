@@ -67,6 +67,7 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   middleware: 'role/admin',
@@ -91,6 +92,10 @@ export default class AdminUserPage extends FormPageComponent {
     }
 
     return { users, cities }
+  }
+
+  created() {
+    this.saveUser = debounce(this.saveUser)
   }
 
   async saveUser(user: any) {

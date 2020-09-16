@@ -79,6 +79,7 @@ import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
+import { debounce } from '~/helpers/helpers'
 
 const MAX_ARTWORK_IMAGES = 12
 
@@ -120,6 +121,10 @@ export default class ArtworkUploadPage extends FormComponent {
     }
 
     return { cities, hashtags, artworkTypes }
+  }
+
+  created() {
+    this.upload = debounce(this.upload)
   }
 
   get titleRules() {

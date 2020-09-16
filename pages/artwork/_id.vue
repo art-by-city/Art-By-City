@@ -224,7 +224,7 @@ import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 import { ConfigStoreState } from '~/store/config'
-import { readFileAsBinaryStringAsync } from '~/helpers/helpers'
+import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
 
 @Component({
   components: {
@@ -262,6 +262,17 @@ export default class ArtworkPage extends FormPageComponent {
     } catch (error) {
       ToastService.error(`error fetching artwork or app config: ${error}`)
     }
+  }
+
+  created() {
+    this.toggleEditMode = debounce(this.toggleEditMode)
+    this.onCancelClicked = debounce(this.onCancelClicked)
+    this.onArtworkImageChanged = debounce(this.onArtworkImageChanged)
+    this.onAddArtworkImageClicked = debounce(this.onAddArtworkImageClicked)
+    this.onDeleteArtworkImageClicked = debounce(this.onDeleteArtworkImageClicked)
+    this.saveArtwork = debounce(this.saveArtwork)
+    this.deleteArtwork = debounce(this.deleteArtwork)
+    this.publishOrApproveArtwork = debounce(this.publishOrApproveArtwork)
   }
 
   get isOwner() {

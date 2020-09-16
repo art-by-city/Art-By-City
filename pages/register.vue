@@ -107,6 +107,7 @@ import {
 } from '~/models/user/validation'
 import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
 import CitySelector from '~/components/forms/citySelector.component.vue'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   components: {
@@ -146,6 +147,10 @@ export default class RegisterPage extends FormPageComponent {
     }
 
     return { errors, config, login }
+  }
+
+  created() {
+    this.register = debounce(this.register)
   }
 
   async register() {

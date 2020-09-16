@@ -83,6 +83,7 @@ import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   middleware: 'auth',
@@ -118,6 +119,10 @@ export default class AccountPage extends FormPageComponent {
     }
 
     return { cities, login: user }
+  }
+
+  created() {
+    this.save = debounce(this.save)
   }
 
   async save() {

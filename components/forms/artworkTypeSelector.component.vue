@@ -2,7 +2,7 @@
   <div id="artworkTypeSelector" class="artwork-type-selector condensed-input">
     <v-select
       v-bind:value="value"
-      v-on:input="$emit('input', $event)"
+      @input="$emit('input', $event)"
       class="text-lowercase"
       name="type"
       label="type"

@@ -47,6 +47,7 @@ import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 import ArtworkModal from '~/components/artwork/ArtworkModal.component.vue'
 import ToastService from '~/services/toast/service'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   components: {
@@ -66,6 +67,10 @@ export default class UserProfilePage extends PageComponent {
     } catch (error) {
       ToastService.error('error fetching user profile')
     }
+  }
+
+  created() {
+    this.onUserAvatarChanged = debounce(this.onUserAvatarChanged)
   }
 
   onArtworkCardClicked(artwork: any) {

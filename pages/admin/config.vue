@@ -113,6 +113,7 @@ import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   middleware: 'role/admin',
@@ -139,6 +140,11 @@ export default class AdminConfigPage extends FormPageComponent {
     }
 
     return { errors, maxUserArtworks, artworkTypes }
+  }
+
+  created() {
+    this.save = debounce(this.save)
+    this.onArtworkTypeEditModalSaveClicked = debounce(this.onArtworkTypeEditModalSaveClicked)
   }
 
   async onArtworkTypeEditModalSaveClicked() {

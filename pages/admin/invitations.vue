@@ -122,6 +122,7 @@ import ProgressService from '~/services/progress/service'
 import Invitation from '~/models/invitation'
 import InvitationService from '~/services/invitation/service'
 import { emailRules } from '~/models/user/validation'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   middleware: 'role/admin',
@@ -158,6 +159,13 @@ export default class AdminInvitationsPage extends FormPageComponent {
     } catch (error) {
       ToastService.error(error)
     }
+  }
+
+  created() {
+    this.onNewInvitationButtonClicked = debounce(this.onNewInvitationButtonClicked)
+    this.onCopyInviteLinkClicked = debounce(this.onCopyInviteLinkClicked)
+    this.onSendInviteEmailClicked = debounce(this.onSendInviteEmailClicked)
+    this.onInviteEmailModalSaveClicked = debounce(this.onInviteEmailModalSaveClicked)
   }
 
   async onNewInvitationButtonClicked() {

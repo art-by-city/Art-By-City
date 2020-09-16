@@ -22,7 +22,5 @@ import { Component } from 'nuxt-property-decorator'
 import PageComponent from '~/components/pages/page.component'
 
 @Component
-export default class AboutPage extends PageComponent {
-
-}
+export default class AboutPage extends PageComponent {}
 </script>
