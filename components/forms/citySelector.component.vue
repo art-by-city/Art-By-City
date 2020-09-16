@@ -2,7 +2,7 @@
   <div id="citySelector" class="city-selector condensed-input">
     <v-autocomplete
       v-bind:value="value"
-      v-on:input="$emit('input', $event)"
+      @input="$emit('input', $event)"
       class="text-lowercase"
       name="NOAUTOCOMPLETE-city-NOAUTOCOMPLETE"
       label="city"

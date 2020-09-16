@@ -15,6 +15,7 @@ import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
 
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
+import { debounce } from '~/helpers/helpers'
 
 interface Artwork {
   id: string
@@ -30,6 +31,10 @@ export default class LikeButton extends Vue {
   }) readonly dark: boolean | undefined
 
   @Model('change', { type: Object, required: true }) artwork!: Artwork
+
+  created() {
+    this.toggleLike = debounce(this.toggleLike)
+  }
 
   toggleLike() {
     if (!this.artwork.likes) {

@@ -56,12 +56,17 @@
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '../components/pages/formPage.component'
+import { debounce } from '~/helpers/helpers'
 
 @Component
 export default class LoginPage extends FormPageComponent {
   login = {
     username: '',
     password: ''
+  }
+
+  created() {
+    this.userLogin = debounce(this.userLogin)
   }
 
   async userLogin() {

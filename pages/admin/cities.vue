@@ -82,6 +82,7 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   middleware: 'role/admin',
@@ -101,6 +102,12 @@ export default class AdminCitiesPage extends FormPageComponent {
       ToastService.error(`error fetching cities: ${error}`)
     }
     return { cities }
+  }
+
+  created() {
+    this.addCity = debounce(this.addCity)
+    this.saveCity = debounce(this.saveCity)
+    this.deleteCity = debounce(this.deleteCity)
   }
 
   async saveCity(city: any) {

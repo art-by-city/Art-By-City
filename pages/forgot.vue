@@ -58,6 +58,7 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
 import ProgressService from '~/services/progress/service'
+import { debounce } from '~/helpers/helpers'
 
 @Component
 export default class ForgotPasswordPage extends FormPageComponent {
@@ -68,6 +69,10 @@ export default class ForgotPasswordPage extends FormPageComponent {
   }
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
+
+  created() {
+    this.save = debounce(this.save)
+  }
 
   async save() {
     ProgressService.start()

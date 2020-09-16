@@ -33,11 +33,13 @@
 
 <script lang="ts">
 import { Vue, Component, PropSync } from 'nuxt-property-decorator'
+import _ from 'lodash'
 
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
 import ArtworkCard from './ArtworkCard.component.vue'
 import ArtworkModal from './ArtworkModal.component.vue'
 import ArtworkOptions from '../../models/artwork/artworkOptions'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   components: {
@@ -53,6 +55,14 @@ export default class ArtworkExplorer extends Vue {
   modalArtwork: any | null = null
   searched: boolean = false
 
+  created() {
+    this.previous = debounce(this.previous)
+    this.next = debounce(this.next)
+    this.fetchMore = debounce(this.fetchMore)
+    this.refresh = debounce(this.refresh)
+    this.onArtworkCardClicked = debounce(this.onArtworkCardClicked)
+  }
+
   get _artworks() {
     return this.$store.state.artworks.list
   }
@@ -61,16 +71,24 @@ export default class ArtworkExplorer extends Vue {
     this.$store.commit('artworks/previous')
   }
 
+  next() {
+    this.$store.commit('artworks/next')
+  }
+
+  fetchMore() {
+    this.$store.dispatch('artworks/fetchMore')
+  }
+
   onArtworkCardClicked(artwork: any, index: number) {
     const requestNewArtworkThreshold = 5
     if (index === this.$store.state.artworks.currentArtworkIndex) {
       this.modalArtwork = artwork
     } else if (index < this.$store.state.artworks.currentArtworkIndex) {
-      this.$store.commit('artworks/previous')
+      this.previous()
     } else if (index > this.$store.state.artworks.currentArtworkIndex) {
-      this.$store.commit('artworks/next')
+      this.next()
       if (this.$store.state.artworks.list.length - index < requestNewArtworkThreshold) {
-        this.$store.dispatch('artworks/fetchMore')
+        this.fetchMore()
       }
     }
   }
