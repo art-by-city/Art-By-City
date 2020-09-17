@@ -7,53 +7,59 @@
           <v-row justify="center">
             <v-col cols="12">
               <v-img
-                :src="getImageSource(artwork.images[imagePreviewIndex])"
+                :src="getImageSource(previewImage)"
                 max-width="500"
                 max-height="500"
                 contain
               ></v-img>
-              {{ artwork.images.length }}
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="4" v-for="(image, i) in artwork.images" :key="i">
-              <v-hover v-slot:default="hoverProps">
-                <v-img
-                  max-width="250"
-                  max-height="250"
-                  aspect-ratio="1.7"
-                  :src="getImageSource(image)"
-                  class="clickable"
-                  :class="isHighlighted(i)"
-                  @click="previewImage(i)"
-                >
-                  <v-overlay absolute :value="editMode && hoverProps.hover">
-                    <v-file-input
-                      class="artwork-upload-button"
-                      accept="image/*"
-                      hide-input
-                      prepend-icon="mdi-camera"
-                      @change="onArtworkImageChanged(i, $event)"
-                    ></v-file-input>
-                    <div style="display: inline-flex;">
-                      <v-btn
-                        icon
-                        small
-                        @click="onDeleteArtworkImageClicked(i)"
-                      >
-                        <v-icon>mdi-delete</v-icon>
-                      </v-btn>
-                      <!-- <v-btn
-                        icon
-                        small
-                      >
-                        <v-icon>mdi-drag-variant</v-icon>
-                      </v-btn> -->
-                    </div>
-                  </v-overlay>
-                </v-img>
-              </v-hover>
-            </v-col>
+            <draggable
+              style="height:100%; width:100%; display: flex; flex-wrap: wrap;"
+              :list="artwork.images"
+              :disabled="!editMode"
+              handle=".drag-handle"
+            >
+              <v-col cols="4" v-for="(image, i) in artwork.images" :key="i">
+                <v-hover v-slot:default="hoverProps">
+                  <v-img
+                    max-width="150"
+                    max-height="150"
+                    aspect-ratio="1.7"
+                    :src="getImageSource(image)"
+                    class="clickable"
+                    @click="setPreviewImage(image)"
+                  >
+                    <v-overlay absolute :value="editMode && hoverProps.hover">
+                      <v-file-input
+                        class="artwork-upload-button"
+                        accept="image/*"
+                        hide-input
+                        prepend-icon="mdi-camera"
+                        @change="onArtworkImageChanged(i, $event)"
+                      ></v-file-input>
+                      <div style="display: inline-flex;">
+                        <v-btn
+                          icon
+                          small
+                          @click="onDeleteArtworkImageClicked(i)"
+                        >
+                          <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+                        <v-btn
+                          icon
+                          small
+                          class="drag-handle"
+                        >
+                          <v-icon>mdi-drag-variant</v-icon>
+                        </v-btn>
+                      </div>
+                    </v-overlay>
+                  </v-img>
+                </v-hover>
+              </v-col>
+            </draggable>
             <v-col cols="4" v-if="editMode && !isAtMaxImages">
               <v-responsive
                 aspect-ratio="1.7"
@@ -205,6 +211,7 @@
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
+import draggable from 'vuedraggable'
 
 import LikeButton from '~/components/likeButton.component.vue'
 import CitySelector from '~/components/forms/citySelector.component.vue'
@@ -231,7 +238,8 @@ import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
     LikeButton,
     CitySelector,
     ArtworkTypeSelector,
-    HashtagSelector
+    HashtagSelector,
+    draggable
   }
 })
 export default class ArtworkPage extends FormPageComponent {
@@ -241,7 +249,8 @@ export default class ArtworkPage extends FormPageComponent {
   hashtagSearchInput: string = ''
 
   editMode = false
-  imagePreviewIndex = 0
+  // imagePreviewIndex = 0
+  previewImage!: ArtworkImageFile
   cachedArtwork!: Artwork
 
   async asyncData({ $axios, store, params }: Context) {
@@ -257,7 +266,8 @@ export default class ArtworkPage extends FormPageComponent {
 
       return {
         artwork: payload,
-        config: config
+        config: config,
+        previewImage: payload.images[0]
       }
     } catch (error) {
       ToastService.error(`error fetching artwork or app config: ${error}`)
@@ -332,10 +342,6 @@ export default class ArtworkPage extends FormPageComponent {
     return false
   }
 
-  isHighlighted(i: number) {
-    return this.imagePreviewIndex === i ? 'highlighted' : ''
-  }
-
   getImageSource(image: ArtworkImageFile) {
     if (isImageFileRef(image)) {
       return `/artwork-images/${(<ImageFileRef>image).source}`
@@ -348,9 +354,10 @@ export default class ArtworkPage extends FormPageComponent {
     return ''
   }
 
-  previewImage(index: number) {
+  setPreviewImage(image: ArtworkImageFile) {
     if (!this.editMode) {
-      this.imagePreviewIndex = index
+      // this.imagePreviewIndex = index
+      this.previewImage = image
     }
   }
 
