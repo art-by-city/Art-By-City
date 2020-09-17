@@ -45,7 +45,8 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
-    "vee-validate": "^3.3.0"
+    "vee-validate": "^3.3.0",
+    "vuedraggable": "^2.24.1"
   },
   "devDependencies": {
     "@nuxt/typescript-build": "^0.6.5",
