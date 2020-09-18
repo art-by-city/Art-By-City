@@ -69,14 +69,11 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
-  created() {
-    this.onUserAvatarChanged = debounce(this.onUserAvatarChanged)
-  }
-
   onArtworkCardClicked(artwork: any) {
     this.modalArtwork = artwork
   }
 
+  @debounce
   async onUserAvatarChanged(image: File) {
     const avatar = await this.$profileService.uploadUserAvatar(image)
     if (avatar) {

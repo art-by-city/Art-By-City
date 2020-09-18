@@ -10,6 +10,23 @@ export const readFileAsBinaryStringAsync = (file: File): Promise<string> => {
   })
 }
 
-export const debounce = (func: (...args: any) => any, timeout?: number) => {
-  return _.debounce(func, timeout || 300, { leading: true, trailing: false })
+export type AnyFunction = ((...args: any) => any)
+
+const _debounce = (
+  _target: Object,
+  _propertyKey: string | symbol,
+  descriptor: TypedPropertyDescriptor<AnyFunction>
+) => {
+  const timeout = 300
+  if (descriptor.value) {
+    descriptor.value = _.debounce(
+      descriptor.value,
+      timeout,
+      { leading: true, trailing: false }
+    )
+  }
+
+  return descriptor
 }
+
+export const debounce: MethodDecorator = <AnyFunction>_debounce

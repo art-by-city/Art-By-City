@@ -149,10 +149,7 @@ export default class RegisterPage extends FormPageComponent {
     return { errors, config, login }
   }
 
-  created() {
-    this.register = debounce(this.register)
-  }
-
+  @debounce
   async register() {
     this.errors = []
     const registrationResult = await this.$axios

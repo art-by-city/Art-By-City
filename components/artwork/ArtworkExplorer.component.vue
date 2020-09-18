@@ -55,30 +55,26 @@ export default class ArtworkExplorer extends Vue {
   modalArtwork: any | null = null
   searched: boolean = false
 
-  created() {
-    this.previous = debounce(this.previous)
-    this.next = debounce(this.next)
-    this.fetchMore = debounce(this.fetchMore)
-    this.refresh = debounce(this.refresh)
-    this.onArtworkCardClicked = debounce(this.onArtworkCardClicked)
-  }
-
   get _artworks() {
     return this.$store.state.artworks.list
   }
 
+  @debounce
   previous() {
     this.$store.commit('artworks/previous')
   }
 
+  @debounce
   next() {
     this.$store.commit('artworks/next')
   }
 
+  @debounce
   fetchMore() {
     this.$store.dispatch('artworks/fetchMore')
   }
 
+  @debounce
   onArtworkCardClicked(artwork: any, index: number) {
     const requestNewArtworkThreshold = 5
     if (index === this.$store.state.artworks.currentArtworkIndex) {
@@ -93,6 +89,7 @@ export default class ArtworkExplorer extends Vue {
     }
   }
 
+  @debounce
   async refresh(opts: ArtworkOptions) {
     this.searched = true
     this.$store.commit('artworks/options', opts)

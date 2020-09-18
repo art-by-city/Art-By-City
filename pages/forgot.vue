@@ -70,10 +70,7 @@ export default class ForgotPasswordPage extends FormPageComponent {
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
 
-  created() {
-    this.save = debounce(this.save)
-  }
-
+  @debounce
   async save() {
     ProgressService.start()
     this.errors = []

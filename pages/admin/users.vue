@@ -94,10 +94,7 @@ export default class AdminUserPage extends FormPageComponent {
     return { users, cities }
   }
 
-  created() {
-    this.saveUser = debounce(this.saveUser)
-  }
-
+  @debounce
   async saveUser(user: any) {
     ProgressService.start()
     try {

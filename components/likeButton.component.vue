@@ -32,10 +32,7 @@ export default class LikeButton extends Vue {
 
   @Model('change', { type: Object, required: true }) artwork!: Artwork
 
-  created() {
-    this.toggleLike = debounce(this.toggleLike)
-  }
-
+  @debounce
   toggleLike() {
     if (!this.artwork.likes) {
       this.artwork.likes = []

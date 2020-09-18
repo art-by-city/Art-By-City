@@ -121,10 +121,7 @@ export default class AccountPage extends FormPageComponent {
     return { cities, login: user }
   }
 
-  created() {
-    this.save = debounce(this.save)
-  }
-
+  @debounce
   async save() {
     ProgressService.start()
 
