@@ -26,7 +26,7 @@
                   <v-switch v-model="artworkTypeModalObj.enabled">
                     <template v-slot:label>
                       <template v-if="artworkTypeModalObj.enabled">
-                        <v-icon color="green">mdi-check</v-icon>
+                        <v-icon color="success">mdi-check</v-icon>
                       </template>
                       <template v-else>
                         <v-icon>mdi-close</v-icon>
@@ -39,10 +39,10 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn small icon color="red" @click="closeArtworkTypeEditModal">
+            <v-btn small icon color="error" @click="closeArtworkTypeEditModal">
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-btn small icon color="green" @click="onArtworkTypeEditModalSaveClicked">
+            <v-btn small icon color="success" @click="onArtworkTypeEditModalSaveClicked">
               <v-icon>mdi-check</v-icon>
             </v-btn>
           </v-card-actions>
@@ -88,7 +88,7 @@
             <tfoot>
               <tr>
                 <td class="text-lowercase">
-                  <v-btn small icon color="green" @click="openArtworkTypeEditModal()">
+                  <v-btn small icon color="success" @click="openArtworkTypeEditModal()">
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
                 </td>
