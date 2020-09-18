@@ -274,17 +274,6 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
-  created() {
-    this.toggleEditMode = debounce(this.toggleEditMode)
-    this.onCancelClicked = debounce(this.onCancelClicked)
-    this.onArtworkImageChanged = debounce(this.onArtworkImageChanged)
-    this.onAddArtworkImageClicked = debounce(this.onAddArtworkImageClicked)
-    this.onDeleteArtworkImageClicked = debounce(this.onDeleteArtworkImageClicked)
-    this.saveArtwork = debounce(this.saveArtwork)
-    this.deleteArtwork = debounce(this.deleteArtwork)
-    this.publishOrApproveArtwork = debounce(this.publishOrApproveArtwork)
-  }
-
   get isOwner() {
     return this.$store.state?.auth?.user?.id === this.artwork?.owner.id
   }
@@ -361,6 +350,7 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
+  @debounce
   toggleEditMode(forceState?: boolean) {
     if (!this.editMode) {
       this.cachedArtwork = { ...this.artwork }
@@ -373,11 +363,13 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
+  @debounce
   onCancelClicked() {
     this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
     this.toggleEditMode(false)
   }
 
+  @debounce
   async onArtworkImageChanged(index: number, image: File) {
     this.artwork.images.splice(
       index,
@@ -389,6 +381,7 @@ export default class ArtworkPage extends FormPageComponent {
     )
   }
 
+  @debounce
   async onAddArtworkImageClicked(image: File) {
     this.artwork.images.splice(
       this.artwork.images.length,
@@ -400,10 +393,12 @@ export default class ArtworkPage extends FormPageComponent {
     )
   }
 
+  @debounce
   async onDeleteArtworkImageClicked(index: number) {
     this.artwork.images.splice(index, 1)
   }
 
+  @debounce
   async saveArtwork() {
     const artwork = await this.$artworkService.updateArtwork(this.artwork)
 
@@ -413,6 +408,7 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
+  @debounce
   async publishOrApproveArtwork(intent: 'publish' | 'approve') {
     ProgressService.start()
     try {
@@ -441,6 +437,7 @@ export default class ArtworkPage extends FormPageComponent {
     ProgressService.stop()
   }
 
+  @debounce
   async deleteArtwork() {
     if (confirm('Are you sure you want to delete this artwork?')) {
       ProgressService.start()

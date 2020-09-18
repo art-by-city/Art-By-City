@@ -123,10 +123,6 @@ export default class ArtworkUploadPage extends FormComponent {
     return { cities, hashtags, artworkTypes }
   }
 
-  created() {
-    this.upload = debounce(this.upload)
-  }
-
   get titleRules() {
     return [(value: string = '') => {
       if (value.length < 1) {
@@ -158,6 +154,7 @@ export default class ArtworkUploadPage extends FormComponent {
     }
   }
 
+  @debounce
   async upload() {
     const artwork = await this.$artworkService.createArtwork(this.artwork)
 
