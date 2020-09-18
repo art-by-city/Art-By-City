@@ -70,7 +70,7 @@
                   class="artwork-upload-button add-artwork-image-button"
                   accept="image/*"
                   hide-input
-                  prepend-icon="mdi-camera"
+                  prepend-icon="mdi-camera-plus"
                   @change="onAddArtworkImageClicked"
                 ></v-file-input>
               </v-responsive>
