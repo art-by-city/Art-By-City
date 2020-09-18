@@ -32,10 +32,10 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn icon color="red" @click="closeInviteEmailModal">
+              <v-btn icon color="error" @click="closeInviteEmailModal">
                 <v-icon>mdi-close</v-icon>
               </v-btn>
-              <v-btn icon color="green" type="submit">
+              <v-btn icon color="success" type="submit">
                 <v-icon>mdi-email-send</v-icon>
               </v-btn>
             </v-card-actions>
@@ -58,7 +58,7 @@
             <v-toolbar dense elevation="0">
               <v-toolbar-title>invitations</v-toolbar-title>
               <v-spacer></v-spacer>
-              <v-btn icon color="green" @click="onNewInvitationButtonClicked">
+              <v-btn icon color="success" @click="onNewInvitationButtonClicked">
                 <v-icon>mdi-email-plus</v-icon>
               </v-btn>
               <v-text-field
