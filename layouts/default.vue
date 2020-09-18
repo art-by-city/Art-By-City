@@ -101,12 +101,12 @@
       :indeterminate="ProgressService.isInProgress"
     ></v-progress-linear>
 
-    <v-content>
+    <v-main>
       <v-container fluid style="height: 100%">
         <nuxt v-if="!$slots.default" />
         <slot />
       </v-container>
-    </v-content>
+    </v-main>
 
     <v-footer dark>
       <nuxt-link class="white--text text-lowercase" to="/about">About</nuxt-link>
