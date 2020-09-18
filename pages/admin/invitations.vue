@@ -161,13 +161,7 @@ export default class AdminInvitationsPage extends FormPageComponent {
     }
   }
 
-  created() {
-    this.onNewInvitationButtonClicked = debounce(this.onNewInvitationButtonClicked)
-    this.onCopyInviteLinkClicked = debounce(this.onCopyInviteLinkClicked)
-    this.onSendInviteEmailClicked = debounce(this.onSendInviteEmailClicked)
-    this.onInviteEmailModalSaveClicked = debounce(this.onInviteEmailModalSaveClicked)
-  }
-
+  @debounce
   async onNewInvitationButtonClicked() {
     try {
       const invitation = await this.$invitationService.requestNewInvitation()
@@ -181,6 +175,7 @@ export default class AdminInvitationsPage extends FormPageComponent {
     }
   }
 
+  @debounce
   async onCopyInviteLinkClicked(invitation: Invitation) {
     try {
       await navigator.clipboard.writeText(
@@ -207,10 +202,12 @@ export default class AdminInvitationsPage extends FormPageComponent {
     } catch (error) {}
   }
 
+  @debounce
   async onSendInviteEmailClicked(invitation: Invitation) {
     this.openInviteEmailModal(invitation)
   }
 
+  @debounce
   async onInviteEmailModalSaveClicked() {
     if (this.invitationToSend) {
       await this.sendInviteEmail(this.invitationToSend)

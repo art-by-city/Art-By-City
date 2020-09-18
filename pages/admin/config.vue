@@ -142,11 +142,7 @@ export default class AdminConfigPage extends FormPageComponent {
     return { errors, maxUserArtworks, artworkTypes }
   }
 
-  created() {
-    this.save = debounce(this.save)
-    this.onArtworkTypeEditModalSaveClicked = debounce(this.onArtworkTypeEditModalSaveClicked)
-  }
-
+  @debounce
   async onArtworkTypeEditModalSaveClicked() {
     await this.save()
     // TODO -> check for successful result
@@ -170,6 +166,7 @@ export default class AdminConfigPage extends FormPageComponent {
     this.artworkTypeModalObj = { name: '' }
   }
 
+  @debounce
   async save() {
     ProgressService.start()
     try {

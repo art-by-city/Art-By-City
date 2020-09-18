@@ -65,10 +65,7 @@ export default class LoginPage extends FormPageComponent {
     password: ''
   }
 
-  created() {
-    this.userLogin = debounce(this.userLogin)
-  }
-
+  @debounce
   async userLogin() {
     this.errors = []
 

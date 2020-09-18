@@ -104,12 +104,7 @@ export default class AdminCitiesPage extends FormPageComponent {
     return { cities }
   }
 
-  created() {
-    this.addCity = debounce(this.addCity)
-    this.saveCity = debounce(this.saveCity)
-    this.deleteCity = debounce(this.deleteCity)
-  }
-
+  @debounce
   async saveCity(city: any) {
     ProgressService.start()
     try {
@@ -130,6 +125,7 @@ export default class AdminCitiesPage extends FormPageComponent {
     ProgressService.stop()
   }
 
+  @debounce
   async deleteCity(city: any, idx: number) {
     ProgressService.start()
     try {
@@ -151,6 +147,7 @@ export default class AdminCitiesPage extends FormPageComponent {
     ProgressService.stop()
   }
 
+  @debounce
   addCity() {
     this.cities.push({ code: '', name: '', country: 'USA', visible: false, disabled: true })
     this.editCity = this.cities.length - 1
