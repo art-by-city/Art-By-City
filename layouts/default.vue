@@ -55,7 +55,7 @@
                       <UserAvatar
                         :user="$auth.user"
                         small
-                        disabled
+                        abbr
                       />
                     </v-badge>
                   </v-btn>

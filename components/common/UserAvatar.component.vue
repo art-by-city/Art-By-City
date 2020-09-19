@@ -9,7 +9,7 @@
           {{ username }}
         </span>
       </template>
-      <v-overlay :value="!disabled && hoverProps.hover">
+      <v-overlay :value="editable && hoverProps.hover">
         <v-file-input
           class="avatar-upload-button"
           accept="image/*"
@@ -51,7 +51,13 @@ export default class UserAvatar extends Vue {
     type: Boolean,
     required: false,
     default: false
-  }) readonly disabled: boolean | undefined
+  }) readonly abbr: boolean | undefined
+
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly editable: boolean | undefined
 
   @Emit('onChange') onAvatarFileInputChanged(image: File) {
     return image
@@ -66,7 +72,7 @@ export default class UserAvatar extends Vue {
   }
 
   get username() {
-    return this.small
+    return this.abbr
       ? this.user.username[0]
       : this.user.username
   }

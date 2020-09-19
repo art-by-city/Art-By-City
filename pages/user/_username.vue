@@ -6,7 +6,7 @@
         <UserAvatar
           class="user-profile-avatar"
           :user="profile.user"
-          :disabled="$auth.user.id !== profile.user.id"
+          :editable="$auth.user.id === profile.user.id"
           @onChange="onUserAvatarChanged"
         />
       </v-col>
