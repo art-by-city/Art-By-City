@@ -20,13 +20,7 @@
           </nuxt-link>
         </v-card-title>
         <v-card-subtitle class="text-lowercase">
-          <v-icon>mdi-brush</v-icon>
-          <nuxt-link
-            class="white--text text-lowercase"
-            :to="`/user/${syncedArtwork.owner.username}`"
-          >
-            {{ syncedArtwork.owner.username }}
-          </nuxt-link>
+          <ArtistTag dark :user="syncedArtwork.owner" />
         </v-card-subtitle>
         <v-card-actions>
           <v-container class="pa-0">
