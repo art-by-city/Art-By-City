@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-row justify="center">
+    <v-row>
       <v-dialog v-model="artworkTypeModalShown" persistent max-width="600px">
         <v-card>
           <v-card-title>artwork type</v-card-title>
@@ -51,54 +51,74 @@
 
       <v-col cols="4">
         <v-form ref="form">
-          <v-text-field
-            v-model="maxUserArtworks"
-            type="text"
-            label="Max User Artworks"
-            class="text-lowercase"
-            name="maxUserArtworks"
-            autocomplete="off"
-          ></v-text-field>
+          <v-card flat outlined>
+            <v-card-title>app config</v-card-title>
+            <v-card-text>
+              <v-text-field
+                v-model="maxUserArtworks"
+                outlined
+                type="number"
+                label="Max User Artworks"
+                class="text-lowercase"
+                name="maxUserArtworks"
+                autocomplete="off"
+              ></v-text-field>
+            </v-card-text>
+          </v-card>
 
-          <v-simple-table>
-            <thead>
-              <tr>
-                <th class="text-lowercase">Artwork Type</th>
-                <th class="text-lowercase">Visible</th>
-                <th class="text-lowercase">Enabled</th>
-                <th class="text-lowercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(artworkType, i) in artworkTypes" :key="i">
-                <td class="text-lowercase">{{ artworkType.name }}</td>
-                <td class="text-lowercase">
-                  <v-icon>{{ artworkType.visible ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
-                </td>
-                <td class="text-lowercase">
-                  <v-icon>{{ artworkType.enabled ? 'mdi-check' : 'mdi-close' }}</v-icon>
-                </td>
-                <td class="text-lowercase">
-                  <v-btn small icon @click="openArtworkTypeEditModal(artworkType)">
-                    <v-icon>mdi-square-edit-outline</v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td class="text-lowercase">
-                  <v-btn small icon color="success" @click="openArtworkTypeEditModal()">
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
-                </td>
-              </tr>
-            </tfoot>
-          </v-simple-table>
+          <v-card flat outlined>
+            <v-card-title>artwork types</v-card-title>
+            <v-card-text>
+              <v-simple-table>
+                <thead>
+                  <tr>
+                    <th class="text-lowercase">Artwork Type</th>
+                    <th class="text-lowercase">Visible</th>
+                    <th class="text-lowercase">Enabled</th>
+                    <th class="text-lowercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(artworkType, i) in artworkTypes" :key="i">
+                    <td class="text-lowercase">{{ artworkType.name }}</td>
+                    <td class="text-lowercase">
+                      <v-icon>{{ artworkType.visible ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+                    </td>
+                    <td class="text-lowercase">
+                      <v-icon>{{ artworkType.enabled ? 'mdi-check' : 'mdi-close' }}</v-icon>
+                    </td>
+                    <td class="text-lowercase">
+                      <v-btn small icon @click="openArtworkTypeEditModal(artworkType)">
+                        <v-icon>mdi-square-edit-outline</v-icon>
+                      </v-btn>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td class="text-lowercase">
+                      <v-btn small icon color="success" @click="openArtworkTypeEditModal()">
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+                    </td>
+                  </tr>
+                </tfoot>
+              </v-simple-table>
+            </v-card-text>
+          </v-card>
 
-          <v-btn type="submit" color="primary" class="text-lowercase" @click.prevent="save">
-            Save
-          </v-btn>
+          <v-card flat>
+            <v-card-actions>
+              <v-btn
+                type="submit"
+                color="primary"
+                class="text-lowercase"
+                @click.prevent="save"
+              >
+                Save
+              </v-btn>
+            </v-card-actions>
+          </v-card>
         </v-form>
       </v-col>
     </v-row>
