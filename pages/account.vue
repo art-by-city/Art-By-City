@@ -32,7 +32,7 @@
 
               <CitySelector
                 v-model="$auth.user.city"
-                :cities="cities"
+                :cities="$store.state.config.cities"
                 disabled
               />
 
@@ -102,7 +102,6 @@ export default class AccountPage extends FormPageComponent {
   }
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
-  cities: string[] = []
 
   async asyncData({ $axios, store, $auth }: Context) {
     let cities = [] as any[]
@@ -110,15 +109,11 @@ export default class AccountPage extends FormPageComponent {
     try {
       const { payload } = await $axios.$get(`/api/user/${$auth.user.id}/account`)
       user = payload
-
-      const config = await $axios.$get('/api/config')
-      store.commit('config/setConfig', config)
-      cities = config.cities
     } catch (error) {
       ToastService.error('error fetching account')
     }
 
-    return { cities, login: user }
+    return { login: user }
   }
 
   @debounce

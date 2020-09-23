@@ -79,4 +79,21 @@ export default class ArtworkService {
       ProgressService.stop()
     }
   }
+
+  async fetchForAdmin(): Promise<Artwork[]> {
+    ProgressService.start()
+    try {
+      const { payload } = await this.$axios.$get('/api/admin/artwork')
+
+      if (payload) {
+        return payload
+      }
+    } catch (error) {
+      ToastService.error(error)
+    } finally {
+      ProgressService.stop()
+    }
+
+    return []
+  }
 }

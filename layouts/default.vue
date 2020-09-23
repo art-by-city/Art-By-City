@@ -208,6 +208,10 @@ export default class DefaultLayout extends Vue {
     return ''
   }
 
+  async fetch() {
+    await this.$configService.fetchAndSetStoreConfig()
+  }
+
   private filterNavItemsForUserRoles(navItems: NavItem[]): NavItem[] {
     return navItems.filter(
       (navItem) =>

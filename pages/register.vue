@@ -128,27 +128,6 @@ export default class RegisterPage extends FormPageComponent {
   repeatPasswordRules = repeatPasswordRules
   inviteCodeRules = inviteCodeRules
 
-  async asyncData({ $axios, store, $auth, query }: Context) {
-    let errors = []
-    let config: ConfigStoreState = DefaultConfigStoreState
-    let login = {
-      inviteCode: query.invite || '',
-      username: '',
-      email: '',
-      password: '',
-      city: ''
-    }
-    try {
-      config = await $axios.$get('/api/config')
-      store.commit('config/setConfig', config)
-    } catch (error) {
-      console.error(error)
-      errors = error.response?.data?.messages
-    }
-
-    return { errors, config, login }
-  }
-
   @debounce
   async register() {
     this.errors = []

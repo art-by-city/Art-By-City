@@ -52,10 +52,7 @@ export default class UserArtworkPage extends PageComponent {
   async asyncData({ $axios, store }: Context) {
     try {
       const { payload } = await $axios.$get('/api/user/artwork')
-
-      const config = await $axios.$get('/api/config')
-      store.commit('config/setConfig', config)
-      const cities = config.cities
+      const cities = store.state.config.cities
 
       return {
         cities,

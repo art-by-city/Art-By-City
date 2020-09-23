@@ -1,6 +1,6 @@
 <template>
   <default-layout>
-    <v-navigation-drawer absolute>
+    <v-navigation-drawer absolute :value="true">
       <v-list>
         <v-subheader>
           <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
@@ -59,7 +59,7 @@ export default class AdminLayout extends Vue {
 
     if (this.$route.path !== crumbs[0].href) {
       crumbs[0].disabled = false
-      crumbs.push({
+      crumbs.splice(1, 0, {
         disabled: true,
         href: this.$route.path,
         text: this.resolveAdminSubpageTitle()
