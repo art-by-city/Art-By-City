@@ -52,7 +52,8 @@
         </nuxt-link>
       </template>
       <template v-slot:item.city="props">
-        <span>{{ resolveCityNameFromId(props.item.city) }}</span>
+        <!-- <span>{{ resolveCityNameFromId(props.item.city) }}</span> -->
+        <span>{{ cityName(citiesById[props.item.city]) || '' }}</span>
       </template>
       <template v-slot:item.hashtags="props">
         <span>{{ props.item.hashtags.slice(0, 3).join(', ') }}</span>
@@ -71,6 +72,8 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue'
+
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
@@ -101,34 +104,30 @@ export default class AdminEventsPage extends FormPageComponent {
   ]
   artworks: any[] = []
   artworkSearchTerm: string = ''
-  config: ConfigStoreState = DefaultConfigStoreState
 
-  async asyncData({ $axios, store }: Context) {
-    let config: ConfigStoreState = DefaultConfigStoreState
+  async asyncData({ app }: Context) {
     let artworks = [] as any[]
 
     try {
-      const artworksResponse = await $axios.$get('/api/admin/artwork')
-      artworks = artworksResponse.payload || []
-      config = await $axios.$get('/api/config')
-      store.commit('config/setConfig', config)
+      artworks = await app.$artworkService.fetchForAdmin()
     } catch (error) {
-      ToastService.error(`error fetching artwork: ${error}`)
+      ToastService.error(`error fetching artworks: ${error}`)
     }
 
-    return { artworks, config }
+    return { artworks }
   }
 
-  _citiesById: any = null
-  resolveCityNameFromId(cityId: string) {
-    if (!this._citiesById) {
-      this._citiesById = {}
-      this.config.cities.forEach((city: any) => {
-        this._citiesById[city.id] = city
-      })
-    }
+  get citiesById() {
+    const citiesById: any = {}
+    this.$store.state.config.cities.forEach((city: any) => {
+      citiesById[city.id] = city
+    })
 
-    return this._citiesById[cityId].code || ''
+    return citiesById
+  }
+
+  cityName(city: any) {
+    return city?.code || ''
   }
 }
 </script>

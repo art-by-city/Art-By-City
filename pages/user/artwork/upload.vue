@@ -30,19 +30,19 @@
 
               <ArtworkTypeSelector
                 v-model="artwork.type"
-                :artworkTypes="artworkTypes"
+                :artworkTypes="$store.state.config.artworkTypes"
                 required
               />
 
               <CitySelector
                 v-model="artwork.city"
-                :cities="cities"
+                :cities="$store.state.config.cities"
                 required
               />
 
               <HashtagSelector
                 v-model="artwork.hashtags"
-                :hashtags="hashtags"
+                :hashtags="$store.state.config.hashtags"
               />
 
               <v-file-input
@@ -91,8 +91,6 @@ const MAX_ARTWORK_IMAGES = 12
   }
 })
 export default class ArtworkUploadPage extends FormComponent {
-  artworkTypes: string[] = this.$store.state.config.artworkTypes
-  cities: string[] = []
   artwork: any = {
     title: '',
     description: '',
@@ -100,27 +98,6 @@ export default class ArtworkUploadPage extends FormComponent {
     city: '',
     hashtags: [],
     images: []
-  }
-  hashtags: string[] = this.$store.state.config.hashtags
-  fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
-  hashtagSearchInput: string = ''
-
-  async asyncData({ $axios, store }: Context) {
-    let cities = [] as any[]
-    let hashtags = [] as string[]
-    let artworkTypes = [] as ArtworkType[]
-
-    try {
-      const config = await $axios.$get('/api/config')
-      store.commit('config/setConfig', config)
-      cities = config.cities
-      hashtags = config.hashtags
-      artworkTypes = config.artworkTypes
-    } catch (error) {
-      ToastService.error('error fetching config')
-    }
-
-    return { cities, hashtags, artworkTypes }
   }
 
   get titleRules() {

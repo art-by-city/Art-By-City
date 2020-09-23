@@ -134,7 +134,7 @@
               <template v-else>
                 <ArtworkTypeSelector
                   v-model="artwork.type"
-                  :artworkTypes="config.artworkTypes"
+                  :artworkTypes="$store.state.config.artworkTypes"
                   required
                 />
               </template>
@@ -148,7 +148,7 @@
               <template v-else>
                 <CitySelector
                   v-model="artwork.city"
-                  :cities="config.cities"
+                  :cities="$store.state.config.cities"
                   required
                 />
               </template>
@@ -163,7 +163,7 @@
               <template v-if="editMode">
                 <HashtagSelector
                   v-model="artwork.hashtags"
-                  :hashtags="config.hashtags"
+                  :hashtags="$store.state.config.hashtags"
                 />
               </template>
             </v-col>
@@ -231,7 +231,6 @@ import Artwork, {
 import ArtworkType from '~/models/artwork/artworkType'
 import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
-import { ConfigStoreState } from '~/store/config'
 import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
 
 @Component({
@@ -245,12 +244,7 @@ import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
 })
 export default class ArtworkPage extends FormPageComponent {
   artwork!: Artwork
-  config: ConfigStoreState = this.$store.state.config
-  fuzzyHashtags = new Fuse(this.config.hashtags, { includeScore: true })
-  hashtagSearchInput: string = ''
-
   editMode = false
-  // imagePreviewIndex = 0
   previewImage!: ArtworkImageFile
   cachedArtwork!: Artwork
 
@@ -262,12 +256,8 @@ export default class ArtworkPage extends FormPageComponent {
         payload.city = null
       }
 
-      const config = await $axios.$get('/api/config')
-      store.commit('config/setConfig', config)
-
       return {
         artwork: payload,
-        config: config,
         previewImage: payload.images[0]
       }
     } catch (error) {
@@ -288,9 +278,9 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   get cityName() {
-    for (let i = 0; i < this.config.cities.length; i++) {
-      if (this.config.cities[i].id === this.artwork.city) {
-        return this.config.cities[i].name
+    for (let i = 0; i < this.$store.state.config.cities.length; i++) {
+      if (this.$store.state.config.cities[i].id === this.artwork.city) {
+        return this.$store.state.config.cities[i].name
       }
     }
   }
