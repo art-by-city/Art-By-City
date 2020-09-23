@@ -69,8 +69,10 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
+  @debounce
   onArtworkCardClicked(artwork: any) {
-    this.modalArtwork = artwork
+    // this.modalArtwork = artwork
+    this.$router.push(`/artwork/${artwork.id}`)
   }
 
   @debounce
