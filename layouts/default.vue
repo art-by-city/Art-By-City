@@ -98,7 +98,7 @@
       v-if="$auth.loggedIn"
       class="progress-bar"
       color="black"
-      :indeterminate="ProgressService.isInProgress"
+      :indeterminate="isInProgress"
     ></v-progress-linear>
 
     <v-main>
@@ -116,7 +116,7 @@
 
     <div class="toast-alerts-container">
       <v-alert
-        v-for="(toast, i) in ToastService.toasts"
+        v-for="(toast, i) in toasts"
         :key="i"
         v-model="toast.show"
         :type="toast.type"
@@ -139,8 +139,6 @@ import ProgressService from '../services/progress/service'
 
 @Component
 export default class DefaultLayout extends Vue {
-  ToastService = ToastService
-  ProgressService = ProgressService
   leftNavItems: NavItem[] = [
     {
       icon: 'mdi-apps',
@@ -206,6 +204,14 @@ export default class DefaultLayout extends Vue {
     }
 
     return ''
+  }
+
+  get isInProgress() {
+    return ProgressService.isInProgress
+  }
+
+  get toasts() {
+    return ToastService.toasts
   }
 
   async fetch() {
