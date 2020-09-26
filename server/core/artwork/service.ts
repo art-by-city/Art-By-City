@@ -8,7 +8,7 @@ import {
   Artwork,
   ArtworkService,
   ArtworkRepository,
-  ArtworkFilterOptions
+  ArtworkFilterOptions, ArtworkDocument, ArtworkViewModelMapper
 } from './'
 
 @injectable()
@@ -27,10 +27,12 @@ export default class ArtworkServiceImpl implements ArtworkService {
   }
 
   async create(artwork: Artwork): Promise<Artwork | null> {
-    await validateArtwork(artwork)
+    const artworkDocument = new ArtworkViewModelMapper().toDocument(artwork)
+
+    await validateArtwork(artworkDocument)
 
     try {
-      return this.artworkRepository.create(artwork)
+      return this.artworkRepository.create(artworkDocument)
     } catch (error) {
       throw new UnknownError(error.message)
     }
