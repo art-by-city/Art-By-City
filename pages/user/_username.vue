@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="profile" fluid>
-    <ArtworkModal :artwork.sync="modalArtwork" />
+    <!-- <ArtworkModal :artwork.sync="modalArtwork" /> -->
     <v-row align="end">
       <v-col cols="2" offset="3">
         <UserAvatar

@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="artwork-explorer-container">
-    <ArtworkModal :artwork.sync="modalArtwork" />
+    <!-- <ArtworkModal :artwork.sync="modalArtwork" /> -->
     <ArtworkExplorerToolbar
       :opts.sync="opts"
       @refresh="refresh"

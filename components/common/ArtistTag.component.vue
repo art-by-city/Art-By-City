@@ -1,10 +1,8 @@
 <template>
   <v-card
     :to="`/user/${user.username}`"
-    :class="{
-      'artist-tag': true,
-      'dark': dark
-    }"
+    class="artist-tag"
+    :class="{ 'dark': dark }"
     width="150"
     flat
     outlined
@@ -52,6 +50,7 @@ export default class ArtistTag extends Vue {
   border-top-right-radius: 24px;
   border-bottom-right-radius: 24px;
   border-bottom-left-radius: 24px;
+  display: inline-block;
 }
 .artist-tag >>> .v-card__actions {
   padding: 0;
