@@ -5,9 +5,9 @@ import {
 
 import ValidationError from '../api/errors/validationError'
 import UnknownError from '../api/errors/unknownError'
-import { Artwork } from './'
+import { ArtworkDocument } from './'
 
-export default async (artwork: Artwork): Promise<void> => {
+export default async (artwork: ArtworkDocument): Promise<void> => {
   const internalProps = ['id', 'created', 'updated', 'owner', 'likes']
 
   if (!artwork.likes) {

@@ -1,8 +1,8 @@
 import { Invitation, InvitationViewModel } from './'
-import EntityMapper from '../api/mapper'
+import ViewModelMapper from '../api/viewModelMapper'
 import { UserViewModel } from '../user'
 
-export default class InvitationMapper implements EntityMapper<Invitation, InvitationViewModel> {
+export default class InvitationMapper implements ViewModelMapper<Invitation, InvitationViewModel> {
   toViewModel(
     domainEntity: Invitation,
     createdBy?: UserViewModel,

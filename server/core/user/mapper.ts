@@ -1,11 +1,11 @@
 import { User, UserViewModel } from './'
-import EntityMapper from '../api/mapper'
+import ViewModelMapper from '../api/viewModelMapper'
 
 export interface UserMapperOptions {
   cityName?: string
 }
 
-export default class UserMapper implements EntityMapper<User, UserViewModel> {
+export default class UserMapper implements ViewModelMapper<User, UserViewModel> {
   toViewModel(domainEntity: User, opts?: UserMapperOptions): UserViewModel {
     return {
       id: domainEntity.id,

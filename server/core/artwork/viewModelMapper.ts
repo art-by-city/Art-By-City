@@ -1,27 +1,24 @@
 import { Artwork, ArtworkViewModel } from './'
-import EntityMapper from '../api/mapper'
+import ViewModelMapper from '../api/viewModelMapper'
 import { UserViewModel } from '../user'
 
-export default class ArtworkMapper implements EntityMapper<Artwork, ArtworkViewModel> {
+export default class ArtworkViewModelMapper implements ViewModelMapper<
+  Artwork,
+  ArtworkViewModel
+> {
   toViewModel(domainEntity: Artwork, user?: UserViewModel): ArtworkViewModel {
     return {
       id: domainEntity.id,
-      owner: user
-        ? {
-          id: user.id,
-          username: user.username,
-          city: user.city,
-          roles: user.roles
-        } : {
-          id: domainEntity.owner,
-          username: 'user',
-          city: 'city',
-          roles: []
-        },
+      owner: user ? user : {
+        id: domainEntity.owner.id,
+        username: 'user',
+        city: 'city',
+        roles: []
+      },
       title: domainEntity.title,
       description: domainEntity.description,
       type: domainEntity.type,
-      city: domainEntity.city,
+      city: domainEntity.city.id,
       hashtags: domainEntity.hashtags,
       images: domainEntity.images,
       likes: domainEntity.likes,

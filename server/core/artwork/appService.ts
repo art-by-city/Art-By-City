@@ -71,7 +71,7 @@ export default class ArtworkApplicationServiceImpl
       throw new Error(`Maximum number of ${maxArtworks} Artworks reached`)
     }
 
-    const artwork = new Artwork().setProps({
+    const artwork = new Artwork({
       userId: user.id,
       title: req.title,
       description: req.description,

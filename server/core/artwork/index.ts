@@ -9,6 +9,7 @@ import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import { User } from '../user'
 
 import Artwork from './artwork'
+import ArtworkDocument from './artworkDocument'
 import ArtworkViewModel from './viewModels/artworkViewModel'
 import ArtworkRepositoryImpl from './repository'
 import ArtworkServiceImpl from './service'
@@ -17,8 +18,10 @@ import ArtworkControllerImpl from './controller'
 import { FileUploadRequest } from '../file'
 
 export { default as Artwork } from './artwork'
+export { default as ArtworkDocument } from './artworkDocument'
+export { default as ArtworkDocumentMapper } from './documentMapper'
 export { default as ArtworkViewModel } from './viewModels/artworkViewModel'
-export { default as ArtworkMapper } from './mapper'
+export { default as ArtworkViewModelMapper } from './viewModelMapper'
 export { default as ArtworkType } from './artworkType/artworkType'
 
 export class ArtworkImage {
@@ -90,7 +93,7 @@ export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
   listLikedByUser(user: User): Promise<Artwork[]>
 }
 export interface ArtworkRepository
-  extends BaseRepositoryInterface<Artwork, ArtworkFilterOptions> {}
+  extends BaseRepositoryInterface<ArtworkDocument, ArtworkFilterOptions> {}
 
 export const ArtworkModule = new ContainerModule((bind) => {
   bind<ArtworkRepository>(Symbol.for('ArtworkRepository')).to(

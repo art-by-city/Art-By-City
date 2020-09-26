@@ -3,12 +3,12 @@ import { injectable, inject } from 'inversify'
 import { DocumentReference, Firestore } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
-import { Artwork, ArtworkRepository, ArtworkFilterOptions } from './'
+import { Artwork, ArtworkDocument, ArtworkRepository, ArtworkFilterOptions } from './'
 import BaseRepositoryImpl from '../db/repository'
 
 @injectable()
 export default class ArtworkRepositoryImpl
-  extends BaseRepositoryImpl<Artwork>
+  extends BaseRepositoryImpl<Artwork, ArtworkDocument>
   implements ArtworkRepository {
   private collectionName = 'Artworks'
   private client: Firestore
@@ -16,11 +16,11 @@ export default class ArtworkRepositoryImpl
   constructor(
     @inject(Symbol.for('DatabaseAdapter')) databaseAdapter: DatabaseAdapter
   ) {
-    super(Artwork)
+    super(ArtworkDocument)
     this.client = databaseAdapter.getClient()
   }
 
-  async find(filter?: ArtworkFilterOptions): Promise<Artwork[]> {
+  async find(filter?: ArtworkFilterOptions): Promise<ArtworkDocument[]> {
     try {
       if (!filter) {
         return this.list()
@@ -60,8 +60,8 @@ export default class ArtworkRepositoryImpl
 
       const found = await query.get()
 
-      let matches: Artwork[] = found.docs.map((doc) => {
-        return <Artwork>doc.data()
+      let matches: ArtworkDocument[] = found.docs.map((doc) => {
+        return <ArtworkDocument>doc.data()
       })
 
       // Limit
@@ -78,7 +78,7 @@ export default class ArtworkRepositoryImpl
     }
   }
 
-  getDocumentReference(id: string): DocumentReference<Artwork> {
-    return <DocumentReference<Artwork>>this.client.doc(`Artworks/${id}`)
+  getDocumentReference(id: string): DocumentReference<ArtworkDocument> {
+    return <DocumentReference<ArtworkDocument>>this.client.doc(`Artworks/${id}`)
   }
 }

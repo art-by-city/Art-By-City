@@ -1,12 +1,15 @@
-import { IsDate, IsString } from 'class-validator'
-
 export default class Entity {
-  @IsString()
   id!: string
-
-  @IsDate()
   created!: Date
-
-  @IsDate()
   updated!: Date
+
+  constructor(data?: {
+    id?: string,
+    created?: Date,
+    updated?: Date
+  }) {
+    this.id = data?.id || ''
+    this.created = data?.created || new Date()
+    this.updated = data?.updated || new Date()
+  }
 }

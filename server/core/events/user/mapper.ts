@@ -1,9 +1,9 @@
-import EntityMapper from '../../api/mapper'
+import ViewModelMapper from '../../api/viewModelMapper'
 import UserEvent from './userEvent'
 import UserEventViewModel from './viewModels/userEventViewModel'
 import { UserViewModel } from '../../user'
 
-export default class UserEventMapper implements EntityMapper<UserEvent, UserEventViewModel> {
+export default class UserEventMapper implements ViewModelMapper<UserEvent, UserEventViewModel> {
   toViewModel(domainEntity: UserEvent, user?: UserViewModel): UserEventViewModel {
     return {
       id: domainEntity.id,

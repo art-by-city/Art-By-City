@@ -1,7 +1,7 @@
-import EntityMapper from '../api/mapper'
+import ViewModelMapper from '../api/viewModelMapper'
 import { City, CityViewModel } from './'
 
-export default class CityMapper implements EntityMapper<City, CityViewModel> {
+export default class CityMapper implements ViewModelMapper<City, CityViewModel> {
   toViewModel(domainEntity: City): CityViewModel {
     return {
       id: domainEntity.id,
