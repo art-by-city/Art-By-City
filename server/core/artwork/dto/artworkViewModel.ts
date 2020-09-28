@@ -1,6 +1,6 @@
 import ViewModel from '../../api/viewModel'
 import { UserViewModel } from '../../user'
-import { ArtworkImage } from '../'
+import { ArtworkImage } from '..'
 
 export default interface ArtworkViewModel extends ViewModel {
   id: string
