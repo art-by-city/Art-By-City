@@ -32,6 +32,25 @@ export default class AnalyticsControllerImpl implements AnalyticsController {
     router.use(passport.authenticate('jwt', { session: false }))
     router.use(roles(['admin']))
 
+    /**
+     * @openapi
+     *
+     * /analytics/events:
+     *  get:
+     *    summary: List UserEvents
+     *    operationId: listUserEvents
+     *    tags:
+     *      - analytics
+     *    responses:
+     *      '200':
+     *        description: An array of UserEvents
+     *        content:
+     *          application/json:
+     *            schema:
+     *              type: array
+     *              items:
+     *                $ref: "#/components/schemas/UserEvent"
+     */
     router.get('/events', async (_req, res, next) => {
       try {
         const result = await this.analyticsService.fetchEvents()

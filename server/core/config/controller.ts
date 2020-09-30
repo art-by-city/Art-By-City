@@ -33,6 +33,33 @@ export default class ConfigControllerImpl implements ConfigController {
 
     // router.use(loggedInAuth)
 
+    /**
+     * @openapi
+     *
+     * /config:
+     *  get:
+     *    summary: Fetch app Config
+     *    operationId: getConfig
+     *    tags:
+     *      - config
+     *    responses:
+     *      '200':
+     *        description: The app Config
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: "#/components/schemas/Config"
+     *      '500':
+     *        description: Unexpected error
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: "#/components/schemas/Error"
+     *            example:
+     *              value:
+     *                statusCode: 500
+     *                message: 'An unknown error has occurred'
+     */
     router.get('/', async (_req, res, next) => {
       try {
         const result = await this.configService.getConfig()
@@ -43,6 +70,29 @@ export default class ConfigControllerImpl implements ConfigController {
       }
     })
 
+    /**
+     * @openapi
+     *
+     * /config:
+     *  post:
+     *    summary: Update app Config
+     *    operationId: updateConfig
+     *    tags:
+     *      - config
+     *    responses:
+     *      '200':
+     *        description: Null response
+     *      '500':
+     *        description: Unexpected error
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: "#/components/schemas/Error"
+     *            example:
+     *              value:
+     *                statusCode: 500
+     *                message: 'An unknown error has occurred'
+     */
     router.post('/', loggedInAuth, roles(['admin']), async (req, res, next) => {
       try {
         const result = await this.configService.updateConfig(req.body)
