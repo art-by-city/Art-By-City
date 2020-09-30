@@ -32,20 +32,50 @@ export default class AdminControllerImpl implements AdminController {
     router.use(roles(['admin']))
 
     /**
-     * GET /users - List all users
+     * @openapi
+     *
+     * /admin/artworks:
+     *  get:
+     *    summary: List artworks for Admin
+     *    operationId: listArtworksForAdmin
+     *    tags:
+     *      - admin
+     *      - artworks
+     *    responses:
+     *      '200':
+     *        description: An array of Artworks
+     *        content:
+     *          application/json:
+     *            schema:
+     *              type: array
+     *              items:
+     *                $ref: "#/components/schemas/Artwork"
      */
-    router.get('/users', async (_req, res, next) => {
-      try {
-        const result = await this.adminService.listUsers()
+    router.get('/artwork', async (_req, res) => {
+      const result = await this.adminService.listArtwork()
 
-        return res.json(result)
-      } catch (error) {
-        next(error)
-      }
+      return res.send(result)
     })
 
     /**
-     * GET /cities - Get all cities
+     * @openapi
+     *
+     * /admin/cities:
+     *  get:
+     *    summary: List Cities for Admin
+     *    operationId: listCitiesForAdmin
+     *    tags:
+     *      - admin
+     *      - cities
+     *    responses:
+     *      '200':
+     *        description: An array of Cities
+     *        content:
+     *          application/json:
+     *            schema:
+     *              type: array
+     *              items:
+     *                $ref: "#/components/schemas/City"
      */
     router.get('/cities', async (_req, res, next) => {
       try {
@@ -58,20 +88,55 @@ export default class AdminControllerImpl implements AdminController {
     })
 
     /**
-     * POST /user - Update a user's roles
-     * TODO -> Temporary?
+     * @openapi
+     *
+     * /admin/users:
+     *  get:
+     *    summary: List Users for Admin
+     *    operationId: listUsersForAdmin
+     *    tags:
+     *      - admin
+     *    responses:
+     *      '200':
+     *        description: An array of Users
+     *        content:
+     *          application/json:
+     *            schema:
+     *              type: array
+     *              items:
+     *                $ref: "#/components/schemas/User"
      */
-    router.post('/user', async (req, res) => {
-      const result = await this.adminService.saveUser(req.body.user)
+    router.get('/users', async (_req, res, next) => {
+      try {
+        const result = await this.adminService.listUsers()
 
-      return res.send(result)
+        return res.json(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     /**
-     * GET /artwork - Admin Artwork Fetch
+     * @openapi
+     *
+     * /admin/user:
+     *  post:
+     *    summary: Update a User for Admin
+     *    operationId: updateUserForAdmin
+     *    tags:
+     *      - admin
+     *    requestBody:
+     *      description: The User to update
+     *      content:
+     *        application/json:
+     *          schema:
+     *            $ref: "#/components/schemas/User"
+     *    responses:
+     *      '200':
+     *        description: Null response
      */
-    router.get('/artwork', async (_req, res) => {
-      const result = await this.adminService.listArtwork()
+    router.post('/user', async (req, res) => {
+      const result = await this.adminService.saveUser(req.body.user)
 
       return res.send(result)
     })
