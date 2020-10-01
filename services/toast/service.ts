@@ -36,15 +36,6 @@ export default class ToastService {
     }
     this._context.store.commit('toasts/add', toast)
     this._context.store.dispatch('toasts/destroyOnExpiration', toast)
-    // setTimeout(() => {
-    //   // toast.show = false
-    //   this._context.store.dispatch('toasts/remove', toast)
-    // }, TOAST_TIMEOUT_MS)
-
-    // this.toasts.push(toast)
-    // setTimeout(() => {
-    //   toast.show = false
-    // }, TOAST_TIMEOUT_MS)
   }
 
   success(message: string) {
