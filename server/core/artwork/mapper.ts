@@ -7,12 +7,8 @@ export default class ArtworkMapper implements EntityMapper<Artwork, ArtworkViewM
     return {
       id: domainEntity.id,
       owner: user
-        ? {
-          id: user.id,
-          username: user.username,
-          city: user.city,
-          roles: user.roles
-        } : {
+        ? user
+        : {
           id: domainEntity.owner,
           username: 'user',
           city: 'city',
