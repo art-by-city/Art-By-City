@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app dense elevation="0">
+    <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app dense elevation="1">
       <v-row>
         <v-col cols="4">
           <v-menu offset-y>
@@ -94,13 +94,6 @@
       </v-row>
     </v-app-bar>
 
-    <v-progress-linear
-      v-if="$auth.loggedIn"
-      class="progress-bar"
-      color="black"
-      :indeterminate="isInProgress"
-    ></v-progress-linear>
-
     <v-main>
       <v-container fluid style="height: 100%">
         <nuxt v-if="!$slots.default" />
@@ -135,7 +128,6 @@ import { Vue, Component } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
 import ToastService from '../services/toast/service'
-import ProgressService from '../services/progress/service'
 
 @Component
 export default class DefaultLayout extends Vue {
@@ -157,6 +149,14 @@ export default class DefaultLayout extends Vue {
       to: '/about'
     }
   ]
+
+  toggleLoadingOn() {
+    this.$nuxt.$loading.start()
+  }
+
+  toggleLoadingOff() {
+    this.$nuxt.$loading.finish()
+  }
 
   get rightNavItems(): NavItem[] {
     return [
@@ -204,10 +204,6 @@ export default class DefaultLayout extends Vue {
     }
 
     return ''
-  }
-
-  get isInProgress() {
-    return ProgressService.isInProgress
   }
 
   get toasts() {
