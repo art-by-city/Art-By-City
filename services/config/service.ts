@@ -2,7 +2,6 @@ import { Context } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import ProgressService from '~/services/progress/service'
-import ToastService from '~/services/toast/service'
 
 export default class ConfigService {
   _context!: Context
@@ -22,7 +21,7 @@ export default class ConfigService {
       this.$store.commit('config/setConfig', config)
     } catch (error) {
       console.error(error)
-      ToastService.error(error)
+      this._context.$toastService.error(error)
     } finally {
       ProgressService.stop()
     }

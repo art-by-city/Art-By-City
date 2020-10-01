@@ -272,7 +272,6 @@ import Artwork, {
   ImageUploadPreview
 } from '~/models/artwork/artwork'
 import ArtworkType from '~/models/artwork/artworkType'
-import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
 
@@ -310,7 +309,7 @@ export default class ArtworkPage extends FormPageComponent {
         previewImage: payload.images[0]
       }
     } catch (error) {
-      ToastService.error(`error fetching artwork or app config: ${error}`)
+      this.$toastService.error(`error fetching artwork or app config: ${error}`)
     }
   }
 
@@ -497,10 +496,10 @@ export default class ArtworkPage extends FormPageComponent {
           published,
           approved
         }
-        ToastService.success(`artwork updated`)
+        this.$toastService.success(`artwork updated`)
       }
     } catch (error) {
-      ToastService.error(`error updating artwork`)
+      this.$toastService.error(`error updating artwork`)
     }
     ProgressService.stop()
   }
@@ -515,11 +514,11 @@ export default class ArtworkPage extends FormPageComponent {
         )
 
         if (success) {
-          ToastService.success('artwork deleted')
+          this.$toastService.success('artwork deleted')
           this.$router.push(`/`)
         }
       } catch (error) {
-        ToastService.error('error deleting artwork')
+        this.$toastService.error('error deleting artwork')
       }
       ProgressService.stop()
     }

@@ -2,7 +2,6 @@ import { Context } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import ProgressService from '~/services/progress/service'
-import ToastService from '~/services/toast/service'
 import { UserAvatar } from '~/models/user/user'
 import { readFileAsBinaryStringAsync } from '~/helpers/helpers'
 
@@ -31,7 +30,7 @@ export default class ProfileService {
         return payload
       }
     } catch (error) {
-      ToastService.error(error)
+      this._context.$toastService.error(error)
     } finally {
       ProgressService.stop()
     }

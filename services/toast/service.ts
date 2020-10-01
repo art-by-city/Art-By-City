@@ -1,10 +1,6 @@
-type AlertType = 'success' | 'info' | 'warning' | 'error'
+import { Context } from '@nuxt/types'
 
-interface ToastMessage {
-  type: AlertType
-  message: string
-  show: boolean
-}
+import ToastType from '../../models/toasts/toastType'
 
 interface AxiosError {
   response: {
@@ -22,36 +18,52 @@ function isAxiosError(thing: any): thing is AxiosError {
 
 const TOAST_TIMEOUT_MS = 5000
 
-class ToastService {
-  toasts: ToastMessage[] = []
+export default class ToastService {
+  // toasts: ToastMessage[] = []
+  _context!: Context
 
-  alert(message: string, type: AlertType) {
-    const toast = { message, type, show: true }
-    this.toasts.push(toast)
-    setTimeout(() => {
-      toast.show = false
-    }, TOAST_TIMEOUT_MS)
+  constructor(context: Context) {
+    this._context = context
+  }
+
+  toast(message: string, type: ToastType) {
+    const toast = {
+      message,
+      type,
+      show: true,
+      timeout: TOAST_TIMEOUT_MS,
+      timestamp: Date.now()
+    }
+    this._context.store.commit('toasts/add', toast)
+    this._context.store.dispatch('toasts/destroyOnExpiration', toast)
+    // setTimeout(() => {
+    //   // toast.show = false
+    //   this._context.store.dispatch('toasts/remove', toast)
+    // }, TOAST_TIMEOUT_MS)
+
+    // this.toasts.push(toast)
+    // setTimeout(() => {
+    //   toast.show = false
+    // }, TOAST_TIMEOUT_MS)
   }
 
   success(message: string) {
-    this.alert(message, 'success')
+    this.toast(message, 'success')
   }
 
   info(message: string) {
-    this.alert(message, 'info')
+    this.toast(message, 'info')
   }
 
   warning(message: string) {
-    this.alert(message, 'warning')
+    this.toast(message, 'warning')
   }
 
   error(message: string | AxiosError) {
     if (isAxiosError(message)) {
-      return this.alert(message.response?.data?.error?.message, 'error')
+      return this.toast(message.response?.data?.error?.message, 'error')
     }
 
-    return this.alert(message, 'error')
+    return this.toast(message, 'error')
   }
 }
-
-export default new ToastService()

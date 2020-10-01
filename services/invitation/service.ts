@@ -1,7 +1,6 @@
 import { Context } from '@nuxt/types'
 
 import ProgressService from '~/services/progress/service'
-import ToastService from '~/services/toast/service'
 import Invitation from '~/models/invitation'
 
 export default class InvitationService {
@@ -20,7 +19,7 @@ export default class InvitationService {
         return payload
       }
     } catch (error) {
-      ToastService.error(error)
+      this._context.$toastService.error(error)
     } finally {
       ProgressService.stop()
     }
@@ -35,7 +34,7 @@ export default class InvitationService {
         return payload
       }
     } catch (error) {
-      ToastService.error(error)
+      this._context.$toastService.error(error)
     } finally {
       ProgressService.stop()
     }
@@ -50,12 +49,12 @@ export default class InvitationService {
       )
 
       if (success) {
-        ToastService.success('invitation email sent')
+        this._context.$toastService.success('invitation email sent')
 
         return payload
       }
     } catch (error) {
-      ToastService.error(error)
+      this._context.$toastService.error(error)
     } finally {
       ProgressService.stop()
     }
