@@ -117,7 +117,6 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
-import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 import Invitation from '~/models/invitation'
 import InvitationService from '~/services/invitation/service'
@@ -157,7 +156,7 @@ export default class AdminInvitationsPage extends FormPageComponent {
 
       return { invitations: [], invitationToSend: null }
     } catch (error) {
-      ToastService.error(error)
+      this.$toastService.error(error)
     }
   }
 
@@ -171,7 +170,7 @@ export default class AdminInvitationsPage extends FormPageComponent {
         throw new Error('error requesting new invitation')
       }
     } catch (error) {
-      ToastService.error(error)
+      this.$toastService.error(error)
     }
   }
 
@@ -181,7 +180,7 @@ export default class AdminInvitationsPage extends FormPageComponent {
       await navigator.clipboard.writeText(
         `${process.env.baseUrl}/register?invite=${invitation.id}`
       )
-      ToastService.info('invitation link copied to clipboard')
+      this.$toastService.info('invitation link copied to clipboard')
     } catch (error) {}
   }
 
@@ -199,7 +198,9 @@ export default class AdminInvitationsPage extends FormPageComponent {
       }
 
       this.closeInviteEmailModal()
-    } catch (error) {}
+    } catch (error) {
+      this.$toastService.error(error)
+    }
   }
 
   @debounce

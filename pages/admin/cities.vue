@@ -86,7 +86,6 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
-import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 import { debounce } from '~/helpers/helpers'
 
@@ -105,7 +104,7 @@ export default class AdminCitiesPage extends FormPageComponent {
       const citiesResponse = await $axios.$get('/api/admin/cities')
       cities = citiesResponse.payload || []
     } catch (error) {
-      ToastService.error(`error fetching cities: ${error}`)
+      this.$toastService.error(`error fetching cities: ${error}`)
     }
     return { cities }
   }
@@ -123,10 +122,10 @@ export default class AdminCitiesPage extends FormPageComponent {
 
       if (success) {
         this.editCity = null
-        ToastService.success('city saved')
+        this.$toastService.success('city saved')
       }
     } catch (error) {
-      ToastService.error(`Error saving city: ${error}`)
+      this.$toastService.error(`Error saving city: ${error}`)
     }
     ProgressService.stop()
   }
@@ -145,10 +144,10 @@ export default class AdminCitiesPage extends FormPageComponent {
       if (success) {
         this.editCity = null
         this.cities.splice(idx, 1)
-        ToastService.success('city deleted')
+        this.$toastService.success('city deleted')
       }
     } catch (error) {
-      ToastService.error(`Error saving city: ${error}`)
+      this.$toastService.error(`Error saving city: ${error}`)
     }
     ProgressService.stop()
   }

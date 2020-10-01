@@ -209,6 +209,14 @@ export default class ArtworkApplicationServiceImpl
         opts.limit = 9
       }
 
+      if (opts.type === 'All') {
+        delete opts.type
+      }
+
+      if (opts.city === 'All') {
+        delete opts.city
+      }
+
       let artworks = await this.artworkService.list(opts)
 
       let shouldResetLastViewedArtwork = false

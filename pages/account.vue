@@ -81,7 +81,6 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
 import CitySelector from '~/components/forms/citySelector.component.vue'
-import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 import { debounce } from '~/helpers/helpers'
 
@@ -110,7 +109,7 @@ export default class AccountPage extends FormPageComponent {
       const { payload } = await $axios.$get(`/api/user/${$auth.user.id}/account`)
       user = payload
     } catch (error) {
-      ToastService.error('error fetching account')
+      this.$toastService.error('error fetching account')
     }
 
     return { login: user }
@@ -128,13 +127,13 @@ export default class AccountPage extends FormPageComponent {
       })
 
       if (success) {
-        ToastService.success('account saved')
+        this.$toastService.success('account saved')
       }
     } catch (error) {
       if (error.response.status === 401) {
-        ToastService.error('invalid credentials')
+        this.$toastService.error('invalid credentials')
       } else {
-        ToastService.error('an error has occurred')
+        this.$toastService.error('an error has occurred')
       }
     }
 

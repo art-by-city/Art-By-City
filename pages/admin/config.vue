@@ -131,7 +131,6 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkType from '~/models/artwork/artworkType'
-import ToastService from '~/services/toast/service'
 import ProgressService from '~/services/progress/service'
 import { debounce } from '~/helpers/helpers'
 
@@ -196,10 +195,10 @@ export default class AdminConfigPage extends FormPageComponent {
       })
 
       if (success) {
-        ToastService.success('config saved')
+        this.$toastService.success('config saved')
       }
     } catch (error) {
-      ToastService.error(`error saving config: ${error}`)
+      this.$toastService.error(`error saving config: ${error}`)
     }
     ProgressService.stop()
   }

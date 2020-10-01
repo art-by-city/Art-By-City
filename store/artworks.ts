@@ -55,14 +55,6 @@ export const actions: ActionTree<ArtworkStoreState, any> = {
 
     const params = { ...state.options }
 
-    if (params.type === 'All') {
-      delete params.type
-    }
-
-    if (params.city === 'All') {
-      delete params.city
-    }
-
     try {
       const { payload } = await this.$axios.$get('/api/artwork', { params })
       commit('set', payload)
@@ -77,14 +69,6 @@ export const actions: ActionTree<ArtworkStoreState, any> = {
     ProgressService.start()
 
     const params = { ...state.options }
-
-    if (params.type === 'All') {
-      delete params.type
-    }
-
-    if (params.city === 'All') {
-      delete params.city
-    }
 
     try {
       const { payload } = await this.$axios.$get('/api/artwork', { params })

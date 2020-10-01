@@ -2,7 +2,6 @@ import { Context } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import ProgressService from '~/services/progress/service'
-import ToastService from '~/services/toast/service'
 import { readFileAsBinaryStringAsync } from '~/helpers/helpers'
 import Artwork, { ImageUploadRequest, isFile, isImageUploadPreview } from '~/models/artwork/artwork'
 
@@ -31,12 +30,12 @@ export default class ArtworkService {
       )
 
       if (payload) {
-        ToastService.success('artwork created')
+        this.context.$toastService.success('artwork created')
 
         return payload
       }
     } catch (error) {
-      ToastService.error(error)
+      this.context.$toastService.error(error)
     } finally {
       ProgressService.stop()
     }
@@ -69,12 +68,12 @@ export default class ArtworkService {
       )
 
       if (payload) {
-        ToastService.success('artwork updated')
+        this.context.$toastService.success('artwork updated')
 
         return payload
       }
     } catch (error) {
-      ToastService.error(error)
+      this.context.$toastService.error(error)
     } finally {
       ProgressService.stop()
     }
@@ -89,7 +88,7 @@ export default class ArtworkService {
         return payload
       }
     } catch (error) {
-      ToastService.error(error)
+      this.context.$toastService.error(error)
     } finally {
       ProgressService.stop()
     }

@@ -79,7 +79,6 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
-import ToastService from '~/services/toast/service'
 
 @Component({
   middleware: 'role/admin',
@@ -111,7 +110,7 @@ export default class AdminEventsPage extends FormPageComponent {
     try {
       artworks = await app.$artworkService.fetchForAdmin()
     } catch (error) {
-      ToastService.error(`error fetching artworks: ${error}`)
+      this.$toastService.error(`error fetching artworks: ${error}`)
     }
 
     return { artworks }

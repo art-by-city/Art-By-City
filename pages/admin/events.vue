@@ -30,7 +30,6 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
-import ToastService from '~/services/toast/service'
 
 @Component({
   middleware: 'role/admin',
@@ -53,7 +52,7 @@ export default class AdminEventsPage extends FormPageComponent {
       const analyticsResponse = await $axios.$get('/api/analytics/events')
       events = analyticsResponse.payload || []
     } catch (error) {
-      ToastService.error(`error fetching events: ${error}`)
+      this.$toastService.error(`error fetching events: ${error}`)
     }
 
     return { events }

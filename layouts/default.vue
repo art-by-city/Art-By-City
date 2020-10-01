@@ -118,16 +118,24 @@
         width="20vw"
       >
         {{ toast.message }}
+        <template v-slot:close="{ toggle }">
+          <v-btn
+            rounded icon dark small aria-label="Close"
+            @click="removeToast(toast)"
+          >
+            <v-icon dark>mdi-close-circle</v-icon>
+          </v-btn>
+        </template>
       </v-alert>
     </div>
   </v-app>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
-import ToastService from '../services/toast/service'
+import ToastMessage from '~/models/toasts/toastMessage'
 
 @Component
 export default class DefaultLayout extends Vue {
@@ -149,14 +157,6 @@ export default class DefaultLayout extends Vue {
       to: '/about'
     }
   ]
-
-  toggleLoadingOn() {
-    this.$nuxt.$loading.start()
-  }
-
-  toggleLoadingOff() {
-    this.$nuxt.$loading.finish()
-  }
 
   get rightNavItems(): NavItem[] {
     return [
@@ -206,8 +206,23 @@ export default class DefaultLayout extends Vue {
     return ''
   }
 
-  get toasts() {
-    return ToastService.toasts
+  toasts: ToastMessage[] = []
+  // @Watch('toasts')
+  // consolidateToasts(toasts: ToastMessage[]) {
+
+  // }
+  removeToast(toast: ToastMessage) {
+    this.$store.commit('toasts/remove', toast)
+  }
+
+  created() {
+    this.$store.watch(state => state.toasts.list, () => {
+      console.log('toastwatch', this.$store.state.toasts.list.length)
+      // this.toasts = this.$store.state.toasts.list.map((toast: ToastMessage) => {
+      //   return { ...toast }
+      // })
+      this.toasts = this.$store.state.toasts.list
+    })
   }
 
   async fetch() {
