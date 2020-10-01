@@ -1,6 +1,5 @@
 $condensed-input-font-size: 14px;
 $condensed-input-height: 24px;
-
 .condensed-input {
   font-size: $condensed-input-font-size;
   text-transform: lowercase;
@@ -68,4 +67,8 @@ $condensed-input-height: 24px;
       }
     }
   }
+}
+
+.nuxt-progress {
+  top: 48px;
 }
