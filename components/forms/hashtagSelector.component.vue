@@ -51,6 +51,11 @@ export default class HashtagSelector extends Vue {
     required: false,
     default: false
   }) readonly disabled!: boolean
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly required: boolean | undefined
   @Prop({ type: Number, default: 12 }) readonly maxSelectable!: number
   @Prop({ type: Array }) readonly hashtags!: string[]
 
@@ -60,6 +65,10 @@ export default class HashtagSelector extends Vue {
 
   get rules() {
     return [(hashtags: string[] = []) => {
+      if (this.required && hashtags.length < 1) {
+        return `hashtags is required`
+      }
+
       for (let i = 0; i < hashtags.length; i++) {
         if (hashtags[i].length > MAX_HASHTAG_LENGTH) {
           return `hashtags must be no more than ${MAX_HASHTAG_LENGTH} characters`

@@ -12,6 +12,7 @@
       :disabled="disabled"
       :rules="rules"
       attach="#artworkTypeSelector"
+      validate-on-blur
     ></v-select>
   </div>
 </template>
@@ -51,12 +52,15 @@ export default class ArtworkTypeSelector extends Vue {
   }
 
   get rules() {
-    return [(value?: string) => {
-      if (value && this.artworkTypes && this.required && !this.artworkTypeNames.includes(value)) {
+    return [(value: string = '') => {
+      if (
+        (this.required && !value) ||
+        (value && this.artworkTypes && !this.artworkTypeNames.includes(value))
+      ) {
         return `type is required`
       }
 
-      return !!value
+      return true
     }]
   }
 }
