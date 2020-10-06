@@ -2,6 +2,7 @@
   <v-container>
     <v-row dense justify="center">
       <v-img
+        class="preview-artwork"
         max-height="75vh"
         max-width="75vw"
         :src="getImageSource(previewImage)"
@@ -227,27 +228,7 @@
       </v-list>
     </v-card>
 
-    <v-dialog
-      class="artwork-zoom-dialog"
-      :value="zoom"
-      @click:outside="onCloseZoomDialog"
-      @click="onCloseZoomDialog"
-      max-height="95vh"
-      max-width="95vw"
-    >
-      <div @click="onCloseZoomDialog">
-        <img
-          class="artwork-zoom-image"
-          :class="{ 'dragging': isZoomDragging }"
-          :src="getImageSource(previewImage)"
-          :style="`left: ${zoomLeft}px; top: ${zoomTop}px`"
-          @mousemove="onZoomDialogMouseMove"
-          @mousedown="onZoomDialogMouseDown"
-          @mouseup="onZoomDialogMouseUp"
-        />
-      </div>
-    </v-dialog>
-
+    <ArtworkZoomDialog :show.sync="zoom" :src="getImageSource(previewImage)" />
   </v-container>
 </template>
 
@@ -262,6 +243,7 @@ import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
+import ArtworkZoomDialog from '~/components/artwork/ArtworkZoomDialog.component.vue'
 import Artwork, {
   ArtworkImageFile,
   ImageFileRef,
@@ -281,7 +263,8 @@ import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
     CitySelector,
     ArtworkTypeSelector,
     HashtagSelector,
-    draggable
+    draggable,
+    ArtworkZoomDialog
   }
 })
 export default class ArtworkPage extends FormPageComponent {
@@ -290,11 +273,6 @@ export default class ArtworkPage extends FormPageComponent {
   cachedArtwork!: Artwork
   editMode = false
   zoom = false
-  isZoomDragging: boolean = false
-  zoomLeft: number = 0
-  zoomTop: number = 0
-  zoomMouseDownX: number = 0
-  zoomMouseDownY: number = 0
 
   async asyncData({ $axios, store, params }: Context) {
     try {
@@ -390,7 +368,12 @@ export default class ArtworkPage extends FormPageComponent {
 
   @debounce
   onPreviewArtworkClicked() {
-    this.zoom = !this.zoom
+    this.zoom = true
+  }
+
+  @debounce
+  onCloseZoomDialog() {
+    this.zoom = false
   }
 
   @debounce
@@ -410,30 +393,6 @@ export default class ArtworkPage extends FormPageComponent {
   onCancelClicked() {
     this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
     this.toggleEditMode(false)
-  }
-
-  @debounce
-  onCloseZoomDialog() {
-    this.zoom = false
-  }
-
-  onZoomDialogMouseDown(evt: MouseEvent) {
-    evt.preventDefault()
-    this.isZoomDragging = true
-    this.zoomMouseDownX = evt.clientX
-    this.zoomMouseDownY = evt.clientY
-  }
-
-  onZoomDialogMouseUp(evt: MouseEvent) {
-    evt.preventDefault()
-    this.isZoomDragging = false
-  }
-
-  onZoomDialogMouseMove(evt: MouseEvent) {
-    if (this.isZoomDragging) {
-      this.zoomLeft = evt.clientX - this.zoomMouseDownX
-      this.zoomTop = evt.clientY - this.zoomMouseDownY
-    }
   }
 
   @debounce
@@ -527,6 +486,9 @@ export default class ArtworkPage extends FormPageComponent {
 </script>
 
 <style scoped>
+.preview-artwork {
+  cursor: zoom-in;
+}
 .clickable {
   cursor: pointer;
 }
@@ -564,22 +526,5 @@ export default class ArtworkPage extends FormPageComponent {
   position: fixed;
   top: 40vh;
   left: 5px;
-}
-.artwork-zoom-image {
-  position: relative;
-  width: unset;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  cursor: grab;
-}
-.artwork-zoom-image.dragging {
-  cursor: grabbing;
-}
-
-.v-dialog__content >>> .v-dialog {
-  background: transparent;
-  box-shadow: none !important;
-  overflow: hidden;
 }
 </style>
