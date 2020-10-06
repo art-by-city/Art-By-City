@@ -12,7 +12,9 @@ export { default as File } from './file'
 
 export interface FileUploadRequest {
   data: string
-  type: string
+  type: string,
+  thumbX?: number,
+  thumbY?: number
 }
 export function isFileUploadRequest(thing: any): thing is FileUploadRequest {
   return (thing as FileUploadRequest).type !== undefined

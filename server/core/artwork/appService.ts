@@ -19,8 +19,7 @@ import {
   ArtworkMapper,
   ArtworkCreateRequest,
   ArtworkImage,
-  ArtworkUpdateRequest,
-  isArtworkImage
+  ArtworkUpdateRequest
 } from './'
 import { ConfigService } from '../config'
 import { FileApplicationService, isFileUploadRequest } from '../file'
@@ -93,7 +92,9 @@ export default class ArtworkApplicationServiceImpl
         }
 
         return {
-          source: `${file.name}?${Date.now()}`
+          source: `${file.name}?${Date.now()}`,
+          thumbX: image.thumbX,
+          thumbY: image.thumbY
         } as ArtworkImage
       }))
     })
@@ -157,7 +158,9 @@ export default class ArtworkApplicationServiceImpl
         }
 
         return {
-          source: `${file.name}?${Date.now()}`
+          source: `${file.name}?${Date.now()}`,
+          thumbX: image.thumbX,
+          thumbY: image.thumbY
         } as ArtworkImage
       } else {
         return image

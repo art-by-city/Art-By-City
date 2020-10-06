@@ -1,9 +1,10 @@
 <template>
   <v-dialog
+    v-if="image"
     :value="zoom"
-    @click:outside="onCloseZoomDialog"
-    max-height="95vh"
-    max-width="95vw"
+    persistent
+    height="500px"
+    width="500px"
   >
     <div
       class="artwork-zoom-dialog-container"
@@ -12,23 +13,38 @@
       <img
         class="artwork-zoom-image"
         :class="{ 'dragging': isDragging }"
-        :src="src"
+        :src="getImageSource(image)"
         :style="`left: ${left}px; top: ${top}px`"
+        contain
         @mousemove="onImgMouseMove"
         @mousedown="onImgMouseDown"
         @mouseup="onImgMouseUp"
       />
+      <div
+        @mousemove="onImgMouseMove"
+        @mousedown="onImgMouseDown"
+        @mouseup="onImgMouseUp"
+        class="thumbnail-bounds"
+      ></div>
     </div>
+    <v-btn @click="onSaveClicked">OK</v-btn>
+    <v-btn @click="onCancelClicked">CANCEL</v-btn>
   </v-dialog>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, PropSync, Emit } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers/helpers'
+import {
+  ArtworkImageFile,
+  getImageSource,
+  isFile
+} from '~/models/artwork/artwork'
 
 @Component
-export default class ArtworkZoomDialog extends Vue {
+export default class ArtworkThumbnailDialog extends Vue {
+  getImageSource = getImageSource
   isDragging: boolean = false
   left: number = 0
   top: number = 0
@@ -44,9 +60,8 @@ export default class ArtworkZoomDialog extends Vue {
   }) zoom!: boolean
 
   @Prop({
-    type: String,
-    required: true
-  }) readonly src!: string
+    default: null
+  }) image!: ArtworkImageFile | null
 
   private reset() {
     this.left = 0
@@ -96,7 +111,37 @@ export default class ArtworkZoomDialog extends Vue {
 
   onContainerMouseOut(evt: MouseEvent) {
     evt.preventDefault()
-    this.stopDragging()
+    if (this.isDragging) {
+      const tarClass = (<Element>evt.relatedTarget)?.className
+      const shouldContinue = tarClass.includes('thumbnail-bounds')
+        || tarClass.includes('artwork-zoom-image')
+      if (!shouldContinue) {
+        this.stopDragging()
+      }
+    }
+  }
+
+  @Emit('close') onArtworkThumbnailDialogClosed(save: boolean = false) {
+    if (save && this.image && !isFile(this.image)) {
+      this.image.thumbX = this.left
+      this.image.thumbY = this.top
+
+      this.onCloseZoomDialog()
+
+      return this.image
+    }
+
+    this.onCloseZoomDialog()
+  }
+
+  @debounce
+  onSaveClicked() {
+    this.onArtworkThumbnailDialogClosed(true)
+  }
+
+  @debounce
+  onCancelClicked() {
+    this.onArtworkThumbnailDialogClosed(false)
   }
 }
 </script>
@@ -123,5 +168,17 @@ export default class ArtworkZoomDialog extends Vue {
   background: transparent;
   box-shadow: none !important;
   overflow: hidden;
+}
+
+.thumbnail-bounds {
+  border: 1px solid red;
+  width: 33.3333333333vh;
+  height: 33.3333333333vh;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
 }
 </style>

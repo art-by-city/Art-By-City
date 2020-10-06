@@ -25,6 +25,9 @@ export class ArtworkImage {
   @IsString()
   @Matches(/\.(png|jpg)$/)
   source!: string
+
+  thumbX?: number
+  thumbY?: number
 }
 export type ArtworkImageRequest = ArtworkImage | FileUploadRequest
 export function isArtworkImage(image: ArtworkImageRequest):
