@@ -54,6 +54,9 @@
                     >
                       <v-icon>mdi-drag-variant</v-icon>
                     </v-btn>
+                    <v-btn icon small @click="onArtworkThumbnailEditClicked(i)">
+                      <v-icon>mdi-image-size-select-large</v-icon>
+                    </v-btn>
                   </div>
                 </v-overlay>
               </v-img>
@@ -228,7 +231,16 @@
       </v-list>
     </v-card>
 
-    <ArtworkZoomDialog :show.sync="zoom" :src="getImageSource(previewImage)" />
+    <ArtworkZoomDialog
+      :show.sync="isZoomDialogOpen"
+      :src="getImageSource(previewImage)"
+    />
+
+    <ArtworkThumbnailDialog
+      :show.sync="isThumbnailDialogOpen"
+      :image="editThumbnailImage"
+      @close="onArtworkThumbnailDialogClosed"
+    />
   </v-container>
 </template>
 
@@ -244,6 +256,7 @@ import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.componen
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkZoomDialog from '~/components/artwork/ArtworkZoomDialog.component.vue'
+import ArtworkThumbnailDialog from '~/components/artwork/ArtworkThumbnailDialog.component.vue'
 import Artwork, {
   ArtworkImageFile,
   ImageFileRef,
@@ -251,7 +264,10 @@ import Artwork, {
   isFile,
   ImageUploadRequest,
   isImageUploadPreview,
-  ImageUploadPreview
+  ImageUploadPreview,
+  getImageSource,
+  getImagePosition,
+  calcImageDimensions
 } from '~/models/artwork/artwork'
 import ArtworkType from '~/models/artwork/artworkType'
 import ProgressService from '~/services/progress/service'
@@ -264,15 +280,21 @@ import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
     ArtworkTypeSelector,
     HashtagSelector,
     draggable,
-    ArtworkZoomDialog
+    ArtworkZoomDialog,
+    ArtworkThumbnailDialog
   }
 })
 export default class ArtworkPage extends FormPageComponent {
   artwork!: Artwork
   previewImage!: ArtworkImageFile
+  editThumbnailImage: ArtworkImageFile | null = null
+  editThumbnailImageIndex: number = -1
   cachedArtwork!: Artwork
   editMode = false
-  zoom = false
+  isZoomDialogOpen = false
+  isThumbnailDialogOpen = false
+  getImageSource = getImageSource
+  getImagePosition = getImagePosition
 
   async asyncData({ $axios, store, params }: Context) {
     try {
@@ -348,18 +370,6 @@ export default class ArtworkPage extends FormPageComponent {
     return false
   }
 
-  getImageSource(image: ArtworkImageFile) {
-    if (isImageFileRef(image)) {
-      return `/artwork-images/${(<ImageFileRef>image).source}`
-    }
-
-    if (isImageUploadPreview(image)) {
-      return `data:${image.type};base64, ${image.ascii}`
-    }
-
-    return ''
-  }
-
   setPreviewImage(image: ArtworkImageFile) {
     if (!this.editMode) {
       this.previewImage = image
@@ -368,12 +378,12 @@ export default class ArtworkPage extends FormPageComponent {
 
   @debounce
   onPreviewArtworkClicked() {
-    this.zoom = true
+    this.isZoomDialogOpen = true
   }
 
   @debounce
   onCloseZoomDialog() {
-    this.zoom = false
+    this.isZoomDialogOpen = false
   }
 
   @debounce
@@ -397,31 +407,53 @@ export default class ArtworkPage extends FormPageComponent {
 
   @debounce
   async onArtworkImageChanged(index: number, image: File) {
-    this.artwork.images.splice(
-      index,
-      1,
-      {
-        ascii: btoa(await readFileAsBinaryStringAsync(image)),
-        type: image.type
-      } as ImageUploadPreview
-    )
+    try {
+      const ascii = btoa(await readFileAsBinaryStringAsync(image))
+      const imageUploadPreview: ImageUploadPreview = { ascii, type: image.type }
+      const { width, height } = await calcImageDimensions(imageUploadPreview)
+      this.artwork.images.splice(
+        index,
+        1,
+        { width, height, ...imageUploadPreview }
+      )
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   @debounce
   async onAddArtworkImageClicked(image: File) {
-    this.artwork.images.splice(
-      this.artwork.images.length,
-      0,
-      {
-        ascii: btoa(await readFileAsBinaryStringAsync(image)),
-        type: image.type
-      } as ImageUploadPreview
-    )
+    try {
+      const ascii = btoa(await readFileAsBinaryStringAsync(image))
+      const imageUploadPreview: ImageUploadPreview = { ascii, type: image.type }
+      const { width, height } = await calcImageDimensions(imageUploadPreview)
+      this.artwork.images.splice(
+        this.artwork.images.length,
+        0,
+        { width, height, ...imageUploadPreview }
+      )
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   @debounce
   async onDeleteArtworkImageClicked(index: number) {
     this.artwork.images.splice(index, 1)
+  }
+
+  @debounce
+  async onArtworkThumbnailEditClicked(index: number) {
+    this.editThumbnailImage = this.artwork.images[index]
+    this.editThumbnailImageIndex = index
+    this.isThumbnailDialogOpen = true
+  }
+
+  onArtworkThumbnailDialogClosed(image: ArtworkImageFile) {
+    if (!isFile(image)) {
+      console.log('_id.vue->onArtworkThumbnailDialogClosed() image', image.thumbX, image.thumbY)
+    }
+    this.artwork.images.splice(this.editThumbnailImageIndex, 1, image)
   }
 
   @debounce

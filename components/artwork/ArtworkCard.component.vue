@@ -5,6 +5,7 @@
         <v-img
           v-if="artwork"
           :src="'/artwork-images/' + artwork.images[0].source"
+          :position="getImagePosition(artwork.images[0], { width: 300, height: 300 })"
           style="cursor: pointer"
           aspect-ratio="1"
           class="elevation-2"
@@ -18,6 +19,7 @@
                   <a class="white--text text-lowercase">
                     {{ artwork.title }}
                   </a>
+                  {{ getImagePosition(artwork.images[0], { width: 300, height: 300 }) }}
                 </v-col>
               </v-row>
             </v-overlay>
@@ -32,6 +34,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
+import { getImagePosition } from '~/models/artwork/artwork'
 
 @Component({
   components: {
@@ -47,6 +50,8 @@ export default class ArtworkCard extends Vue {
   @Emit('click') onArtworkCardClicked() {
     return this.artwork
   }
+
+  getImagePosition = getImagePosition
 }
 </script>
 
