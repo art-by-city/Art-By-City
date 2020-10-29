@@ -166,67 +166,19 @@
       </v-col>
     </v-row>
 
-    <v-card
-      v-if="isOwnerOrAdmin"
-      class="artwork-actions"
-      tile
-      elevation="5"
-    >
-      <v-list dense min-width="150px">
-        <v-list-item>
-          <v-list-item-content>
-            <v-checkbox
-              v-model="artwork.published"
-              disabled
-              label="published"
-            />
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item>
-          <v-list-item-content>
-            <v-checkbox
-              v-model="artwork.approved"
-              disabled
-              label="approved"
-            />
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="!editMode && isOwner">
-          <v-list-item-content>
-            <v-btn small color="primary" @click="toggleEditMode">Edit</v-btn>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="editMode && isOwner">
-          <v-list-item-content>
-            <v-btn small color="primary" @click="saveArtwork">Save</v-btn>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="editMode && isOwner">
-          <v-list-item-content>
-            <v-btn small color="warning" @click="onCancelClicked">Cancel</v-btn>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="!editMode && isOwnerOrAdmin">
-          <v-list-item-content>
-            <v-btn small color="primary" @click="publishOrApproveArtwork('publish')">
-              {{ artwork.published ? 'Unpublish' : 'Publish' }}
-            </v-btn>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="!editMode && isAdmin">
-          <v-list-item-content>
-            <v-btn small color="primary" @click="publishOrApproveArtwork('approve')">
-              {{ artwork.approved ? 'Unapprove' : 'Approve' }}
-            </v-btn>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="editMode && isOwner">
-          <v-list-item-content>
-            <v-btn small color="error" @click="deleteArtwork">Delete</v-btn>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-card>
+    <ArtworkEditControls
+      :isOwner="isOwner"
+      :isAdmin="isAdmin"
+      :editMode="editMode"
+      :published="artwork.published"
+      :approved="artwork.approved"
+      @edit="toggleEditMode"
+      @save="saveArtwork"
+      @cancel="onCancelClicked"
+      @delete="deleteArtwork"
+      @publish="publishOrApproveArtwork('publish')"
+      @approve="publishOrApproveArtwork('approve')"
+    />
 
     <ArtworkZoomDialog :show.sync="zoom" :src="getImageSource(previewImage)" />
   </v-container>
@@ -244,6 +196,7 @@ import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.componen
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkZoomDialog from '~/components/artwork/ArtworkZoomDialog.component.vue'
+import ArtworkEditControls from '~/components/artwork/ArtworkEditControls.component.vue'
 import Artwork, {
   ArtworkImageFile,
   ImageFileRef,
@@ -264,7 +217,8 @@ import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
     ArtworkTypeSelector,
     HashtagSelector,
     draggable,
-    ArtworkZoomDialog
+    ArtworkZoomDialog,
+    ArtworkEditControls
   }
 })
 export default class ArtworkPage extends FormPageComponent {
@@ -521,10 +475,5 @@ export default class ArtworkPage extends FormPageComponent {
   height: 56px;
   width: 96px;
   margin: 5px;
-}
-.artwork-actions {
-  position: fixed;
-  top: 40vh;
-  left: 5px;
 }
 </style>
