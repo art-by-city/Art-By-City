@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-if="isOwnerOrAdmin"
-    class="artwork-actions"
+    class="artwork-edit-controls"
     tile
     elevation="5"
   >
@@ -65,8 +65,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Emit } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers/helpers'
-
 @Component
 export default class ArtworkEditControls extends Vue {
   @Prop({ type: Boolean, default: false }) readonly isOwner!: boolean
@@ -91,9 +89,10 @@ export default class ArtworkEditControls extends Vue {
 </script>
 
 <style scoped>
-.artwork-actions {
+.artwork-edit-controls {
   position: fixed;
   top: 40vh;
   left: 5px;
+  z-index: 5555;
 }
 </style>
