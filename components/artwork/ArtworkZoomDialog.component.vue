@@ -1,29 +1,27 @@
 <template>
-  <v-dialog
-    :value="zoom"
-    @click:outside="onCloseZoomDialog"
-    max-height="95vh"
-    max-width="95vw"
-  >
-    <div
-      class="artwork-zoom-dialog-container"
-      @mouseout="onContainerMouseOut"
+  <div class="artwork-zoom-dialog">
+    <v-dialog
+      :value="zoom"
+      @click:outside="onCloseZoomDialog"
+      max-height="95vh"
+      max-width="95vw"
     >
-      <img
-        class="artwork-zoom-image"
-        :class="{ 'dragging': isDragging }"
-        :src="src"
-        :style="`left: ${left}px; top: ${top}px`"
-        @mousemove="onImgMouseMove"
-        @mousedown="onImgMouseDown"
-        @mouseup="onImgMouseUp"
-      />
-    </div>
-    left: {{ left }}
-    top: {{ top }}
-    mouseDownX: {{ mouseDownX }}
-    mouseDownY: {{ mouseDownY }}
-  </v-dialog>
+      <div
+        class="artwork-zoom-dialog-container"
+        @mouseout="onContainerMouseOut"
+      >
+        <img
+          class="artwork-zoom-image"
+          :class="{ 'dragging': isDragging }"
+          :src="src"
+          :style="`left: ${left}px; top: ${top}px`"
+          @mousemove="onImgMouseMove"
+          @mousedown="onImgMouseDown"
+          @mouseup="onImgMouseUp"
+        />
+      </div>
+    </v-dialog>
+  </div>
 </template>
 
 <script lang="ts">
@@ -106,6 +104,10 @@ export default class ArtworkZoomDialog extends Vue {
 </script>
 
 <style scoped>
+.artwork-zoom-dialog {
+  z-index: 9999;
+}
+
 .artwork-zoom-dialog-container {
   background-color: rgba(0,0,0,0.5)
 }
