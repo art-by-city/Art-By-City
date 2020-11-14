@@ -18,7 +18,7 @@
             ></v-img>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-btn icon :to="`/artwork/${item.id}`">
+            <v-btn icon :to="`/a/${item.id}`">
               <v-icon>mdi-eye</v-icon>
             </v-btn>
           </template>

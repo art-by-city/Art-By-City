@@ -102,14 +102,14 @@ export default class AccountPage extends FormPageComponent {
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
 
-  async asyncData({ $axios, store, $auth }: Context) {
+  async asyncData({ $axios, store, $auth, app }: Context) {
     let cities = [] as any[]
     let user = {} as any
     try {
       const { payload } = await $axios.$get(`/api/user/${$auth.user.id}/account`)
       user = payload
     } catch (error) {
-      this.$toastService.error('error fetching account')
+      app.$toastService.error('error fetching account')
     }
 
     return { login: user }

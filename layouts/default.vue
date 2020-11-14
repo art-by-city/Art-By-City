@@ -168,7 +168,7 @@ export default class DefaultLayout extends Vue {
       {
         icon: 'mdi-account',
         title: 'my profile',
-        to: `/user/${this.$auth.user?.username || ''}`
+        to: `/${this.$auth.user?.username || ''}`
       },
       {
         icon: 'mdi-brush',
