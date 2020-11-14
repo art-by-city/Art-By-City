@@ -5,7 +5,8 @@ import {
   ArrayUnique,
   IsNotEmpty,
   Matches,
-  IsEmail
+  IsEmail,
+  IsNotIn
 } from 'class-validator'
 
 import Entity from '../common/entity'
@@ -19,6 +20,9 @@ export default class User extends Entity {
   @IsString()
   @MinLength(3, {
     message: 'Username must be at least 3 characters'
+  })
+  @IsNotIn(['artwork'], {
+    message: 'Username not allowed'
   })
   username!: string
 
