@@ -63,8 +63,6 @@ export default class UserProfilePage extends PageComponent {
     try {
       const { payload } = await $axios.$get(`/api/user/${params.username}/profile`)
 
-      console.log('_username.vue -> payload', payload)
-
       profile = payload
     } catch (error) {
       app.$toastService.error('error fetching user profile')
