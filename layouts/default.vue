@@ -1,6 +1,6 @@
 <template>
   <v-app dark>
-    <v-app-bar v-if="$auth.loggedIn" :clipped-left="true" fixed app dense elevation="1">
+    <v-app-bar v-if="isLoggedIn" :clipped-left="true" fixed app dense elevation="1">
       <v-row>
         <v-col cols="4">
           <v-menu offset-y>
@@ -35,12 +35,12 @@
 
         <v-col cols="4" class="text-center">
           <v-toolbar-items>
-            <template v-if="!$auth.loggedIn">
+            <template v-if="!isLoggedIn">
               <v-btn text to="/register">sign up</v-btn>
               <v-divider vertical />
               <v-btn text to="/login">log in</v-btn>
             </template>
-            <template v-if="$auth.loggedIn">
+            <template v-if="isLoggedIn">
               <v-menu offset-y>
                 <template v-slot:activator="props">
                   <v-btn class="avatar-menu-button" text right v-on="props.on">
@@ -184,6 +184,10 @@ export default class DefaultLayout extends Vue {
     }
 
     return false
+  }
+
+  get isLoggedIn(): boolean {
+    return this.$auth.loggedIn
   }
 
   get isArtist(): boolean {
