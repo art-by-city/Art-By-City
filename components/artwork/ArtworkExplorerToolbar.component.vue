@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, Prop, PropSync } from 'nuxt-property-decorator'
+import { Vue, Component, Emit, Prop } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
 import CitySelector from '~/components/forms/citySelector.component.vue'

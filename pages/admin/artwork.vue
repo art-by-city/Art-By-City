@@ -38,7 +38,7 @@
         </td>
       </template>
       <template v-slot:item.id="props">
-        <nuxt-link :to="`/artwork/${props.item.id}`" >{{ props.item.id }}</nuxt-link>
+        <nuxt-link :to="`/a/${props.item.id}`" >{{ props.item.id }}</nuxt-link>
       </template>
       <template v-slot:item.created="props">
         <DateWithTooltip :date="props.item.created" />
@@ -47,7 +47,7 @@
         <DateWithTooltip :date="props.item.updated" />
       </template>
       <template v-slot:item.owner="props">
-        <nuxt-link :to="`/user/${props.item.owner.username}`">
+        <nuxt-link :to="`/${props.item.owner.username}`">
           {{ props.item.owner.username }}
         </nuxt-link>
       </template>
@@ -110,7 +110,7 @@ export default class AdminEventsPage extends FormPageComponent {
     try {
       artworks = await app.$artworkService.fetchForAdmin()
     } catch (error) {
-      this.$toastService.error(`error fetching artworks: ${error}`)
+      app.$toastService.error(`error fetching artworks: ${error}`)
     }
 
     return { artworks }

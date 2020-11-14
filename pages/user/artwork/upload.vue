@@ -135,7 +135,7 @@ export default class ArtworkUploadPage extends FormComponent {
     const artwork = await this.$artworkService.createArtwork(this.artwork)
 
     if (artwork) {
-      this.$router.push(`/artwork/${artwork.id}`)
+      this.$router.push(`/a/${artwork.id}`)
     }
   }
 }

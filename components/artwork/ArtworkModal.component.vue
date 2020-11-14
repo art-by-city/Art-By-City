@@ -14,7 +14,7 @@
           <LikeButton :dark="true" :artwork="syncedArtwork" />
           <nuxt-link
             class="white--text text-lowercase"
-            :to="`/artwork/${syncedArtwork.id}`"
+            :to="`/a/${syncedArtwork.id}`"
           >
             {{ syncedArtwork.title }}
           </nuxt-link>

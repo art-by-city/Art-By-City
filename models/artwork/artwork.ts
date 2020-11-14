@@ -36,6 +36,18 @@ export function isFile(file: ArtworkImageFile): file is File {
     && !isImageUploadPreview(file)
 }
 
+export function getImageSource(image: ArtworkImageFile) {
+  if (isImageFileRef(image)) {
+    return `/artwork-images/${(<ImageFileRef>image).source}`
+  }
+
+  if (isImageUploadPreview(image)) {
+    return `data:${image.type};base64, ${image.ascii}`
+  }
+
+  return ''
+}
+
 export default interface Artwork {
   id: string
   created: Date

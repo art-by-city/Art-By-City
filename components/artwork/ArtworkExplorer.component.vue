@@ -79,7 +79,7 @@ export default class ArtworkExplorer extends Vue {
     const requestNewArtworkThreshold = 5
     if (index === this.$store.state.artworks.currentArtworkIndex) {
       // this.modalArtwork = artwork
-      this.$router.push(`/artwork/${artwork.id}`)
+      this.$router.push(`/a/${artwork.id}`)
     } else if (index < this.$store.state.artworks.currentArtworkIndex) {
       this.previous()
     } else if (index > this.$store.state.artworks.currentArtworkIndex) {

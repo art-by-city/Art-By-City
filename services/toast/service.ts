@@ -19,7 +19,6 @@ function isAxiosError(thing: any): thing is AxiosError {
 const TOAST_TIMEOUT_MS = 5000
 
 export default class ToastService {
-  // toasts: ToastMessage[] = []
   _context!: Context
 
   constructor(context: Context) {

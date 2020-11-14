@@ -168,7 +168,7 @@ export default class DefaultLayout extends Vue {
       {
         icon: 'mdi-account',
         title: 'my profile',
-        to: `/user/${this.$auth.user?.username || ''}`
+        to: `/${this.$auth.user?.username || ''}`
       },
       {
         icon: 'mdi-brush',
@@ -207,20 +207,12 @@ export default class DefaultLayout extends Vue {
   }
 
   toasts: ToastMessage[] = []
-  // @Watch('toasts')
-  // consolidateToasts(toasts: ToastMessage[]) {
-
-  // }
   removeToast(toast: ToastMessage) {
     this.$store.commit('toasts/remove', toast)
   }
 
   created() {
     this.$store.watch(state => state.toasts.list, () => {
-      console.log('toastwatch', this.$store.state.toasts.list.length)
-      // this.toasts = this.$store.state.toasts.list.map((toast: ToastMessage) => {
-      //   return { ...toast }
-      // })
       this.toasts = this.$store.state.toasts.list
     })
   }
