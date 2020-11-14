@@ -133,7 +133,7 @@ export default class ArtworkPage extends FormPageComponent {
       artwork = payload
       previewImage = payload.images[0]
     } catch (error) {
-      app.$toastService.error(`error fetching artwork or app config: ${error}`)
+      app.$toastService.error('error fetching artwork')
     } finally {
       return { artwork, previewImage }
     }
