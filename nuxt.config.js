@@ -1,3 +1,5 @@
+import IgnoreNotFoundExportPlugin from 'ignore-not-found-export-webpack-plugin'
+
 export default {
   /*
    ** Headers of the page
@@ -97,6 +99,9 @@ export default {
      ** You can extend webpack config here
      */
     // @ts-ignore
-    extend(config, ctx) {}
+    extend(config, ctx) {},
+    plugins: [
+      new IgnoreNotFoundExportPlugin()
+    ]
   }
 }
