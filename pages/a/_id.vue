@@ -1,87 +1,89 @@
 <template>
-  <v-container>
-    <v-row dense justify="center">
-      <v-img
-        class="preview-artwork"
-        max-height="75vh"
-        max-width="75vw"
-        :src="getImageSource(previewImage)"
-        contain
-        @click="onPreviewArtworkClicked"
-      ></v-img>
-    </v-row>
-    <v-row dense justify="center">
-      <div class="artwork-image-selector-container">
-        <div
-          class="artwork-image-selector"
-          v-for="(image, i) in artwork.images"
-          :key="i"
-        >
-          <v-img
-            aspect-ratio="1.7"
-            :src="getImageSource(image)"
-            class="clickable"
-            :class="{ 'highlighted': image === previewImage }"
-            @click="setPreviewImage(image)"
+  <div>
+    <v-container v-if="artwork">
+      <v-row dense justify="center">
+        <v-img
+          class="preview-artwork"
+          max-height="75vh"
+          max-width="75vw"
+          :src="getImageSource(previewImage)"
+          contain
+          @click="onPreviewArtworkClicked"
+        ></v-img>
+      </v-row>
+      <v-row dense justify="center">
+        <div class="artwork-image-selector-container">
+          <div
+            class="artwork-image-selector"
+            v-for="(image, i) in artwork.images"
+            :key="i"
           >
-          </v-img>
+            <v-img
+              aspect-ratio="1.7"
+              :src="getImageSource(image)"
+              class="clickable"
+              :class="{ 'highlighted': image === previewImage }"
+              @click="setPreviewImage(image)"
+            >
+            </v-img>
+          </div>
         </div>
-      </div>
-    </v-row>
-    <v-row dense justify="center">
-      <v-col cols="10">
-        <v-divider></v-divider>
-      </v-col>
-    </v-row>
-    <v-row dense>
-      <v-col offset="2" cols="5">
-        <v-row dense>
-          <span class="text-lowercase text-h2">{{ artwork.title }}</span>
-          <div style="align-self: flex-end">
-            <LikeButton :artwork="artwork"/>
-          </div>
-        </v-row>
-        <v-row dense>
-          <div class="text-lowercase" style="width: 100%">
-            {{ artwork.description }}
-          </div>
-        </v-row>
-      </v-col>
-      <v-col cols="5">
-        <ArtistTag :user="artwork.owner" />
-        <div class="text-lowercase">{{ artwork.type }}</div>
-        <div class="text-lowercase">{{ cityName }}</div>
-        <div class="text-lowercase">{{ hashtagsString }}</div>
-      </v-col>
-    </v-row>
+      </v-row>
+      <v-row dense justify="center">
+        <v-col cols="10">
+          <v-divider></v-divider>
+        </v-col>
+      </v-row>
+      <v-row dense>
+        <v-col offset="2" cols="5">
+          <v-row dense>
+            <span class="text-lowercase text-h2">{{ artwork.title }}</span>
+            <div style="align-self: flex-end">
+              <LikeButton :artwork="artwork"/>
+            </div>
+          </v-row>
+          <v-row dense>
+            <div class="text-lowercase" style="width: 100%">
+              {{ artwork.description }}
+            </div>
+          </v-row>
+        </v-col>
+        <v-col cols="5">
+          <ArtistTag :user="artwork.owner" />
+          <div class="text-lowercase">{{ artwork.type }}</div>
+          <div class="text-lowercase">{{ cityName }}</div>
+          <div class="text-lowercase">{{ hashtagsString }}</div>
+        </v-col>
+      </v-row>
 
-    <ArtworkEditControls
-      :isOwner="isOwner"
-      :isAdmin="isAdmin"
-      :editMode="editMode"
-      :published="artwork.published"
-      :approved="artwork.approved"
-      @edit="toggleEditMode"
-      @save="saveArtwork"
-      @cancel="onCancelClicked"
-      @delete="deleteArtwork"
-      @publish="publishOrApproveArtwork('publish')"
-      @approve="publishOrApproveArtwork('approve')"
-    />
+      <ArtworkEditControls
+        :isOwner="isOwner"
+        :isAdmin="isAdmin"
+        :editMode="editMode"
+        :published="artwork.published"
+        :approved="artwork.approved"
+        @edit="toggleEditMode"
+        @save="saveArtwork"
+        @cancel="onCancelClicked"
+        @delete="deleteArtwork"
+        @publish="publishOrApproveArtwork('publish')"
+        @approve="publishOrApproveArtwork('approve')"
+      />
 
-    <ArtworkZoomDialog
-      :show.sync="zoom"
-      :src="getImageSource(previewImage)"
-    />
+      <ArtworkZoomDialog
+        :show.sync="zoom"
+        :src="getImageSource(previewImage)"
+      />
 
-    <v-dialog
-      :value="editMode"
-      persistent
-      max-width="40vw"
-    >
-      <ArtworkEditForm :artwork="artwork" />
-    </v-dialog>
-  </v-container>
+      <v-dialog
+        :value="editMode"
+        persistent
+        max-width="40vw"
+      >
+        <ArtworkEditForm :artwork="artwork" />
+      </v-dialog>
+    </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -118,7 +120,9 @@ export default class ArtworkPage extends FormPageComponent {
 
   getImageSource = getImageSource
 
-  async asyncData({ $axios, store, params }: Context) {
+  async asyncData({ $axios, store, params, app }: Context) {
+    let artwork, previewImage
+
     try {
       const { payload } = await $axios.$get(`/api/artwork/${params.id}`)
 
@@ -126,12 +130,12 @@ export default class ArtworkPage extends FormPageComponent {
         payload.city = null
       }
 
-      return {
-        artwork: payload,
-        previewImage: payload.images[0]
-      }
+      artwork = payload
+      previewImage = payload.images[0]
     } catch (error) {
-      this.$toastService.error(`error fetching artwork or app config: ${error}`)
+      app.$toastService.error(`error fetching artwork or app config: ${error}`)
+    } finally {
+      return { artwork, previewImage }
     }
   }
 

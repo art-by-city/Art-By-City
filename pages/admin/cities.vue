@@ -97,14 +97,14 @@ export default class AdminCitiesPage extends FormPageComponent {
   cities: any[] = []
   editCity: null | number = null
 
-  async asyncData({ $axios }: Context) {
+  async asyncData({ $axios, app }: Context) {
     let cities = [] as any[]
 
     try {
       const citiesResponse = await $axios.$get('/api/admin/cities')
       cities = citiesResponse.payload || []
     } catch (error) {
-      this.$toastService.error(`error fetching cities: ${error}`)
+      app.$toastService.error(`error fetching cities: ${error}`)
     }
     return { cities }
   }

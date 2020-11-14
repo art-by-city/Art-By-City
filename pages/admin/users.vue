@@ -14,7 +14,7 @@
       <tr v-for="user in users" :key="user.id">
         <td class="text-lowercase">{{ user.id }}</td>
         <td class="text-lowercase">
-          <nuxt-link :to="`/user/${user.username}`">
+          <nuxt-link :to="`/${user.username}`">
             {{ user.username }}
           </nuxt-link>
         </td>
@@ -77,7 +77,7 @@ export default class AdminUserPage extends FormPageComponent {
   users: any[] = []
   cities: any[] = []
 
-  async asyncData({ $axios }: Context) {
+  async asyncData({ $axios, app }: Context) {
     let users = [] as any[]
     let cities = [] as any[]
 
@@ -87,7 +87,7 @@ export default class AdminUserPage extends FormPageComponent {
       const citiesResponse = await $axios.$get('/api/admin/cities')
       cities = citiesResponse.payload || []
     } catch (error) {
-      this.$toastService.error(`error fetching: ${error}`)
+      app.$toastService.error(`error fetching: ${error}`)
     }
 
     return { users, cities }

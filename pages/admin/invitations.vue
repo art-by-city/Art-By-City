@@ -74,7 +74,7 @@
             <DateWithTooltip :date="props.item.created" />
           </template>
           <template v-slot:item.createdByUser="props">
-            <nuxt-link :to="`/user/${props.item.createdByUser.username}`">
+            <nuxt-link :to="`/${props.item.createdByUser.username}`">
               {{ props.item.createdByUser.username }}
             </nuxt-link>
           </template>
@@ -93,7 +93,7 @@
           <template v-slot:item.usedByUser="props">
             <nuxt-link
               v-if="props.item.usedByUser"
-              :to="`/user/${props.item.usedByUser.username}`"
+              :to="`/${props.item.usedByUser.username}`"
             >
               {{ props.item.usedByUser.username }}
             </nuxt-link>
@@ -156,7 +156,7 @@ export default class AdminInvitationsPage extends FormPageComponent {
 
       return { invitations: [], invitationToSend: null }
     } catch (error) {
-      this.$toastService.error(error)
+      app.$toastService.error(error)
     }
   }
 

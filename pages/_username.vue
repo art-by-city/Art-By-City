@@ -58,20 +58,25 @@ export default class UserProfilePage extends PageComponent {
   profile: any | null
   modalArtwork: any | null = null
 
-  async asyncData({ $axios, params }: Context) {
+  async asyncData({ $axios, params, app }: Context) {
+    let profile
     try {
       const { payload } = await $axios.$get(`/api/user/${params.username}/profile`)
 
-      return { profile: payload }
+      console.log('_username.vue -> payload', payload)
+
+      profile = payload
     } catch (error) {
-      this.$toastService.error('error fetching user profile')
+      app.$toastService.error('error fetching user profile')
+    } finally {
+      return { profile }
     }
   }
 
   @debounce
   onArtworkCardClicked(artwork: any) {
     // this.modalArtwork = artwork
-    this.$router.push(`/artwork/${artwork.id}`)
+    this.$router.push(`/a/${artwork.id}`)
   }
 
   @debounce
