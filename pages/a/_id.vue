@@ -146,7 +146,7 @@ export default class ArtworkPage extends FormPageComponent {
           hashtags: [],
           likes: [],
           type: '',
-          city: '',
+          city: store.state.auth.user.city,
           published: false,
           approved: false
         }
