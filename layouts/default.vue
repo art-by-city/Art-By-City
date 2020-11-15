@@ -171,9 +171,9 @@ export default class DefaultLayout extends Vue {
         to: `/${this.$auth.user?.username || ''}`
       },
       {
-        icon: 'mdi-brush',
-        title: 'my artwork',
-        to: '/user/artwork'
+        icon: 'mdi-folder-multiple-image',
+        title: 'my portfolio',
+        to: '/portfolio'
       }
     ]
   }
