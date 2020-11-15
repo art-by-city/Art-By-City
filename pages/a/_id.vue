@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container v-if="artwork">
-      <v-row dense justify="center">
+      <v-row v-if="previewImage" dense justify="center">
         <v-img
           class="preview-artwork"
           max-height="75vh"
@@ -57,6 +57,7 @@
       </v-row>
 
       <ArtworkEditControls
+        :isNew="!artwork.id"
         :isOwner="isOwner"
         :isAdmin="isAdmin"
         :editMode="editMode"
@@ -71,6 +72,7 @@
       />
 
       <ArtworkZoomDialog
+        v-if="previewImage"
         :show.sync="zoom"
         :src="getImageSource(previewImage)"
       />
@@ -113,7 +115,7 @@ import { debounce } from '~/helpers/helpers'
 })
 export default class ArtworkPage extends FormPageComponent {
   artwork!: Artwork
-  previewImage!: ArtworkImageFile
+  previewImage?: ArtworkImageFile
   cachedArtwork!: Artwork
   editMode = false
   zoom = false
@@ -122,25 +124,48 @@ export default class ArtworkPage extends FormPageComponent {
 
   async asyncData({ $axios, store, params, app }: Context) {
     let artwork, previewImage
+    let editMode = false
 
     try {
-      const { payload } = await $axios.$get(`/api/artwork/${params.id}`)
+      if (params.id !== 'new') {
+        const { payload } = await $axios.$get(`/api/artwork/${params.id}`)
 
-      if (!payload.city) {
-        payload.city = null
+        if (!payload.city) {
+          payload.city = null
+        }
+
+        artwork = payload
+        previewImage = payload.images[0]
+      } else {
+        artwork = {
+          owner: {
+            id: store.state.auth.user.id,
+            username: store.state.auth.user.username
+          },
+          images: [],
+          hashtags: [],
+          likes: [],
+          type: '',
+          city: '',
+          published: false,
+          approved: false
+        }
+        previewImage = null
+        editMode = true
       }
-
-      artwork = payload
-      previewImage = payload.images[0]
     } catch (error) {
       app.$toastService.error('error fetching artwork')
     } finally {
-      return { artwork, previewImage }
+      return { artwork, previewImage, editMode }
     }
   }
 
+  get isNew() {
+    return !this.artwork.id || this.artwork.id === 'new'
+  }
+
   get isOwner() {
-    return this.$store.state?.auth?.user?.id === this.artwork?.owner.id
+    return this.$store.state?.auth?.user?.id === this.artwork?.owner?.id
   }
 
   get isAdmin() {
@@ -189,15 +214,24 @@ export default class ArtworkPage extends FormPageComponent {
 
   @debounce
   onCancelClicked() {
-    this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
-    this.toggleEditMode(false)
+    if (this.isNew) {
+      this.$router.push('/portfolio')
+    } else {
+      this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
+      this.toggleEditMode(false)
+    }
   }
 
   @debounce
   async saveArtwork() {
-    const artwork = await this.$artworkService.updateArtwork(this.artwork)
+    const artwork = this.isNew
+      ? await this.$artworkService.createArtwork(this.artwork)
+      : await this.$artworkService.updateArtwork(this.artwork)
 
     if (artwork) {
+      if (this.isNew) {
+        this.previewImage = artwork.images[0]
+      }
       this.artwork = Object.assign({}, this.artwork, artwork)
       this.toggleEditMode(false)
     }
@@ -243,7 +277,7 @@ export default class ArtworkPage extends FormPageComponent {
 
         if (success) {
           this.$toastService.success('artwork deleted')
-          this.$router.push(`/`)
+          this.$router.push('/')
         }
       } catch (error) {
         this.$toastService.error('error deleting artwork')

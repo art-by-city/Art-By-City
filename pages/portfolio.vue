@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-layout column justify-center align-center>
-      <h2 class="text-lowercase">My Artwork</h2>
-      <nuxt-link to="/user/artwork/upload" class="text-lowercase">
-        Upload New
+      <h2 class="text-lowercase">My Portfolio</h2>
+      <nuxt-link to="/a/new" class="text-lowercase">
+        Upload New Artwork
       </nuxt-link>
       <v-container fluid>
         <v-data-table :headers="headers" :items="artworks" item-key="id">

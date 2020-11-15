@@ -104,7 +104,7 @@
         </v-list-item>
 
         <v-list-item
-          v-if="editMode && isOwner"
+          v-if="editMode && isOwner && !isNew"
           dense
           @click="onDeleteClicked"
         >
@@ -127,6 +127,7 @@ import { Vue, Component, Prop, PropSync, Emit } from 'nuxt-property-decorator'
 export default class ArtworkEditControls extends Vue {
   @Prop({ type: Boolean, default: false }) readonly isOwner!: boolean
   @Prop({ type: Boolean, default: false }) readonly isAdmin!: boolean
+  @Prop({ type: Boolean, default: false }) readonly isNew!: boolean
 
   @Prop({ type: Boolean, default: false }) editMode!: boolean
 

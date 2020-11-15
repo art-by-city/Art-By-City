@@ -3,7 +3,13 @@ import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import ProgressService from '~/services/progress/service'
 import { readFileAsBinaryStringAsync } from '~/helpers/helpers'
-import Artwork, { ImageUploadRequest, isFile, isImageUploadPreview } from '~/models/artwork/artwork'
+import Artwork, {
+  ArtworkImageFile,
+  ImageFileRef,
+  ImageUploadRequest,
+  isFile,
+  isImageUploadPreview
+} from '~/models/artwork/artwork'
 
 export default class ArtworkService {
   context!: Context
@@ -14,14 +20,30 @@ export default class ArtworkService {
     this.$axios = context.$axios
   }
 
+  private async prepareArtworkImageForUpload(image: ArtworkImageFile):
+    Promise<ImageFileRef | ImageUploadRequest> {
+    if (isFile(image)) {
+      return {
+        type: image.type,
+        data: await readFileAsBinaryStringAsync(image)
+      } as ImageUploadRequest
+    }
+
+    if (isImageUploadPreview(image)) {
+      return {
+        type: image.type,
+        data: atob(image.ascii)
+      } as ImageUploadRequest
+    }
+
+    return image
+  }
+
   async createArtwork(artwork: Artwork): Promise<Artwork | undefined> {
     ProgressService.start()
     try {
       artwork.images = await Promise.all(artwork.images.map(async (image) => {
-        return {
-          data: await readFileAsBinaryStringAsync(<File>image),
-          type: (<File>image).type
-        } as ImageUploadRequest
+        return this.prepareArtworkImageForUpload(image)
       }))
 
       const { payload } = await this.$axios.$post(
@@ -35,6 +57,7 @@ export default class ArtworkService {
         return payload
       }
     } catch (error) {
+      console.error(error)
       this.context.$toastService.error(error)
     } finally {
       ProgressService.stop()
@@ -45,21 +68,7 @@ export default class ArtworkService {
     ProgressService.start()
     try {
       artwork.images = await Promise.all(artwork.images.map(async (image) => {
-        if (isFile(image)) {
-          return {
-            type: image.type,
-            data: await readFileAsBinaryStringAsync(image)
-          } as ImageUploadRequest
-        }
-
-        if (isImageUploadPreview(image)) {
-          return {
-            type: image.type,
-            data: atob(image.ascii)
-          } as ImageUploadRequest
-        }
-
-        return image
+        return this.prepareArtworkImageForUpload(image)
       }))
 
       const { payload } = await this.$axios.$put(
