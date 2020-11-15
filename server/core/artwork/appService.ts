@@ -76,7 +76,7 @@ export default class ArtworkApplicationServiceImpl
       title: req.title,
       description: req.description,
       type: req.type,
-      cityId: req.city,
+      cityId: user.city,
       hashtags: req.hashtags,
       images: await Promise.all(req.images.map(async (image) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
@@ -139,7 +139,7 @@ export default class ArtworkApplicationServiceImpl
     artwork.title = req.title,
     artwork.description = req.description,
     artwork.type = req.type,
-    artwork.city = req.city,
+    artwork.city = user.city,
     artwork.hashtags = req.hashtags,
     artwork.images = await Promise.all(req.images.map(async (image) => {
       if (isFileUploadRequest(image)) {

@@ -81,7 +81,7 @@
         <CitySelector
           v-model="artwork.city"
           :cities="$store.state.config.cities"
-          required
+          disabled
         />
         <HashtagSelector
           v-model="artwork.hashtags"
