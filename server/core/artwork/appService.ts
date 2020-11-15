@@ -301,13 +301,13 @@ export default class ArtworkApplicationServiceImpl
   }
 
   async get(id: string): Promise<ApiServiceResult<ArtworkViewModel>> {
+    const artwork = await this.artworkService.get(id)
+
+    if (!artwork) {
+      throw new NotFoundError('artwork')
+    }
+
     try {
-      const artwork = await this.artworkService.get(id)
-
-      if (!artwork) {
-        throw new NotFoundError('artwork')
-      }
-
       const user = await this.userService.getById(artwork.owner)
 
       return new ApiServiceSuccessResult(

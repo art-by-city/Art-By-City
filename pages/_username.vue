@@ -58,14 +58,18 @@ export default class UserProfilePage extends PageComponent {
   profile: any | null
   modalArtwork: any | null = null
 
-  async asyncData({ $axios, params, app }: Context) {
+  async asyncData({ $axios, params, app, error }: Context) {
     let profile
     try {
       const { payload } = await $axios.$get(`/api/user/${params.username}/profile`)
 
       profile = payload
-    } catch (error) {
-      app.$toastService.error('error fetching user profile')
+    } catch (err) {
+      if (err.response?.status === 404) {
+        return error({ statusCode: 404, message: 'user profile not found' })
+      } else {
+        app.$toastService.error('error fetching user profile')
+      }
     } finally {
       return { profile }
     }

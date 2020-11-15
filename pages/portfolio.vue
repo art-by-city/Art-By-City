@@ -34,7 +34,9 @@ import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
 
-@Component
+@Component({
+  middleware: 'auth'
+})
 export default class UserArtworkPage extends PageComponent {
   artworks: any[] = []
   cities: any[] = []
