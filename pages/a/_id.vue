@@ -122,7 +122,7 @@ export default class ArtworkPage extends FormPageComponent {
 
   getImageSource = getImageSource
 
-  async asyncData({ $axios, store, params, app }: Context) {
+  async asyncData({ $axios, store, params, app, error }: Context) {
     let artwork, previewImage
     let editMode = false
 
@@ -153,8 +153,12 @@ export default class ArtworkPage extends FormPageComponent {
         previewImage = null
         editMode = true
       }
-    } catch (error) {
-      app.$toastService.error('error fetching artwork')
+    } catch (err) {
+      if (err.response?.status === 404) {
+        return error({ statusCode: 404, message: 'artwork not found' })
+      } else {
+        app.$toastService.error('error fetching artwork')
+      }
     } finally {
       return { artwork, previewImage, editMode }
     }
