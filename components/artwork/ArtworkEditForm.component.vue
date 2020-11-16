@@ -1,11 +1,24 @@
 <template>
   <v-container class="artwork-edit-form">
     <v-row v-if="cropMode && cropImage" dense>
+      <v-tabs v-model="cropTab" @change="onCropTabChanged">
+        <v-tab
+          v-for="(tab, i) in cropTabs"
+          :key="i"
+        >{{ tab }}</v-tab>
+      </v-tabs>
+    </v-row>
+    <v-row v-if="cropMode && cropImage" dense>
       <img
         id="cropImage"
         class="crop-image"
         :src="getImageSource(cropImage)"
       />
+    </v-row>
+    <v-row v-if="cropMode && cropImage" justify="end">
+      <div class="crop-image-preview-container">
+        <div class="crop-image-preview"></div>
+      </div>
     </v-row>
     <v-row v-if="cropMode && cropImage" dense>
       <v-col>
@@ -162,6 +175,12 @@ export default class ArtworkEditForm extends Vue {
   cropImage?: ArtworkImageFile
   cropImageIndex?: number
   cropper?: Cropper
+  cropTabs = ['crop', 'thumbnail']
+  cropTab: number = 0
+
+  get cropType() {
+    return this.cropTabs[this.cropTab]
+  }
 
   get titleRules() {
     return [(value: string = '') => {
@@ -234,8 +253,13 @@ export default class ArtworkEditForm extends Vue {
       this.cropper.destroy()
     }
     this.$nextTick(() => {
+      const resetIt = this.resetCropBox
       this.cropper = new Cropper(document.getElementById('cropImage') as HTMLImageElement, {
-        viewMode: 1
+        viewMode: 1,
+        preview: '.crop-image-preview',
+        ready() {
+          resetIt()
+        }
       })
     })
   }
@@ -265,6 +289,27 @@ export default class ArtworkEditForm extends Vue {
   onCancelCropSelection() {
     this.cropMode = false
     this.cropper?.destroy()
+  }
+
+  onCropTabChanged(index: number) {
+    if (this.cropper && this.cropTabs[index] === 'thumbnail') {
+      this.cropper.setAspectRatio(1)
+    } else if (this.cropper && this.cropTabs[index] === 'crop') {
+      this.resetCropBox()
+    }
+  }
+
+  private resetCropBox() {
+    if (this.cropper) {
+      this.cropper.setAspectRatio(NaN)
+      const imageData = this.cropper.getImageData()
+      this.cropper.setCropBoxData({
+        left: 0,
+        top: 0,
+        width: imageData.width,
+        height: imageData.height
+      })
+    }
   }
 }
 </script>
@@ -304,5 +349,16 @@ export default class ArtworkEditForm extends Vue {
 .crop-image {
   display: block;
   max-width: 100%;
+}
+.crop-image-preview-container {
+  height: 96px;
+  width: 96px;
+  border: 1px solid blue;
+  margin-top: 25px;
+}
+.crop-image-preview {
+  height: 96px;
+  width: 96px;
+  overflow: hidden;
 }
 </style>
