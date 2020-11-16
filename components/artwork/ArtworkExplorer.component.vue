@@ -1,6 +1,5 @@
 <template>
   <v-container fluid class="artwork-explorer-container">
-    <!-- <ArtworkModal :artwork.sync="modalArtwork" /> -->
     <ArtworkExplorerToolbar
       :opts.sync="opts"
       @refresh="refresh"
@@ -37,15 +36,13 @@ import _ from 'lodash'
 
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
 import ArtworkCard from './ArtworkCard.component.vue'
-import ArtworkModal from './ArtworkModal.component.vue'
 import ArtworkOptions from '../../models/artwork/artworkOptions'
 import { debounce } from '~/helpers/helpers'
 
 @Component({
   components: {
     ArtworkExplorerToolbar,
-    ArtworkCard,
-    ArtworkModal
+    ArtworkCard
   }
 })
 export default class ArtworkExplorer extends Vue {

@@ -1,123 +1,125 @@
 <template>
-  <v-card
-    v-if="isOwnerOrAdmin"
-    class="artwork-edit-controls"
-    tile
-    elevation="5"
-  >
-    <v-navigation-drawer
-      permanent
-      expand-on-hover
+  <div class="artwork-edit-controls">
+    <v-card
+      v-if="isOwnerOrAdmin"
+      class="artwork-edit-controls"
+      tile
+      elevation="5"
     >
-      <v-list nav dense>
-        <v-list-item dense>
-          <v-list-item-icon>
-            <v-icon :color="published ? 'green' : 'grey'">
-              {{ published ? 'mdi-eye' : 'mdi-eye-off' }}
-            </v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>
-            {{ published ? 'published' : 'unpublished' }}
-          </v-list-item-title>
-        </v-list-item>
-
-        <v-list-item dense>
-          <v-list-item-icon>
-            <v-icon :color="approved ? 'green' : 'grey'">
-              mdi-stamper
-            </v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>
-            {{ approved ? 'approved' : 'unapproved' }}
-          </v-list-item-title>
-        </v-list-item>
-
-        <v-divider></v-divider>
-
-        <v-list-item
-          v-if="!editMode && isOwner"
-          dense
-          @click="onEditClicked"
-        >
-          <v-list-item-action>
-            <v-icon color="primary">mdi-square-edit-outline</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>edit</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item
-          v-if="editMode && isOwner"
-          dense
-          @click="onSaveClicked"
-        >
-          <v-list-item-action>
-            <v-icon color="primary">mdi-content-save</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>save</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item
-          v-if="editMode && isOwner"
-          dense
-          @click="onCancelClicked"
-        >
-          <v-list-item-action>
-            <v-icon color="warning">mdi-cancel</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>cancel</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item
-          v-if="!editMode && isOwnerOrAdmin"
-          dense
-          @click="onPublishClicked"
-        >
-          <v-list-item-action>
-            <v-icon color="primary">mdi-eye</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
+      <v-navigation-drawer
+        permanent
+        expand-on-hover
+      >
+        <v-list nav dense>
+          <v-list-item dense>
+            <v-list-item-icon>
+              <v-icon :color="published ? 'green' : 'grey'">
+                {{ published ? 'mdi-eye' : 'mdi-eye-off' }}
+              </v-icon>
+            </v-list-item-icon>
             <v-list-item-title>
-              {{ published ? 'unpublish' : 'publish' }}
+              {{ published ? 'published' : 'unpublished' }}
             </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+          </v-list-item>
 
-        <v-list-item
-          v-if="!editMode && isAdmin"
-          dense
-          @click="onApproveClicked"
-        >
-          <v-list-item-action>
-            <v-icon color="primary">mdi-stamper</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
+          <v-list-item dense>
+            <v-list-item-icon>
+              <v-icon :color="approved ? 'green' : 'grey'">
+                mdi-stamper
+              </v-icon>
+            </v-list-item-icon>
             <v-list-item-title>
-              {{ approved ? 'unapprove' : 'approve' }}
+              {{ approved ? 'approved' : 'unapproved' }}
             </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+          </v-list-item>
 
-        <v-list-item
-          v-if="editMode && isOwner && !isNew"
-          dense
-          @click="onDeleteClicked"
-        >
-          <v-list-item-action>
-            <v-icon color="error">mdi-delete</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>delete</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-  </v-card>
+          <v-divider></v-divider>
+
+          <v-list-item
+            v-if="!editMode && isOwner"
+            dense
+            @click="onEditClicked"
+          >
+            <v-list-item-action>
+              <v-icon color="primary">mdi-square-edit-outline</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>edit</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item
+            v-if="editMode && isOwner"
+            dense
+            @click="onSaveClicked"
+          >
+            <v-list-item-action>
+              <v-icon color="primary">mdi-content-save</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>save</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item
+            v-if="editMode && isOwner"
+            dense
+            @click="onCancelClicked"
+          >
+            <v-list-item-action>
+              <v-icon color="warning">mdi-cancel</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>cancel</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item
+            v-if="!editMode && isOwnerOrAdmin"
+            dense
+            @click="onPublishClicked"
+          >
+            <v-list-item-action>
+              <v-icon color="primary">mdi-eye</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ published ? 'unpublish' : 'publish' }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item
+            v-if="!editMode && isAdmin"
+            dense
+            @click="onApproveClicked"
+          >
+            <v-list-item-action>
+              <v-icon color="primary">mdi-stamper</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ approved ? 'unapprove' : 'approve' }}
+              </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item
+            v-if="editMode && isOwner && !isNew"
+            dense
+            @click="onDeleteClicked"
+          >
+            <v-list-item-action>
+              <v-icon color="error">mdi-delete</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>delete</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">
