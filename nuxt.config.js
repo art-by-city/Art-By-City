@@ -29,7 +29,8 @@ export default {
    ** Global CSS
    */
   css: [
-    '@assets/global.scss'
+    '@assets/global.scss',
+    '~/node_modules/cropperjs/dist/cropper.css'
   ],
   /*
    ** Plugins to load before mounting the App
