@@ -24,7 +24,6 @@
       <v-col cols="6" offset="3">
         <v-row>
           <v-col
-            class="artwork-grid-col"
             v-for="(artwork, i) in profile.artworks"
             :key="i"
             cols="4"

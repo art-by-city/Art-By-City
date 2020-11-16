@@ -73,10 +73,40 @@
         <v-card flat outlined>
           <v-card-title>progress bar</v-card-title>
           <v-card-text>
-            <v-btn @click="toggleLoadingOn">on</v-btn>
-            <v-btn @click="toggleLoadingOff">off</v-btn>
+            <v-btn color="success" @click="toggleLoadingOn">on</v-btn>
+            <v-btn color="error" @click="toggleLoadingOff">off</v-btn>
           </v-card-text>
         </v-card>
+        <v-card flat outlined>
+          <v-card-title>toast notifications</v-card-title>
+          <v-card-text>
+            <v-select
+              v-model="toastType"
+              label="type"
+              :items="toastTypes"
+            ></v-select>
+            <v-text-field
+              v-model="toastText"
+              type="text"
+              name="message"
+              label="message"
+              class="text-lowercase"
+            ></v-text-field>
+            <v-btn :color="toastType" @click="sendToastNotification">go</v-btn>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col
+        v-for="(t, i) in scrollItems"
+        :key="i"
+        cols="4"
+        class="lazy-load-test-col"
+      >
+        <v-lazy transition="fade-transition">
+          {{ i }}
+        </v-lazy>
       </v-col>
     </v-row>
   </v-container>
@@ -89,6 +119,7 @@ import FormPageComponent from '~/components/pages/formPage.component'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
+import { debounce } from '~/helpers/helpers'
 
 @Component({
   middleware: 'role/admin',
@@ -105,13 +136,31 @@ export default class AdminThemePage extends FormPageComponent {
   artworkType = ''
   hashtags = []
   text = ''
+  scrollItems = [...Array(15).keys()]
+  toastTypes = ['info', 'success', 'warning', 'error']
+  toastType: 'info' | 'success' | 'warning' | 'error' = 'info'
+  toastText = 'this is a test message'
 
+  @debounce
   toggleLoadingOn() {
     this.$nuxt.$loading.start()
   }
 
+  @debounce
   toggleLoadingOff() {
     this.$nuxt.$loading.finish()
   }
+
+  sendToastNotification() {
+    this.$toastService.toast(this.toastText, this.toastType)
+  }
 }
 </script>
+
+<style scoped>
+.lazy-load-test-col {
+  border: 1px solid black;
+  height: 10vw;
+  /* width: 10vw; */
+}
+</style>
