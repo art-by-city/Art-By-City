@@ -1,6 +1,23 @@
 <template>
   <v-container class="artwork-edit-form">
-    <v-row dense justify="center">
+    <v-row v-if="cropMode && cropImage" dense>
+      <img
+        id="cropImage"
+        class="crop-image"
+        :src="getImageSource(cropImage)"
+      />
+    </v-row>
+    <v-row v-if="cropMode && cropImage" dense>
+      <v-col>
+        <v-btn small icon @click="onSaveCropSelection">
+          <v-icon>mdi-content-save</v-icon>
+        </v-btn>
+        <v-btn small icon @click="onCancelCropSelection">
+          <v-icon>mdi-cancel</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row v-if="!cropMode" dense justify="center">
       <div class="artwork-image-selector-container">
         <draggable
           style="height:100%; width:100%; display: flex; flex-wrap: wrap;"
@@ -27,6 +44,13 @@
                     @change="onArtworkImageChanged(i, $event)"
                   ></v-file-input>
                   <div style="display: inline-flex;">
+                    <v-btn
+                      icon
+                      small
+                      @click="onCropArtworkImageClicked(i)"
+                    >
+                      <v-icon>mdi-crop</v-icon>
+                    </v-btn>
                     <v-btn
                       icon
                       small
@@ -63,7 +87,7 @@
         </draggable>
       </div>
     </v-row>
-    <v-row dense>
+    <v-row v-if="!cropMode" dense>
       <v-col>
         <v-text-field
           v-model="artwork.title"
@@ -105,10 +129,13 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
+import Cropper from 'cropperjs'
 
 import Artwork, {
   getImageSource,
-  ImageUploadPreview
+  ImageUploadPreview,
+  ArtworkImageFile,
+  isImageFileRef
 } from '~/models/artwork/artwork'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
@@ -127,6 +154,14 @@ export default class ArtworkEditForm extends Vue {
   @Prop({ type: Object, required: true }) artwork!: Artwork
 
   getImageSource = getImageSource
+
+  $refs!: {
+    cropImage: HTMLImageElement
+  }
+  cropMode: boolean = false
+  cropImage?: ArtworkImageFile
+  cropImageIndex?: number
+  cropper?: Cropper
 
   get titleRules() {
     return [(value: string = '') => {
@@ -160,15 +195,19 @@ export default class ArtworkEditForm extends Vue {
     return false
   }
 
+  private async createImagePreview(image: File): Promise<ImageUploadPreview> {
+    return {
+      ascii: btoa(await readFileAsBinaryStringAsync(image)),
+      type: image.type
+    } as ImageUploadPreview
+  }
+
   @debounce
   async onArtworkImageChanged(index: number, image: File) {
     this.artwork.images.splice(
       index,
       1,
-      {
-        ascii: btoa(await readFileAsBinaryStringAsync(image)),
-        type: image.type
-      } as ImageUploadPreview
+      await this.createImagePreview(image)
     )
   }
 
@@ -182,11 +221,50 @@ export default class ArtworkEditForm extends Vue {
     this.artwork.images.splice(
       this.artwork.images.length,
       0,
-      {
-        ascii: btoa(await readFileAsBinaryStringAsync(image)),
-        type: image.type
-      } as ImageUploadPreview
+      await this.createImagePreview(image)
     )
+  }
+
+  @debounce
+  onCropArtworkImageClicked(index: number) {
+    this.cropMode = true
+    this.cropImageIndex = index
+    this.cropImage = this.artwork.images[index]
+    if (this.cropper) {
+      this.cropper.destroy()
+    }
+    this.$nextTick(() => {
+      this.cropper = new Cropper(document.getElementById('cropImage') as HTMLImageElement, {
+        viewMode: 1
+      })
+    })
+  }
+
+  @debounce
+  onSaveCropSelection() {
+    if (this.cropper && typeof this.cropImageIndex !== 'undefined') {
+      let type = 'image/png'
+      const originalImage = this.artwork.images[this.cropImageIndex]
+      if (!isImageFileRef(originalImage)) {
+        type = originalImage.type
+      }
+      this.artwork.images.splice(this.cropImageIndex, 1, {
+        type,
+        ascii: this.cropper
+          .getCroppedCanvas()
+          .toDataURL(type)
+          .replace(/^data:image\/(png|jpg);base64,/, '')
+      })
+
+      this.cropMode = false
+      this.cropper.destroy()
+    }
+  }
+
+  @debounce
+  onCancelCropSelection() {
+    this.cropMode = false
+    this.cropper?.destroy()
   }
 }
 </script>
@@ -222,5 +300,9 @@ export default class ArtworkEditForm extends Vue {
   height: 56px;
   width: 96px;
   margin: 5px;
+}
+.crop-image {
+  display: block;
+  max-width: 100%;
 }
 </style>

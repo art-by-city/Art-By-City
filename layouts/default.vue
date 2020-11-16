@@ -27,7 +27,7 @@
           </v-menu>
         </v-col>
 
-        <v-col cols="4" class="text-center logo-col" align-self="center">
+        <v-col cols="4" class="text-center" align-self="center">
           <v-toolbar-title>
             <nuxt-link to="/">art x by x city</nuxt-link>
           </v-toolbar-title>
@@ -243,10 +243,6 @@ export default class DefaultLayout extends Vue {
 div.v-toolbar__content div.v-toolbar__title a {
   color: rgba(0, 0, 0, 0.87);
   text-decoration: none;
-}
-
-.logo-col {
-  padding-left: 16px;
 }
 
 .avatar-menu-button {
