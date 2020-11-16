@@ -8,6 +8,7 @@ import {
   IsEmail,
   IsNotIn
 } from 'class-validator'
+import crypto from 'crypto'
 
 import Entity from '../common/entity'
 
@@ -21,7 +22,7 @@ export default class User extends Entity {
   @MinLength(3, {
     message: 'Username must be at least 3 characters'
   })
-  @IsNotIn(['artwork'], {
+  @IsNotIn(['artwork', 'admin', 'artist'], {
     message: 'Username not allowed'
   })
   username!: string
@@ -46,6 +47,7 @@ export default class User extends Entity {
     message: 'Passwords must contain at least 1 number'
   })
   password?: string
+  salt?: string
 
   @ArrayUnique()
   @IsString({ each: true })
@@ -63,12 +65,23 @@ export default class User extends Entity {
 
   avatar?: UserAvatar
 
-  updatePassword(newPassword: string): void {
-    this.password = newPassword
+  private saltAndHash(password: string): string {
+    if (!this.salt) {
+      this.salt = crypto.randomBytes(Math.ceil(8)).toString('hex').slice(0,16)
+    }
+
+    const hash = crypto.createHmac('sha512', this.salt)
+    hash.update(password)
+
+    return hash.digest('hex')
+  }
+
+  setPassword(newPassword: string): void {
+    this.password = this.saltAndHash(newPassword)
   }
 
   verifyPassword(otherPassword: string): boolean {
-    return this.password === otherPassword
+    return this.password === this.saltAndHash(otherPassword)
   }
 
   addRole(role: string): void {

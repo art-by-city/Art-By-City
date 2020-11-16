@@ -39,20 +39,17 @@ export default class UserServiceImpl implements UserService {
     user.updated = new Date()
     user.username = req.body?.username || ''
     user.email = req.body?.email || ''
-    user.password = req.body?.password || ''
     user.city = req.body?.city || ''
     user.roles = []
     user.artworkCount = 0
     user.invitation = req.body?.inviteCode
 
+    user.setPassword(req.body?.password)
+
     // TODO -> make this admin configurable
     if (user.invitation) {
       const invitation = await this.invitationService.get(user.invitation)
-      if (invitation) {
-        if (invitation.used) {
-          throw new InvalidInvitationCodeError()
-        }
-      } else {
+      if (!invitation || invitation.used) {
         throw new InvalidInvitationCodeError()
       }
     } else {
@@ -62,13 +59,11 @@ export default class UserServiceImpl implements UserService {
     await validateUser(user)
 
     const existingUsernameUser = await this.userRepository.getByUsername(user.username)
-
     if (existingUsernameUser) {
       throw new UsernameAlreadyTakenError()
     }
 
     const existingEmailUser = await this.userRepository.getByEmail(user.email)
-
     if (existingEmailUser) {
       throw new EmailAlreadyTakenError()
     }
@@ -91,16 +86,16 @@ export default class UserServiceImpl implements UserService {
     const validatePasswordUser = new User()
     validatePasswordUser.password = password
 
-    await validateUser(validatePasswordUser, true)
-
     const user = await this.userRepository.get(id)
 
     if (!user) {
       throw new NotFoundError('user')
     }
 
+    await validateUser(validatePasswordUser, true)
+
     try {
-      user.updatePassword(password)
+      user.setPassword(password)
       user.updated = new Date()
 
       const updatedUser = await this.userRepository.update(user)
@@ -181,23 +176,17 @@ export default class UserServiceImpl implements UserService {
   }
 
   async authenticate(username: string, password: string): Promise<User | null> {
-    const usernameUser = await this.userRepository.getByUsername(username)
+    let user = await this.userRepository.getByUsername(username)
 
-    if (!usernameUser) {
-      const emailUser = await this.userRepository.getByEmail(username)
-
-      if (!emailUser || !emailUser.verifyPassword(password)) {
-        return null
-      }
-
-      return emailUser
+    if (!user) {
+      user = await this.userRepository.getByEmail(username)
     }
 
-    if (!usernameUser.verifyPassword(password)) {
+    if (user && !user?.verifyPassword(password)) {
       return null
     }
 
-    return usernameUser
+    return user
   }
 
   async getById(id: string): Promise<User | null> {
