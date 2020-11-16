@@ -252,7 +252,7 @@ div.v-toolbar__content div.v-toolbar__title a {
 }
 
 .toast-alerts-container {
-  position: absolute;
+  position: fixed;
   bottom: 32px;
   right: 32px;
 }
