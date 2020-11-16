@@ -1,41 +1,42 @@
 <template>
-  <v-container v-if="profile" fluid>
-    <!-- <ArtworkModal :artwork.sync="modalArtwork" /> -->
-    <v-row align="end">
-      <v-col cols="2" offset="3">
-        <UserAvatar
-          class="user-profile-avatar"
-          :user="profile.user"
-          :editable="$auth.user.id === profile.user.id"
-          @onChange="onUserAvatarChanged"
-        />
-      </v-col>
-      <v-col cols="4">
-        <div class="user-profile-username text-lowercase">{{ profile.user.username }}</div>
-        <div class="text-caption text-lowercase">{{ profile.user.city }}</div>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6" offset="3">
-        <v-divider></v-divider>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6" offset="3">
-        <v-row>
-          <v-col
-            v-for="(artwork, i) in profile.artworks"
-            :key="i"
-            cols="4"
-          >
-            <v-lazy transition="fade-transition">
-              <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork)" />
-            </v-lazy>
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div class="user-profile-page">
+    <v-container v-if="profile" fluid>
+      <v-row align="end">
+        <v-col cols="2" offset="3">
+          <UserAvatar
+            class="user-profile-avatar"
+            :user="profile.user"
+            :editable="$auth.user.id === profile.user.id"
+            @onChange="onUserAvatarChanged"
+          />
+        </v-col>
+        <v-col cols="4">
+          <div class="user-profile-username text-lowercase">{{ profile.user.username }}</div>
+          <div class="text-caption text-lowercase">{{ profile.user.city }}</div>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="6" offset="3">
+          <v-divider></v-divider>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="6" offset="3">
+          <v-row>
+            <v-col
+              v-for="(artwork, i) in profile.artworks"
+              :key="i"
+              cols="4"
+            >
+              <v-lazy transition="fade-transition">
+                <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork)" />
+              </v-lazy>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script lang="ts">
@@ -44,13 +45,11 @@ import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import ArtworkModal from '~/components/artwork/ArtworkModal.component.vue'
 import { debounce } from '~/helpers/helpers'
 
 @Component({
   components: {
-    ArtworkCard,
-    ArtworkModal
+    ArtworkCard
   }
 })
 export default class UserProfilePage extends PageComponent {

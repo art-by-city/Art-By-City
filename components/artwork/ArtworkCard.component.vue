@@ -1,30 +1,32 @@
 <template>
-  <div v-if="artwork">
-    <v-hover>
-      <template v-slot:default="props">
-        <v-img
-          v-if="artwork"
-          :src="'/artwork-images/' + artwork.images[0].source"
-          style="cursor: pointer"
-          aspect-ratio="1"
-          class="elevation-2"
-          @click="onArtworkCardClicked"
-        >
-          <v-fade-transition>
-            <v-overlay v-if="props.hover" absolute class="artwork-overlay">
-              <v-row align="end" class="fill-height pa-1">
-                <v-col cols="auto" class="artwork-overlay-title-container">
-                  <LikeButton :dark="true" :artwork="artwork" />
-                  <a class="white--text text-lowercase">
-                    {{ artwork.title }}
-                  </a>
-                </v-col>
-              </v-row>
-            </v-overlay>
-          </v-fade-transition>
-        </v-img>
-      </template>
-    </v-hover>
+  <div class="artwork-card">
+    <div v-if="artwork">
+      <v-hover>
+        <template v-slot:default="props">
+          <v-img
+            v-if="artwork"
+            :src="'/artwork-images/' + artwork.images[0].source"
+            style="cursor: pointer"
+            aspect-ratio="1"
+            class="elevation-2"
+            @click="onArtworkCardClicked"
+          >
+            <v-fade-transition>
+              <v-overlay v-if="props.hover" absolute class="artwork-overlay">
+                <v-row align="end" class="fill-height pa-1">
+                  <v-col cols="auto" class="artwork-overlay-title-container">
+                    <LikeButton :dark="true" :artwork="artwork" />
+                    <a class="white--text text-lowercase">
+                      {{ artwork.title }}
+                    </a>
+                  </v-col>
+                </v-row>
+              </v-overlay>
+            </v-fade-transition>
+          </v-img>
+        </template>
+      </v-hover>
+    </div>
   </div>
 </template>
 
