@@ -92,9 +92,7 @@ export default class UserServiceImpl implements UserService {
       throw new NotFoundError('user')
     }
 
-    if (!['admin', 'artist'].includes(user.username)) {
-      await validateUser(validatePasswordUser, true)
-    }
+    await validateUser(validatePasswordUser, true)
 
     try {
       user.setPassword(password)
