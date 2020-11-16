@@ -1,6 +1,6 @@
 <template>
   <v-card
-    :to="`/user/${user.username}`"
+    :to="`/${user.username}`"
     class="artist-tag"
     :class="{ 'dark': dark }"
     width="150"

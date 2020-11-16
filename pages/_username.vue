@@ -24,7 +24,6 @@
       <v-col cols="6" offset="3">
         <v-row>
           <v-col
-            class="artwork-grid-col"
             v-for="(artwork, i) in profile.artworks"
             :key="i"
             cols="4"
@@ -58,20 +57,27 @@ export default class UserProfilePage extends PageComponent {
   profile: any | null
   modalArtwork: any | null = null
 
-  async asyncData({ $axios, params }: Context) {
+  async asyncData({ $axios, params, app, error }: Context) {
+    let profile
     try {
       const { payload } = await $axios.$get(`/api/user/${params.username}/profile`)
 
-      return { profile: payload }
-    } catch (error) {
-      this.$toastService.error('error fetching user profile')
+      profile = payload
+    } catch (err) {
+      if (err.response?.status === 404) {
+        return error({ statusCode: 404, message: 'user profile not found' })
+      } else {
+        app.$toastService.error('error fetching user profile')
+      }
+    } finally {
+      return { profile }
     }
   }
 
   @debounce
   onArtworkCardClicked(artwork: any) {
     // this.modalArtwork = artwork
-    this.$router.push(`/artwork/${artwork.id}`)
+    this.$router.push(`/a/${artwork.id}`)
   }
 
   @debounce

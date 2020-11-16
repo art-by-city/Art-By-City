@@ -1,9 +1,9 @@
 <template>
   <div>
     <v-layout column justify-center align-center>
-      <h2 class="text-lowercase">My Artwork</h2>
-      <nuxt-link to="/user/artwork/upload" class="text-lowercase">
-        Upload New
+      <h2 class="text-lowercase">My Portfolio</h2>
+      <nuxt-link to="/a/new" class="text-lowercase">
+        Upload New Artwork
       </nuxt-link>
       <v-container fluid>
         <v-data-table :headers="headers" :items="artworks" item-key="id">
@@ -18,7 +18,7 @@
             ></v-img>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-btn icon :to="`/artwork/${item.id}`">
+            <v-btn icon :to="`/a/${item.id}`">
               <v-icon>mdi-eye</v-icon>
             </v-btn>
           </template>
@@ -34,7 +34,9 @@ import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
 
-@Component
+@Component({
+  middleware: 'auth'
+})
 export default class UserArtworkPage extends PageComponent {
   artworks: any[] = []
   cities: any[] = []

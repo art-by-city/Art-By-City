@@ -168,12 +168,12 @@ export default class DefaultLayout extends Vue {
       {
         icon: 'mdi-account',
         title: 'my profile',
-        to: `/user/${this.$auth.user?.username || ''}`
+        to: `/${this.$auth.user?.username || ''}`
       },
       {
-        icon: 'mdi-brush',
-        title: 'my artwork',
-        to: '/user/artwork'
+        icon: 'mdi-folder-multiple-image',
+        title: 'my portfolio',
+        to: '/portfolio'
       }
     ]
   }
@@ -256,7 +256,7 @@ div.v-toolbar__content div.v-toolbar__title a {
 }
 
 .toast-alerts-container {
-  position: absolute;
+  position: fixed;
   bottom: 32px;
   right: 32px;
 }

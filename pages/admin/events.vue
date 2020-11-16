@@ -45,14 +45,14 @@ export default class AdminEventsPage extends FormPageComponent {
   ]
   eventLogSearch = ''
 
-  async asyncData({ $axios }: Context) {
+  async asyncData({ $axios, app }: Context) {
     let events = [] as any[]
 
     try {
       const analyticsResponse = await $axios.$get('/api/analytics/events')
       events = analyticsResponse.payload || []
     } catch (error) {
-      this.$toastService.error(`error fetching events: ${error}`)
+      app.$toastService.error(`error fetching events: ${error}`)
     }
 
     return { events }
