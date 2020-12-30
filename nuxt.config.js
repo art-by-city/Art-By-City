@@ -50,7 +50,6 @@ export default {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/auth',
-    // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv'
   ],
   env: {

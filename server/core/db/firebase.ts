@@ -9,12 +9,11 @@ export default class FirebaseAdapter implements DatabaseAdapter {
   private firestore!: Firestore
 
   initialize() {
-    // TODO -> from environment
     this.firestore = new Firestore({
-      projectId: 'art-by-city-dev',
-      host: 'localhost',
-      port: 8080,
-      ssl: false
+      projectId: process.env.GCP_PROJECT_ID,
+      host: process.env.DB_HOST,
+      port: Number.parseInt(process.env.DB_PORT || '8080'),
+      ssl: process.env.DB_SSL === 'true'
     })
     fireorm.initialize(this.firestore, { validateModels: false })
   }
