@@ -38,7 +38,9 @@ export function isFile(file: ArtworkImageFile): file is File {
 
 export function getImageSource(image: ArtworkImageFile) {
   if (isImageFileRef(image)) {
-    return `/artwork-images/${(<ImageFileRef>image).source}`
+    return process.env.env === 'staging' || process.env.env === 'production'
+      ? `https://storage.googleapis.com/${process.env.USER_UPLOAD_BUCKET_NAME}/artwork-images/${(<ImageFileRef>image).source}`
+      : `/artwork-images/${(<ImageFileRef>image).source}`
   }
 
   if (isImageUploadPreview(image)) {

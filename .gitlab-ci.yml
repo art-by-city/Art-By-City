@@ -1,0 +1,13 @@
+# https://medium.com/google-cloud/automatically-deploy-to-google-app-engine-with-gitlab-ci-d1c7237cbe11
+build:
+  image: node:14-alpine
+  stage: build
+  script:
+    - npm install --progress=false
+    - npm run build
+  artifacts:
+    paths:
+      - dist
+
+deploy:
+
