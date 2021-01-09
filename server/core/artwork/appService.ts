@@ -183,7 +183,7 @@ export default class ArtworkApplicationServiceImpl
         delete opts.type
       }
 
-      if (opts.city === 'All') {
+      if (opts.city === 'All' || !opts.city) {
         delete opts.city
       }
 
@@ -226,7 +226,7 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult(mappedArtworks)
     } catch (error) {
-      throw new UnknownError(error.message)
+      throw new UnknownError()
     }
   }
 

@@ -235,8 +235,11 @@ export default class FileApplicationServiceImpl
 
   private async removeFileAsset(path: string): Promise<boolean> {
     try {
-      // TODO -> cloud files
-      await fs.promises.unlink(path)
+      if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+        // TODO -> cloud files
+      } else {
+        await fs.promises.unlink(path)
+      }
 
       return true
     } catch (error) {
