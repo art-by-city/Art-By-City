@@ -2,7 +2,7 @@ import { Context } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import ProgressService from '~/services/progress/service'
-import { readFileAsBinaryStringAsync } from '~/helpers/helpers'
+import { readFileAsDataUrlAsync } from '~/helpers/helpers'
 import Artwork, {
   ArtworkImageFile,
   ImageFileRef,
@@ -23,16 +23,17 @@ export default class ArtworkService {
   private async prepareArtworkImageForUpload(image: ArtworkImageFile):
     Promise<ImageFileRef | ImageUploadRequest> {
     if (isFile(image)) {
+      const imgData = await readFileAsDataUrlAsync(image)
       return {
         type: image.type,
-        data: await readFileAsBinaryStringAsync(image)
+        data: imgData.split(',')[1]
       } as ImageUploadRequest
     }
 
     if (isImageUploadPreview(image)) {
       return {
         type: image.type,
-        data: atob(image.ascii)
+        data: image.ascii
       } as ImageUploadRequest
     }
 

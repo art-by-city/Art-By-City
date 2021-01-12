@@ -1,12 +1,12 @@
 import _ from 'lodash'
 
-export const readFileAsBinaryStringAsync = (file: File): Promise<string> => {
+export const readFileAsDataUrlAsync = (file: File): Promise<string> => {
   return new Promise((resolve, _reject) => {
     const reader = new FileReader()
     reader.onload = () => {
       resolve(<string>reader.result)
     }
-    reader.readAsBinaryString(file)
+    reader.readAsDataURL(file)
   })
 }
 
