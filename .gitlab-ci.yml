@@ -10,8 +10,10 @@ build_staging:
     GCP_PROJECT_ID: $PROJECT_ID
     USER_UPLOAD_BUCKET_NAME: $USER_UPLOAD_BUCKET_NAME
   script:
+    - apk add --no-cache --virtual .gyp python make g++
     - npm install --production --progress=false
     - npm run build
+    - apk del .gyp
   artifacts:
     paths:
       - .nuxt
@@ -28,8 +30,10 @@ build_production:
     GCP_PROJECT_ID: $PROJECT_ID
     USER_UPLOAD_BUCKET_NAME: $USER_UPLOAD_BUCKET_NAME
   script:
+    - apk add --no-cache --virtual .gyp python make g++
     - npm install --production --progress=false
     - npm run build
+    - apk del .gyp
   artifacts:
     paths:
       - .nuxt
