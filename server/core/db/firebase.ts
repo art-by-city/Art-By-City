@@ -19,9 +19,10 @@ export default class FirebaseAdapter implements DatabaseAdapter {
       firestoreOpts.host = process.env.DB_HOST
       firestoreOpts.port = Number.parseInt(process.env.DB_PORT || '8080')
       firestoreOpts.ssl = process.env.DB_SSL === 'true'
-    } else {
-      firestoreOpts.keyFilename = process.env.GAC
     }
+    // else {
+    //   firestoreOpts.keyFilename = process.env.GAC
+    // }
 
     this.firestore = new Firestore(firestoreOpts)
     fireorm.initialize(this.firestore, { validateModels: false })

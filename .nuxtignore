@@ -92,6 +92,3 @@ sw.*
 
 # Vim swap files
 *.swp
-
-#GCP App yaml
-app*.yaml

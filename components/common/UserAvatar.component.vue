@@ -10,7 +10,6 @@
         </span>
       </template>
       <v-overlay :value="editable && hoverProps.hover">
-        env: {{ env }}
         <v-file-input
           class="avatar-upload-button"
           accept="image/*"
