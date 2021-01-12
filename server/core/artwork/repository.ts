@@ -74,7 +74,9 @@ export default class ArtworkRepositoryImpl
 
       return matches
     } catch (error) {
-      throw new Error(`Error finding artwork: ${error.message}`)
+      const msg = `Error finding artwork: ${error.message}`
+      console.error(msg)
+      throw new Error(msg)
     }
   }
 

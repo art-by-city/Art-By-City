@@ -1,3 +1,5 @@
+import { ActionTree } from 'vuex'
+
 import ArtworkType from '~/models/artwork/artworkType'
 
 const defaultState = {
@@ -24,5 +26,16 @@ export const mutations = {
 
   setHashtags(state: ConfigStoreState, hashtags: string[]) {
     state.hashtags = hashtags
+  }
+}
+
+export const actions: ActionTree<ConfigStoreState, any> = {
+  async setConfig({ commit }): Promise<void> {
+    try {
+      const config = await this.$axios.$get('/api/config')
+      commit('setConfig', config)
+    } catch (error) {
+      console.error(error)
+    }
   }
 }

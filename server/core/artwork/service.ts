@@ -1,8 +1,7 @@
 import { injectable, inject } from 'inversify'
 
 import UnknownError from '../api/errors/unknownError'
-import { User, UserRepository } from '../user'
-import { DomainServiceOptions } from '../domainService.interface'
+import { User } from '../user'
 import validateArtwork from './validator'
 import {
   Artwork,
@@ -14,16 +13,12 @@ import {
 @injectable()
 export default class ArtworkServiceImpl implements ArtworkService {
   private artworkRepository: ArtworkRepository
-  private userRepository: UserRepository
 
   constructor(
     @inject(Symbol.for('ArtworkRepository'))
-    artworkRepository: ArtworkRepository,
-    @inject(Symbol.for('UserRepository'))
-    userRepository: UserRepository
+    artworkRepository: ArtworkRepository
   ) {
     this.artworkRepository = artworkRepository
-    this.userRepository = userRepository
   }
 
   async create(artwork: Artwork): Promise<Artwork | null> {

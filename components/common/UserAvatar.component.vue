@@ -2,7 +2,7 @@
   <v-hover v-slot:default="hoverProps">
     <v-avatar :color="currentColor" :size="size">
       <template v-if="user.avatar">
-        <v-img :src="'/avatar-images/' + user.avatar.source"></v-img>
+        <v-img :src="baseUrl + user.avatar.source"></v-img>
       </template>
       <template v-else>
         <span class="white--text text-lowercase">
@@ -30,6 +30,8 @@ import User from '~/models/user/user'
 
 @Component
 export default class UserAvatar extends Vue {
+  env = process.env.env
+
   @Prop({
     type: Object,
     required: true
@@ -81,6 +83,12 @@ export default class UserAvatar extends Vue {
     return this.small
       ? '32'
       : '192'
+  }
+
+  get baseUrl() {
+    return process.env.env === 'staging' || process.env.env === 'production'
+      ? `https://storage.googleapis.com/${process.env.USER_UPLOAD_BUCKET_NAME}/avatar-images/`
+      : '/avatar-images/'
   }
 }
 </script>

@@ -6,5 +6,5 @@ import FirebaseAdapter from './firebase'
 export default new ContainerModule((bind) => {
   bind<DatabaseAdapterInterface>(Symbol.for('DatabaseAdapter')).to(
     FirebaseAdapter
-  )
+  ).inSingletonScope()
 })

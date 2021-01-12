@@ -7,6 +7,7 @@ import File from './file'
 import FileRepositoryImpl from './repository'
 import FileServiceImpl from './service'
 import FileApplicationServiceImpl from './appService'
+import { ArtworkImage, ArtworkImageRequest } from '../artwork'
 
 export { default as File } from './file'
 
@@ -39,6 +40,10 @@ export interface FileApplicationService
   getExistingUserAvatarFile(userId: string): Promise<File | null>
   deleteFileAndAsset(file: File): Promise<void>
   deleteFile(file: File): Promise<void>
+  createFromFileUploadRequests(
+    userId: string,
+    assetType: FileAssetType,
+    fileUploadRequests: (FileUploadRequest | ArtworkImageRequest)[]): Promise<ArtworkImage[]>
   createFromFileData(
     userId: string,
     assetType: FileAssetType,
