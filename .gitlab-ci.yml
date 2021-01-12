@@ -1,13 +1,56 @@
 # https://medium.com/google-cloud/automatically-deploy-to-google-app-engine-with-gitlab-ci-d1c7237cbe11
-build:
+build_staging:
   image: node:14-alpine
   stage: build
+  environment: Staging
+  only:
+    - staging
+  variables:
+    NODE_ENV: staging
+    BASE_URL: $BASE_URL
+    GCP_PROJECT_ID: $PROJECT_ID
+    USER_UPLOAD_BUCKET_NAME: $USER_UPLOAD_BUCKET_NAME
   script:
-    - npm install --progress=false
+    - npm install --production --progress=false
     - npm run build
   artifacts:
     paths:
       - .nuxt
 
-deploy:
+build_production:
+  image: node:14-alpine
+  stage: build
+  environment: Production
+  only:
+    - production
+  variables:
+    NODE_ENV: production
+    BASE_URL: $BASE_URL
+    GCP_PROJECT_ID: $PROJECT_ID
+    USER_UPLOAD_BUCKET_NAME: $USER_UPLOAD_BUCKET_NAME
+  script:
+    - npm install --production --progress=false
+    - npm run build
+  artifacts:
+    paths:
+      - .nuxt
 
+deploy_staging:
+  stage: deploy
+  environment: Staging
+  only:
+    - staging
+  script:
+    - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
+    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+    - gcloud --quiet --project $PROJECT_ID app deploy app.staging.yaml
+
+deploy_production:
+  stage: deploy
+  environment: Production
+  only:
+    - production
+  script:
+    - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
+    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+    - gcloud --quiet --project $PROJECT_ID app deploy app.production.yaml
