@@ -40,6 +40,7 @@ deploy_staging:
   only:
     - staging
   before_script:
+    - apk add --no-cache --virtual .gyp python make g++ coreutils curl
     - curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
     - mkdir -p /usr/local/gcloud
     - tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz
@@ -56,6 +57,7 @@ deploy_production:
   only:
     - production
   before_script:
+    - apk add --no-cache --virtual .gyp python make g++ coreutils curl
     - curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
     - mkdir -p /usr/local/gcloud
     - tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz
