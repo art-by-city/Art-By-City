@@ -235,6 +235,7 @@ export default class ArtworkPage extends FormPageComponent {
     if (artwork) {
       if (this.isNew) {
         this.previewImage = artwork.images[0]
+        window.history.replaceState(window.history.state, document.title, `/a/${artwork.id}`)
       }
       this.artwork = Object.assign({}, this.artwork, artwork)
       this.toggleEditMode(false)
