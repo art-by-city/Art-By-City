@@ -62,7 +62,8 @@ export default {
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     redirect: {
-      rewriteRedirects: true
+      rewriteRedirects: true,
+      resetOnError: true
     },
     strategies: {
       local: {
