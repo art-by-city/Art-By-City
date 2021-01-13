@@ -27,8 +27,8 @@ export const mutations: MutationTree<ArtworkStoreState> = {
     state.currentArtworkIndex = 0
   },
 
-  next(state: ArtworkStoreState) {
-    const nextIndex = state.currentArtworkIndex + 1
+  next(state: ArtworkStoreState, skip: number = 0) {
+    const nextIndex = state.currentArtworkIndex + (1 + skip)
     if (nextIndex >= maxArtworkHistory) {
       // this is what we want to do, but it doesn't animate
       // state.list.shift()
@@ -40,8 +40,8 @@ export const mutations: MutationTree<ArtworkStoreState> = {
     }
   },
 
-  previous(state: ArtworkStoreState) {
-    state.currentArtworkIndex = state.currentArtworkIndex - 1
+  previous(state: ArtworkStoreState, skip: number = 0) {
+    state.currentArtworkIndex = state.currentArtworkIndex - (1 + skip)
   },
 
   options(state: ArtworkStoreState, options: any) {
