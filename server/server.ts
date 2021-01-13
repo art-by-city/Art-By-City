@@ -22,11 +22,11 @@ import { InvitationController, InvitationApplicationService } from './core/invit
 import { FileApplicationService } from './core/file'
 
 // Debug Env Vars
-console.log('***DEBUG ENV VARS***')
-console.log('\tBASE_URL', process.env.BASE_URL)
-console.log('\tGCP_PROJECT_ID', process.env.GCP_PROJECT_ID)
-console.log('\tGAC', process.env.GAC)
-console.log('\tUSER_UPLOAD_BUCKET_NAME', process.env.USER_UPLOAD_BUCKET_NAME)
+// console.log('***DEBUG ENV VARS***')
+// console.log('\tBASE_URL', process.env.BASE_URL)
+// console.log('\tGCP_PROJECT_ID', process.env.GCP_PROJECT_ID)
+// console.log('\tGAC', process.env.GAC)
+// console.log('\tUSER_UPLOAD_BUCKET_NAME', process.env.USER_UPLOAD_BUCKET_NAME)
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(
