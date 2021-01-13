@@ -5,6 +5,7 @@ import passport from 'passport'
 import { AuthService } from '../auth'
 import { User, UserService, UserMapper } from '../user'
 import { AuthController } from './'
+import UnknownError from '../api/errors/unknownError'
 
 @injectable()
 export default class AuthControllerImpl implements AuthController {
@@ -86,7 +87,8 @@ export default class AuthControllerImpl implements AuthController {
 
         return res.json(result)
       } catch (error) {
-        next(error)
+        console.error(error)
+        next(new UnknownError())
       }
     })
 
@@ -117,7 +119,8 @@ export default class AuthControllerImpl implements AuthController {
       try {
         return res.send()
       } catch (error) {
-        next(error)
+        console.error(error)
+        next(new UnknownError())
       }
     })
 
@@ -156,7 +159,8 @@ export default class AuthControllerImpl implements AuthController {
 
         return res.json({ user })
       } catch (error) {
-        next(error)
+        console.error(error)
+        next(new UnknownError())
       }
     })
 
@@ -236,7 +240,8 @@ export default class AuthControllerImpl implements AuthController {
 
         return res.json(result)
       } catch (error) {
-        next(error)
+        console.error(error)
+        next(new UnknownError())
       }
     })
 
@@ -283,7 +288,8 @@ export default class AuthControllerImpl implements AuthController {
 
         return res.send(result)
       } catch (error) {
-        next(error)
+        console.error(error)
+        next(new UnknownError())
       }
     })
 
