@@ -10,7 +10,7 @@ build_staging:
   stage: build
   environment: Staging
   only:
-    - staging
+    - master
   variables:
     NODE_ENV: staging
   script:
@@ -38,7 +38,7 @@ deploy_staging:
   stage: deploy
   environment: Staging
   only:
-    - staging
+    - master
   before_script:
     - apk add --no-cache --virtual .gyp python make g++ coreutils curl
     - curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
