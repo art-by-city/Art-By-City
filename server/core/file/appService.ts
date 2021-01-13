@@ -104,7 +104,7 @@ export default class FileApplicationServiceImpl
     await fs.promises.writeFile(
       `${dir}/${filename}`,
       fileData,
-      'binary'
+      'base64'
     )
 
     const file = new File()
