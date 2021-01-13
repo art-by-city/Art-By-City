@@ -3,7 +3,7 @@ import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import ProgressService from '~/services/progress/service'
 import { UserAvatar } from '~/models/user/user'
-import { readFileAsBinaryStringAsync } from '~/helpers/helpers'
+import { readFileAsDataUrlAsync } from '~/helpers/helpers'
 
 export default class ProfileService {
   _context!: Context
@@ -17,8 +17,9 @@ export default class ProfileService {
   async uploadUserAvatar(image: File): Promise<UserAvatar | undefined> {
     ProgressService.start()
     try {
+      const imgData = await readFileAsDataUrlAsync(image)
       const { payload } = await this.$axios.$post('/api/user/avatar', {
-        image: await readFileAsBinaryStringAsync(image),
+        image: imgData.split(',')[1],
         type: image.type
       })
 

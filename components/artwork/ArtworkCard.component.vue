@@ -5,7 +5,7 @@
         <template v-slot:default="props">
           <v-img
             v-if="artwork"
-            :src="'/artwork-images/' + artwork.images[0].source"
+            :src="getImageSource(artwork.images[0])"
             style="cursor: pointer"
             aspect-ratio="1"
             class="elevation-2"
@@ -15,7 +15,7 @@
               <v-overlay v-if="props.hover" absolute class="artwork-overlay">
                 <v-row align="end" class="fill-height pa-1">
                   <v-col cols="auto" class="artwork-overlay-title-container">
-                    <LikeButton :dark="true" :artwork="artwork" />
+                    <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
                     <a class="white--text text-lowercase">
                       {{ artwork.title }}
                     </a>
@@ -34,6 +34,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
+import { getImageSource } from '~/models/artwork/artwork'
 
 @Component({
   components: {
@@ -45,6 +46,8 @@ export default class ArtworkCard extends Vue {
     default: null
   })
   artwork: any | null
+
+  getImageSource = getImageSource
 
   @Emit('click') onArtworkCardClicked() {
     return this.artwork

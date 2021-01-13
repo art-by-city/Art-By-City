@@ -140,7 +140,7 @@ import Artwork, {
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
-import { readFileAsBinaryStringAsync, debounce } from '~/helpers/helpers'
+import { readFileAsDataUrlAsync, debounce } from '~/helpers/helpers'
 
 @Component({
   components: {
@@ -196,8 +196,9 @@ export default class ArtworkEditForm extends Vue {
   }
 
   private async createImagePreview(image: File): Promise<ImageUploadPreview> {
+    const imgData = await readFileAsDataUrlAsync(image)
     return {
-      ascii: btoa(await readFileAsBinaryStringAsync(image)),
+      ascii: imgData.split(',')[1],
       type: image.type
     } as ImageUploadPreview
   }

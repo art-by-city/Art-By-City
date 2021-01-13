@@ -12,7 +12,7 @@
           </template>
           <template v-slot:item.images="{ item }">
             <v-img
-              :src="'/artwork-images/' + previewImageSource(item)"
+              :src="getImageSource(item.images[0])"
               width="100"
               height="100"
             ></v-img>
@@ -33,11 +33,13 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
+import { getImageSource } from '~/models/artwork/artwork'
 
 @Component({
   middleware: 'auth'
 })
 export default class UserArtworkPage extends PageComponent {
+  getImageSource = getImageSource
   artworks: any[] = []
   cities: any[] = []
 
@@ -75,10 +77,6 @@ export default class UserArtworkPage extends PageComponent {
 
   totalLikes(artwork: any) {
     return artwork.likes?.length || 0
-  }
-
-  previewImageSource(artwork: any) {
-    return artwork.images[0].source
   }
 
   cityName(cityId: string) {

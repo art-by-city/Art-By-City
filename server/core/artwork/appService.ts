@@ -78,24 +78,11 @@ export default class ArtworkApplicationServiceImpl
       type: req.type,
       cityId: user.city,
       hashtags: req.hashtags,
-      images: await Promise.all(req.images.map(async (image) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
-        const file = await this.fileAppService.createFromFileData(
-          user.id,
-          'artwork',
-          image.data,
-          image.type,
-          `artwork-${uniqueSuffix}`
-        )
-
-        if (!file) {
-          throw new Error('error creating artwork')
-        }
-
-        return {
-          source: `${file.name}?${Date.now()}`
-        } as ArtworkImage
-      }))
+      images: await this.fileAppService.createFromFileUploadRequests(
+        user.id,
+        'artwork',
+        req.images
+      )
     })
 
     const createdArtwork = await this.artworkService.create(artwork)
@@ -136,33 +123,16 @@ export default class ArtworkApplicationServiceImpl
       throw new UnauthorizedError()
     }
 
-    artwork.title = req.title,
-    artwork.description = req.description,
-    artwork.type = req.type,
-    artwork.city = user.city,
-    artwork.hashtags = req.hashtags,
-    artwork.images = await Promise.all(req.images.map(async (image) => {
-      if (isFileUploadRequest(image)) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
-        const file = await this.fileAppService.createFromFileData(
-          user.id,
-          'artwork',
-          image.data,
-          image.type,
-          `artwork-${uniqueSuffix}`
-        )
-
-        if (!file) {
-          throw new Error('error updating artwork')
-        }
-
-        return {
-          source: `${file.name}?${Date.now()}`
-        } as ArtworkImage
-      } else {
-        return image
-      }
-    }))
+    artwork.title = req.title
+    artwork.description = req.description
+    artwork.type = req.type
+    artwork.city = user.city
+    artwork.hashtags = req.hashtags
+    artwork.images = await this.fileAppService.createFromFileUploadRequests(
+      user.id,
+      'artwork',
+      req.images
+    )
 
     const savedArtwork = await this.artworkService.update(artwork)
 
@@ -213,7 +183,7 @@ export default class ArtworkApplicationServiceImpl
         delete opts.type
       }
 
-      if (opts.city === 'All') {
+      if (opts.city === 'All' || !opts.city) {
         delete opts.city
       }
 
@@ -256,7 +226,7 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult(mappedArtworks)
     } catch (error) {
-      throw new UnknownError(error.message)
+      throw new UnknownError()
     }
   }
 

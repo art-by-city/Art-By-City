@@ -1,6 +1,12 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import passport from 'passport'
+// import * as dotenv from 'dotenv'
+import * as dotenvflow from 'dotenv-flow'
+import _ from 'lodash'
+
+// Environment
+dotenvflow.config()
 
 import { container } from './inversify.config'
 import DatabaseAdapter from './core/db/adapter.interface'
@@ -14,6 +20,13 @@ import { EventService } from './core/events'
 import { AnalyticsController } from './core/analytics'
 import { InvitationController, InvitationApplicationService } from './core/invitation'
 import { FileApplicationService } from './core/file'
+
+// Debug Env Vars
+console.log('***DEBUG ENV VARS***')
+console.log('\tBASE_URL', process.env.BASE_URL)
+console.log('\tGCP_PROJECT_ID', process.env.GCP_PROJECT_ID)
+console.log('\tGAC', process.env.GAC)
+console.log('\tUSER_UPLOAD_BUCKET_NAME', process.env.USER_UPLOAD_BUCKET_NAME)
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(
@@ -31,7 +44,7 @@ passport.deserializeUser(authService.deserializeUser)
 // Express Config
 const app = express()
 app.use(passport.initialize())
-app.use(bodyParser.json({ limit: '5mb' }))
+app.use(bodyParser.json({ limit: '20mb' })) // TODO -> finalize this
 
 // Express Routing
 app.use(
