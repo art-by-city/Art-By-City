@@ -1,12 +1,6 @@
 <template>
   <v-container fluid>
     <v-row>
-      env: {{ env.env }}<br />
-      baseUrl: {{ env.baseUrl }}<br />
-      BASE_URL: {{ env.BASE_URL }}<br />
-      USER_UPLOAD_BUCKET_NAME: {{ env.USER_UPLOAD_BUCKET_NAME }}<br />
-    </v-row>
-    <v-row>
       <v-col cols="4">
         <v-card flat outlined>
           <v-card-title>city selector</v-card-title>
@@ -146,12 +140,6 @@ export default class AdminThemePage extends FormPageComponent {
   toastTypes = ['info', 'success', 'warning', 'error']
   toastType: 'info' | 'success' | 'warning' | 'error' = 'info'
   toastText = 'this is a test message'
-  env = {
-    env: process.env.env,
-    baseUrl: process.env.baseUrl,
-    BASE_URL: process.env.BASE_URL,
-    USER_UPLOAD_BUCKET_NAME: process.env.USER_UPLOAD_BUCKET_NAME
-  }
 
   @debounce
   toggleLoadingOn() {
