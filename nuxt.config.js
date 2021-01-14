@@ -1,6 +1,4 @@
 import IgnoreNotFoundExportPlugin from 'ignore-not-found-export-webpack-plugin'
-import * as dotenvflow from 'dotenv-flow'
-dotenvflow.config()
 
 export default {
   /*
@@ -51,8 +49,7 @@ export default {
    */
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/auth',
-    '@nuxtjs/dotenv'
+    '@nuxtjs/auth'
   ],
   env: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
