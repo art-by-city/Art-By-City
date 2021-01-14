@@ -282,7 +282,7 @@ export default class ArtworkPage extends FormPageComponent {
 
         if (success) {
           this.$toastService.success('artwork deleted')
-          this.$router.push('/')
+          this.$router.push('/portfolio')
         }
       } catch (error) {
         this.$toastService.error('error deleting artwork')
