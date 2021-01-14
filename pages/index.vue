@@ -43,6 +43,7 @@ export default class HomePage extends PageComponent {
   expand: boolean = false
 
   async asyncData({ $axios, store, $auth }: Context) {
+    console.log('index.vue asyncData() $auth.loggedIn', $auth.loggedIn)
     if ($auth.loggedIn) {
       const options = { ...store.state.artworks.options }
       let payload = []

@@ -63,17 +63,19 @@ export default {
   auth: {
     redirect: {
       rewriteRedirects: true,
-      resetOnError: true
+      // resetOnError: true
     },
     strategies: {
       local: {
-        login: {
-          url: '/auth/login',
-          method: 'post',
-          propertyName: 'token'
-        },
-        logout: false,
-        user: { url: '/auth/user', method: 'get', propertyName: 'user' }
+        endpoints: {
+          login: {
+            url: '/api/auth/login',
+            method: 'post',
+            propertyName: 'token'
+          },
+          logout: false,
+          user: { url: '/api/auth/user', method: 'get', propertyName: 'user' }
+        }
       }
     }
   },
