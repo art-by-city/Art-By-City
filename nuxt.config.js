@@ -80,10 +80,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    proxy: false
-  },
-  proxy: {
-    '/api/': process.env.BASE_URL || 'http://localhost:3000'
+    proxy: true
   },
   /*
    ** vuetify module configuration
