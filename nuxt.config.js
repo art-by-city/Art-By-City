@@ -82,6 +82,9 @@ export default {
   axios: {
     proxy: false
   },
+  proxy: {
+    '/api/': process.env.BASE_URL || 'http://localhost:3000'
+  },
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
