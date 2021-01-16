@@ -15,7 +15,8 @@ import { UserEvents } from '../events/user'
 
 @injectable()
 export default class AuthServiceImpl implements AuthService {
-  private JWT_SECRET = 'TODO_REAL_JWT_SECRET'
+  private JWT_SECRET = process.env.JWT_SECRET || 'THIS_IS_A_DEV_JWT_SECRET'
+  private JWT_TOKEN_EXPIRES_IN = process.env.JWT_SECRET_EXPIRES_IN || '30m'
 
   private strategyOptions: StrategyOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -62,7 +63,7 @@ export default class AuthServiceImpl implements AuthService {
   }
 
   sign(thing: any): string {
-    return jwt.sign(thing, this.JWT_SECRET)
+    return jwt.sign(thing, this.JWT_SECRET, { expiresIn: this.JWT_TOKEN_EXPIRES_IN })
   }
 
   serializeUser(user: UserViewModel, callback: Function) {

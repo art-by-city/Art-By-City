@@ -47,6 +47,7 @@ deploy_staging:
     - /usr/local/gcloud/google-cloud-sdk/install.sh
     - export PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin
   script:
+    - node generateSecrets.js > secrets.yaml
     - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
     - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
     - gcloud --quiet --project $PROJECT_ID app deploy app.staging.yaml
@@ -64,6 +65,7 @@ deploy_production:
     - /usr/local/gcloud/google-cloud-sdk/install.sh
     - export PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin
   script:
+    - node generateSecrets.js > secrets.yaml
     - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
     - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
     - gcloud --quiet --project $PROJECT_ID app deploy app.production.yaml

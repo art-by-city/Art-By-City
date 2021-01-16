@@ -21,3 +21,6 @@ env_variables:
   BASE_URL: https://art-by-city-staging-299519.ue.r.appspot.com/
   GCP_PROJECT_ID: art-by-city-staging-299519
   USER_UPLOAD_BUCKET_NAME: art-by-city-staging-user-uploads
+
+includes:
+  - secrets.yaml
