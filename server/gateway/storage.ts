@@ -9,8 +9,7 @@ export default class StorageGateway implements GatewayAdapter<Storage> {
 
   initialize() {
     const storageOpts = {
-      projectId: process.env.GCP_PROJECT_ID,
-      // keyFilename: process.env.GAC
+      projectId: process.env.GCP_PROJECT_ID || 'art-by-city-dev'
     }
     this.client = new Storage(storageOpts)
   }

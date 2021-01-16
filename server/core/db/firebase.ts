@@ -12,17 +12,14 @@ export default class FirebaseAdapter implements DatabaseAdapter {
     const isProduction = process.env.NODE_ENV === 'production'
                          || process.env.NODE_ENV === 'staging'
     const firestoreOpts: any = {
-      projectId: process.env.GCP_PROJECT_ID
+      projectId: process.env.GCP_PROJECT_ID || 'art-by-city-dev'
     }
 
     if (!isProduction) {
-      firestoreOpts.host = process.env.DB_HOST
+      firestoreOpts.host = process.env.DB_HOST || 'localhost'
       firestoreOpts.port = Number.parseInt(process.env.DB_PORT || '8080')
       firestoreOpts.ssl = process.env.DB_SSL === 'true'
     }
-    // else {
-    //   firestoreOpts.keyFilename = process.env.GAC
-    // }
 
     this.firestore = new Firestore(firestoreOpts)
     fireorm.initialize(this.firestore, { validateModels: false })
