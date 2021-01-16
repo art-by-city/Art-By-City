@@ -57,13 +57,13 @@ export default class ArtworkExplorer extends Vue {
   }
 
   @debounce
-  previous() {
-    this.$store.commit('artworks/previous')
+  previous(skip: number = 0) {
+    this.$store.commit('artworks/previous', skip)
   }
 
   @debounce
-  next() {
-    this.$store.commit('artworks/next')
+  next(skip: number = 0) {
+    this.$store.commit('artworks/next', skip)
   }
 
   @debounce
@@ -74,13 +74,13 @@ export default class ArtworkExplorer extends Vue {
   @debounce
   onArtworkCardClicked(artwork: any, index: number) {
     const requestNewArtworkThreshold = 5
-    if (index === this.$store.state.artworks.currentArtworkIndex) {
-      // this.modalArtwork = artwork
+    const currentArtworkIndex = this.$store.state.artworks.currentArtworkIndex
+    if (index === currentArtworkIndex) {
       this.$router.push(`/a/${artwork.id}`)
-    } else if (index < this.$store.state.artworks.currentArtworkIndex) {
-      this.previous()
-    } else if (index > this.$store.state.artworks.currentArtworkIndex) {
-      this.next()
+    } else if (index < currentArtworkIndex) {
+      this.previous(currentArtworkIndex - index - 1)
+    } else if (index > currentArtworkIndex) {
+      this.next(index - currentArtworkIndex - 1)
       if (this.$store.state.artworks.list.length - index < requestNewArtworkThreshold) {
         this.fetchMore()
       }

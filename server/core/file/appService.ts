@@ -14,7 +14,7 @@ export default class FileApplicationServiceImpl
   implements FileApplicationService {
   private fileService: FileService
   private eventService: EventService
-  private bucket: Bucket
+  private bucket!: Bucket
 
   artworkDirName = 'artwork-images'
   avatarDirName = 'avatar-images'
@@ -31,7 +31,9 @@ export default class FileApplicationServiceImpl
   ) {
     this.fileService = fileService
     this.eventService = eventService
-    this.bucket = storage.getClient().bucket(process.env.USER_UPLOAD_BUCKET_NAME)
+    if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+      this.bucket = storage.getClient().bucket(process.env.USER_UPLOAD_BUCKET_NAME)
+    }
   }
 
   async createFromFileUploadRequests(
@@ -102,7 +104,7 @@ export default class FileApplicationServiceImpl
     await fs.promises.writeFile(
       `${dir}/${filename}`,
       fileData,
-      'binary'
+      'base64'
     )
 
     const file = new File()
