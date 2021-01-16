@@ -31,7 +31,7 @@
           <v-img
             v-for="(image, i) in props.item.images"
             :key="i"
-            :src="`/artwork-images/${image.source}`"
+            :src="getImageSource(image)"
             width="100"
             height="100"
           ></v-img>
@@ -79,6 +79,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
+import { getImageSource } from '~/models/artwork/artwork'
 
 @Component({
   middleware: 'role/admin',
@@ -103,6 +104,7 @@ export default class AdminEventsPage extends FormPageComponent {
   ]
   artworks: any[] = []
   artworkSearchTerm: string = ''
+  getImageSource = getImageSource
 
   async asyncData({ app }: Context) {
     let artworks = [] as any[]
