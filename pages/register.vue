@@ -128,6 +128,18 @@ export default class RegisterPage extends FormPageComponent {
   repeatPasswordRules = repeatPasswordRules
   inviteCodeRules = inviteCodeRules
 
+  async asyncData({ query }: Context) {
+    return {
+      login: {
+        inviteCode: query.invite || '',
+        username: '',
+        email: '',
+        password: '',
+        city: ''
+      }
+    }
+  }
+
   @debounce
   async register() {
     this.errors = []

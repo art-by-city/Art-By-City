@@ -24,6 +24,8 @@ export const inviteCodeRules = [
     if (value.length != 20) {
       return 'A valid invitation code is required'
     }
+
+    return true
   }
 ]
 
