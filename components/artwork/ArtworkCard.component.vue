@@ -16,7 +16,7 @@
                 <v-row align="end" class="fill-height pa-1">
                   <v-col cols="auto" class="artwork-overlay-title-container">
                     <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
-                    <a class="white--text text-lowercase">
+                    <a class="white--text text-lowercase disable-text-highlighting">
                       {{ artwork.title }}
                     </a>
                   </v-col>
