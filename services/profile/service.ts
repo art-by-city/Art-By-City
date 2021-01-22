@@ -31,7 +31,11 @@ export default class ProfileService {
         return payload
       }
     } catch (error) {
-      this._context.$toastService.error(error)
+      this._context.$toastService.error(
+        error.response.status === 413
+          ? 'Avatar images must be less than 5MB'
+          : error
+      )
     } finally {
       ProgressService.stop()
     }

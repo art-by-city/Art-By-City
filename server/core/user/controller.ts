@@ -1,6 +1,7 @@
 import { injectable, inject } from 'inversify'
 import { Router } from 'express'
 import passport from 'passport'
+import bodyParser from 'body-parser'
 
 import { ArtworkApplicationService } from '../artwork'
 import { User, UserController, UserApplicationService } from './'
@@ -35,6 +36,9 @@ export default class UserControllerImpl implements UserController {
 
     router.use(passport.authenticate('jwt', { session: false }))
 
+    const normalLimits = bodyParser.json()
+    const avatarUploadLimit = bodyParser.json({ limit: '5mb' })
+
     /**
      * @openapi
      *
@@ -65,7 +69,7 @@ export default class UserControllerImpl implements UserController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.get('/artwork', async (req, res, next) => {
+    router.get('/artwork', normalLimits, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.listByUser(<User>req.user)
 
@@ -102,7 +106,7 @@ export default class UserControllerImpl implements UserController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.get('/:id/account', async (req, res, next) => {
+    router.get('/:id/account', normalLimits, async (req, res, next) => {
       try {
         const result = await this.userAppService.getUserAccount(req.params.id)
 
@@ -148,7 +152,7 @@ export default class UserControllerImpl implements UserController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.get('/:username/profile', async (req, res, next) => {
+    router.get('/:username/profile', normalLimits, async (req, res, next) => {
       try {
         const result = await this.userAppService.getUserProfile(req.params.username)
 
@@ -201,7 +205,7 @@ export default class UserControllerImpl implements UserController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.post('/avatar', async (req, res, next) => {
+    router.post('/avatar', avatarUploadLimit, async (req, res, next) => {
       try {
         const result = await this.userAppService.uploadAvatar(
           <User>req.user,

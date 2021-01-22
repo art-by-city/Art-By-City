@@ -1,6 +1,7 @@
 import { injectable, inject } from 'inversify'
 import { Router } from 'express'
 import passport from 'passport'
+import bodyParser from 'body-parser'
 
 import roles from '../middleware/roles'
 import { User } from '../user'
@@ -31,6 +32,9 @@ export default class ArtworkControllerImpl implements ArtworkController {
 
     router.use(passport.authenticate('jwt', { session: false }))
 
+    const normalLimit = bodyParser.json()
+    const increasedUploadLimit = bodyParser.json({ limit: '200mb' })
+
     /**
      * @openapi
      *
@@ -55,7 +59,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *            schema:
      *              type: string
      */
-    router.post('/', async (req, res, next) => {
+    router.post('/', increasedUploadLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.create({
           userId: (<User>req.user).id,
@@ -92,7 +96,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *            schema:
      *              $ref: "#/components/schemas/Artwork"
      */
-    router.get('/:id', async (req, res, next) => {
+    router.get('/:id', normalLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.get(req.params.id)
 
@@ -128,7 +132,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *              items:
      *                $ref: "#/components/schemas/Artwork"
      */
-    router.get('/', async (req, res, next) => {
+    router.get('/', normalLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.list(req)
 
@@ -164,7 +168,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *      '200':
      *        description: Null response
      */
-    router.put('/:id', async (req, res, next) => {
+    router.put('/:id', increasedUploadLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.update({
           userId: (<User>req.user).id,
@@ -197,7 +201,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *      '200':
      *        description: Null response
      */
-    router.delete('/:id', async (req, res, next) => {
+    router.delete('/:id', normalLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.delete(
           <User>req.user,
@@ -230,7 +234,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *      '200':
      *        description: Null response
      */
-    router.post('/:id/publish', async (req, res, next) => {
+    router.post('/:id/publish', normalLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.publish(req)
 
@@ -260,7 +264,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *      '200':
      *        description: Null response
      */
-    router.post('/:id/unpublish', async (req, res, next) => {
+    router.post('/:id/unpublish', normalLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.unpublish(req)
 
@@ -290,7 +294,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *      '200':
      *        description: Null response
      */
-    router.post('/:id/approve', roles(['admin']), async (req, res, next) => {
+    router.post('/:id/approve', normalLimit, roles(['admin']), async (req, res, next) => {
       try {
         const result = await this.artworkAppService.approve(req)
 
@@ -320,7 +324,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *      '200':
      *        description: Null response
      */
-    router.post('/:id/unapprove', roles(['admin']), async (req, res, next) => {
+    router.post('/:id/unapprove', normalLimit, roles(['admin']), async (req, res, next) => {
       try {
         const result = await this.artworkAppService.unapprove(req)
 
@@ -351,7 +355,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *        description: Null response
      */
     // TODO -> should be post?
-    router.put('/:id/like', async (req, res, next) => {
+    router.put('/:id/like', normalLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.like(
           <User>req.user,
@@ -385,7 +389,7 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *        description: Null response
      */
     // TODO -> should be post?
-    router.delete('/:id/like', async (req, res, next) => {
+    router.delete('/:id/like', normalLimit, async (req, res, next) => {
       try {
         const result = await this.artworkAppService.unlike(
           <User>req.user,

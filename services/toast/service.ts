@@ -4,6 +4,7 @@ import ToastType from '../../models/toasts/toastType'
 
 interface AxiosError {
   response: {
+    status: number
     data: {
       error: {
         message: string
@@ -49,11 +50,15 @@ export default class ToastService {
     this.toast(message, 'warning')
   }
 
-  error(message: string | AxiosError) {
-    if (isAxiosError(message)) {
-      return this.toast(message.response?.data?.error?.message, 'error')
+  error(error: string | AxiosError) {
+    if (isAxiosError(error)) {
+      const msg = error.response?.status === 413
+        ? 'Image(s) too big'
+        : error.response?.data?.error?.message || 'Unknown error'
+
+      return this.toast(msg, 'error')
     }
 
-    return this.toast(message, 'error')
+    return this.toast(error, 'error')
   }
 }
