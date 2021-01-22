@@ -58,8 +58,11 @@ export default class ArtworkService {
         return payload
       }
     } catch (error) {
-      console.error(error)
-      this.context.$toastService.error(error)
+      this.context.$toastService.error(
+        error.response.status === 413
+        ? 'Artwork images must be less than 200MB'
+        : error
+      )
     } finally {
       ProgressService.stop()
     }
@@ -83,7 +86,11 @@ export default class ArtworkService {
         return payload
       }
     } catch (error) {
-      this.context.$toastService.error(error)
+      this.context.$toastService.error(
+        error.response.status === 413
+        ? 'Artwork images must be less than 200MB'
+        : error
+      )
     } finally {
       ProgressService.stop()
     }
