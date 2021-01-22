@@ -56,7 +56,7 @@ export default class ArtworkServiceImpl implements ArtworkService {
     return this.artworkRepository.find({
       owner: user.id,
       includeUnapproved: true,
-      includeUnpublished: true
+      includeUnpublished: false
     })
   }
 

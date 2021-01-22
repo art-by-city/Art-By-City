@@ -10,14 +10,18 @@
         class="artwork-zoom-dialog-container"
         @mouseout="onContainerMouseOut"
       >
+        <div
+          class="artwork-zoom-image-overlay"
+          @mousemove="onImgMouseMove"
+          @mousedown="onImgMouseDown"
+          @mouseup="onImgMouseUp"
+        >
+        </div>
         <img
           class="artwork-zoom-image"
           :class="{ 'dragging': isDragging }"
           :src="src"
           :style="`left: ${left}px; top: ${top}px`"
-          @mousemove="onImgMouseMove"
-          @mousedown="onImgMouseDown"
-          @mouseup="onImgMouseUp"
         />
       </div>
     </v-dialog>
@@ -105,16 +109,31 @@ export default class ArtworkZoomDialog extends Vue {
 
 <style scoped>
 .artwork-zoom-dialog {
-  z-index: 9999;
+  z-index: 9990;
 }
 
 .artwork-zoom-dialog-container {
-  background-color: rgba(0,0,0,0.5)
+  background-color: rgba(0,0,0,0.5);
+  text-align: center;
 }
 
 .artwork-zoom-image {
+  z-index: 9991;
+  display: inline-block;
   position: relative;
   width: unset;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: grab;
+}
+
+.artwork-zoom-image-overlay {
+  float: left;
+  z-index: 9992;
+  position: absolute;
+  width: 95vw;
+  height: 95vh;
   display: block;
   margin-left: auto;
   margin-right: auto;
