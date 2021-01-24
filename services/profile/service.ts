@@ -2,7 +2,7 @@ import { Context } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import ProgressService from '~/services/progress/service'
-import { UserAvatar } from '~/models/user/user'
+import User, { UserAvatar } from '~/models/user/user'
 import { readFileAsDataUrlAsync } from '~/helpers/helpers'
 
 export default class ProfileService {
@@ -31,7 +31,27 @@ export default class ProfileService {
         return payload
       }
     } catch (error) {
+      this._context.$toastService.error(
+        error.response.status === 413
+          ? 'Avatar images must be less than 5MB'
+          : error
+      )
+    } finally {
+      ProgressService.stop()
+    }
+  }
+
+  async updateProfile(user: User): Promise<boolean> {
+    ProgressService.start()
+    try {
+      await this.$axios.$post('/api/user/profile', {
+        name: user.name
+      })
+
+      return true
+    } catch (error) {
       this._context.$toastService.error(error)
+      return false
     } finally {
       ProgressService.stop()
     }

@@ -45,6 +45,7 @@ export interface UserAvatarViewModel extends ViewModel {
 export default interface UserViewModel extends ViewModel {
   id: string
   username: string
+  name: string
   city: string
   roles: string[]
   avatar?: UserAvatarViewModel

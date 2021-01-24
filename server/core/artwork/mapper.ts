@@ -6,11 +6,14 @@ export default class ArtworkMapper implements EntityMapper<Artwork, ArtworkViewM
   toViewModel(domainEntity: Artwork, user?: UserViewModel): ArtworkViewModel {
     return {
       id: domainEntity.id,
+      created: domainEntity.created,
+      updated: domainEntity.updated,
       owner: user
         ? user
         : {
           id: domainEntity.owner,
           username: 'user',
+          name: '',
           city: 'city',
           roles: []
         },

@@ -31,11 +31,11 @@ export default class ArtworkServiceImpl implements ArtworkService {
     }
   }
 
-  async update(artwork: Artwork): Promise<Artwork> {
+  async update(artwork: Artwork, modifyUpdated: boolean = true): Promise<Artwork> {
     await validateArtwork(artwork)
 
     try {
-      return this.artworkRepository.update(artwork)
+      return this.artworkRepository.update(artwork, modifyUpdated)
     } catch (error) {
       throw new UnknownError(error.message)
     }
