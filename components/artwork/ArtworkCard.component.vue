@@ -15,7 +15,7 @@
               <v-overlay v-if="props.hover" absolute class="artwork-overlay">
                 <v-row align="end" class="fill-height pa-1">
                   <v-col cols="auto" class="artwork-overlay-title-container">
-                    <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
+                    <LikeButton :dark="true" :artwork="artwork" />
                     <a class="white--text text-lowercase disable-text-highlighting">
                       {{ artwork.title }}
                     </a>
