@@ -83,7 +83,7 @@ export interface ArtworkApplicationService
 export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
   create(artwork: Artwork): Promise<Artwork | null>
   get(id: string): Promise<Artwork | null>
-  update(artwork: Artwork): Promise<Artwork>
+  update(artwork: Artwork, modifyUpdated?: boolean): Promise<Artwork>
   delete(id: string): Promise<void>
   list(opts?: ArtworkFilterOptions): Promise<Artwork[]>
   listByUser(user: User): Promise<Artwork[]>
