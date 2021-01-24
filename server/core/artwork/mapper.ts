@@ -1,11 +1,14 @@
 import { Artwork, ArtworkViewModel } from './'
 import EntityMapper from '../api/mapper'
 import { UserViewModel } from '../user'
+import { Timestamp } from '@google-cloud/firestore'
 
 export default class ArtworkMapper implements EntityMapper<Artwork, ArtworkViewModel> {
   toViewModel(domainEntity: Artwork, user?: UserViewModel): ArtworkViewModel {
     return {
       id: domainEntity.id,
+      created: domainEntity.created,
+      updated: domainEntity.updated,
       owner: user
         ? user
         : {

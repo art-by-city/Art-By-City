@@ -1,5 +1,6 @@
 <template>
-  <v-data-table
+  <div class="admin-artwork-page">
+    <v-data-table
       :headers="artworkHeaders"
       :items="artworks"
       item-key="id"
@@ -52,7 +53,6 @@
         </nuxt-link>
       </template>
       <template v-slot:item.city="props">
-        <!-- <span>{{ resolveCityNameFromId(props.item.city) }}</span> -->
         <span>{{ cityName(citiesById[props.item.city]) || '' }}</span>
       </template>
       <template v-slot:item.hashtags="props">
@@ -68,17 +68,16 @@
       <template v-slot:item.approved="props">
         <v-simple-checkbox v-model="props.item.approved" disabled></v-simple-checkbox>
       </template>
-  </v-data-table>
+    </v-data-table>
+    <div>{{ citiesById }}</div>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
-import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
 import { getImageSource } from '~/models/artwork/artwork'
 
 @Component({
@@ -86,27 +85,12 @@ import { getImageSource } from '~/models/artwork/artwork'
   layout: 'admin'
 })
 export default class AdminEventsPage extends FormPageComponent {
-  artworkHeaders = [
-    { text: 'id',          value: 'id'          },
-    { text: 'created',     value: 'created',    },
-    { text: 'updated',     value: 'updated',    },
-    { text: 'title',       value: 'title',  },
-    { text: 'owner',       value: 'owner',      },
-    // { text: 'description', value: 'description' },
-    { text: 'type',        value: 'type',       },
-    { text: 'city',        value: 'city',       },
-    { text: 'hashtags',    value: 'hashtags', width: '150'  },
-    // { text: 'images',      value: 'images',     },
-    { text: 'likes',       value: 'likes',      },
-    { text: 'published',   value: 'published',  },
-    { text: 'approved',    value: 'approved',   },
-    { text: '',            value: 'data-table-expand' },
-  ]
   artworks: any[] = []
   artworkSearchTerm: string = ''
   getImageSource = getImageSource
+  citiesById: any = {}
 
-  async asyncData({ app }: Context) {
+  async asyncData({ app, store }: Context) {
     let artworks = [] as any[]
 
     try {
@@ -115,20 +99,33 @@ export default class AdminEventsPage extends FormPageComponent {
       app.$toastService.error(`error fetching artworks: ${error}`)
     }
 
-    return { artworks }
-  }
-
-  get citiesById() {
     const citiesById: any = {}
-    this.$store.state.config.cities.forEach((city: any) => {
+    store.state.config.cities.forEach((city: any) => {
       citiesById[city.id] = city
     })
 
-    return citiesById
+    return { artworks, citiesById }
   }
 
   cityName(city: any) {
     return city?.code || ''
+  }
+
+  get artworkHeaders() {
+    return [
+      { text: 'id',        value: 'id' },
+      { text: 'created',   value: 'created', },
+      { text: 'updated',   value: 'updated', },
+      { text: 'title',     value: 'title', },
+      { text: 'owner',     value: 'owner', },
+      { text: 'type',      value: 'type', },
+      { text: 'city',      value: 'city', },
+      { text: 'hashtags',  value: 'hashtags', width: '150' },
+      { text: 'likes',     value: 'likes', },
+      { text: 'published', value: 'published', },
+      { text: 'approved',  value: 'approved', },
+      { text: '',          value: 'data-table-expand', },
+    ]
   }
 }
 </script>
