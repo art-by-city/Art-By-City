@@ -5,5 +5,6 @@ export interface UserAvatar {
 export default interface User {
   id: string
   username: string
+  name: string
   avatar: UserAvatar
 }

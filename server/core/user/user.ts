@@ -4,7 +4,6 @@ import {
   IsString,
   ArrayUnique,
   IsNotEmpty,
-  Matches,
   IsEmail,
   IsNotIn
 } from 'class-validator'
@@ -26,6 +25,9 @@ export default class User extends Entity {
     message: 'Username not allowed'
   })
   username!: string
+
+  @IsString()
+  name: string = ''
 
   @IsEmail()
   email!: string

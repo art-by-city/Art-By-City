@@ -12,11 +12,13 @@ export default class UserEventMapper implements EntityMapper<UserEvent, UserEven
         ? {
           id: user.id,
           username: user.username,
+          name: user.name,
           city: user.city,
           roles: user.roles
         } : {
           id: domainEntity.userId,
           username: 'user',
+          name: '',
           city: 'city',
           roles: []
         },

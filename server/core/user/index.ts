@@ -12,6 +12,7 @@ import UserRepositoryImpl from './repository'
 import UserServiceImpl from './service'
 import UserControllerImpl from './controller'
 import UserApplicationServiceImpl from './appService'
+import { ProfileUpdateRequest } from './requests'
 
 export { default as User } from './user'
 export { default as UserMapper } from './mapper'
@@ -56,6 +57,7 @@ export interface UserApplicationService {
   getUserAccount(id: string): Promise<ApiServiceResult<UserAccountViewModel>>
   uploadAvatar(user: User, imageData: string, imageType: string):
     Promise<ApiServiceResult<UserAvatarViewModel>>
+  updateUserProfile(user: User, profile: ProfileUpdateRequest): Promise<boolean>
 }
 
 export interface UserController extends BaseControllerInterface {}
