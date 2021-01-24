@@ -55,8 +55,8 @@ export default class ArtworkServiceImpl implements ArtworkService {
   listByUser(user: User): Promise<Artwork[]> {
     return this.artworkRepository.find({
       owner: user.id,
-      includeUnapproved: true,
-      includeUnpublished: true
+      includeUnapproved: false,
+      includeUnpublished: false
     })
   }
 
