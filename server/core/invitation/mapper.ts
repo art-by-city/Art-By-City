@@ -15,6 +15,7 @@ export default class InvitationMapper implements EntityMapper<Invitation, Invita
       createdByUser: createdBy ? createdBy : {
         id: domainEntity.createdByUser,
         username: 'user',
+        name: '',
         city: 'city',
         roles: []
       },

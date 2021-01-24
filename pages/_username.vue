@@ -11,8 +11,53 @@
           />
         </v-col>
         <v-col cols="4">
-          <div class="user-profile-username text-lowercase">{{ profile.user.username }}</div>
-          <div class="text-caption text-lowercase">{{ profile.user.city }}</div>
+          <v-hover>
+            <template v-slot:default="props">
+              <div class="user-profile-info">
+                <div class="user-profile-username text-lowercase">
+                  {{ profile.user.username }}
+                </div>
+                <div class="text-caption text-lowercase">
+                  <span v-if="!editMode">{{ profile.user.name }}</span>
+                    <v-text-field
+                      v-if="editMode"
+                      v-model="profile.user.name"
+                      type="text"
+                      name="name"
+                      label="Name"
+                      class="text-lowercase"
+                      autocomplete="off"
+                      aria-autocomplete="off"
+                    ></v-text-field>
+                </div>
+                <div class="text-caption text-lowercase">
+                  {{ profile.user.city }}
+                </div>
+                <div class="profile-edit-controls">
+                  <v-btn
+                    v-if="editMode || (props.hover && $auth.user.id === profile.user.id)"
+                    icon
+                    @click="toggleEditMode"
+                  >
+                    <v-icon>
+                      {{
+                        editMode
+                          ? 'mdi-content-save'
+                          : 'mdi-square-edit-outline'
+                      }}
+                    </v-icon>
+                  </v-btn>
+                  <v-btn
+                    v-if="editMode"
+                    icon
+                    @click="toggleEditMode(false)"
+                  >
+                    <v-icon>mdi-cancel</v-icon>
+                  </v-btn>
+                </div>
+              </div>
+            </template>
+          </v-hover>
         </v-col>
       </v-row>
       <v-row>
@@ -55,6 +100,7 @@ import { debounce } from '~/helpers/helpers'
 export default class UserProfilePage extends PageComponent {
   profile: any | null
   modalArtwork: any | null = null
+  editMode = false
 
   async asyncData({ $axios, params, app, error }: Context) {
     let profile
@@ -74,8 +120,20 @@ export default class UserProfilePage extends PageComponent {
   }
 
   @debounce
+  async toggleEditMode(save: boolean = true) {
+    let success = true
+
+    if (this.editMode && save) {
+      success = await this.$profileService.updateProfile(this.profile.user)
+    }
+
+    if (success) {
+      this.editMode = !this.editMode
+    }
+  }
+
+  @debounce
   onArtworkCardClicked(artwork: any) {
-    // this.modalArtwork = artwork
     this.$router.push(`/a/${artwork.id}`)
   }
 
@@ -108,5 +166,13 @@ export default class UserProfilePage extends PageComponent {
 .user-profile-avatar {
   left: 50%;
   transform: translateX(-50%)
+}
+.user-profile-info {
+  position: relative;
+}
+.profile-edit-controls {
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 </style>

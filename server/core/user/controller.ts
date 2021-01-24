@@ -5,6 +5,7 @@ import bodyParser from 'body-parser'
 
 import { ArtworkApplicationService } from '../artwork'
 import { User, UserController, UserApplicationService } from './'
+import { ProfileUpdateRequest } from './requests'
 
 @injectable()
 export default class UserControllerImpl implements UserController {
@@ -211,6 +212,20 @@ export default class UserControllerImpl implements UserController {
           <User>req.user,
           req.body.image,
           req.body.type
+        )
+
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
+    })
+
+    // TODO -> Docs
+    router.post('/profile', normalLimits, async (req, res, next) => {
+      try {
+        const result = await this.userAppService.updateUserProfile(
+          <User>req.user,
+          <ProfileUpdateRequest>req.body
         )
 
         return res.send(result)
