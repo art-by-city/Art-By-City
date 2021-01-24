@@ -11,6 +11,10 @@ import { ArtworkImage } from '../'
  *      properties:
  *        id:
  *          type: string
+ *        created:
+ *          type: Date
+ *        updated:
+ *          type: Date
  *        owner:
  *          type: string
  *          required: true
@@ -46,6 +50,8 @@ import { ArtworkImage } from '../'
  */
 export default interface ArtworkViewModel extends ViewModel {
   id: string
+  created: Date
+  updated: Date
   owner: UserViewModel
   title: string
   description: string
