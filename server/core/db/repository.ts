@@ -50,9 +50,12 @@ export default class BaseRepositoryImpl<T extends TrackableEntity> {
     }
   }
 
-  update(thing: T): Promise<T> {
+  update(thing: T, modifyUpdated: boolean = true): Promise<T> {
     try {
-      thing.updated = new Date()
+      if (modifyUpdated) {
+        thing.updated = new Date()
+      }
+
       return this.repository.update(thing)
     } catch (error) {
       throw new Error(`Error updating ${this.x.name}: ${error.message}`)

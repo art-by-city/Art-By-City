@@ -330,7 +330,7 @@ export default class ArtworkApplicationServiceImpl
         throw new NotFoundError('artwork')
       }
 
-      await this.artworkService.update(artwork)
+      await this.artworkService.update(artwork, false)
 
       return new ApiServiceSuccessResult()
     } catch (error) {
@@ -356,7 +356,7 @@ export default class ArtworkApplicationServiceImpl
         throw new NotFoundError('artwork')
       }
 
-      await this.artworkService.update(artwork)
+      await this.artworkService.update(artwork, false)
 
       return new ApiServiceSuccessResult()
     } catch (error) {
@@ -380,7 +380,7 @@ export default class ArtworkApplicationServiceImpl
 
       artwork.published = true
 
-      const savedArtwork = await this.artworkService.update(artwork)
+      const savedArtwork = await this.artworkService.update(artwork, false)
 
       if (savedArtwork) {
         return new ApiServiceSuccessResult()
@@ -408,7 +408,7 @@ export default class ArtworkApplicationServiceImpl
 
       artwork.published = false
 
-      const savedArtwork = await this.artworkService.update(artwork)
+      const savedArtwork = await this.artworkService.update(artwork, false)
 
       if (savedArtwork) {
         return new ApiServiceSuccessResult()
@@ -436,7 +436,7 @@ export default class ArtworkApplicationServiceImpl
 
       artwork.approved = true
 
-      const savedArtwork = await this.artworkService.update(artwork)
+      const savedArtwork = await this.artworkService.update(artwork, false)
 
       if (savedArtwork) {
         return new ApiServiceSuccessResult()
@@ -464,7 +464,7 @@ export default class ArtworkApplicationServiceImpl
 
       artwork.approved = false
 
-      const savedArtwork = await this.artworkService.update(artwork)
+      const savedArtwork = await this.artworkService.update(artwork, false)
 
       if (savedArtwork) {
         return new ApiServiceSuccessResult()
