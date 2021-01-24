@@ -12,7 +12,7 @@
       <v-overlay :value="editable && hoverProps.hover">
         <v-file-input
           class="avatar-upload-button"
-          accept="image/*"
+          accept="image/png, image/jpeg"
           hide-input
           @change="onAvatarFileInputChanged"
           prepend-icon="mdi-camera"
