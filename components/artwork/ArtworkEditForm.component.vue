@@ -38,7 +38,7 @@
                 <v-overlay absolute :value="hoverProps.hover">
                   <v-file-input
                     class="artwork-upload-button"
-                    accept="image/*"
+                    accept="image/png, image/jpeg"
                     hide-input
                     prepend-icon="mdi-camera"
                     @change="onArtworkImageChanged(i, $event)"
@@ -77,7 +77,7 @@
             >
               <v-file-input
                 class="artwork-upload-button add-artwork-image-button"
-                accept="image/*"
+                accept="image/png, image/jpeg"
                 hide-input
                 prepend-icon="mdi-camera-plus"
                 @change="onAddArtworkImageClicked"

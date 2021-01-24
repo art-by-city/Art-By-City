@@ -36,6 +36,7 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    '~/plugins/axios',
     '~/plugins/components.ts',
     '~/plugins/services.ts',
     '~/plugins/filters.ts'

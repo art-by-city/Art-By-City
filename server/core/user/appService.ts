@@ -18,6 +18,7 @@ import { CityService } from '../city'
 import UserMapper from './mapper'
 import { FileApplicationService } from '../file'
 import UnknownError from '../api/errors/unknownError'
+import { ProfileUpdateRequest } from './requests'
 
 @injectable()
 export default class UserApplicationServiceImpl implements UserApplicationService {
@@ -44,6 +45,29 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
     this.artworkService = artworkService
     this.cityService = cityService
     this.fileAppService = fileAppService
+  }
+
+  async updateUserProfile(
+    user: User,
+    profile: ProfileUpdateRequest
+  ): Promise<boolean> {
+    try {
+      const dbUser = await this.userService.getById(user.id)
+
+      if (!dbUser) {
+        return false
+      }
+
+      dbUser.name = profile.name || ''
+
+      await this.userService.saveUser(dbUser)
+
+      return true
+    } catch (error) {
+      console.error(error)
+
+      throw new UnknownError()
+    }
   }
 
   async getUserProfile(username: string):

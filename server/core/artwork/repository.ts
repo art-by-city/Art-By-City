@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { injectable, inject } from 'inversify'
-import { DocumentReference, Firestore } from '@google-cloud/firestore'
+import { DocumentReference, Firestore, Timestamp } from '@google-cloud/firestore'
 
 import DatabaseAdapter from '../db/adapter.interface'
 import { Artwork, ArtworkRepository, ArtworkFilterOptions } from './'
@@ -61,7 +61,11 @@ export default class ArtworkRepositoryImpl
       const found = await query.get()
 
       let matches: Artwork[] = found.docs.map((doc) => {
-        return <Artwork>doc.data()
+        const artworkData = doc.data()
+        artworkData.created = (artworkData.created as Timestamp).toDate()
+        artworkData.updated = (artworkData.updated as Timestamp).toDate()
+
+        return <Artwork>artworkData
       })
 
       // Limit

@@ -38,6 +38,7 @@
               <CitySelector
                 v-model="login.city"
                 :cities="$store.state.config.cities"
+                :disabled="disableCityInput"
               />
 
               <v-text-field
@@ -62,6 +63,7 @@
               <v-text-field
                 v-model="login.inviteCode"
                 :rules="inviteCodeRules"
+                :disabled="disableInviteCodeInput"
                 type="text"
                 name="inviteCode"
                 label="Invite Code"
@@ -122,11 +124,36 @@ export default class RegisterPage extends FormPageComponent {
     password: '',
     city: ''
   }
+  disableCityInput = false
+  disableInviteCodeInput = false
   usernameRules = usernameRules
   emailRules = emailRules
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
   inviteCodeRules = inviteCodeRules
+
+  async asyncData({ store, query }: Context) {
+    // Temporarily restrict city to NYC, if found
+    const cities = store?.state?.config?.cities || []
+    let forceRegistrationCityId
+    for (let i = 0; i < cities.length; i++) {
+      if (cities[i].code === 'NYC') {
+        forceRegistrationCityId = cities[i].id
+      }
+    }
+
+    return {
+      disableCityInput: !!forceRegistrationCityId,
+      disableInviteCodeInput: !!query.invite,
+      login: {
+        inviteCode: query.invite || '',
+        username: '',
+        email: '',
+        password: '',
+        city: forceRegistrationCityId || ''
+      }
+    }
+  }
 
   @debounce
   async register() {

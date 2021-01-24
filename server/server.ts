@@ -29,10 +29,22 @@ passport.use(authService.getJwtAuthenticationStrategy())
 passport.serializeUser(authService.serializeUser)
 passport.deserializeUser(authService.deserializeUser)
 
-// Express Config
+// Express App
 const app = express()
+
+// Initialize Controllers that have unique upload limits first
+app.use(
+  '/artwork',
+  container.get<ArtworkController>(Symbol.for('ArtworkController')).getRouter()
+)
+app.use(
+  '/user',
+  container.get<UserController>(Symbol.for('UserController')).getRouter()
+)
+
+// Express Config
 app.use(passport.initialize())
-app.use(bodyParser.json({ limit: '20mb' })) // TODO -> finalize this
+app.use(bodyParser.json())
 
 // Express Routing
 app.use(
@@ -42,14 +54,6 @@ app.use(
 app.use(
   '/admin',
   container.get<AdminController>(Symbol.for('AdminController')).getRouter()
-)
-app.use(
-  '/artwork',
-  container.get<ArtworkController>(Symbol.for('ArtworkController')).getRouter()
-)
-app.use(
-  '/user',
-  container.get<UserController>(Symbol.for('UserController')).getRouter()
 )
 app.use(
   '/city',

@@ -1,6 +1,11 @@
 # art-by-city
 
-> My first-rate Nuxt.js project
+## Requirements
+
+[Firestore Emulator](https://firebase.google.com/docs/rules/emulator-setup)
+
+## NOTE
+Firestore emulator should be running if you're on a local dev env
 
 ## Build Setup
 

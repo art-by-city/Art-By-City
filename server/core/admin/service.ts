@@ -49,7 +49,10 @@ export default class AdminServiceImpl implements AdminService {
     const mappedArtworks = await Promise.all(
       artworks.map(async (artwork) => {
         const user = await this.userService.getById(artwork.owner)
-        return new ArtworkMapper().toViewModel(artwork, user || undefined)
+        return new ArtworkMapper().toViewModel(
+          artwork,
+          user ? new UserMapper().toViewModel(user) : undefined
+        )
       })
     )
 
