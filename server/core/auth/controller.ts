@@ -254,8 +254,7 @@ export default class AuthControllerImpl implements AuthController {
 
         return res.json(result)
       } catch (error) {
-        console.error(error)
-        next(new UnknownError())
+        next(error)
       }
     })
 

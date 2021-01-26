@@ -9,7 +9,7 @@ export default class ValidationError implements ApiServiceError {
   constructor(messages?: string[]) {
     if (messages) {
       this.messages = messages
-      this.message = messages.join('\n')
+      this.message = messages.join(',\n')
     }
   }
 }
