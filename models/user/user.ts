@@ -16,6 +16,7 @@ export function getUser(authUser: Record<string, unknown> | null): User | null {
   if (authUser) {
     return {
       id: authUser.id as string,
+      name: authUser.name as string,
       username: authUser.username as string,
       avatar: authUser.avatar as UserAvatar,
       roles: authUser.roles as string[],
