@@ -250,11 +250,17 @@ export default class AuthControllerImpl implements AuthController {
       try {
         const user = await this.userService.register(req)
 
-        const result = this.authService.login(user)
+        try {
+          const result = this.authService.login(user)
 
-        return res.json(result)
+          return res.json(result)
+        } catch (error) {
+          console.error(error)
+          throw new UnknownError()
+        }
       } catch (error) {
-        next(error)
+        console.error(error)
+        next(new UnknownError())
       }
     })
 

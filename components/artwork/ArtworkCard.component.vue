@@ -12,8 +12,7 @@
             @click="onArtworkCardClicked"
           >
             <v-fade-transition>
-              <!-- <v-overlay v-if="props.hover" absolute class="artwork-overlay"> -->
-              <v-overlay v-if="true" absolute class="artwork-overlay">
+              <v-overlay v-if="props.hover" absolute class="artwork-overlay">
                 <v-row align="end" class="fill-height pa-1">
                   <v-col
                     cols="auto"

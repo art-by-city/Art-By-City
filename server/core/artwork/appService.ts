@@ -18,12 +18,10 @@ import {
   ArtworkViewModel,
   ArtworkMapper,
   ArtworkCreateRequest,
-  ArtworkImage,
-  ArtworkUpdateRequest,
-  isArtworkImage
+  ArtworkUpdateRequest
 } from './'
 import { ConfigService } from '../config'
-import { FileApplicationService, isFileUploadRequest } from '../file'
+import { FileApplicationService } from '../file'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
@@ -58,99 +56,109 @@ export default class ArtworkApplicationServiceImpl
   }
 
   async create(req: ArtworkCreateRequest): Promise<ApiServiceResult<ArtworkViewModel>> {
-    const user = await this.userService.getById(req.userId)
+    try {
+      const user = await this.userService.getById(req.userId)
 
-    if (!user) {
-      throw new UnauthorizedError()
+      if (!user) {
+        throw new UnauthorizedError()
+      }
+
+      // Non-artist users are restricted to max amount of artwork
+      const config = await this.configService.getConfig()
+      const maxArtworks = config ? config.maxUserArtworks : 10
+      if (!user.hasRole('artist') && user.artworkCount >= maxArtworks) {
+        throw new Error(`Maximum number of ${maxArtworks} Artworks reached`)
+      }
+
+      const artwork = new Artwork().setProps({
+        userId: user.id,
+        title: req.title,
+        description: req.description,
+        type: req.type,
+        cityId: user.city,
+        hashtags: req.hashtags,
+        images: await this.fileAppService.createFromFileUploadRequests(
+          user.id,
+          'artwork',
+          req.images
+        )
+      })
+
+      const createdArtwork = await this.artworkService.create(artwork)
+
+      if (createdArtwork) {
+        this.eventService.emit(UserEvents.Artwork.Created, user.id, createdArtwork.id)
+
+        createdArtwork.hashtags.forEach((hashtag) => {
+          this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
+        })
+
+        return new ApiServiceSuccessResult(
+          new ArtworkMapper().toViewModel(
+            createdArtwork,
+            new UserMapper().toViewModel(user)
+          )
+        )
+      }
+
+      return { success: false }
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
     }
+  }
 
-    // Non-artist users are restricted to max amount of artwork
-    const config = await this.configService.getConfig()
-    const maxArtworks = config ? config.maxUserArtworks : 10
-    if (!user.hasRole('artist') && user.artworkCount >= maxArtworks) {
-      throw new Error(`Maximum number of ${maxArtworks} Artworks reached`)
-    }
+  async update(req: ArtworkUpdateRequest): Promise<ApiServiceResult<ArtworkViewModel>> {
+    try {
+      const user = await this.userService.getById(req.userId)
 
-    const artwork = new Artwork().setProps({
-      userId: user.id,
-      title: req.title,
-      description: req.description,
-      type: req.type,
-      cityId: user.city,
-      hashtags: req.hashtags,
-      images: await this.fileAppService.createFromFileUploadRequests(
+      if (!user) {
+        throw new UnauthorizedError()
+      }
+
+      const artwork = await this.artworkService.get(req.id)
+      const oldArtwork = { ...artwork }
+
+      if (!artwork) {
+        throw new NotFoundError('artwork')
+      }
+
+      if (artwork.owner !== user.id) {
+        throw new UnauthorizedError()
+      }
+
+      artwork.title = req.title
+      artwork.description = req.description
+      artwork.type = req.type
+      artwork.city = user.city
+      artwork.hashtags = req.hashtags
+      artwork.images = await this.fileAppService.createFromFileUploadRequests(
         user.id,
         'artwork',
         req.images
       )
-    })
 
-    const createdArtwork = await this.artworkService.create(artwork)
+      const savedArtwork = await this.artworkService.update(artwork)
 
-    if (createdArtwork) {
-      this.eventService.emit(UserEvents.Artwork.Created, user.id, createdArtwork.id)
+      if (savedArtwork) {
+        this.eventService.emit(UserEvents.Artwork.Updated, user.id, oldArtwork, savedArtwork)
 
-      createdArtwork.hashtags.forEach((hashtag) => {
-        this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
-      })
+        savedArtwork.hashtags.forEach((hashtag) => {
+          this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
+        })
 
-      return new ApiServiceSuccessResult(
-        new ArtworkMapper().toViewModel(
-          createdArtwork,
-          new UserMapper().toViewModel(user)
+        return new ApiServiceSuccessResult(
+          new ArtworkMapper().toViewModel(
+            savedArtwork, new UserMapper().toViewModel(user)
+          )
         )
-      )
+      }
+
+      return { success: false }
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
     }
-
-    return { success: false }
-  }
-
-  async update(req: ArtworkUpdateRequest): Promise<ApiServiceResult<ArtworkViewModel>> {
-    const user = await this.userService.getById(req.userId)
-
-    if (!user) {
-      throw new UnauthorizedError()
-    }
-
-    const artwork = await this.artworkService.get(req.id)
-    const oldArtwork = { ...artwork }
-
-    if (!artwork) {
-      throw new NotFoundError('artwork')
-    }
-
-    if (artwork.owner !== user.id) {
-      throw new UnauthorizedError()
-    }
-
-    artwork.title = req.title
-    artwork.description = req.description
-    artwork.type = req.type
-    artwork.city = user.city
-    artwork.hashtags = req.hashtags
-    artwork.images = await this.fileAppService.createFromFileUploadRequests(
-      user.id,
-      'artwork',
-      req.images
-    )
-
-    const savedArtwork = await this.artworkService.update(artwork)
-
-    if (savedArtwork) {
-      this.eventService.emit(UserEvents.Artwork.Updated, user.id, oldArtwork, savedArtwork)
-
-      savedArtwork.hashtags.forEach((hashtag) => {
-        this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
-      })
-
-      return new ApiServiceSuccessResult(
-        new ArtworkMapper().toViewModel(
-          savedArtwork, new UserMapper().toViewModel(user)
-        )
-      )
-    }
-
-    return { success: false }
   }
 
   async list(req: any): Promise<ApiServiceResult<ArtworkViewModel[]>> {
@@ -226,6 +234,7 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult(mappedArtworks)
     } catch (error) {
+      console.error(error)
       throw new UnknownError()
     }
   }
@@ -246,7 +255,8 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult(mappedArtworks)
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -266,7 +276,8 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult(mappedArtworks)
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -288,7 +299,7 @@ export default class ArtworkApplicationServiceImpl
       )
     } catch (error) {
       console.error(error)
-      throw new UnknownError(error.message)
+      throw new UnknownError()
     }
   }
 
@@ -310,7 +321,8 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult()
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -334,7 +346,8 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult()
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -360,14 +373,14 @@ export default class ArtworkApplicationServiceImpl
 
       return new ApiServiceSuccessResult()
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
   async publish(req: any): Promise<ApiServiceResult<void>> {
-    const user = <User>req.user
-
     try {
+      const user = <User>req.user
       const artwork = await this.artworkService.get(req.params.id)
 
       if (!artwork) {
@@ -388,14 +401,14 @@ export default class ArtworkApplicationServiceImpl
 
       return { success: false }
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
   async unpublish(req: any): Promise<ApiServiceResult<void>> {
-    const user = <User>req.user
-
     try {
+      const user = <User>req.user
       const artwork = await this.artworkService.get(req.params.id)
 
       if (!artwork) {
@@ -416,14 +429,14 @@ export default class ArtworkApplicationServiceImpl
 
       return { success: false }
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
   async approve(req: any): Promise<ApiServiceResult<void>> {
-    const user = <User>req.user
-
     try {
+      const user = <User>req.user
       const artwork = await this.artworkService.get(req.params.id)
 
       if (!artwork) {
@@ -444,14 +457,14 @@ export default class ArtworkApplicationServiceImpl
 
       return { success: false }
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
   async unapprove(req: any): Promise<ApiServiceResult<void>> {
-    const user = <User>req.user
-
     try {
+      const user = <User>req.user
       const artwork = await this.artworkService.get(req.params.id)
 
       if (!artwork) {
@@ -472,7 +485,8 @@ export default class ArtworkApplicationServiceImpl
 
       return { success: false }
     } catch (error) {
-      throw new UnknownError(error.message)
+      error.message
+      throw new UnknownError()
     }
   }
 }

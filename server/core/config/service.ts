@@ -27,28 +27,33 @@ export default class ConfigServiceImpl implements ConfigService {
   }
 
   async getConfig(): Promise<ConfigViewModel> {
-    const config = await this.configRepository.get()
-    return {
-      cities: (await this.cityService.list()).sort((a: City, b: City) => {
-        if (a.disabled === b.disabled) {
-          return a.name.localeCompare(b.name)
-        } else if (a.disabled && !b.disabled) {
-          return 1
-        } else {
-          return -1
-        }
-      }),
-      hashtags: (await this.hashtagService.list()).map((h: Hashtag) => h.hashtag),
-      maxUserArtworks: config?.maxUserArtworks || 10,
-      artworkTypes: config?.artworkTypes.sort((a: ArtworkType, b: ArtworkType) => {
-        if (a.enabled === b.enabled) {
-          return a.name.localeCompare(b.name)
-        } else if (!a.enabled && b.enabled) {
-          return 1
-        } else {
-          return -1
-        }
-      }) || []
+    try {
+      const config = await this.configRepository.get()
+      return {
+        cities: (await this.cityService.list()).sort((a: City, b: City) => {
+          if (a.disabled === b.disabled) {
+            return a.name.localeCompare(b.name)
+          } else if (a.disabled && !b.disabled) {
+            return 1
+          } else {
+            return -1
+          }
+        }),
+        hashtags: (await this.hashtagService.list()).map((h: Hashtag) => h.hashtag),
+        maxUserArtworks: config?.maxUserArtworks || 10,
+        artworkTypes: config?.artworkTypes.sort((a: ArtworkType, b: ArtworkType) => {
+          if (a.enabled === b.enabled) {
+            return a.name.localeCompare(b.name)
+          } else if (!a.enabled && b.enabled) {
+            return 1
+          } else {
+            return -1
+          }
+        }) || []
+      }
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError('Error fetching config')
     }
   }
 
@@ -70,8 +75,8 @@ export default class ConfigServiceImpl implements ConfigService {
 
       return { success: true }
     } catch (error) {
-      console.error(error.message)
-      throw new UnknownError()
+      console.error(error)
+      throw new UnknownError('Error updating config')
     }
   }
 }

@@ -32,7 +32,12 @@ export default class FileApplicationServiceImpl
     this.fileService = fileService
     this.eventService = eventService
     if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
-      this.bucket = storage.getClient().bucket(process.env.USER_UPLOAD_BUCKET_NAME)
+      try {
+        this.bucket = storage.getClient().bucket(process.env.USER_UPLOAD_BUCKET_NAME)
+      } catch (error) {
+        console.error(error)
+        throw new UnknownError()
+      }
     }
   }
 
@@ -41,29 +46,34 @@ export default class FileApplicationServiceImpl
     assetType: FileAssetType,
     fileUploadRequests: (FileUploadRequest | ArtworkImageRequest)[]
   ): Promise<ArtworkImage[]> {
-    return Promise.all(fileUploadRequests.map(async (image) => {
-      if (isFileUploadRequest(image)) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
+    try {
+      return Promise.all(fileUploadRequests.map(async (image) => {
+        if (isFileUploadRequest(image)) {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9)
 
-        const file = await this.createFromFileData(
-          userId,
-          assetType,
-          image.data,
-          image.type,
-          `artwork-${uniqueSuffix}`
-        )
+          const file = await this.createFromFileData(
+            userId,
+            assetType,
+            image.data,
+            image.type,
+            `artwork-${uniqueSuffix}`
+          )
 
-        if (!file) {
-          throw new Error('error creating arwork')
+          if (!file) {
+            throw new Error('error creating arwork')
+          }
+
+          return {
+            source: `${file.name}?${Date.now()}`
+          } as ArtworkImage
+        } else {
+          return image
         }
-
-        return {
-          source: `${file.name}?${Date.now()}`
-        } as ArtworkImage
-      } else {
-        return image
-      }
-    }))
+      }))
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
+    }
   }
 
   async createFromFileData(
@@ -159,22 +169,37 @@ export default class FileApplicationServiceImpl
   }
 
   getExistingUserAvatarFile(userId: string): Promise<File | null> {
-    return this.fileService.findOne({
-      owner: userId,
-      assetType: 'avatar'
-    })
+    try {
+      return this.fileService.findOne({
+        owner: userId,
+        assetType: 'avatar'
+      })
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
+    }
   }
 
   async deleteFileAndAsset(file: File): Promise<void> {
-    const path = `${this.avatarImageDirectory}/${file.name}` // TODO -> cloud files
-    const isAssetDeleted = await this.removeFileAsset(path)
-    if (isAssetDeleted) {
-      await this.fileService.delete(file.id)
+    try {
+      const path = `${this.avatarImageDirectory}/${file.name}` // TODO -> cloud files
+      const isAssetDeleted = await this.removeFileAsset(path)
+      if (isAssetDeleted) {
+        await this.fileService.delete(file.id)
+      }
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
   deleteFile(file: File): Promise<void> {
-    return this.fileService.delete(file.id)
+    try {
+      return this.fileService.delete(file.id)
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
+    }
   }
 
   registerEvents() {
