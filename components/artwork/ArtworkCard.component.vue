@@ -12,11 +12,22 @@
             @click="onArtworkCardClicked"
           >
             <v-fade-transition>
-              <v-overlay v-if="props.hover" absolute class="artwork-overlay">
+              <!-- <v-overlay v-if="props.hover" absolute class="artwork-overlay"> -->
+              <v-overlay v-if="true" absolute class="artwork-overlay">
                 <v-row align="end" class="fill-height pa-1">
-                  <v-col cols="auto" class="artwork-overlay-title-container">
+                  <v-col
+                    cols="auto"
+                    class="
+                      artwork-overlay-title-container
+                      disable-text-highlighting
+                    "
+                  >
+                    <div
+                      v-if="disabled"
+                      class="artwork-card-disable-overlay"
+                    ></div>
                     <LikeButton :dark="true" :artwork="artwork" />
-                    <a class="white--text text-lowercase disable-text-highlighting">
+                    <a class="white--text text-lowercase">
                       {{ artwork.title }}
                     </a>
                   </v-col>
@@ -47,6 +58,9 @@ export default class ArtworkCard extends Vue {
   })
   artwork: any | null
 
+  @Prop()
+  disabled?: boolean
+
   getImageSource = getImageSource
 
   @Emit('click') onArtworkCardClicked() {
@@ -65,5 +79,13 @@ export default class ArtworkCard extends Vue {
 }
 .artwork-overlay-title-container {
   padding-bottom: 2px;
+}
+.artwork-card-disable-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 8990;
 }
 </style>

@@ -12,18 +12,19 @@
           v-for="(artwork, i) in _artworks"
           :key="i"
           class="artwork-grid-col"
-          :class="{
-            'left-artwork': i < $store.state.artworks.currentArtworkIndex,
-            [`left-${$store.state.artworks.currentArtworkIndex - i}`]: i < $store.state.artworks.currentArtworkIndex,
-            'current-artwork': i === $store.state.artworks.currentArtworkIndex,
-            'right-artwork': i > $store.state.artworks.currentArtworkIndex,
-            [`right-${i - $store.state.artworks.currentArtworkIndex}`]: i > $store.state.artworks.currentArtworkIndex
-          }"
+          :class="getArtworkCardClasses(i)"
         >
-          <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork, i)" />
+          <ArtworkCard
+            :artwork="artwork"
+            :disabled="!isCurrentArtworkCard(i)"
+            @click="onArtworkCardClicked(artwork, i)"
+          />
         </div>
         <div v-if="searched && _artworks.length < 1" class="text-h1">
-          no results <v-icon class="very-big-icon" color="black">mdi-emoticon-frown</v-icon>
+          no results
+          <v-icon class="very-big-icon" color="black">
+            mdi-emoticon-frown
+          </v-icon>
         </div>
       </div>
     </div>
@@ -56,6 +57,25 @@ export default class ArtworkExplorer extends Vue {
     return this.$store.state.artworks.list
   }
 
+  private getArtworkCardClasses(index: number) {
+    const isLeft = index < this.$store.state.artworks.currentArtworkIndex
+    const isRight = index > this.$store.state.artworks.currentArtworkIndex
+    const leftOffset = this.$store.state.artworks.currentArtworkIndex - index
+    const rightOffset = index - this.$store.state.artworks.currentArtworkIndex
+
+    return {
+      'left-artwork': isLeft,
+      [`left-${leftOffset}`]: isLeft,
+      'current-artwork': this.isCurrentArtworkCard(index),
+      'right-artwork': isRight,
+      [`right-${rightOffset}`]: isRight
+    }
+  }
+
+  private isCurrentArtworkCard(index: number) {
+    return index === this.$store.state.artworks.currentArtworkIndex
+  }
+
   @debounce
   previous(skip: number = 0) {
     this.$store.commit('artworks/previous', skip)
@@ -81,7 +101,10 @@ export default class ArtworkExplorer extends Vue {
       this.previous(currentArtworkIndex - index - 1)
     } else if (index > currentArtworkIndex) {
       this.next(index - currentArtworkIndex - 1)
-      if (this.$store.state.artworks.list.length - index < requestNewArtworkThreshold) {
+      if (
+        this.$store.state.artworks.list.length
+        - index < requestNewArtworkThreshold
+      ) {
         this.fetchMore()
       }
     }
