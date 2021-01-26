@@ -29,7 +29,7 @@
     "types": [
       "node",
       "@nuxt/types",
-      "nuxtjs__auth",
+      "@nuxtjs/auth-next",
       "reflect-metadata",
       "@nuxtjs/axios",
       "vuetify"

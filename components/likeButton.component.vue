@@ -13,8 +13,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
 
-import ProgressService from '~/services/progress/service'
 import { debounce } from '~/helpers/helpers'
+import User, { getUser } from '../models/user/user'
 
 interface Artwork {
   id: string
@@ -31,28 +31,34 @@ export default class LikeButton extends Vue {
 
   @Model('change', { type: Object, required: true }) artwork!: Artwork
 
+  get user(): User | null {
+    return getUser(this.$auth.user)
+  }
+
   @debounce
   toggleLike() {
     if (!this.artwork.likes) {
       this.artwork.likes = []
     }
 
-    if (!this.artwork.likes.includes(this.$auth.user.id)) {
-      this.artwork.likes.push(this.$auth.user.id)
-      try {
-        this.$axios.$put(`/api/artwork/${this.artwork.id}/like`)
-      } catch (error) {
-        this.$toastService.error('error liking artwork')
+    if (this.user) {
+      if (!this.artwork.likes.includes(this.user.id)) {
+        this.artwork.likes.push(this.user.id)
+        try {
+          this.$axios.$put(`/api/artwork/${this.artwork.id}/like`)
+        } catch (error) {
+          this.$toastService.error('error liking artwork')
+        }
+      } else {
+        try {
+          this.$axios.$delete(`/api/artwork/${this.artwork.id}/like`)
+        } catch (error) {
+          this.$toastService.error('error unliking artwork')
+        }
+        this.artwork.likes = this.artwork.likes.filter((id: string) => {
+          return this.user && id !== this.user.id
+        })
       }
-    } else {
-      try {
-        this.$axios.$delete(`/api/artwork/${this.artwork.id}/like`)
-      } catch (error) {
-        this.$toastService.error('error unliking artwork')
-      }
-      this.artwork.likes = this.artwork.likes.filter((id: string) => {
-        return id !== this.$auth.user.id
-      })
     }
 
     this.$forceUpdate()
@@ -77,7 +83,7 @@ export default class LikeButton extends Vue {
   }
 
   isLiked() {
-    if (this.artwork.likes?.includes(this.$auth.user.id)) {
+    if (this.user && this.artwork.likes?.includes(this.user.id)) {
       return true
     }
 

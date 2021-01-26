@@ -136,6 +136,7 @@ import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
 import ToastMessage from '~/models/toasts/toastMessage'
+import User, { getUser } from '../models/user/user'
 
 @Component
 export default class DefaultLayout extends Vue {
@@ -178,9 +179,13 @@ export default class DefaultLayout extends Vue {
     ]
   }
 
+  get user(): User | null {
+    return getUser(this.$auth.user)
+  }
+
   get isAdmin(): boolean {
-    if (this.$auth.user && this.$auth.user.roles) {
-      return this.$auth.user.roles.includes('admin')
+    if (this.user && this.user.roles) {
+      return this.user.roles.includes('admin')
     }
 
     return false
@@ -191,8 +196,8 @@ export default class DefaultLayout extends Vue {
   }
 
   get isArtist(): boolean {
-    if (this.$auth.user && this.$auth.user.roles) {
-      return this.$auth.user.roles.includes('artist')
+    if (this.user && this.user.roles) {
+      return this.user.roles.includes('artist')
     }
 
     return false
@@ -225,7 +230,7 @@ export default class DefaultLayout extends Vue {
     return navItems.filter(
       (navItem) =>
         !navItem.only ||
-        navItem.only.every((role) => this.$auth.user?.roles?.includes(role))
+        navItem.only.every((role) => this.user && this.user?.roles?.includes(role))
     )
   }
 

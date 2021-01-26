@@ -50,7 +50,7 @@ export default {
    */
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/auth'
+    '@nuxtjs/auth-next'
   ],
   env: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
@@ -65,13 +65,20 @@ export default {
     },
     strategies: {
       local: {
-        login: {
-          url: '/auth/login',
-          method: 'post',
-          propertyName: 'token'
+        scheme: 'refresh',
+        token: {
+          property: 'token',
+          maxAge: 1800
         },
+        refreshToken: {
+          property: 'refresh_token',
+          data: 'refresh_token',
+          maxAge: 60 * 60 * 24 * 30
+        },
+        user: { property: 'user' },
+        login: { url: '/auth/login', method: 'post' },
         logout: false,
-        user: { url: '/auth/user', method: 'get', propertyName: 'user' }
+        user: { url: '/auth/user', method: 'get' }
       }
     }
   },
