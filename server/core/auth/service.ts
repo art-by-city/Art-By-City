@@ -78,12 +78,11 @@ export default class AuthServiceImpl implements AuthService {
   async refresh(refreshToken: string): Promise<AuthenticationResult> {
     const jwtPayload = jwt.verify(refreshToken, this.JWT_SECRET) as { id: string }
     const user = await this.userService.getById(jwtPayload.id)
+
     if (user) {
       const { token, refresh_token } = this.generateTokensForUser(user)
 
       return { user, token, refresh_token, success: true }
-    } else {
-
     }
 
     throw new Error('Auth Error')
