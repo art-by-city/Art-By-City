@@ -1,4 +1,5 @@
 import { injectable, inject } from 'inversify'
+import UnknownError from '../api/errors/unknownError'
 import { EmailService } from './'
 
 @injectable()
@@ -13,16 +14,21 @@ export default class EmailApplicationServiceImpl {
   }
 
   sendInvitationEmail(recipientEmail: string, inviteCode: string): Promise<boolean> {
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
-    return this.emailService.sendEmail({
-      to: recipientEmail,
-      from: 'welcome@artby.city', // TODO -> admin configurable
-      subject: 'Invitation to join Art x By x City', // TODO -> admin configurable
-      text:
-        `
-        <p>Hi!  You've been sent an invitation to join Art x By x City'</p>
-        <p>Sign up here: <a href='${baseUrl}/register?invite=${inviteCode}'></a></p>
-        ` // TODO -> from email template
-    })
+    try {
+      const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+      return this.emailService.sendEmail({
+        to: recipientEmail,
+        from: 'welcome@artby.city', // TODO -> admin configurable
+        subject: 'Invitation to join Art x By x City', // TODO -> admin configurable
+        text:
+          `
+          <p>Hi!  You've been sent an invitation to join Art x By x City'</p>
+          <p>Sign up here: <a href='${baseUrl}/register?invite=${inviteCode}'></a></p>
+          ` // TODO -> from email template
+      })
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
+    }
   }
 }

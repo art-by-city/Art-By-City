@@ -29,6 +29,7 @@ export default class CityControllerImpl implements CityController {
     const router = Router()
 
     router.use(passport.authenticate('jwt', { session: false }))
+    router.use(roles(['admin']))
 
     /**
      * @openapi
@@ -77,7 +78,7 @@ export default class CityControllerImpl implements CityController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.put('/', roles(['admin']), async (req, res) => {
+    router.put('/', async (req, res) => {
       const result = await this.cityAppService.create(req)
 
       return res.send(result)
@@ -123,7 +124,7 @@ export default class CityControllerImpl implements CityController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.post('/:id', roles(['admin']), async (req, res) => {
+    router.post('/:id', async (req, res) => {
       const result = await this.cityAppService.update(req)
 
       return res.send(result)

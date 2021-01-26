@@ -31,7 +31,8 @@ export default class CityApplicationServiceImpl
       }
       throw new UnknownError()
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -52,7 +53,8 @@ export default class CityApplicationServiceImpl
       }
       throw new NotFoundError('city')
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -62,7 +64,8 @@ export default class CityApplicationServiceImpl
         await this.cityService.delete(req.params?.id || '')
       )
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -74,7 +77,8 @@ export default class CityApplicationServiceImpl
         return new CityMapper().toViewModel(city)
       }))
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -85,7 +89,8 @@ export default class CityApplicationServiceImpl
         return new CityMapper().toViewModel(city)
       })
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 }
