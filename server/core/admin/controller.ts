@@ -51,10 +51,14 @@ export default class AdminControllerImpl implements AdminController {
      *              items:
      *                $ref: "#/components/schemas/Artwork"
      */
-    router.get('/artwork', async (_req, res) => {
-      const result = await this.adminService.listArtwork()
+    router.get('/artwork', async (_req, res, next) => {
+      try {
+        const result = await this.adminService.listArtwork()
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     /**
@@ -135,10 +139,14 @@ export default class AdminControllerImpl implements AdminController {
      *      '200':
      *        description: Null response
      */
-    router.post('/user', async (req, res) => {
-      const result = await this.adminService.saveUser(req.body.user)
+    router.post('/user', async (req, res, next) => {
+      try {
+        const result = await this.adminService.saveUser(req.body.user)
 
-      return res.send(result)
+        return res.send(result)
+      } catch (error) {
+        next(error)
+      }
     })
 
     return router

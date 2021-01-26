@@ -136,7 +136,8 @@ export default class UserServiceImpl implements UserService {
 
       return { success: true }
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
