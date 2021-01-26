@@ -18,6 +18,7 @@ export interface AuthService {
   serializeUser(user: UserViewModel, callback: Function): void
   deserializeUser(userId: string, callback: Function): void
   login(user: UserViewModel): AuthenticationResult
+  refresh(refreshToken: string): Promise<AuthenticationResult>
 }
 
 export const AuthModule = new ContainerModule((bind) => {
