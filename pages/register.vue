@@ -45,7 +45,7 @@
                 v-model="login.password"
                 type="password"
                 label="Password"
-
+                :rules="passwordRules"
                 required
                 class="text-lowercase"
                 autocomplete="new-password"
