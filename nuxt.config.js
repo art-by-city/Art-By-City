@@ -55,7 +55,7 @@ export default {
   env: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
     env: process.env.NODE_ENV || 'development',
-    USER_UPLOAD_BUCKET_NAME: process.env.USER_UPLOAD_BUCKET_NAME || ''
+    USER_UPLOAD_BUCKET_NAME: process.env.USER_UPLOAD_BUCKET_NAME || 'art-by-city-staging-user-uploads'
   },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {

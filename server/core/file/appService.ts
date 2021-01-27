@@ -182,8 +182,7 @@ export default class FileApplicationServiceImpl
 
   async deleteFileAndAsset(file: File): Promise<void> {
     try {
-      const path = `${this.avatarImageDirectory}/${file.name}` // TODO -> cloud files
-      const isAssetDeleted = await this.removeFileAsset(path)
+      const isAssetDeleted = await this.removeFileAsset(file)
       if (isAssetDeleted) {
         await this.fileService.delete(file.id)
       }
@@ -211,7 +210,8 @@ export default class FileApplicationServiceImpl
     try {
       if (artwork) {
         await Promise.all(artwork.images.map(async (image: ArtworkImage) => {
-          await this.deleteFileByName(image.source.split('?')[0], 'artwork')
+
+          await this.deleteFileByName(image.source.split('?')[0])
         }))
       }
     } catch (error) {
@@ -238,34 +238,35 @@ export default class FileApplicationServiceImpl
       }
 
       await Promise.all(abandonedImages.map(async (image: ArtworkImage) => {
-        await this.deleteFileByName(image.source.split('?')[0], 'artwork')
+        await this.deleteFileByName(image.source.split('?')[0])
       }))
     } catch (error) {
       console.error(error)
     }
   }
 
-  private async deleteFileByName(filename: string, assetType: FileAssetType): Promise<void> {
+  private async deleteFileByName(filename: string): Promise<void> {
     const file = await this.fileService.findOne({ name: filename })
-    const dir = assetType === 'artwork'
-      ? this.artworkImageDirectory
-      : this.avatarImageDirectory
+
     if (file) {
-      const isFileAssetDeleted = await this.removeFileAsset(
-        `${dir}/${filename}`
-      )
-      if (isFileAssetDeleted) {
-        await this.fileService.delete(file.id)
-      }
+      this.deleteFileAndAsset(file)
     }
   }
 
-  private async removeFileAsset(path: string): Promise<boolean> {
+  private async removeFileAsset(file: File): Promise<boolean> {
     try {
       if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
-        // TODO -> cloud files
+        const location = file.assetType === 'artwork'
+          ? this.artworkDirName
+          : this.avatarDirName
+        await this.bucket.file(`${location}/${file.name}`).delete({
+          ignoreNotFound: true
+        })
       } else {
-        await fs.promises.unlink(path)
+        const dir = file.assetType === 'artwork'
+          ? this.artworkImageDirectory
+          : this.avatarImageDirectory
+        await fs.promises.unlink(`${dir}/${file.name}`)
       }
 
       return true
