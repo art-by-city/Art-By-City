@@ -239,9 +239,9 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
-  async listByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>> {
+  async listByUser(user: User, opts?: ArtworkFilterOptions): Promise<ApiServiceResult<ArtworkViewModel[]>> {
     try {
-      const artworks = await this.artworkService.listByUser(user)
+      const artworks = await this.artworkService.listByUser(user, opts)
 
       const mappedArtworks = await Promise.all(
         artworks.map(async (artwork) => {
