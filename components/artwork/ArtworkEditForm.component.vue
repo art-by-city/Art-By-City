@@ -23,6 +23,7 @@
           style="height:100%; width:100%; display: flex; flex-wrap: wrap;"
           :list="artwork.images"
           handle=".drag-handle"
+          @sort="onPreviewImageChanged()"
         >
           <div
             class="artwork-image-selector"
@@ -163,6 +164,8 @@ export default class ArtworkEditForm extends Vue {
   cropImageIndex?: number
   cropper?: Cropper
 
+  @Emit('previewImageChanged') onPreviewImageChanged() {}
+
   get titleRules() {
     return [(value: string = '') => {
       if (value.length < 1) {
@@ -210,11 +213,19 @@ export default class ArtworkEditForm extends Vue {
       1,
       await this.createImagePreview(image)
     )
+
+    if (index === 0) {
+      this.onPreviewImageChanged()
+    }
   }
 
   @debounce
   async onDeleteArtworkImageClicked(index: number) {
     this.artwork.images.splice(index, 1)
+
+    if (index === 0) {
+      this.onPreviewImageChanged()
+    }
   }
 
   @debounce
@@ -224,6 +235,10 @@ export default class ArtworkEditForm extends Vue {
       0,
       await this.createImagePreview(image)
     )
+
+    if (this.artwork.images.length === 1) {
+      this.onPreviewImageChanged()
+    }
   }
 
   @debounce
