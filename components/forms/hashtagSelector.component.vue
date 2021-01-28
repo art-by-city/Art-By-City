@@ -1,8 +1,11 @@
 <template>
-  <div id="hashtagSelector" class="hashtag-selector condensed-input">
+  <div
+    id="hashtagSelector"
+    class="hashtag-selector"
+    :class="{ 'dense': dense }"
+  >
     <v-combobox
       v-bind:value="value"
-      class="condensed-input"
       name="hashtags"
       label="hashtags"
       multiple
@@ -56,6 +59,11 @@ export default class HashtagSelector extends Vue {
     required: false,
     default: false
   }) readonly required: boolean | undefined
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: true
+  }) readonly dense: boolean | undefined
   @Prop({ type: Number, default: 12 }) readonly maxSelectable!: number
   @Prop({ type: Array }) readonly hashtags!: string[]
 
@@ -101,3 +109,59 @@ export default class HashtagSelector extends Vue {
   }
 }
 </script>
+
+<style scoped>
+/* Sizing */
+.hashtag-selector.dense
+  >>> .v-input__slot {
+  min-height: 24px;
+}
+.hashtag-selector.dense
+  >>> .v-input__append-inner {
+  margin-top: 0px;
+}
+.hashtag-selector.dense
+  >>> .v-text-field__details {
+  position: relative;
+  left: 15px;
+  top: 5px;
+}
+.hashtag-selector.dense
+  >>> .v-input__control {
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+/* Chips */
+.hashtag-selector.dense
+  >>> .v-select__selections
+  > .v-chip {
+  height: 16px;
+}
+
+/* Font */
+.hashtag-selector.dense
+  >>> .v-select__selections {
+  text-transform: lowercase;
+  min-height: 24px;
+}
+.hashtag-selector.dense
+  >>> .v-select__selections
+  > .v-chip
+  > .v-chip__content
+  > .v-icon {
+  font-size: 14px;
+}
+.hashtag-selector.dense
+  >>> .v-select__selections
+  > input {
+  font-size: 14px;
+  padding: 0;
+}
+.hashtag-selector.dense
+  >>> .v-select__slot
+  > .v-label {
+  font-size: 14px;
+  top: 2px;
+}
+</style>
