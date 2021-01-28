@@ -133,7 +133,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'nuxt-property-decorator'
+import { Vue, Component } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
 import ToastMessage from '~/models/toasts/toastMessage'
