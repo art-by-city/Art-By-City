@@ -16,6 +16,7 @@
         >
           <ArtworkCard
             :artwork="artwork"
+            :baseUrl="baseUrl"
             :disabled="!isCurrentArtworkCard(i)"
             @click="onArtworkCardClicked(artwork, i)"
           />
@@ -32,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, PropSync } from 'nuxt-property-decorator'
 import _ from 'lodash'
 
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
@@ -49,6 +50,11 @@ import { debounce } from '~/helpers/helpers'
 export default class ArtworkExplorer extends Vue {
   @PropSync('initial', { type: Array }) artworks!: any[]
   @PropSync('options', { type: Object }) opts!: any
+
+  @Prop({
+    type: String,
+    required: true
+  }) readonly baseUrl!: string
 
   modalArtwork: any | null = null
   searched: boolean = false

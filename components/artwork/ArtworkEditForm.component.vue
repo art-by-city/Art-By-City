@@ -4,7 +4,7 @@
       <img
         id="cropImage"
         class="crop-image"
-        :src="getImageSource(cropImage)"
+        :src="getImageSource(cropImage, baseUrl)"
       />
     </v-row>
     <v-row v-if="cropMode && cropImage" dense>
@@ -33,7 +33,7 @@
             <v-hover v-slot:default="hoverProps">
               <v-img
                 aspect-ratio="1.7"
-                :src="getImageSource(image)"
+                :src="getImageSource(image, baseUrl)"
                 class="clickable"
               >
                 <v-overlay absolute :value="hoverProps.hover">
@@ -165,6 +165,11 @@ export default class ArtworkEditForm extends Vue {
   cropper?: Cropper
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
+
+  @Prop({
+    type: String,
+    required: true
+  }) readonly baseUrl!: string
 
   get titleRules() {
     return [(value: string = '') => {

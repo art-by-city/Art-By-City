@@ -6,7 +6,7 @@
           class="preview-artwork"
           max-height="75vh"
           max-width="75vw"
-          :src="getImageSource(previewImage)"
+          :src="getImageSource(previewImage, $config.imgBaseUrl)"
           contain
           @click="onPreviewArtworkClicked"
         ></v-img>
@@ -20,7 +20,7 @@
           >
             <v-img
               aspect-ratio="1.7"
-              :src="getImageSource(image)"
+              :src="getImageSource(image, $config.imgBaseUrl)"
               class="clickable"
               :class="{ 'highlighted': image === previewImage }"
               @click="setPreviewImage(image)"
@@ -49,7 +49,10 @@
           </v-row>
         </v-col>
         <v-col cols="5">
-          <ArtistTag :user="artwork.owner" />
+          <ArtistTag
+            :user="artwork.owner"
+            :baseUrl="$config.imgBaseUrl"
+          />
           <div class="text-lowercase">{{ artwork.type }}</div>
           <div class="text-lowercase">{{ cityName }}</div>
           <div class="text-lowercase">{{ hashtagsString }}</div>
@@ -74,7 +77,7 @@
       <ArtworkZoomDialog
         v-if="previewImage"
         :show.sync="zoom"
-        :src="getImageSource(previewImage)"
+        :src="getImageSource(previewImage, $config.imgBaseUrl)"
       />
 
       <v-dialog
@@ -84,6 +87,7 @@
       >
         <ArtworkEditForm
           :artwork="artwork"
+          :baseUrl="$config.imgBaseUrl"
           @previewImageChanged="setPreviewImage()"
         />
       </v-dialog>
