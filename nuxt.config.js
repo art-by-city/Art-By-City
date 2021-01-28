@@ -52,10 +52,14 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth-next'
   ],
-  env: {
+  publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
-    env: process.env.NODE_ENV || 'development',
-    USER_UPLOAD_BUCKET_NAME: process.env.USER_UPLOAD_BUCKET_NAME || 'art-by-city-staging-user-uploads'
+    imgBaseUrl: (
+      process.env.NODE_ENV === 'production'
+      || process.env.NODE_ENV === 'staging'
+    )
+      ? `https://storage.googleapis.com/${process.env.USER_UPLOAD_BUCKET_NAME}`
+      : 'http://localhost:3000'
   },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
