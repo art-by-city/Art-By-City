@@ -5,7 +5,7 @@
         <template v-slot:default="props">
           <v-img
             v-if="artwork"
-            :src="getImageSource(artwork.images[0])"
+            :src="src"
             style="cursor: pointer"
             aspect-ratio="1"
             class="elevation-2"
@@ -44,7 +44,10 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
-import { getImageSource } from '~/models/artwork/artwork'
+import Artwork, {
+  isImageFileRef,
+  isImageUploadPreview
+} from '~/models/artwork/artwork'
 
 @Component({
   components: {
@@ -55,15 +58,33 @@ export default class ArtworkCard extends Vue {
   @Prop({
     default: null
   })
-  artwork: any | null
+  artwork!: Artwork | null
 
   @Prop()
   disabled?: boolean
 
-  getImageSource = getImageSource
+  @Prop({
+    type: String,
+    required: true
+  }) readonly baseUrl!: string
 
   @Emit('click') onArtworkCardClicked() {
     return this.artwork
+  }
+
+  get src() {
+    if (this.artwork) {
+      const image = this.artwork.images[0]
+      if (isImageFileRef(image)) {
+        return `${this.baseUrl}/artwork-images/${image.source}`
+      }
+
+      if (isImageUploadPreview(image)) {
+        return `data:${image.type};base64, ${image.ascii}`
+      }
+    }
+
+    return ''
   }
 }
 </script>

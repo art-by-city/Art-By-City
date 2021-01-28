@@ -54,6 +54,7 @@
                     >
                       <UserAvatar
                         :user="$auth.user"
+                        :baseUrl="$config.imgBaseUrl"
                         small
                         abbr
                       />

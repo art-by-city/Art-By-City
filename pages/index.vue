@@ -1,7 +1,11 @@
 <template>
   <div style="height: 100%">
     <template v-if="$auth.loggedIn">
-      <ArtworkExplorer :initial.sync="payload" :options.sync="options" />
+      <ArtworkExplorer
+        :initial.sync="payload"
+        :options.sync="options"
+        :baseUrl="$config.imgBaseUrl"
+      />
     </template>
     <template v-if="!$auth.loggedIn">
       <v-row style="height: 45vh" align="end">
