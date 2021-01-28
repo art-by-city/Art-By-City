@@ -27,6 +27,7 @@
         />
       </div>
       <div class="artwork-zoom-controls">
+        <span class="white--text">{{ $data.width }}, {{ $data.height }}</span>
         <v-btn icon @click="onZoomButtonClicked(-0.1)">
           <v-icon color="white">mdi-magnify-minus</v-icon>
         </v-btn>
@@ -45,7 +46,7 @@ import { Vue, Component, Prop, PropSync } from 'nuxt-property-decorator'
 import { debounce } from '~/helpers/helpers'
 
 const ZOOM_UPPER_LIMIT: number = 1
-const ZOOM_LOWER_LIMIT: number = -1
+const ZOOM_LOWER_LIMIT: number = -0.9
 
 @Component
 export default class ArtworkZoomDialog extends Vue {
@@ -150,7 +151,11 @@ export default class ArtworkZoomDialog extends Vue {
   }
 
   get zoomImageStyle() {
-    if (this.width === 'auto' || this.height === 'auto') {
+    if (
+      !this.width
+      || !this.height
+      || this.width === 'auto'
+      || this.height === 'auto') {
       this.setImageDimensions()
     }
 
@@ -179,7 +184,7 @@ export default class ArtworkZoomDialog extends Vue {
 .artwork-zoom-dialog-container {
   background-color: rgba(0,0,0,0.5);
   text-align: center;
-  height: 95vh;
+  height: 90vh;
   width: 95vw;
 }
 
@@ -199,7 +204,7 @@ export default class ArtworkZoomDialog extends Vue {
   z-index: 9992;
   position: absolute;
   width: 95vw;
-  height: 95vh;
+  height: 90vh;
   display: block;
   margin-left: auto;
   margin-right: auto;
