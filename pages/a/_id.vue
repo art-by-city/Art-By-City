@@ -82,7 +82,10 @@
         persistent
         max-width="40vw"
       >
-        <ArtworkEditForm :artwork="artwork" />
+        <ArtworkEditForm
+          :artwork="artwork"
+          @previewImageChanged="setPreviewImage()"
+        />
       </v-dialog>
     </v-container>
   </div>
@@ -101,7 +104,6 @@ import Artwork, {
   ArtworkImageFile,
   getImageSource
 } from '~/models/artwork/artwork'
-import ArtworkType from '~/models/artwork/artworkType'
 import ProgressService from '~/services/progress/service'
 import { debounce } from '~/helpers/helpers'
 
@@ -192,10 +194,10 @@ export default class ArtworkPage extends FormPageComponent {
     return this.artwork.hashtags.map((h) => { return `#${h}` }).join(', ')
   }
 
-  setPreviewImage(image: ArtworkImageFile) {
-    if (!this.editMode) {
-      this.previewImage = image
-    }
+  setPreviewImage(image?: ArtworkImageFile) {
+    this.previewImage = image
+      ? image
+      : this.artwork.images[0]
   }
 
   @debounce
