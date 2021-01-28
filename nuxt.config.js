@@ -63,9 +63,20 @@ export default {
   },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
+    localStorage: false,
+    cookie: {
+      options: {
+        secure: process.env.NODE_ENV === 'production'
+          || process.env.NODE_ENV === 'staging'
+      }
+    },
     redirect: {
+      login: '/login',
+      logout: '/',
+      home: '/',
+      // callback: '/callback',
       rewriteRedirects: true,
-      resetOnError: true
+      // resetOnError: true
     },
     strategies: {
       local: {
