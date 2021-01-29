@@ -173,6 +173,9 @@ export default class UserServiceImpl implements UserService {
   }
 
   async saveUser(user: User): Promise<ApiServiceResult<void>> {
+    if (!user.created) {
+      user.created = new Date()
+    }
     await validateUser(user)
 
     try {

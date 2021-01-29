@@ -1,0 +1,1 @@
+export { ChangelogParser } from './parser'
