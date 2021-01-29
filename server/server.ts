@@ -14,8 +14,12 @@ import { CityController } from './core/city'
 import { ConfigController } from './core/config'
 import { EventService } from './core/events'
 import { AnalyticsController } from './core/analytics'
-import { InvitationController, InvitationApplicationService } from './core/invitation'
+import {
+  InvitationController,
+  InvitationApplicationService
+} from './core/invitation'
 import { FileApplicationService } from './core/file'
+import { ChangelogController } from './core/changelog'
 
 dotenv.config()
 
@@ -57,6 +61,10 @@ app.use(
 app.use(
   '/admin',
   container.get<AdminController>(Symbol.for('AdminController')).getRouter()
+)
+app.use(
+  '/changelog',
+  container.get<ChangelogController>(Symbol.for('ChangelogController')).getRouter()
 )
 app.use(
   '/city',

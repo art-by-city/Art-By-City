@@ -6,7 +6,8 @@ const defaultState = {
   cities: [] as any[],
   hashtags: [] as string[],
   artworkTypes: [] as ArtworkType[],
-  maxUserArtworks: 10 as number
+  maxUserArtworks: 10 as number,
+  changelogLatestVersion: ''
 }
 export const state = () => ({...defaultState})
 export type ConfigStoreState = ReturnType<typeof state>
@@ -18,6 +19,9 @@ export const mutations = {
     state.hashtags = newState.hashtags
     state.artworkTypes = newState.artworkTypes
     state.maxUserArtworks = newState.maxUserArtworks
+    if (newState.changelogLatestVersion) {
+      state.changelogLatestVersion = newState.changelogLatestVersion
+    }
   },
 
   setCities(state: ConfigStoreState, cities: any[]) {

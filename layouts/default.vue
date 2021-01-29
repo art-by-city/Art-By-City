@@ -103,7 +103,22 @@
     </v-main>
 
     <v-footer dark>
-      <nuxt-link class="white--text text-lowercase" to="/about">About</nuxt-link>
+      <div class="text-lowercase">
+        <nuxt-link class="white--text mr-2" to="/about">About</nuxt-link>
+        <template v-if="isLoggedIn">
+          <v-badge
+            dot
+            overlap
+            color="rgb(110, 81, 255)"
+            :value="shouldChangelogIconBlink"
+            class="notification-icon"
+          >
+            <nuxt-link class="white--text mr-2" to="/changelog">
+              What's New
+            </nuxt-link>
+          </v-badge>
+        </template>
+      </div>
       <v-spacer></v-spacer>
       <div>&copy; art x by x city {{ new Date().getFullYear() }}</div>
     </v-footer>
@@ -216,6 +231,18 @@ export default class DefaultLayout extends Vue {
     return ''
   }
 
+  get shouldChangelogIconBlink(): boolean {
+    if (
+      this.user
+      && this.user.changelogLastVersionViewed
+        !== this.$store.state.config.changelogLatestVersion
+    ) {
+      return true
+    }
+
+    return false
+  }
+
   toasts: ToastMessage[] = []
   removeToast(toast: ToastMessage) {
     this.$store.commit('toasts/remove', toast)
@@ -263,5 +290,29 @@ div.v-toolbar__content div.v-toolbar__title a {
   top: 48px;
   position: fixed;
   z-index: 5;
+}
+
+.notification-icon >>> .v-badge__badge {
+  animation: ripple 2s infinite;
+}
+
+@keyframes blink {
+  0%   {background-color: red;}
+  25%  {background-color: yellow;}
+  50%  {background-color: blue;}
+  100% {background-color: green;}
+}
+
+/* rgb(110, 81, 255) */
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0rem rgba(110, 81, 255, 0.4);
+  }
+  25% {
+    box-shadow: 0 0 0 0.5rem rgba(110, 81, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0rem rgba(110, 81, 255, 0.4);
+  }
 }
 </style>

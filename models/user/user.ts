@@ -10,6 +10,7 @@ export default interface User {
   roles: string[]
   city: string
   email: string
+  changelogLastVersionViewed?: string
 }
 
 export function getUser(authUser: Record<string, unknown> | null): User | null {
@@ -21,7 +22,10 @@ export function getUser(authUser: Record<string, unknown> | null): User | null {
       avatar: authUser.avatar as UserAvatar,
       roles: authUser.roles as string[],
       city: authUser.city as string,
-      email: authUser.email as string
+      email: authUser.email as string,
+      changelogLastVersionViewed: authUser.changelogLastVersionViewed
+        ? authUser.changelogLastVersionViewed as string
+        : undefined
     }
   }
 
