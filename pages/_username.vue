@@ -6,6 +6,7 @@
           <UserAvatar
             class="user-profile-avatar"
             :user="profile.user"
+            :baseUrl="$config.imgBaseUrl"
             :editable="$auth.user.id === profile.user.id"
             @onChange="onUserAvatarChanged"
           />
@@ -74,7 +75,11 @@
               cols="4"
             >
               <v-lazy transition="fade-transition">
-                <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork)" />
+                <ArtworkCard
+                  :artwork="artwork"
+                  :baseUrl="$config.imgBaseUrl"
+                  @click="onArtworkCardClicked(artwork)"
+                />
               </v-lazy>
             </v-col>
           </v-row>

@@ -21,9 +21,6 @@ export default class User extends Entity {
   @MinLength(3, {
     message: 'Username must be at least 3 characters'
   })
-  @IsNotIn(['artwork', 'admin', 'artist'], {
-    message: 'Username not allowed'
-  })
   username!: string
 
   @IsString()
@@ -68,6 +65,8 @@ export default class User extends Entity {
   invitation?: string
 
   avatar?: UserAvatar
+
+  changelogLastVersionSeen?: string
 
   private saltAndHash(password: string): string {
     if (!this.salt) {

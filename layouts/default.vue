@@ -54,6 +54,7 @@
                     >
                       <UserAvatar
                         :user="$auth.user"
+                        :baseUrl="$config.imgBaseUrl"
                         small
                         abbr
                       />
@@ -102,7 +103,22 @@
     </v-main>
 
     <v-footer dark>
-      <nuxt-link class="white--text text-lowercase" to="/about">About</nuxt-link>
+      <div class="text-lowercase">
+        <nuxt-link class="white--text mr-2" to="/about">About</nuxt-link>
+        <template v-if="isLoggedIn">
+          <v-badge
+            dot
+            overlap
+            color="rgb(110, 81, 255)"
+            :value="shouldChangelogIconBlink"
+            class="notification-icon"
+          >
+            <nuxt-link class="white--text mr-2" to="/changelog">
+              What's New
+            </nuxt-link>
+          </v-badge>
+        </template>
+      </div>
       <v-spacer></v-spacer>
       <div>&copy; art x by x city {{ new Date().getFullYear() }}</div>
     </v-footer>
@@ -132,10 +148,11 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'nuxt-property-decorator'
+import { Vue, Component } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
 import ToastMessage from '~/models/toasts/toastMessage'
+import User, { getUser } from '../models/user/user'
 
 @Component
 export default class DefaultLayout extends Vue {
@@ -178,9 +195,13 @@ export default class DefaultLayout extends Vue {
     ]
   }
 
+  get user(): User | null {
+    return getUser(this.$auth.user)
+  }
+
   get isAdmin(): boolean {
-    if (this.$auth.user && this.$auth.user.roles) {
-      return this.$auth.user.roles.includes('admin')
+    if (this.user && this.user.roles) {
+      return this.user.roles.includes('admin')
     }
 
     return false
@@ -191,8 +212,8 @@ export default class DefaultLayout extends Vue {
   }
 
   get isArtist(): boolean {
-    if (this.$auth.user && this.$auth.user.roles) {
-      return this.$auth.user.roles.includes('artist')
+    if (this.user && this.user.roles) {
+      return this.user.roles.includes('artist')
     }
 
     return false
@@ -210,6 +231,18 @@ export default class DefaultLayout extends Vue {
     return ''
   }
 
+  get shouldChangelogIconBlink(): boolean {
+    if (
+      this.user
+      && this.user.changelogLastVersionViewed
+        !== this.$store.state.config.changelogLatestVersion
+    ) {
+      return true
+    }
+
+    return false
+  }
+
   toasts: ToastMessage[] = []
   removeToast(toast: ToastMessage) {
     this.$store.commit('toasts/remove', toast)
@@ -225,7 +258,7 @@ export default class DefaultLayout extends Vue {
     return navItems.filter(
       (navItem) =>
         !navItem.only ||
-        navItem.only.every((role) => this.$auth.user?.roles?.includes(role))
+        navItem.only.every((role) => this.user && this.user?.roles?.includes(role))
     )
   }
 
@@ -257,5 +290,29 @@ div.v-toolbar__content div.v-toolbar__title a {
   top: 48px;
   position: fixed;
   z-index: 5;
+}
+
+.notification-icon >>> .v-badge__badge {
+  animation: ripple 2s infinite;
+}
+
+@keyframes blink {
+  0%   {background-color: red;}
+  25%  {background-color: yellow;}
+  50%  {background-color: blue;}
+  100% {background-color: green;}
+}
+
+/* rgb(110, 81, 255) */
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0rem rgba(110, 81, 255, 0.4);
+  }
+  25% {
+    box-shadow: 0 0 0 0.5rem rgba(110, 81, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0rem rgba(110, 81, 255, 0.4);
+  }
 }
 </style>

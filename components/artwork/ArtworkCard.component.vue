@@ -5,7 +5,7 @@
         <template v-slot:default="props">
           <v-img
             v-if="artwork"
-            :src="getImageSource(artwork.images[0])"
+            :src="src"
             style="cursor: pointer"
             aspect-ratio="1"
             class="elevation-2"
@@ -14,9 +14,19 @@
             <v-fade-transition>
               <v-overlay v-if="props.hover" absolute class="artwork-overlay">
                 <v-row align="end" class="fill-height pa-1">
-                  <v-col cols="auto" class="artwork-overlay-title-container">
+                  <v-col
+                    cols="auto"
+                    class="
+                      artwork-overlay-title-container
+                      disable-text-highlighting
+                    "
+                  >
+                    <div
+                      v-if="disabled"
+                      class="artwork-card-disable-overlay"
+                    ></div>
                     <LikeButton :dark="true" :artwork="artwork" />
-                    <a class="white--text text-lowercase disable-text-highlighting">
+                    <a class="white--text text-lowercase">
                       {{ artwork.title }}
                     </a>
                   </v-col>
@@ -34,7 +44,10 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
-import { getImageSource } from '~/models/artwork/artwork'
+import Artwork, {
+  isImageFileRef,
+  isImageUploadPreview
+} from '~/models/artwork/artwork'
 
 @Component({
   components: {
@@ -45,12 +58,33 @@ export default class ArtworkCard extends Vue {
   @Prop({
     default: null
   })
-  artwork: any | null
+  artwork!: Artwork | null
 
-  getImageSource = getImageSource
+  @Prop()
+  disabled?: boolean
+
+  @Prop({
+    type: String,
+    required: true
+  }) readonly baseUrl!: string
 
   @Emit('click') onArtworkCardClicked() {
     return this.artwork
+  }
+
+  get src() {
+    if (this.artwork) {
+      const image = this.artwork.images[0]
+      if (isImageFileRef(image)) {
+        return `${this.baseUrl}/artwork-images/${image.source}`
+      }
+
+      if (isImageUploadPreview(image)) {
+        return `data:${image.type};base64, ${image.ascii}`
+      }
+    }
+
+    return ''
   }
 }
 </script>
@@ -65,5 +99,13 @@ export default class ArtworkCard extends Vue {
 }
 .artwork-overlay-title-container {
   padding-bottom: 2px;
+}
+.artwork-card-disable-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 8990;
 }
 </style>

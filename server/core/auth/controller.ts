@@ -92,6 +92,19 @@ export default class AuthControllerImpl implements AuthController {
       }
     })
 
+    // TODO -> Docs
+    // TODO -> Can refactor logic inside AuthService.refresh() to JWT Auth Strategy?
+    router.post('/refresh', async (req, res, next) => {
+      try {
+        const result = await this.authService.refresh(req.body.refresh_token)
+
+        return res.json(result)
+      } catch (error) {
+        console.error(error)
+        next(new UnknownError())
+      }
+    })
+
     /**
      * @openapi
      *
@@ -117,6 +130,7 @@ export default class AuthControllerImpl implements AuthController {
      */
     router.post('/logout', (_req, res, next) => {
       try {
+        // TODO ->
         return res.send()
       } catch (error) {
         console.error(error)
@@ -236,9 +250,14 @@ export default class AuthControllerImpl implements AuthController {
       try {
         const user = await this.userService.register(req)
 
-        const result = this.authService.login(user)
+        try {
+          const result = this.authService.login(user)
 
-        return res.json(result)
+          return res.json(result)
+        } catch (error) {
+          console.error(error)
+          throw new UnknownError()
+        }
       } catch (error) {
         console.error(error)
         next(new UnknownError())
@@ -278,7 +297,7 @@ export default class AuthControllerImpl implements AuthController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.post('/update', localAuth, async (req, res, next) => {
+    router.post('/update', jwtAuth, async (req, res, next) => {
       try {
         const user = <User>req.user
         const result = await this.userService.updatePassword(
@@ -292,11 +311,6 @@ export default class AuthControllerImpl implements AuthController {
         next(new UnknownError())
       }
     })
-
-    // TODO ???????????????????????
-    // router.post('/refresh', jwtAuth, async (req, res, next) => {
-
-    // })
 
     return router
   }

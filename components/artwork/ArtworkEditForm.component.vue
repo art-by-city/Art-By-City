@@ -4,7 +4,7 @@
       <img
         id="cropImage"
         class="crop-image"
-        :src="getImageSource(cropImage)"
+        :src="getImageSource(cropImage, baseUrl)"
       />
     </v-row>
     <v-row v-if="cropMode && cropImage" dense>
@@ -23,6 +23,7 @@
           style="height:100%; width:100%; display: flex; flex-wrap: wrap;"
           :list="artwork.images"
           handle=".drag-handle"
+          @sort="onPreviewImageChanged()"
         >
           <div
             class="artwork-image-selector"
@@ -32,7 +33,7 @@
             <v-hover v-slot:default="hoverProps">
               <v-img
                 aspect-ratio="1.7"
-                :src="getImageSource(image)"
+                :src="getImageSource(image, baseUrl)"
                 class="clickable"
               >
                 <v-overlay absolute :value="hoverProps.hover">
@@ -163,6 +164,13 @@ export default class ArtworkEditForm extends Vue {
   cropImageIndex?: number
   cropper?: Cropper
 
+  @Emit('previewImageChanged') onPreviewImageChanged() {}
+
+  @Prop({
+    type: String,
+    required: true
+  }) readonly baseUrl!: string
+
   get titleRules() {
     return [(value: string = '') => {
       if (value.length < 1) {
@@ -210,11 +218,19 @@ export default class ArtworkEditForm extends Vue {
       1,
       await this.createImagePreview(image)
     )
+
+    if (index === 0) {
+      this.onPreviewImageChanged()
+    }
   }
 
   @debounce
   async onDeleteArtworkImageClicked(index: number) {
     this.artwork.images.splice(index, 1)
+
+    if (index === 0) {
+      this.onPreviewImageChanged()
+    }
   }
 
   @debounce
@@ -224,6 +240,10 @@ export default class ArtworkEditForm extends Vue {
       0,
       await this.createImagePreview(image)
     )
+
+    if (this.artwork.images.length === 1) {
+      this.onPreviewImageChanged()
+    }
   }
 
   @debounce

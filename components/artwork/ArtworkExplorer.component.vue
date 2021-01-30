@@ -12,18 +12,20 @@
           v-for="(artwork, i) in _artworks"
           :key="i"
           class="artwork-grid-col"
-          :class="{
-            'left-artwork': i < $store.state.artworks.currentArtworkIndex,
-            [`left-${$store.state.artworks.currentArtworkIndex - i}`]: i < $store.state.artworks.currentArtworkIndex,
-            'current-artwork': i === $store.state.artworks.currentArtworkIndex,
-            'right-artwork': i > $store.state.artworks.currentArtworkIndex,
-            [`right-${i - $store.state.artworks.currentArtworkIndex}`]: i > $store.state.artworks.currentArtworkIndex
-          }"
+          :class="getArtworkCardClasses(i)"
         >
-          <ArtworkCard :artwork="artwork" @click="onArtworkCardClicked(artwork, i)" />
+          <ArtworkCard
+            :artwork="artwork"
+            :baseUrl="baseUrl"
+            :disabled="!isCurrentArtworkCard(i)"
+            @click="onArtworkCardClicked(artwork, i)"
+          />
         </div>
         <div v-if="searched && _artworks.length < 1" class="text-h1">
-          no results <v-icon class="very-big-icon" color="black">mdi-emoticon-frown</v-icon>
+          no results
+          <v-icon class="very-big-icon" color="black">
+            mdi-emoticon-frown
+          </v-icon>
         </div>
       </div>
     </div>
@@ -31,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, PropSync } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, PropSync } from 'nuxt-property-decorator'
 import _ from 'lodash'
 
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
@@ -49,11 +51,35 @@ export default class ArtworkExplorer extends Vue {
   @PropSync('initial', { type: Array }) artworks!: any[]
   @PropSync('options', { type: Object }) opts!: any
 
+  @Prop({
+    type: String,
+    required: true
+  }) readonly baseUrl!: string
+
   modalArtwork: any | null = null
   searched: boolean = false
 
   get _artworks() {
     return this.$store.state.artworks.list
+  }
+
+  private getArtworkCardClasses(index: number) {
+    const isLeft = index < this.$store.state.artworks.currentArtworkIndex
+    const isRight = index > this.$store.state.artworks.currentArtworkIndex
+    const leftOffset = this.$store.state.artworks.currentArtworkIndex - index
+    const rightOffset = index - this.$store.state.artworks.currentArtworkIndex
+
+    return {
+      'left-artwork': isLeft,
+      [`left-${leftOffset}`]: isLeft,
+      'current-artwork': this.isCurrentArtworkCard(index),
+      'right-artwork': isRight,
+      [`right-${rightOffset}`]: isRight
+    }
+  }
+
+  private isCurrentArtworkCard(index: number) {
+    return index === this.$store.state.artworks.currentArtworkIndex
   }
 
   @debounce
@@ -81,7 +107,10 @@ export default class ArtworkExplorer extends Vue {
       this.previous(currentArtworkIndex - index - 1)
     } else if (index > currentArtworkIndex) {
       this.next(index - currentArtworkIndex - 1)
-      if (this.$store.state.artworks.list.length - index < requestNewArtworkThreshold) {
+      if (
+        this.$store.state.artworks.list.length
+        - index < requestNewArtworkThreshold
+      ) {
         this.fetchMore()
       }
     }

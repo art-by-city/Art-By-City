@@ -26,7 +26,8 @@ export default class AnalyticsServiceImpl implements AnalyticsService {
         return new UserEventMapper().toViewModel(event)
       }))
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 }

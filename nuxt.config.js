@@ -50,28 +50,50 @@ export default {
    */
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/auth'
+    '@nuxtjs/auth-next'
   ],
-  env: {
+  publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
-    env: process.env.NODE_ENV || 'development',
-    USER_UPLOAD_BUCKET_NAME: process.env.USER_UPLOAD_BUCKET_NAME || ''
+    imgBaseUrl: (
+      process.env.NODE_ENV === 'production'
+      || process.env.NODE_ENV === 'staging'
+    )
+      ? `https://storage.googleapis.com/${process.env.USER_UPLOAD_BUCKET_NAME}`
+      : 'http://localhost:3000'
   },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
+    localStorage: false,
+    cookie: {
+      options: {
+        secure: process.env.NODE_ENV === 'production'
+          || process.env.NODE_ENV === 'staging'
+      }
+    },
     redirect: {
+      login: '/login',
+      logout: '/',
+      home: '/',
+      // callback: '/callback',
       rewriteRedirects: true,
-      resetOnError: true
+      // resetOnError: true
     },
     strategies: {
       local: {
-        login: {
-          url: '/auth/login',
-          method: 'post',
-          propertyName: 'token'
+        scheme: 'refresh',
+        token: {
+          property: 'token',
+          maxAge: 1800
         },
+        refreshToken: {
+          property: 'refresh_token',
+          data: 'refresh_token',
+          maxAge: 60 * 60 * 24 * 30
+        },
+        user: { property: 'user' },
+        login: { url: '/auth/login', method: 'post' },
         logout: false,
-        user: { url: '/auth/user', method: 'get', propertyName: 'user' }
+        user: { url: '/auth/user', method: 'get' }
       }
     }
   },

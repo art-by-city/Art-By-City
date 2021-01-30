@@ -43,10 +43,10 @@ export default class UserControllerImpl implements UserController {
     /**
      * @openapi
      *
-     * /user/artworks:
+     * /user/portfolio:
      *  get:
-     *    summary: Get Artworks for authenticated User
-     *    operationId: getArtworksForUser
+     *    summary: Get Portfolio for authenticated User
+     *    operationId: getPortfolioForUser
      *    tags:
      *      - user
      *      - artworks
@@ -70,9 +70,15 @@ export default class UserControllerImpl implements UserController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.get('/artwork', normalLimits, async (req, res, next) => {
+    router.get('/portfolio', normalLimits, async (req, res, next) => {
       try {
-        const result = await this.artworkAppService.listByUser(<User>req.user)
+        const result = await this.artworkAppService.listByUser(
+          <User>req.user,
+          {
+            includeUnapproved: true,
+            includeUnpublished: true
+          }
+        )
 
         return res.send(result)
       } catch (error) {

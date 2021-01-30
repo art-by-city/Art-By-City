@@ -2,6 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import passport from 'passport'
 import _ from 'lodash'
+import * as dotenv from 'dotenv'
 
 import { container } from './inversify.config'
 import DatabaseAdapter from './core/db/adapter.interface'
@@ -13,8 +14,14 @@ import { CityController } from './core/city'
 import { ConfigController } from './core/config'
 import { EventService } from './core/events'
 import { AnalyticsController } from './core/analytics'
-import { InvitationController, InvitationApplicationService } from './core/invitation'
+import {
+  InvitationController,
+  InvitationApplicationService
+} from './core/invitation'
 import { FileApplicationService } from './core/file'
+import { ChangelogController } from './core/changelog'
+
+dotenv.config()
 
 // Initialize Database
 const databaseAdapter = container.get<DatabaseAdapter>(
@@ -54,6 +61,10 @@ app.use(
 app.use(
   '/admin',
   container.get<AdminController>(Symbol.for('AdminController')).getRouter()
+)
+app.use(
+  '/changelog',
+  container.get<ChangelogController>(Symbol.for('ChangelogController')).getRouter()
 )
 app.use(
   '/city',

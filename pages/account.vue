@@ -31,7 +31,7 @@
               ></v-text-field>
 
               <CitySelector
-                v-model="$auth.user.city"
+                v-model="userCity"
                 :cities="$store.state.config.cities"
                 disabled
               />
@@ -83,6 +83,7 @@ import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ProgressService from '~/services/progress/service'
 import { debounce } from '~/helpers/helpers'
+import User, { getUser } from '../models/user/user'
 
 @Component({
   middleware: 'auth',
@@ -94,20 +95,32 @@ export default class AccountPage extends FormPageComponent {
   newPassword = ''
   repeatPassword = ''
   login = {
-    id: this.$auth.user.id,
-    username: this.$auth.user.username,
-    email: this.$auth.user.email,
+    id: this.user?.id || '',
+    username: this.user?.username || '',
+    email: this.user?.email || '',
     password: ''
   }
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
 
-  async asyncData({ $axios, store, $auth, app }: Context) {
-    let cities = [] as any[]
+  get userCity() {
+    return this.user?.city || ''
+  }
+
+  get user(): User | null {
+    return getUser(this.$auth.user)
+  }
+
+  async asyncData({ $axios, $auth, app, redirect }: Context) {
     let user = {} as any
     try {
-      const { payload } = await $axios.$get(`/api/user/${$auth.user.id}/account`)
-      user = payload
+      const _user = getUser($auth.user)
+      if (_user) {
+        const { payload } = await $axios.$get(`/api/user/${_user.id}/account`)
+        user = payload
+      } else {
+        redirect('/login')
+      }
     } catch (error) {
       app.$toastService.error('error fetching account')
     }

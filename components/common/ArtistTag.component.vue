@@ -11,7 +11,11 @@
     <v-card-actions>
       <v-list-item>
         <v-list-item-avatar>
-          <UserAvatar abbr :user="user" />
+          <UserAvatar
+            :user="user"
+            :baseUrl="baseUrl"
+            abbr
+          />
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>
@@ -34,6 +38,11 @@ export default class ArtistTag extends Vue {
     type: Object,
     required: true
   }) readonly user!: User
+
+  @Prop({
+    type: String,
+    required: true
+  }) readonly baseUrl!: string
 
   @Prop({
     type: Boolean,

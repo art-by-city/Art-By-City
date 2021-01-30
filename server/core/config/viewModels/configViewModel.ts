@@ -29,4 +29,5 @@ export default interface ConfigViewModel extends ViewModel {
   hashtags: string[]
   maxUserArtworks: number
   artworkTypes: ArtworkType[]
+  changelogLatestVersion?: string
 }
