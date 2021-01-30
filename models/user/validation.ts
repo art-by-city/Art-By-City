@@ -57,14 +57,7 @@ export const passwordRules = [
     }
 
     return true
-  },
-  // (value: string = '') => {
-  //   if (!/[\s!"#$%&'()*+,-./\\:;<=>?@[\]^_`{|}~]/.test(value)) {
-  //     return 'Passwords must contain at least 1 symbol'
-  //   }
-
-  //   return true
-  // }
+  }
 ]
 
 export const repeatPasswordRules = (repeatPassword: string) => {

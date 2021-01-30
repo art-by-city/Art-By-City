@@ -71,7 +71,7 @@ export interface ArtworkApplicationService
   create(req: ArtworkCreateRequest): Promise<ApiServiceResult<ArtworkViewModel>>
   update(req: ArtworkUpdateRequest): Promise<ApiServiceResult<ArtworkViewModel>>
   list(request: any): Promise<ApiServiceResult<ArtworkViewModel[]>>
-  listByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>>
+  listByUser(user: User, opts?: ArtworkFilterOptions): Promise<ApiServiceResult<ArtworkViewModel[]>>
   listLikedByUser(user: User): Promise<ApiServiceResult<ArtworkViewModel[]>>
   like(user: User, id: string): Promise<ApiServiceResult<void>>
   unlike(user: User, id: string): Promise<ApiServiceResult<void>>
@@ -86,7 +86,7 @@ export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
   update(artwork: Artwork, modifyUpdated?: boolean): Promise<Artwork>
   delete(id: string): Promise<void>
   list(opts?: ArtworkFilterOptions): Promise<Artwork[]>
-  listByUser(user: User): Promise<Artwork[]>
+  listByUser(user: User, opts?: ArtworkFilterOptions): Promise<Artwork[]>
   listLikedByUser(user: User): Promise<Artwork[]>
 }
 export interface ArtworkRepository

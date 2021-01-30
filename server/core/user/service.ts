@@ -12,6 +12,7 @@ import EmailAlreadyTakenError from '../api/errors/emailAlreadyTakenError'
 import { InvitationService } from '../invitation'
 import InvalidInvitationCodeError from '../api/errors/invalidInvitationCodeError'
 import { UserAvatar } from './user'
+import ValidationError from '../api/errors/validationError'
 
 @injectable()
 export default class UserServiceImpl implements UserService {
@@ -32,6 +33,34 @@ export default class UserServiceImpl implements UserService {
     this.invitationService = invitationService
   }
 
+  private validatePassword(password: string)  {
+    const messages: string[] = []
+
+    if (!password) {
+      messages.push('A password is required')
+    }
+
+    if (password.length < 8) {
+      messages.push('Passwords must be at least 8 characters')
+    }
+
+    if (!/[a-z]/.test(password)) {
+      messages.push('Passwords must contain at least 1 lowercase character')
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      messages.push('Passwords must contain at least 1 uppercase character')
+    }
+
+    if (!/[0-9]/.test(password)) {
+      messages.push('Passwords must contain at least 1 number')
+    }
+
+    if (messages.length > 0) {
+      throw new ValidationError(messages)
+    }
+  }
+
   async register(req: any): Promise<UserViewModel> {
     const user = new User()
     user.id = ''
@@ -44,8 +73,6 @@ export default class UserServiceImpl implements UserService {
     user.artworkCount = 0
     user.invitation = req.body?.inviteCode
 
-    user.setPassword(req.body?.password)
-
     // TODO -> make this admin configurable
     if (user.invitation) {
       const invitation = await this.invitationService.get(user.invitation)
@@ -56,6 +83,8 @@ export default class UserServiceImpl implements UserService {
       throw new InvalidInvitationCodeError()
     }
 
+    this.validatePassword(req.body?.password || '')
+    user.setPassword(req.body?.password)
     await validateUser(user)
 
     const existingUsernameUser = await this.userRepository.getByUsername(user.username)
@@ -75,7 +104,8 @@ export default class UserServiceImpl implements UserService {
 
       return new UserMapper().toViewModel(savedUser)
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -106,7 +136,8 @@ export default class UserServiceImpl implements UserService {
 
       return { success: true }
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -142,6 +173,9 @@ export default class UserServiceImpl implements UserService {
   }
 
   async saveUser(user: User): Promise<ApiServiceResult<void>> {
+    if (!user.created) {
+      user.created = new Date()
+    }
     await validateUser(user)
 
     try {

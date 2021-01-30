@@ -60,7 +60,8 @@ export default class InvitationApplicationServiceImpl
 
       throw new Error('error creating new invitation')
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
@@ -85,53 +86,59 @@ export default class InvitationApplicationServiceImpl
 
       return new ApiServiceSuccessResult(mappedInvitations)
     } catch (error) {
-      throw new UnknownError(error.message)
+      console.error(error)
+      throw new UnknownError()
     }
   }
 
   async sendInvitationEmail(req: any): Promise<ApiServiceResult<InvitationViewModel>> {
-    const recipientEmail = req.body?.email || ''
+    try {
+      const recipientEmail = req.body?.email || ''
 
-    if (!recipientEmail) {
-      throw new InvalidEmailError()
+      if (!recipientEmail) {
+        throw new InvalidEmailError()
+      }
+
+      const invitation = await this.invitationService.get(req.params.id)
+
+      if (!invitation) {
+        throw new InvitationNotFoundError()
+      }
+
+      if (invitation.used) {
+        throw new InvitationAlreadyUsedError()
+      }
+
+      if (invitation.sent && invitation.sentToEmail !== recipientEmail) {
+        throw new InvitationAlreadySentError()
+      }
+
+      // TODO -> send email
+      const sendEmailResult = await this.emailAppService.sendInvitationEmail(
+        recipientEmail,
+        invitation.id
+      )
+
+      if (!sendEmailResult) {
+        throw new InvitationEmailSendError()
+      }
+
+      invitation.sent = true
+      invitation.sentToEmail = recipientEmail
+      invitation.sentOn = new Date() // TODO -> get this from email send result?
+
+      const savedInvitation = await this.invitationService.update(invitation)
+      const createdByUser = await this.userService.getById(invitation.createdByUser)
+
+      if (savedInvitation) {
+        return new ApiServiceSuccessResult(new InvitationMapper().toViewModel(savedInvitation, createdByUser || undefined))
+      }
+
+      return { success: false }
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError()
     }
-
-    const invitation = await this.invitationService.get(req.params.id)
-
-    if (!invitation) {
-      throw new InvitationNotFoundError()
-    }
-
-    if (invitation.used) {
-      throw new InvitationAlreadyUsedError()
-    }
-
-    if (invitation.sent && invitation.sentToEmail !== recipientEmail) {
-      throw new InvitationAlreadySentError()
-    }
-
-    // TODO -> send email
-    const sendEmailResult = await this.emailAppService.sendInvitationEmail(
-      recipientEmail,
-      invitation.id
-    )
-
-    if (!sendEmailResult) {
-      throw new InvitationEmailSendError()
-    }
-
-    invitation.sent = true
-    invitation.sentToEmail = recipientEmail
-    invitation.sentOn = new Date() // TODO -> get this from email send result?
-
-    const savedInvitation = await this.invitationService.update(invitation)
-    const createdByUser = await this.userService.getById(invitation.createdByUser)
-
-    if (savedInvitation) {
-      return new ApiServiceSuccessResult(new InvitationMapper().toViewModel(savedInvitation, createdByUser || undefined))
-    }
-
-    return { success: false }
   }
 
   registerEvents() {

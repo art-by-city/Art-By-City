@@ -6,7 +6,7 @@
           class="preview-artwork"
           max-height="75vh"
           max-width="75vw"
-          :src="getImageSource(previewImage)"
+          :src="getImageSource(previewImage, $config.imgBaseUrl)"
           contain
           @click="onPreviewArtworkClicked"
         ></v-img>
@@ -20,7 +20,7 @@
           >
             <v-img
               aspect-ratio="1.7"
-              :src="getImageSource(image)"
+              :src="getImageSource(image, $config.imgBaseUrl)"
               class="clickable"
               :class="{ 'highlighted': image === previewImage }"
               @click="setPreviewImage(image)"
@@ -49,7 +49,10 @@
           </v-row>
         </v-col>
         <v-col cols="5">
-          <ArtistTag :user="artwork.owner" />
+          <ArtistTag
+            :user="artwork.owner"
+            :baseUrl="$config.imgBaseUrl"
+          />
           <div class="text-lowercase">{{ artwork.type }}</div>
           <div class="text-lowercase">{{ cityName }}</div>
           <div class="text-lowercase">{{ hashtagsString }}</div>
@@ -74,7 +77,7 @@
       <ArtworkZoomDialog
         v-if="previewImage"
         :show.sync="zoom"
-        :src="getImageSource(previewImage)"
+        :src="getImageSource(previewImage, $config.imgBaseUrl)"
       />
 
       <v-dialog
@@ -82,7 +85,11 @@
         persistent
         max-width="40vw"
       >
-        <ArtworkEditForm :artwork="artwork" />
+        <ArtworkEditForm
+          :artwork="artwork"
+          :baseUrl="$config.imgBaseUrl"
+          @previewImageChanged="setPreviewImage()"
+        />
       </v-dialog>
     </v-container>
   </div>
@@ -101,7 +108,6 @@ import Artwork, {
   ArtworkImageFile,
   getImageSource
 } from '~/models/artwork/artwork'
-import ArtworkType from '~/models/artwork/artworkType'
 import ProgressService from '~/services/progress/service'
 import { debounce } from '~/helpers/helpers'
 
@@ -192,10 +198,10 @@ export default class ArtworkPage extends FormPageComponent {
     return this.artwork.hashtags.map((h) => { return `#${h}` }).join(', ')
   }
 
-  setPreviewImage(image: ArtworkImageFile) {
-    if (!this.editMode) {
-      this.previewImage = image
-    }
+  setPreviewImage(image?: ArtworkImageFile) {
+    this.previewImage = image
+      ? image
+      : this.artwork.images[0]
   }
 
   @debounce

@@ -13,6 +13,8 @@ import { AnalyticsModule } from './core/analytics'
 import { InvitationModule } from './core/invitation'
 import { EmailModule } from './core/email'
 import { FileModule } from './core/file'
+import { ChangelogModule } from './core/changelog'
+
 import GatewayModule from './gateway'
 import DatabaseModule from './core/db/module'
 
@@ -31,6 +33,8 @@ container.load(AnalyticsModule)
 container.load(InvitationModule)
 container.load(EmailModule)
 container.load(FileModule)
+container.load(ChangelogModule)
+
 container.load(GatewayModule)
 container.load(DatabaseModule)
 

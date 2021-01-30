@@ -6,12 +6,14 @@ import { CityService, City } from '../city'
 import { ArtworkType } from '../artwork'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import UnknownError from '../api/errors/unknownError'
+import { ChangelogService } from '../changelog'
 
 @injectable()
 export default class ConfigServiceImpl implements ConfigService {
   private hashtagService: HashtagService
   private cityService: CityService
   private configRepository: ConfigRepository
+  private changelogService: ChangelogService
 
   constructor(
     @inject(Symbol.for('HashtagService'))
@@ -19,36 +21,46 @@ export default class ConfigServiceImpl implements ConfigService {
     @inject(Symbol.for('CityService'))
     cityService: CityService,
     @inject(Symbol.for('ConfigRepository'))
-    configRepository: ConfigRepository
+    configRepository: ConfigRepository,
+    @inject(Symbol.for('ChangelogService'))
+    changelogService: ChangelogService
   ) {
     this.hashtagService = hashtagService
     this.cityService = cityService
     this.configRepository = configRepository
+    this.changelogService = changelogService
   }
 
   async getConfig(): Promise<ConfigViewModel> {
-    const config = await this.configRepository.get()
-    return {
-      cities: (await this.cityService.list()).sort((a: City, b: City) => {
-        if (a.disabled === b.disabled) {
-          return a.name.localeCompare(b.name)
-        } else if (a.disabled && !b.disabled) {
-          return 1
-        } else {
-          return -1
-        }
-      }),
-      hashtags: (await this.hashtagService.list()).map((h: Hashtag) => h.hashtag),
-      maxUserArtworks: config?.maxUserArtworks || 10,
-      artworkTypes: config?.artworkTypes.sort((a: ArtworkType, b: ArtworkType) => {
-        if (a.enabled === b.enabled) {
-          return a.name.localeCompare(b.name)
-        } else if (!a.enabled && b.enabled) {
-          return 1
-        } else {
-          return -1
-        }
-      }) || []
+    try {
+      const config = await this.configRepository.get()
+      const changelog = await this.changelogService.getChangelog()
+      return {
+        cities: (await this.cityService.list()).sort((a: City, b: City) => {
+          if (a.disabled === b.disabled) {
+            return a.name.localeCompare(b.name)
+          } else if (a.disabled && !b.disabled) {
+            return 1
+          } else {
+            return -1
+          }
+        }),
+        hashtags: (await this.hashtagService.list()).map((h: Hashtag) => h.hashtag),
+        maxUserArtworks: config?.maxUserArtworks || 10,
+        artworkTypes: config?.artworkTypes.sort((a: ArtworkType, b: ArtworkType) => {
+          if (a.enabled === b.enabled) {
+            return a.name.localeCompare(b.name)
+          } else if (!a.enabled && b.enabled) {
+            return 1
+          } else {
+            return -1
+          }
+        }) || [],
+        changelogLatestVersion: changelog.entries[0].version
+      }
+    } catch (error) {
+      console.error(error)
+      throw new UnknownError('Error fetching config')
     }
   }
 
@@ -70,8 +82,8 @@ export default class ConfigServiceImpl implements ConfigService {
 
       return { success: true }
     } catch (error) {
-      console.error(error.message)
-      throw new UnknownError()
+      console.error(error)
+      throw new UnknownError('Error updating config')
     }
   }
 }

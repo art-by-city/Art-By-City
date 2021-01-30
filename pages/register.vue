@@ -107,7 +107,6 @@ import {
   repeatPasswordRules,
   inviteCodeRules
 } from '~/models/user/validation'
-import { ConfigStoreState, DefaultConfigStoreState } from '~/store/config'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import { debounce } from '~/helpers/helpers'
 
@@ -166,7 +165,10 @@ export default class RegisterPage extends FormPageComponent {
 
     if (registrationResult && registrationResult.token) {
       try {
-        await this.$auth.setUserToken(registrationResult.token)
+        await this.$auth.setUserToken(
+          registrationResult.token,
+          registrationResult.refresh_token
+        )
         this.$router.push({ path: '/' })
       } catch (err) {
         // TODO -> Sentry

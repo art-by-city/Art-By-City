@@ -52,11 +52,11 @@ export default class ArtworkServiceImpl implements ArtworkService {
       : this.artworkRepository.list()
   }
 
-  listByUser(user: User): Promise<Artwork[]> {
+  listByUser(user: User, opts?: ArtworkFilterOptions): Promise<Artwork[]> {
     return this.artworkRepository.find({
       owner: user.id,
-      includeUnapproved: false,
-      includeUnpublished: false
+      includeUnapproved: opts?.includeUnapproved || false,
+      includeUnpublished: opts?.includeUnpublished || false
     })
   }
 
