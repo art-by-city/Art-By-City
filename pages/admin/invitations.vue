@@ -117,9 +117,7 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
-import ProgressService from '~/services/progress/service'
 import Invitation from '~/models/invitation'
-import InvitationService from '~/services/invitation/service'
 import { emailRules } from '~/models/user/validation'
 import { debounce } from '~/helpers/helpers'
 
@@ -178,7 +176,7 @@ export default class AdminInvitationsPage extends FormPageComponent {
   async onCopyInviteLinkClicked(invitation: Invitation) {
     try {
       await navigator.clipboard.writeText(
-        `${process.env.baseUrl}/register?invite=${invitation.id}`
+        `${this.$config.baseUrl}/register?invite=${invitation.id}`
       )
       this.$toastService.info('invitation link copied to clipboard')
     } catch (error) {}
