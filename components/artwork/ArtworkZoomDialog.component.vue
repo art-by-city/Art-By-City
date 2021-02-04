@@ -26,16 +26,26 @@
           :style="zoomImageStyle"
         />
       </div>
-      <div class="artwork-zoom-controls">
-        <span class="white--text">{{ $data.width }}, {{ $data.height }}</span>
-        <v-btn icon @click="onZoomButtonClicked(-0.1)">
-          <v-icon color="white">mdi-magnify-minus</v-icon>
-        </v-btn>
-        <v-btn icon @click="onZoomButtonClicked(0.1)">
-          <v-icon color="white">mdi-magnify-plus</v-icon>
-        </v-btn>
-        <span class="white--text">{{ Math.round((zoomFactor+1)*100) }}%</span>
-      </div>
+      <v-container class="artwork-zoom-controls">
+        <v-row>
+          <v-col cols="1" offset="6">
+            <v-btn icon @click="onCloseZoomDialog">
+              <v-icon dark color="white">mdi-close-circle</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="2" offset="3" style="text-align: right;">
+            <v-btn icon @click="onZoomButtonClicked(-0.1)">
+              <v-icon color="white">mdi-magnify-minus</v-icon>
+            </v-btn>
+            <v-btn icon @click="onZoomButtonClicked(0.1)">
+              <v-icon color="white">mdi-magnify-plus</v-icon>
+            </v-btn>
+            <span class="white--text">
+              {{ Math.round((zoomFactor+1)*100) }}%
+            </span>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-dialog>
   </div>
 </template>
@@ -224,8 +234,7 @@ export default class ArtworkZoomDialog extends Vue {
 .artwork-zoom-controls {
   z-index: 9993;
   position: absolute;
-  top: 95vh;
-  left: 90vw;
+  padding-top: 0px;
   cursor: pointer;
 }
 </style>
