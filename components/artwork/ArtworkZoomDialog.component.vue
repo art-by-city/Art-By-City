@@ -27,20 +27,20 @@
         />
       </div>
       <v-container class="artwork-zoom-controls">
-        <v-row>
+        <v-row @click="onCloseZoomDialog">
           <v-col cols="1" offset="6">
             <v-btn icon @click="onCloseZoomDialog">
               <v-icon dark color="white">mdi-close-circle</v-icon>
             </v-btn>
           </v-col>
           <v-col cols="2" offset="3" style="text-align: right;">
-            <v-btn icon @click="onZoomButtonClicked(-0.1)">
+            <v-btn icon @click.stop="onZoomButtonClicked(-0.1)">
               <v-icon color="white">mdi-magnify-minus</v-icon>
             </v-btn>
-            <v-btn icon @click="onZoomButtonClicked(0.1)">
+            <v-btn icon @click.stop="onZoomButtonClicked(0.1)">
               <v-icon color="white">mdi-magnify-plus</v-icon>
             </v-btn>
-            <span class="white--text">
+            <span @click.stop class="white--text">
               {{ Math.round((zoomFactor+1)*100) }}%
             </span>
           </v-col>
@@ -61,8 +61,10 @@ const ZOOM_LOWER_LIMIT: number = -0.9
 @Component
 export default class ArtworkZoomDialog extends Vue {
   isDragging: boolean = false
+  _width: number | 'auto' = 'auto'
   width: number | 'auto' = 'auto'
   height: number | 'auto' = 'auto'
+  _height: number | 'auto' = 'auto'
   left: number = 0
   top: number = 0
   offsetX: number = 0
@@ -82,13 +84,6 @@ export default class ArtworkZoomDialog extends Vue {
     required: true
   }) readonly src!: string
 
-  private setImageDimensions() {
-    if (this.$refs.zoomImage) {
-      this.width = (<Element>this.$refs.zoomImage).clientWidth
-      this.height = (<Element>this.$refs.zoomImage).clientHeight
-    }
-  }
-
   private reset() {
     this.left = 0
     this.top = 0
@@ -96,8 +91,9 @@ export default class ArtworkZoomDialog extends Vue {
     this.offsetY = 0
     this.mouseDownX = 0
     this.mouseDownY = 0
-    delete this.width
-    delete this.height
+    this.width = this._width
+    this.height = this._height
+    this.zoomFactor = 0
   }
 
   private startDragging(x: number, y: number) {
@@ -160,11 +156,18 @@ export default class ArtworkZoomDialog extends Vue {
     this.magnify(evt.deltaY / 1000)
   }
 
+  private setImageDimensions() {
+    if (this.$refs.zoomImage) {
+      this._width = (<Element>this.$refs.zoomImage).clientWidth
+      this.width = this._width
+      this._height = (<Element>this.$refs.zoomImage).clientHeight
+      this.height = this._height
+    }
+  }
+
   get zoomImageStyle() {
     if (
-      !this.width
-      || !this.height
-      || this.width === 'auto'
+      this.width === 'auto'
       || this.height === 'auto') {
       this.setImageDimensions()
     }
@@ -235,6 +238,5 @@ export default class ArtworkZoomDialog extends Vue {
   z-index: 9993;
   position: absolute;
   padding-top: 0px;
-  cursor: pointer;
 }
 </style>
