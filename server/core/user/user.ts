@@ -4,8 +4,7 @@ import {
   IsString,
   ArrayUnique,
   IsNotEmpty,
-  IsEmail,
-  IsNotIn
+  IsEmail
 } from 'class-validator'
 import crypto from 'crypto'
 
@@ -29,22 +28,7 @@ export default class User extends Entity {
   @IsEmail()
   email!: string
 
-  // @Matches(/[\s!"#$%&'()*+,-./\\:;<=>?@[\]^_`{|}~]/, {
-  //   message: 'Passwords must contain at least 1 symbol'
-  // })
   @IsString()
-  // @MinLength(8, {
-  //   message: 'Passwords must be at least 8 characters'
-  // })
-  // @Matches(/[a-z]/, {
-  //   message: 'Passwords must contain at least 1 lowercase character'
-  // })
-  // @Matches(/[A-Z]/, {
-  //   message: 'Passwords must contain at least 1 uppercase character'
-  // })
-  // @Matches(/[0-9]/, {
-  //   message: 'Passwords must contain at least 1 number'
-  // })
   password?: string
 
   @IsString()

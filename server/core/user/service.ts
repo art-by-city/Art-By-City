@@ -14,6 +14,10 @@ import InvalidInvitationCodeError from '../api/errors/invalidInvitationCodeError
 import { UserAvatar } from './user'
 import ValidationError from '../api/errors/validationError'
 
+const DISALLOWED_USERNAMES = [
+  'artwork', 'admin', 'artist'
+]
+
 @injectable()
 export default class UserServiceImpl implements UserService {
   private userRepository: UserRepository
@@ -66,7 +70,6 @@ export default class UserServiceImpl implements UserService {
     user.id = ''
     user.created = new Date()
     user.updated = new Date()
-    user.username = req.body?.username || ''
     user.email = req.body?.email || ''
     user.city = req.body?.city || ''
     user.roles = []
@@ -83,6 +86,10 @@ export default class UserServiceImpl implements UserService {
       throw new InvalidInvitationCodeError()
     }
 
+    if (DISALLOWED_USERNAMES.includes(req.body?.username)) {
+      throw new ValidationError(['Username not allowed'])
+    }
+    user.username = req.body?.username
     this.validatePassword(req.body?.password || '')
     user.setPassword(req.body?.password)
     await validateUser(user)
