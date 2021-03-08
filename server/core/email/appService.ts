@@ -16,14 +16,17 @@ export default class EmailApplicationServiceImpl {
   sendInvitationEmail(recipientEmail: string, inviteCode: string): Promise<boolean> {
     try {
       const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+      const registrationUrl = `${baseUrl}/register?invite=${inviteCode}`
+
       return this.emailService.sendEmail({
         to: recipientEmail,
         from: 'welcome@artby.city', // TODO -> admin configurable
         subject: 'Invitation to join Art x By x City', // TODO -> admin configurable
-        text:
+        html:
           `
-          <p>Hi!  You've been sent an invitation to join Art x By x City'</p>
-          <p>Sign up here: <a href='${baseUrl}/register?invite=${inviteCode}'></a></p>
+          <p>Hi!</p>
+          <p>You've been sent an invitation to join Art x By x City</p>
+          <p>Sign up <a href='${registrationUrl}'>here</a> (${registrationUrl})</p>
           ` // TODO -> from email template
       })
     } catch (error) {

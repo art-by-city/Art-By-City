@@ -260,7 +260,7 @@ export default class AuthControllerImpl implements AuthController {
         }
       } catch (error) {
         console.error(error)
-        next(new UnknownError())
+        next(error)
       }
     })
 

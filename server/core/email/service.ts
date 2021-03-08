@@ -1,31 +1,43 @@
-import { injectable, inject } from 'inversify'
+import { injectable } from 'inversify'
 import nodemailer from 'nodemailer'
 
 import { Email } from './'
-import InvitationEmailSendError from '../invitation/errors/InvitationEmailSendError'
+import EmailSendError from './sendError'
 
 @injectable()
 export default class EmailServiceImpl {
   async sendEmail(email: Email): Promise<boolean> {
-    const transporter = nodemailer.createTransport({
-      jsonTransport: true
-    })
+    const isProduction = process.env.NODE_ENV === 'production'
+      || process.env.NODE_ENV === 'staging'
+
+    const transporter = !isProduction
+      ? nodemailer.createTransport({
+          jsonTransport: true
+        })
+      : nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: 587,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      })
 
     try {
       const result = await transporter.sendMail(email)
-
-      // TODO -> check environment from an environmentService or helper
-      if (process.env.NODE_ENV === 'development' && result.messageId) { // TODO -> use this for DEV
-        console.log(result.message)
+      if (result.messageId) {
+        console.log(
+          isProduction
+            ? `Email sent: ${result.messageId}`
+            : result.message
+        )
         return true
       }
 
-      //if ((result.accepted?.length || 0) > 0) { // TODO -> use this for STAGING/PROD
-      // }
-
-      throw new InvitationEmailSendError()
+      throw new EmailSendError()
     } catch (error) {
-      throw new InvitationEmailSendError()
+      console.error('EmailService Error', error)
+      throw new EmailSendError()
     }
   }
 }
