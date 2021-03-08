@@ -17,6 +17,7 @@ export default class EmailApplicationServiceImpl {
     try {
       const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
       const registrationUrl = `${baseUrl}/register?invite=${inviteCode}`
+
       return this.emailService.sendEmail({
         to: recipientEmail,
         from: 'welcome@artby.city', // TODO -> admin configurable
