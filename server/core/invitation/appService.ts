@@ -113,7 +113,6 @@ export default class InvitationApplicationServiceImpl
         throw new InvitationAlreadySentError()
       }
 
-      // TODO -> send email
       const sendEmailResult = await this.emailAppService.sendInvitationEmail(
         recipientEmail,
         invitation.id
