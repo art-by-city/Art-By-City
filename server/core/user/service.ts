@@ -86,13 +86,10 @@ export default class UserServiceImpl implements UserService {
       throw new InvalidInvitationCodeError()
     }
 
-<<<<<<< HEAD
-=======
     if (DISALLOWED_USERNAMES.includes(req.body?.username)) {
       throw new ValidationError(['Username not allowed'])
     }
     user.username = req.body?.username
->>>>>>> master
     this.validatePassword(req.body?.password || '')
     user.setPassword(req.body?.password)
     await validateUser(user)
