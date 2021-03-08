@@ -26,18 +26,6 @@
           :style="zoomImageStyle"
         />
       </div>
-<<<<<<< HEAD
-      <div class="artwork-zoom-controls">
-        <span class="white--text">{{ $data.width }}, {{ $data.height }}</span>
-        <v-btn icon @click="onZoomButtonClicked(-0.1)">
-          <v-icon color="white">mdi-magnify-minus</v-icon>
-        </v-btn>
-        <v-btn icon @click="onZoomButtonClicked(0.1)">
-          <v-icon color="white">mdi-magnify-plus</v-icon>
-        </v-btn>
-        <span class="white--text">{{ Math.round((zoomFactor+1)*100) }}%</span>
-      </div>
-=======
       <v-container class="artwork-zoom-controls">
         <v-row @click="onCloseZoomDialog">
           <v-col cols="1" offset="6">
@@ -58,7 +46,6 @@
           </v-col>
         </v-row>
       </v-container>
->>>>>>> master
     </v-dialog>
   </div>
 </template>
@@ -180,13 +167,7 @@ export default class ArtworkZoomDialog extends Vue {
 
   get zoomImageStyle() {
     if (
-<<<<<<< HEAD
-      !this.width
-      || !this.height
-      || this.width === 'auto'
-=======
       this.width === 'auto'
->>>>>>> master
       || this.height === 'auto') {
       this.setImageDimensions()
     }
