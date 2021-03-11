@@ -92,3 +92,6 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# Firestore Export Directory
+data-export/
