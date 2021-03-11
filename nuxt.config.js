@@ -30,7 +30,8 @@ export default {
    */
   css: [
     '@assets/global.scss',
-    '~/node_modules/cropperjs/dist/cropper.css'
+    '~/node_modules/cropperjs/dist/cropper.css',
+    '~/node_modules/shepherd.js/dist/css/shepherd.css'
   ],
   /*
    ** Plugins to load before mounting the App
@@ -39,7 +40,8 @@ export default {
     '~/plugins/axios',
     '~/plugins/components.ts',
     '~/plugins/services.ts',
-    '~/plugins/filters.ts'
+    '~/plugins/filters.ts',
+    { src: '~/plugins/shepherd.ts', mode: 'client' }
   ],
   /*
    ** Nuxt.js dev-modules

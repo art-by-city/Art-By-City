@@ -75,6 +75,38 @@ export default class HomePage extends PageComponent {
       return { payload, options }
     }
   }
+
+  created() {
+    // console.log()
+    this.$nextTick(this.checkStartTour)
+  }
+
+  // updated() {
+  //   this.$nextTick(this.checkStartTour)
+  // }
+
+  checkStartTour() {
+    if (this.$tourService.shouldShowTour(this.constructor.name)) {
+      const tour = this.$shepherd({
+        useModalOverlay: true
+      })
+
+      tour.addStep({
+        id: 'welcome',
+        title: 'welcome',
+        text: 'welcome to art by city!'
+      })
+
+      const completeCancel = ['complete', 'cancel']
+      completeCancel.forEach((event: string) => {
+        tour.on(event, () => {
+          this.$tourService.markTourSeen(this.constructor.name)
+        })
+      })
+
+      tour.start()
+    }
+  }
 }
 </script>
 

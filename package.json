@@ -60,6 +60,7 @@
     "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "sass-loader": "^7.0.0",
+    "shepherd.js": "^8.1.0",
     "vee-validate": "^3.3.0",
     "vuedraggable": "^2.24.1"
   },
