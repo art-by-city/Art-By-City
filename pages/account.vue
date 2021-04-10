@@ -2,73 +2,78 @@
   <v-container fluid>
     <v-row justify="center">
       <v-col cols="4">
-        <v-card>
-          <v-card-title class="text-lowercase">Account Settings</v-card-title>
-          <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="save">
-              <v-text-field
-                v-model="login.id"
-                type="text"
-                label="Id"
-                class="text-lowercase"
-                disabled
-              ></v-text-field>
+        <v-expansion-panels accordion>
+          <v-expansion-panel>
+            <v-expansion-panel-header>Ethereum</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              ethereum wallet stuff here
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel-header>Arweave</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              arweave wallet stuff here
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header>Account</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-form ref="form" v-model="valid" @submit.prevent="save">
+                <v-text-field
+                  v-model="login.username"
+                  type="text"
+                  label="Username"
+                  class="text-lowercase"
+                  disabled
+                ></v-text-field>
 
-              <v-text-field
-                v-model="login.username"
-                type="text"
-                label="Username"
-                class="text-lowercase"
-                disabled
-              ></v-text-field>
+                <v-text-field
+                  v-model="login.email"
+                  type="text"
+                  label="Email"
+                  class="text-lowercase"
+                  disabled
+                ></v-text-field>
 
-              <v-text-field
-                v-model="login.email"
-                type="text"
-                label="Email"
-                class="text-lowercase"
-                disabled
-              ></v-text-field>
+                <CitySelector
+                  v-model="userCity"
+                  :cities="$store.state.config.cities"
+                  disabled
+                />
 
-              <CitySelector
-                v-model="userCity"
-                :cities="$store.state.config.cities"
-                disabled
-              />
+                <v-text-field
+                  v-model="login.password"
+                  type="password"
+                  label="Current Password"
+                  class="text-lowercase"
+                  :rules="required"
+                  autocomplete="new-password"
+                ></v-text-field>
 
-              <v-text-field
-                v-model="login.password"
-                type="password"
-                label="Current Password"
-                class="text-lowercase"
-                :rules="required"
-                autocomplete="new-password"
-              ></v-text-field>
+                <v-text-field
+                  v-model="newPassword"
+                  type="password"
+                  label="New Password"
+                  class="text-lowercase"
+                  :rules="passwordRules"
+                  autocomplete="new-password"
+                ></v-text-field>
 
-              <v-text-field
-                v-model="newPassword"
-                type="password"
-                label="New Password"
-                class="text-lowercase"
-                :rules="passwordRules"
-                autocomplete="new-password"
-              ></v-text-field>
+                <v-text-field
+                  v-model="repeatPassword"
+                  type="password"
+                  label="Repeat New Password"
+                  class="text-lowercase"
+                  :rules="repeatPasswordRules(newPassword)"
+                  autocomplete="new-password"
+                ></v-text-field>
 
-              <v-text-field
-                v-model="repeatPassword"
-                type="password"
-                label="Repeat New Password"
-                class="text-lowercase"
-                :rules="repeatPasswordRules(newPassword)"
-                autocomplete="new-password"
-              ></v-text-field>
-
-              <v-btn type="submit" color="primary" class="text-lowercase">
-                Save
-              </v-btn>
-            </v-form>
-          </v-card-text>
-        </v-card>
+                <v-btn type="submit" color="primary" class="text-lowercase">
+                  Save
+                </v-btn>
+              </v-form>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-col>
     </v-row>
   </v-container>
