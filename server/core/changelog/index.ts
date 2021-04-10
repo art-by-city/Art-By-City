@@ -28,7 +28,6 @@ export interface ChangelogController extends BaseControllerInterface {}
 export interface ChangelogApplicationService
   extends BaseApplicationServiceInterface {
   getChangelogForUser(userId: string): Promise<ChangelogViewModel>
-  markVersionSeenForUser(userId: string, version: string): Promise<true>
 }
 
 export interface ChangelogService {
@@ -41,10 +40,8 @@ export const ChangelogModule = new ContainerModule((bind) => {
   )
   bind<ChangelogApplicationService>(
     Symbol.for('ChangelogApplicationService')
-  ).to(
-    ChangelogApplicationServiceImpl
-  )
-  bind<ChangelogService>(Symbol.for('ChangelogService')).to(
-    ChangelogServiceImpl
-  ).inSingletonScope()
+  ).to(ChangelogApplicationServiceImpl)
+  bind<ChangelogService>(Symbol.for('ChangelogService'))
+    .to(ChangelogServiceImpl)
+    .inSingletonScope()
 })

@@ -1,6 +1,13 @@
 <template>
   <v-app dark>
-    <v-app-bar v-if="isLoggedIn" :clipped-left="true" fixed app dense elevation="1">
+    <v-app-bar
+      v-if="isLoggedIn"
+      :clipped-left="true"
+      fixed
+      app
+      dense
+      elevation="1"
+    >
       <v-row>
         <v-col cols="4">
           <v-menu offset-y>
@@ -110,7 +117,7 @@
             dot
             overlap
             color="rgb(110, 81, 255)"
-            :value="shouldChangelogIconBlink"
+            :value="shouldChangelogIconBlink()"
             class="notification-icon"
           >
             <nuxt-link class="white--text mr-2" to="/changelog">
@@ -136,7 +143,11 @@
         {{ toast.message }}
         <template v-slot:close="{ toggle }">
           <v-btn
-            rounded icon dark small aria-label="Close"
+            rounded
+            icon
+            dark
+            small
+            aria-label="Close"
             @click="removeToast(toast)"
           >
             <v-icon dark>mdi-close-circle</v-icon>
@@ -148,7 +159,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Vue, Component, Watch } from 'nuxt-property-decorator'
 
 import { NavItem } from '../components/types'
 import ToastMessage from '~/models/toasts/toastMessage'
@@ -231,16 +242,8 @@ export default class DefaultLayout extends Vue {
     return ''
   }
 
-  get shouldChangelogIconBlink(): boolean {
-    if (
-      this.user
-      && this.user.changelogLastVersionViewed
-        !== this.$store.state.config.changelogLatestVersion
-    ) {
-      return true
-    }
-
-    return false
+  shouldChangelogIconBlink(): boolean {
+    return !this.$changelogService.hasSeenLatestChangelog()
   }
 
   toasts: ToastMessage[] = []
@@ -249,16 +252,27 @@ export default class DefaultLayout extends Vue {
   }
 
   created() {
-    this.$store.watch(state => state.toasts.list, () => {
-      this.toasts = this.$store.state.toasts.list
-    })
+    this.$store.watch(
+      (state) => state.toasts.list,
+      () => {
+        this.toasts = this.$store.state.toasts.list
+      }
+    )
+    this.$store.watch(
+      (state) => state.auth.user.changelogLastVersionViewed,
+      () => {
+        this.$forceUpdate()
+      }
+    )
   }
 
   private filterNavItemsForUserRoles(navItems: NavItem[]): NavItem[] {
     return navItems.filter(
       (navItem) =>
         !navItem.only ||
-        navItem.only.every((role) => this.user && this.user?.roles?.includes(role))
+        navItem.only.every(
+          (role) => this.user && this.user?.roles?.includes(role)
+        )
     )
   }
 
@@ -297,10 +311,18 @@ div.v-toolbar__content div.v-toolbar__title a {
 }
 
 @keyframes blink {
-  0%   {background-color: red;}
-  25%  {background-color: yellow;}
-  50%  {background-color: blue;}
-  100% {background-color: green;}
+  0% {
+    background-color: red;
+  }
+  25% {
+    background-color: yellow;
+  }
+  50% {
+    background-color: blue;
+  }
+  100% {
+    background-color: green;
+  }
 }
 
 /* rgb(110, 81, 255) */
