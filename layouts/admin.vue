@@ -46,7 +46,8 @@ export default class AdminLayout extends Vue {
     { text: 'Config', icon: 'mdi-card-bulleted-settings', to: '/admin/config' },
     { text: 'Cities', icon: 'mdi-map', to: '/admin/cities' },
     { text: 'Event Log', icon: 'mdi-table-clock', to: '/admin/events' },
-    { text: 'Theme', icon: 'mdi-theme-light-dark', to: '/admin/theme' }
+    { text: 'Theme', icon: 'mdi-theme-light-dark', to: '/admin/theme' },
+    { text: 'Web3 Sandbox', icon: 'mdi-ethereum', to: '/admin/web3' }
   ]
 
   get breadcrumbs(): Breadcrumb[] {

@@ -37,6 +37,8 @@
     "@types/passport": "^1.0.3",
     "@types/passport-jwt": "^3.0.3",
     "@types/passport-local": "^1.0.33",
+    "@types/prop-types": "^15.7.3",
+    "@types/react": "^17.0.3",
     "@types/swagger-jsdoc": "^3.0.2",
     "@types/swagger-ui-express": "^4.1.2",
     "body-parser": "^1.19.0",
@@ -61,7 +63,9 @@
     "reflect-metadata": "^0.1.13",
     "sass-loader": "^7.0.0",
     "vee-validate": "^3.3.0",
-    "vuedraggable": "^2.24.1"
+    "vuedraggable": "^2.24.1",
+    "web3": "^1.3.4",
+    "web3modal": "^1.9.3"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
