@@ -179,11 +179,6 @@ export default class DefaultLayout extends Vue {
     return [
       {
         icon: 'mdi-account',
-        title: 'my account',
-        to: '/account'
-      },
-      {
-        icon: 'mdi-account',
         title: 'my profile',
         to: `/${this.$auth.user?.username || ''}`
       },
@@ -191,6 +186,11 @@ export default class DefaultLayout extends Vue {
         icon: 'mdi-folder-multiple-image',
         title: 'my portfolio',
         to: '/portfolio'
+      },
+      {
+        icon: 'mdi-account-settings',
+        title: 'settings',
+        to: '/settings'
       }
     ]
   }
