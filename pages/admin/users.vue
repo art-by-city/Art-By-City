@@ -73,7 +73,7 @@ import { debounce } from '~/helpers/helpers'
   layout: 'admin'
 })
 export default class AdminUserPage extends FormPageComponent {
-  roles = ['admin', 'artist']
+  roles = ['admin', 'artist', 'crypto']
   users: any[] = []
   cities: any[] = []
 
