@@ -1,21 +1,13 @@
 <template>
   <v-container fluid>
     <v-row justify="center">
+      <h2 class="text-lowercase">Settings</h2>
+    </v-row>
+    <v-row justify="center">
       <v-col cols="4">
-        <v-expansion-panels accordion>
+        <v-expansion-panels popout>
           <v-expansion-panel>
-            <v-expansion-panel-header>Ethereum</v-expansion-panel-header>
-            <v-expansion-panel-content>
-              ethereum wallet stuff here
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel-header>Arweave</v-expansion-panel-header>
-            <v-expansion-panel-content>
-              arweave wallet stuff here
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header>Account</v-expansion-panel-header>
+            <v-expansion-panel-header class="text-lowercase">Account</v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-form ref="form" v-model="valid" @submit.prevent="save">
                 <v-text-field
@@ -71,6 +63,22 @@
                   Save
                 </v-btn>
               </v-form>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header class="text-lowercase">
+              Ethereum Wallet
+            </v-expansion-panel-header>
+            <v-expansion-panel-content class="text-lowercase">
+              ethereum wallet stuff here
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header class="text-lowercase">
+              Arweave Wallet
+            </v-expansion-panel-header>
+            <v-expansion-panel-content class="text-lowercase">
+              arweave wallet stuff here
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
