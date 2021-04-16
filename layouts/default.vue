@@ -258,12 +258,14 @@ export default class DefaultLayout extends Vue {
         this.toasts = this.$store.state.toasts.list
       }
     )
-    this.$store.watch(
-      (state) => state.auth.user.changelogLastVersionViewed,
-      () => {
-        this.$forceUpdate()
-      }
-    )
+    if (this.$auth.loggedIn) {
+      this.$store.watch(
+        (state) => state.auth.user.changelogLastVersionViewed,
+        () => {
+          this.$forceUpdate()
+        }
+      )
+    }
   }
 
   private filterNavItemsForUserRoles(navItems: NavItem[]): NavItem[] {
