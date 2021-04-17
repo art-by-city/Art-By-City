@@ -55,7 +55,7 @@
     "markdown-it": "^12.0.4",
     "moment": "^2.27.0",
     "nodemailer": "^6.4.11",
-    "nuxt": "^2.15.4",
+    "nuxt": "^2.14.8",
     "nuxt-property-decorator": "^2.7.2",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
