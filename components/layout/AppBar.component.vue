@@ -111,11 +111,6 @@ export default class AppBar extends Vue {
 
   @Emit('logout') onLogoutClicked() {}
 
-  // Props TODO
-  // - user
-  // - config
-
-
   leftNavItems: NavItem[] = [
     {
       icon: 'mdi-apps',
