@@ -111,6 +111,7 @@
 
     <v-footer dark>
       <div class="text-lowercase">
+        <nuxt-link class="white--text mr-2" to="/">Home</nuxt-link>
         <nuxt-link class="white--text mr-2" to="/about">About</nuxt-link>
         <template v-if="isLoggedIn">
           <v-badge
