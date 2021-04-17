@@ -18,7 +18,9 @@
       </template>
     </div>
     <v-spacer></v-spacer>
-    <div>&copy; art x by x city {{ new Date().getFullYear() }}</div>
+    <div class="text-lowercase text-body-2">
+      &copy; art x by x city {{ new Date().getFullYear() }}
+    </div>
   </v-footer>
 </template>
 
