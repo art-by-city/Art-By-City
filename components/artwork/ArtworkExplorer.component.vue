@@ -4,6 +4,7 @@
       :opts.sync="opts"
       @refresh="refresh"
       @previous="previous"
+      :dense="shouldToolbarBeDense"
     />
     <v-divider></v-divider>
     <div class="artwork-explorer-container">
@@ -56,8 +57,24 @@ export default class ArtworkExplorer extends Vue {
     required: true
   }) readonly baseUrl!: string
 
+  @Prop({
+    type: String,
+    required: true
+  }) readonly displayBreakpoint!: string
+
   modalArtwork: any | null = null
   searched: boolean = false
+
+  get shouldToolbarBeDense(): boolean {
+    switch (this.displayBreakpoint) {
+      case 'xs': return true
+      case 'sm': return true
+      case 'md': return false
+      case 'lg': return false
+      case 'xl': return false
+        default: return false
+    }
+  }
 
   get _artworks() {
     return this.$store.state.artworks.list

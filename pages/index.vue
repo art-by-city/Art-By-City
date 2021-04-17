@@ -5,6 +5,7 @@
         :initial.sync="payload"
         :options.sync="options"
         :baseUrl="$config.imgBaseUrl"
+        :displayBreakpoint="$vuetify.breakpoint.name"
       />
     </template>
     <template v-if="!$auth.loggedIn">
