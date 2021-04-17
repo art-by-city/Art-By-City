@@ -10,18 +10,14 @@
     <template v-if="!$auth.loggedIn">
       <v-row style="height: 45vh" align="end">
         <v-col cols="12" style="text-align: center;">
-          <span class="splash-logo" @click="expand = !expand">
-            art x by x city
-          </span>
+          <SplashLogo @click="expand = !expand" />
         </v-col>
       </v-row>
       <v-expand-transition>
-        <v-row v-show="expand" >
-          <v-col cols="1" offset="5" style="text-align: center;">
-            <nuxt-link to="/login">login</nuxt-link>
-          </v-col>
-          <v-col cols="1" style="text-align: center;">
-            <nuxt-link to="/register">sign up</nuxt-link>
+        <v-row v-show="expand" justify="center">
+          <v-col cols="12" style="text-align: center;">
+            <v-btn text class="text-lowercase" to="/login">login</v-btn>
+            <v-btn text class="text-lowercase" to="/register">sign up</v-btn>
           </v-col>
         </v-row>
       </v-expand-transition>
@@ -81,7 +77,6 @@ export default class HomePage extends PageComponent {
 <style scoped>
 .splash-logo {
   color: black;
-  font-size: 72px;
   text-decoration: none;
   cursor: pointer;
 }
