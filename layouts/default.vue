@@ -13,27 +13,10 @@
       </v-container>
     </v-main>
 
-    <v-footer dark>
-      <div class="text-lowercase">
-        <nuxt-link class="white--text mr-2" to="/">Home</nuxt-link>
-        <nuxt-link class="white--text mr-2" to="/about">About</nuxt-link>
-        <template v-if="$auth.loggedIn">
-          <v-badge
-            dot
-            overlap
-            color="rgb(110, 81, 255)"
-            :value="shouldChangelogIconBlink()"
-            class="notification-icon"
-          >
-            <nuxt-link class="white--text mr-2" to="/changelog">
-              What's New
-            </nuxt-link>
-          </v-badge>
-        </template>
-      </div>
-      <v-spacer></v-spacer>
-      <div>&copy; art x by x city {{ new Date().getFullYear() }}</div>
-    </v-footer>
+    <Footer
+      :isLoggedIn="$auth.loggedIn"
+      :shouldChangelogIconBlink="shouldChangelogIconBlink()"
+    />
 
     <div class="toast-alerts-container">
       <v-alert
@@ -68,11 +51,12 @@ import { Vue, Component } from 'nuxt-property-decorator'
 
 import ToastMessage from '~/models/toasts/toastMessage'
 import User, { getUser } from '../models/user/user'
-import { AppBar } from '~/components/layout'
+import { AppBar, Footer } from '~/components/layout'
 
 @Component({
   components: {
-    AppBar
+    AppBar,
+    Footer
   }
 })
 export default class DefaultLayout extends Vue {
