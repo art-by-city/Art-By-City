@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container v-if="artwork">
-      <v-row v-if="previewImage" dense justify="center">
+      <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
         <v-img
           class="preview-artwork"
           max-height="75vh"
@@ -11,7 +11,7 @@
           @click="onPreviewArtworkClicked"
         ></v-img>
       </v-row>
-      <v-row dense justify="center">
+      <v-row dense justify="center" v-if="artwork.images.length > 1">
         <div class="artwork-image-selector-container">
           <div
             class="artwork-image-selector"
@@ -35,12 +35,15 @@
         </v-col>
       </v-row>
       <v-row dense>
-        <v-col offset="2" cols="5">
+        <v-col offset="1" offset-sm="2" cols="6" sm="5">
           <v-row dense>
-            <span class="text-lowercase text-h2">{{ artwork.title }}</span>
-            <div style="align-self: flex-end">
-              <LikeButton :artwork="artwork"/>
-            </div>
+            <span class="text-lowercase text-h4 text-sm-h2">{{ artwork.title }}</span>
+          </v-row>
+          <v-row dense>
+            <ArtistTag
+              :user="artwork.owner"
+              :baseUrl="$config.imgBaseUrl"
+            />
           </v-row>
           <v-row dense>
             <div class="text-lowercase" style="width: 100%">
@@ -49,10 +52,9 @@
           </v-row>
         </v-col>
         <v-col cols="5">
-          <ArtistTag
-            :user="artwork.owner"
-            :baseUrl="$config.imgBaseUrl"
-          />
+          <div style="align-self: flex-end">
+            <LikeButton :artwork="artwork"/>
+          </div>
           <div class="text-lowercase">{{ artwork.type }}</div>
           <div class="text-lowercase">{{ cityName }}</div>
           <div class="text-lowercase">{{ hashtagsString }}</div>
@@ -199,6 +201,8 @@ export default class ArtworkPage extends FormPageComponent {
   get hashtagsString() {
     return this.artwork.hashtags.map((h) => { return `#${h}` }).join(', ')
   }
+
+
 
   setPreviewImage(image?: ArtworkImageFile) {
     this.previewImage = image
