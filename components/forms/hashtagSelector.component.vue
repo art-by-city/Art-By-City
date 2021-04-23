@@ -15,6 +15,7 @@
       :items="filteredHashtags"
       no-filter
       hide-selected
+      hide-details="auto"
       :search-input.sync="hashtagSearchInput"
       @input="onHashtagInput"
       @update:search-input="onHashtagUpdateSearchInput"
@@ -120,15 +121,9 @@ export default class HashtagSelector extends Vue {
   margin-top: 0px;
 }
 .hashtag-selector.dense
-  >>> .v-text-field__details {
-  position: relative;
-  left: 15px;
-  top: 5px;
-}
-.hashtag-selector.dense
   >>> .v-input__control {
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 /* Chips */
