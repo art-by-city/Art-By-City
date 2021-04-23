@@ -1,6 +1,6 @@
 <template>
   <v-footer dark>
-    <div class="text-lowercase text-body-2">
+    <div class="text-lowercase text-caption">
       <nuxt-link class="white--text mr-2" to="/">Home</nuxt-link>
       <nuxt-link class="white--text mr-2" to="/about">About</nuxt-link>
       <template v-if="isLoggedIn">
@@ -18,7 +18,7 @@
       </template>
     </div>
     <v-spacer></v-spacer>
-    <div class="text-lowercase text-body-2">
+    <div class="text-lowercase text-caption">
       &copy; art x by x city {{ new Date().getFullYear() }}
     </div>
   </v-footer>
