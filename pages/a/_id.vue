@@ -102,8 +102,10 @@ import { Component } from 'nuxt-property-decorator'
 import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkZoomDialog from '~/components/artwork/ArtworkZoomDialog.component.vue'
-import ArtworkEditControls from '~/components/artwork/ArtworkEditControls.component.vue'
-import ArtworkEditForm from '~/components/artwork/ArtworkEditForm.component.vue'
+import {
+  ArtworkEditControls,
+  ArtworkEditForm
+} from '~/components/artwork/edit'
 import Artwork, {
   ArtworkImageFile,
   getImageSource

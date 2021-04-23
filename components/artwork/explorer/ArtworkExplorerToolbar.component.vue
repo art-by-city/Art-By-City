@@ -1,6 +1,6 @@
 <template>
-  <v-container fluid class="pa-0 pb-5">
-    <v-row>
+  <div class="pa-2 pt-3 pb-5 artwork-explorer-toolbar-container">
+    <v-row justify="center" style="margin-left: 0px;">
       <v-col cols="3" sm="3" class="pa-0">
         <CitySelector
           v-model="opts.city"
@@ -9,7 +9,7 @@
           @input="onRefresh"
         />
       </v-col>
-      <v-col cols="9" sm="4" offset-sm="1" class="pa-0 pl-5 pl-sm-0">
+      <v-col cols="9" sm="4" offset-sm="1" class="pa-0 pl-5 pr-5 pl-sm-0">
         <HashtagSelector
           v-model="opts.hashtags"
           :hashtags="hashtags"
@@ -18,7 +18,7 @@
         />
       </v-col>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts">

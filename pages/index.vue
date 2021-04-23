@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%">
+  <div class="index-page-wrapper" style="height: 100%">
     <template v-if="$auth.loggedIn">
       <ArtworkExplorer
         :initial.sync="payload"
@@ -31,7 +31,7 @@ import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
-import ArtworkExplorer from '~/components/artwork/ArtworkExplorer.component.vue'
+import { ArtworkExplorer } from '~/components/artwork/explorer'
 
 @Component({
   components: {
