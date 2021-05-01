@@ -4,8 +4,8 @@
       <h2 class="text-lowercase">Settings</h2>
     </v-row>
     <v-row justify="center">
-      <v-col cols="4">
-        <v-expansion-panels popout>
+      <v-col cols="11" sm="6">
+        <v-expansion-panels popout readonly :value="0">
           <v-expansion-panel>
             <v-expansion-panel-header class="text-lowercase">Account</v-expansion-panel-header>
             <v-expansion-panel-content>
@@ -65,7 +65,7 @@
               </v-form>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-expansion-panel>
+          <!-- <v-expansion-panel>
             <v-expansion-panel-header class="text-lowercase">
               Ethereum Wallet
             </v-expansion-panel-header>
@@ -80,7 +80,7 @@
             <v-expansion-panel-content class="text-lowercase">
               arweave wallet stuff here
             </v-expansion-panel-content>
-          </v-expansion-panel>
+          </v-expansion-panel> -->
         </v-expansion-panels>
       </v-col>
     </v-row>
