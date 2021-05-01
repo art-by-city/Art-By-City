@@ -1,5 +1,5 @@
 <template>
-  <div class="pa-2 pt-3 pb-5 artwork-explorer-toolbar-container">
+  <v-container fluid class="artwork-explorer-toolbar-container pb-5 pt-5">
     <v-row justify="center" style="margin-left: 0px;">
       <v-col cols="3" sm="3" class="pa-0">
         <CitySelector
@@ -18,7 +18,7 @@
         />
       </v-col>
     </v-row>
-  </div>
+  </v-container>
 </template>
 
 <script lang="ts">
