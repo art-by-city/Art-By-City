@@ -26,7 +26,6 @@
         :type="toast.type"
         dismissible
         transition="fade-transition"
-        width="20vw"
       >
         {{ toast.message }}
         <template v-slot:close="{ toggle }">
