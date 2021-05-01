@@ -51,7 +51,7 @@
               <UserAvatar
                 :user="user"
                 :baseUrl="config.imgBaseUrl"
-                small
+                dense
                 abbr
               />
             </v-btn>
