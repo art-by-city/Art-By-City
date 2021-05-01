@@ -7,7 +7,7 @@
     />
 
     <v-main>
-      <v-container fluid class="pl-0 pr-0" style="height: 100%">
+      <v-container fluid class="pl-0 pr-0 pt-0" style="height: 100%">
         <nuxt v-if="!$slots.default" />
         <slot />
       </v-container>

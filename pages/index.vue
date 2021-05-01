@@ -8,9 +8,12 @@
         :displayBreakpoint="$vuetify.breakpoint.name"
       />
     </template>
-    <template v-if="!$auth.loggedIn">
+    <v-container fluid v-if="!$auth.loggedIn">
       <v-row style="height: 45vh" align="end">
-        <v-col cols="12" style="text-align: center;">
+        <v-col
+          cols="12"
+          style="text-align: center;"
+        >
           <SplashLogo @click="expand = !expand" />
         </v-col>
       </v-row>
@@ -22,7 +25,7 @@
           </v-col>
         </v-row>
       </v-expand-transition>
-    </template>
+    </v-container>
   </div>
 </template>
 
