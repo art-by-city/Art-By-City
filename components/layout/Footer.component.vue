@@ -1,5 +1,5 @@
 <template>
-  <v-footer dark>
+  <v-footer dark style="z-index: 5;">
     <div class="text-lowercase text-caption">
       <nuxt-link class="white--text mr-2" to="/">Home</nuxt-link>
       <nuxt-link class="white--text mr-2" to="/about">About</nuxt-link>
