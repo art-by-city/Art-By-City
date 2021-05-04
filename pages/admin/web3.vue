@@ -1,24 +1,20 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="4">
-        <v-card flat outlined>
-          <v-card-title>Authentication Test</v-card-title>
-          <v-card-text>
-            <ul v-if="accounts">
-              <li v-for="(account, i) in accounts">{{ account }}</li>
-            </ul>
-            <span v-else>please authenticate</span>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn @click="authClicked">
-              Auth
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div class="admin-web3-sandbox">
+    <v-card flat outlined>
+      <v-card-title>Authentication Test</v-card-title>
+      <v-card-text>
+        <ul v-if="accounts">
+          <li v-for="(account, i) in accounts">{{ account }}</li>
+        </ul>
+        <span v-else>please authenticate</span>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="authClicked">
+          Auth
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">

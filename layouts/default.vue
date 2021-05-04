@@ -100,6 +100,7 @@ export default class DefaultLayout extends Vue {
   position: fixed;
   bottom: 32px;
   right: 32px;
+  z-index: 5;
 }
 
 .progress-bar {
