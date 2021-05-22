@@ -88,8 +88,8 @@
         </draggable>
       </div>
     </v-row>
-    <v-row v-if="!cropMode" dense>
-      <v-col>
+    <v-row v-if="!cropMode" dense justify="center">
+      <v-col cols="12" md="auto">
         <v-text-field
           v-model="artwork.title"
           type="text"
@@ -293,7 +293,8 @@ export default class ArtworkEditForm extends Vue {
 <style scoped>
 .artwork-edit-form {
   background-color: white;
-  padding: 12px 120px;
+  padding: 12px 48px;
+  width: 100%;
 }
 .artwork-upload-button.v-text-field {
   margin-top: 0px;

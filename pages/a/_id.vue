@@ -85,7 +85,7 @@
       <v-dialog
         :value="editMode"
         persistent
-        max-width="40vw"
+        :max-width="editDialogMaxWidth"
       >
         <ArtworkEditForm
           :artwork="artwork"
@@ -174,6 +174,25 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
+  get isMobile() {
+    switch (this.$vuetify.breakpoint.name) {
+      case 'xs':
+      case 'sm':
+      case 'md': return true
+      case 'lg':
+      case 'xl':
+        default: return false
+    }
+  }
+
+  get editDialogMaxWidth() {
+    if (this.isMobile) {
+      return '1785px'
+    }
+
+    return '500px'
+  }
+
   get isNew() {
     return !this.artwork.id || this.artwork.id === 'new'
   }
@@ -201,8 +220,6 @@ export default class ArtworkPage extends FormPageComponent {
   get hashtagsString() {
     return this.artwork.hashtags.map((h) => { return `#${h}` }).join(', ')
   }
-
-
 
   setPreviewImage(image?: ArtworkImageFile) {
     this.previewImage = image
