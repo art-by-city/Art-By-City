@@ -65,12 +65,31 @@ export default class UserServiceImpl implements UserService {
     }
   }
 
+  private normalizeUserIdentifier(value: string) {
+    return value.toLowerCase()
+  }
+
+  private async checkUsernameTaken(username: string) {
+    const normalizedUsername = username.toLowerCase()
+    if (await this.userRepository.getByUsername(normalizedUsername)) {
+      throw new UsernameAlreadyTakenError()
+    }
+  }
+
+  private async checkEmailTaken(email: string) {
+    const normalizedEmail = email.toLowerCase()
+    if (await this.userRepository.getByEmail(normalizedEmail)) {
+      throw new EmailAlreadyTakenError()
+    }
+  }
+
   async register(req: any): Promise<UserViewModel> {
     const user = new User()
     user.id = ''
     user.created = new Date()
     user.updated = new Date()
     user.email = req.body?.email || ''
+    user.email = user.email.toLowerCase()
     user.city = req.body?.city || ''
     user.roles = []
     user.artworkCount = 0
@@ -90,19 +109,13 @@ export default class UserServiceImpl implements UserService {
       throw new ValidationError(['Username not allowed'])
     }
     user.username = req.body?.username
+    user.username = user.username.toLowerCase()
     this.validatePassword(req.body?.password || '')
     user.setPassword(req.body?.password)
+
     await validateUser(user)
-
-    const existingUsernameUser = await this.userRepository.getByUsername(user.username)
-    if (existingUsernameUser) {
-      throw new UsernameAlreadyTakenError()
-    }
-
-    const existingEmailUser = await this.userRepository.getByEmail(user.email)
-    if (existingEmailUser) {
-      throw new EmailAlreadyTakenError()
-    }
+    await this.checkUsernameTaken(user.username)
+    await this.checkEmailTaken(user.email)
 
     try {
       const savedUser = await this.userRepository.create(user)
@@ -183,6 +196,10 @@ export default class UserServiceImpl implements UserService {
     if (!user.created) {
       user.created = new Date()
     }
+
+    user.username = user.username.toLowerCase()
+    user.email = user.email.toLowerCase()
+
     await validateUser(user)
 
     try {
