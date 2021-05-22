@@ -10,6 +10,10 @@ import { Artwork } from './'
 export default async (artwork: Artwork): Promise<void> => {
   const internalProps = ['id', 'created', 'updated', 'owner', 'likes']
 
+  if (!artwork.description) {
+    artwork.description = ''
+  }
+
   if (!artwork.likes) {
     artwork.likes = []
   }

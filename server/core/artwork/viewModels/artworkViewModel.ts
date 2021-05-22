@@ -54,7 +54,7 @@ export default interface ArtworkViewModel extends ViewModel {
   updated: Date
   owner: UserViewModel
   title: string
-  description: string
+  description?: string
   type: string
   city: string
   hashtags: string[]
