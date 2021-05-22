@@ -1,14 +1,15 @@
 <template>
-  <v-container fluid class="pa-0 pb-5">
-    <v-row>
-      <v-col cols="3" class="pa-0">
+  <v-container fluid class="artwork-explorer-toolbar-container pb-5 pt-5">
+    <v-row justify="center" style="margin-left: 0px;">
+      <v-col cols="3" sm="3" class="pa-0">
         <CitySelector
           v-model="opts.city"
           :cities="cities"
+          :dense="dense"
           @input="onRefresh"
         />
       </v-col>
-      <v-col offset="1" cols="4" class="pa-0">
+      <v-col cols="9" sm="4" offset-sm="1" class="pa-0 pl-5 pr-5 pl-sm-0">
         <HashtagSelector
           v-model="opts.hashtags"
           :hashtags="hashtags"
@@ -40,6 +41,12 @@ export default class ArtworkExplorerToolbar extends Vue {
   hashtags = this.$store.state.config.hashtags
   fuzzyHashtags = new Fuse(this.hashtags, { includeScore: true })
   hashtagSearchInput: string = ''
+
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly dense: boolean | undefined
 
   @Prop({
     default: {

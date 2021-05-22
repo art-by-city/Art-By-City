@@ -15,10 +15,10 @@
       :items="filteredHashtags"
       no-filter
       hide-selected
+      hide-details="auto"
       :search-input.sync="hashtagSearchInput"
       @input="onHashtagInput"
       @update:search-input="onHashtagUpdateSearchInput"
-      attach="#hashtagSelector"
       :rules="rules"
     >
       <template v-slot:selection="data">
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Model, Watch } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
 import Fuse from 'fuse.js'
 
 const MAX_HASHTAG_LENGTH = 32
@@ -121,15 +121,9 @@ export default class HashtagSelector extends Vue {
   margin-top: 0px;
 }
 .hashtag-selector.dense
-  >>> .v-text-field__details {
-  position: relative;
-  left: 15px;
-  top: 5px;
-}
-.hashtag-selector.dense
   >>> .v-input__control {
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 /* Chips */
@@ -139,18 +133,20 @@ export default class HashtagSelector extends Vue {
   height: 16px;
 }
 
+/* Chip Close Button */
+.hashtag-selector.dense
+  >>> .v-select__selections
+  > .v-chip
+  > .v-chip__content
+  > .v-chip__close {
+  font-size: 12px !important;
+}
+
 /* Font */
 .hashtag-selector.dense
   >>> .v-select__selections {
   text-transform: lowercase;
   min-height: 24px;
-}
-.hashtag-selector.dense
-  >>> .v-select__selections
-  > .v-chip
-  > .v-chip__content
-  > .v-icon {
-  font-size: 14px;
 }
 .hashtag-selector.dense
   >>> .v-select__selections

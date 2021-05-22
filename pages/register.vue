@@ -1,14 +1,13 @@
 <template>
   <v-container fluid>
     <v-row justify="center" align="center">
-      <v-col cols="2">
-        <h1 style="font-weight: normal">art x by x city</h1>
+      <v-col cols="12" style="text-align: center;">
+        <SplashLogo />
       </v-col>
     </v-row>
     <v-row justify="center">
-      <v-col cols="4">
+      <v-col cols="12" sm="8" md="6" lg="4">
         <v-card>
-          <v-card-title class="text-lowercase">Sign Up</v-card-title>
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="register" autocomplete="off">
               <v-text-field
@@ -84,7 +83,7 @@
                 </v-alert>
               </template>
 
-              <v-btn type="submit" color="primary" class="text-lowercase">
+              <v-btn text type="submit" class="text-lowercase">
                 Sign Up
               </v-btn>
             </v-form>

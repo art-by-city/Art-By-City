@@ -50,11 +50,12 @@ export default class User extends Entity {
 
   avatar?: UserAvatar
 
-  changelogLastVersionSeen?: string
-
   private saltAndHash(password: string): string {
     if (!this.salt) {
-      this.salt = crypto.randomBytes(Math.ceil(8)).toString('hex').slice(0,16)
+      this.salt = crypto
+        .randomBytes(Math.ceil(8))
+        .toString('hex')
+        .slice(0, 16)
     }
 
     const hash = crypto.createHmac('sha512', this.salt)

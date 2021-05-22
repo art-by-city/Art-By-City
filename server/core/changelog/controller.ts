@@ -43,18 +43,6 @@ export default class ChangelogControllerImpl implements ChangelogController {
       }
     })
 
-    router.post('/mark', async (req, res, next) => {
-      try {
-        const userId = (<User>req.user)?.id || ''
-        const version = req.body.version
-        const result = await this.changelogAppService.markVersionSeenForUser(userId, version)
-
-        return res.send(result)
-      } catch (error) {
-        next(error)
-      }
-    })
-
     return router
   }
 }

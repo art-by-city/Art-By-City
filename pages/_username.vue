@@ -2,34 +2,47 @@
   <div class="user-profile-page">
     <v-container v-if="profile" fluid>
       <v-row align="end">
-        <v-col cols="2" offset="3">
+        <v-col
+          cols="1" offset="3"
+            sm="2" offset-sm="3"
+        >
           <UserAvatar
             class="user-profile-avatar"
             :user="profile.user"
             :baseUrl="$config.imgBaseUrl"
             :editable="$auth.user.id === profile.user.id"
+            :size="$vuetify.breakpoint.name"
             @onChange="onUserAvatarChanged"
           />
         </v-col>
-        <v-col cols="4">
+        <v-col
+          cols="6" offset="2"
+            sm="4" offset-sm="1"
+        >
           <v-hover>
             <template v-slot:default="props">
               <div class="user-profile-info">
-                <div class="user-profile-username text-lowercase">
+                <div class="
+                  user-profile-username
+                  text-lowercase
+                  font-weight-black
+                  text-body-1
+                  text-sm-h2
+                ">
                   {{ profile.user.username }}
                 </div>
                 <div class="text-caption text-lowercase">
                   <span v-if="!editMode">{{ profile.user.name }}</span>
-                    <v-text-field
-                      v-if="editMode"
-                      v-model="profile.user.name"
-                      type="text"
-                      name="name"
-                      label="Name"
-                      class="text-lowercase"
-                      autocomplete="off"
-                      aria-autocomplete="off"
-                    ></v-text-field>
+                  <v-text-field
+                    v-if="editMode"
+                    v-model="profile.user.name"
+                    type="text"
+                    name="name"
+                    label="Name"
+                    class="text-lowercase"
+                    autocomplete="off"
+                    aria-autocomplete="off"
+                  ></v-text-field>
                 </div>
                 <div class="text-caption text-lowercase">
                   {{ profile.user.city }}
@@ -62,12 +75,15 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="6" offset="3">
+        <v-col cols="10" offset="1" sm="6" offset-sm="3">
           <v-divider></v-divider>
         </v-col>
       </v-row>
       <v-row>
-        <v-col cols="6" offset="3">
+        <v-col
+          cols="12"
+            sm="6"  offset-sm="3"
+        >
           <v-row>
             <v-col
               v-for="(artwork, i) in profile.artworks"
@@ -158,10 +174,8 @@ export default class UserProfilePage extends PageComponent {
 
 <style scoped>
 .user-profile-username {
-  font-weight: 300;
-  font-size: 3.75rem;
-  letter-spacing: -0.03125rem;
   margin-left: -3px;
+  word-break: break-word;
 }
 .user-profile-city {
   font-weight: 400;

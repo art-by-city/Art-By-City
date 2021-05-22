@@ -1,6 +1,6 @@
 <template>
   <v-hover v-slot:default="hoverProps">
-    <v-avatar :color="currentColor" :size="size">
+    <v-avatar :color="currentColor" :size="_size">
       <template v-if="user.avatar">
         <v-img :src="src"></v-img>
       </template>
@@ -47,10 +47,15 @@ export default class UserAvatar extends Vue {
   }) readonly color!: string
 
   @Prop({
+    type: String,
+    required: false
+  }) readonly size!: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined
+
+  @Prop({
     type: Boolean,
     required: false,
     default: false
-  }) readonly small: boolean | undefined
+  }) readonly dense: boolean | undefined
 
   @Prop({
     type: Boolean,
@@ -82,10 +87,19 @@ export default class UserAvatar extends Vue {
       : this.user.username
   }
 
-  get size() {
-    return this.small
-      ? '32'
-      : '192'
+  get _size() {
+    if (this.dense) {
+      return 32
+    }
+
+    switch (this.size) {
+      case 'xs': return 128
+      case 'sm':
+      case 'md':
+      case 'lg':
+      case 'xl':
+        default: return 192
+    }
   }
 
   get src() {

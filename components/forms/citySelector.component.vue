@@ -18,10 +18,14 @@
       validate-on-blur
     >
       <template v-slot:item="{ item }">
-        <span class="text-lowercase">{{ item.name }}</span>
+        <span class="text-lowercase text-truncate">
+          {{ item.name }}
+        </span>
       </template>
       <template v-slot:selection="{ item }">
-        <span class="text-lowercase">{{ item.name }}</span>
+        <span class="text-lowercase text-truncate">
+          {{ dense ? item.code : item.name }}
+        </span>
       </template>
     </v-autocomplete>
   </div>
@@ -40,16 +44,25 @@ interface City {
 @Component
 export default class CitySelector extends Vue {
   @Model('input', { type: String, required: true }) value!: string
+
   @Prop({
     type: Boolean,
     required: false,
     default: false
   }) readonly disabled: boolean | undefined
+
   @Prop({
     type: Boolean,
     required: false,
     default: false
   }) readonly required: boolean | undefined
+
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly dense: boolean | undefined
+
   @Prop({ type: Array }) readonly cities!: City[]
 
   private isValidCity(cityId: string): boolean {

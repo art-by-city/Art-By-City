@@ -8,9 +8,7 @@
     <v-row justify="center">
       <v-col cols="auto">
         <v-timeline dense class="changelog-timeline">
-          <template
-            v-for="(entry, i) in changelog.entries"
-          >
+          <template v-for="(entry, i) in changelog.entries">
             <v-timeline-item
               large
               fill-dot
@@ -18,10 +16,7 @@
               class="changelog-timeline-item"
               icon="mdi-flag-checkered"
             >
-              <a
-                class="text-decoration-none"
-                :href="`#${entry.version}`"
-              >
+              <a class="text-decoration-none" :href="`#${entry.version}`">
                 <h2 class="pt-2 black--text">
                   {{ entry.version }}
                 </h2>
@@ -33,7 +28,11 @@
               fill-dot
               small
               :color="change.type === 'feature' ? 'info' : 'error'"
-              :icon="change.type === 'feature' ? 'mdi-gift-outline' : 'mdi-bug-outline'"
+              :icon="
+                change.type === 'feature'
+                  ? 'mdi-gift-outline'
+                  : 'mdi-bug-outline'
+              "
             >
               <span class="pt-2 body-2 text-lowercase" style="max-width:400px">
                 {{ change.content }}
@@ -71,28 +70,11 @@ export default class ChangelogPage extends PageComponent {
   }
 
   mounted() {
-    this.markLastVersionSeen()
+    this.$changelogService.markLatestChangelogSeen()
   }
 
   get user(): User | null {
     return getUser(this.$auth.user)
-  }
-
-  async markLastVersionSeen() {
-    if (
-      this.user
-      && this.user.changelogLastVersionViewed
-        !== this.$store.state.config.changelogLatestVersion
-    ) {
-      const { changelogLastVersionViewed, ...user } = this.user
-      this.$auth.setUser({
-        ...user,
-        changelogLastVersionViewed: this.$store.state.config.changelogLatestVersion
-      })
-      this.$axios.$post('/api/changelog/mark', {
-        version: this.$store.state.config.changelogLatestVersion
-      })
-    }
   }
 }
 </script>

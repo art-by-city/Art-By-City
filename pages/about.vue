@@ -1,16 +1,17 @@
 <template>
   <v-container fluid style="width: 100%;">
     <v-row justify="center">
-      <v-col cols="auto">
-        <h1 class="text-lowercase">About art x by x city</h1>
+      <v-col cols="12" style="text-align: center;">
+        <SplashLogo />
       </v-col>
     </v-row>
     <v-row justify="center">
       <v-col cols="auto">
         <p>
-          Welcome to the Alpha Phase of <strong>art x by city</strong>.
+          <strong>art x by city</strong> is currently undergoing an invite-only
+          alpha phase.
         </p>
-        <p>More should be written here!</p>
+        <p>check back later for more details.</p>
       </v-col>
     </v-row>
   </v-container>

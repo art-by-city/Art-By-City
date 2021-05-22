@@ -11,8 +11,8 @@
     "start": "nuxt-ts start",
     "generate": "nuxt-ts generate",
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
-    "firestore": "firebase emulators:start --project art-by-city-dev --only firestore --import=./data",
-    "firestore:export": "firebase emulators:export --only firestore --project art-by-city-dev ./data",
+    "firestore": "firebase emulators:start --project art-by-city-dev --only firestore --import=./data-export",
+    "firestore:export": "firebase emulators:export --only firestore --project art-by-city-dev ./data-export",
     "cleanup-local-dev-images": "node scripts/cleanup-abandoned-dev-images.js",
     "docs": "nodemon -e js,ts,json,mjs ./server/docs/server.js",
     "deploy:staging": "gcloud app deploy app.staging.yaml --project art-by-city-staging-299519",
@@ -37,6 +37,8 @@
     "@types/passport": "^1.0.3",
     "@types/passport-jwt": "^3.0.3",
     "@types/passport-local": "^1.0.33",
+    "@types/prop-types": "^15.7.3",
+    "@types/react": "^17.0.3",
     "@types/swagger-jsdoc": "^3.0.2",
     "@types/swagger-ui-express": "^4.1.2",
     "body-parser": "^1.19.0",
@@ -61,7 +63,9 @@
     "reflect-metadata": "^0.1.13",
     "sass-loader": "^7.0.0",
     "vee-validate": "^3.3.0",
-    "vuedraggable": "^2.24.1"
+    "vuedraggable": "^2.24.1",
+    "web3": "^1.3.4",
+    "web3modal": "^1.9.3"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",

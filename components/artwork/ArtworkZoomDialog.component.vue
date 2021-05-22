@@ -13,8 +13,11 @@
         <div
           class="artwork-zoom-image-overlay"
           @mousemove="onImgMouseMove"
+          @touchmove="onImgTouchMove"
           @mousedown="onImgMouseDown"
+          @touchstart="onImgTouchStart"
           @mouseup="onImgMouseUp"
+          @touchend="onImgTouchEnd"
           @wheel="onMouseWheel"
         >
         </div>
@@ -27,13 +30,13 @@
         />
       </div>
       <v-container class="artwork-zoom-controls">
-        <v-row @click="onCloseZoomDialog">
-          <v-col cols="1" offset="6">
+        <v-row justify="center" @click="onCloseZoomDialog">
+          <v-col cols="1" offset="2" md="1" offset-md="6">
             <v-btn icon @click="onCloseZoomDialog">
               <v-icon dark color="white">mdi-close-circle</v-icon>
             </v-btn>
           </v-col>
-          <v-col cols="2" offset="3" style="text-align: right;">
+          <v-col cols="auto" offset="1" md="2" offset-md="3" style="text-align: right;">
             <v-btn icon @click.stop="onZoomButtonClicked(-0.1)">
               <v-icon color="white">mdi-magnify-minus</v-icon>
             </v-btn>
@@ -108,26 +111,44 @@ export default class ArtworkZoomDialog extends Vue {
     this.isDragging = false
   }
 
+  private handleDrag(x: number, y: number) {
+    const diffX = x - this.mouseDownX
+    const diffY = y - this.mouseDownY
+    this.left = this.offsetX + diffX
+    this.top = this.offsetY + diffY
+  }
+
   @debounce
   onCloseZoomDialog() {
     this.zoom = false
+    this.isDragging = false
     this.reset()
   }
 
+  onImgTouchStart(evt: TouchEvent) {
+    evt.preventDefault()
+    this.startDragging(evt.touches[0].clientX, evt.touches[0].clientY)
+  }
   onImgMouseDown(evt: MouseEvent) {
     evt.preventDefault()
     this.startDragging(evt.clientX, evt.clientY)
   }
 
+  onImgTouchMove(evt: TouchEvent) {
+    if (this.isDragging) {
+      this.handleDrag(evt.touches[0].clientX, evt.touches[0].clientY)
+    }
+  }
   onImgMouseMove(evt: MouseEvent) {
     if (this.isDragging) {
-      const diffX = evt.clientX - this.mouseDownX
-      const diffY = evt.clientY - this.mouseDownY
-      this.left = this.offsetX + diffX
-      this.top = this.offsetY + diffY
+      this.handleDrag(evt.clientX, evt.clientY)
     }
   }
 
+  onImgTouchEnd(evt: TouchEvent) {
+    evt.preventDefault()
+    this.stopDragging()
+  }
   onImgMouseUp(evt: MouseEvent) {
     evt.preventDefault()
     this.stopDragging()
@@ -148,6 +169,7 @@ export default class ArtworkZoomDialog extends Vue {
     }
   }
 
+  @debounce
   onZoomButtonClicked(factor: number) {
     this.magnify(factor)
   }

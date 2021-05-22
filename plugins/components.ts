@@ -1,13 +1,17 @@
 import Vue from 'vue'
 
-import DateWithTooltipComponent from '~/components/common/DateWithTooltip.component.vue'
-import UserAvatarComponent from '~/components/common/UserAvatar.component.vue'
-import ArtistTag from '~/components/common/ArtistTag.component.vue'
+import {
+  ArtistTag,
+  DateWithTooltip,
+  SplashLogo,
+  UserAvatar
+} from '~/components/common'
 
 Vue.use({
   install (vue) {
-    vue.component('DateWithTooltip', DateWithTooltipComponent)
-    vue.component('UserAvatar', UserAvatarComponent)
+    vue.component('DateWithTooltip', DateWithTooltip)
+    vue.component('UserAvatar', UserAvatar)
     vue.component('ArtistTag', ArtistTag)
+    vue.component('SplashLogo', SplashLogo)
   }
 })

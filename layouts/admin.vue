@@ -1,10 +1,13 @@
 <template>
   <default-layout>
-    <v-navigation-drawer absolute :value="true">
+    <v-navigation-drawer
+      fixed
+      clipped
+      permanent
+      :mini-variant="isMobile"
+      class="mt-10"
+    >
       <v-list>
-        <v-subheader>
-          <v-breadcrumbs large :items="breadcrumbs"></v-breadcrumbs>
-        </v-subheader>
         <v-list-item-group>
           <v-list-item v-for="(item, i) in adminPageLinks" :key="i" :to="item.to">
             <v-list-item-icon>
@@ -18,6 +21,11 @@
       </v-list>
     </v-navigation-drawer>
     <v-container fluid>
+      <v-row>
+        <v-col offset="2" cols="10">
+          <v-breadcrumbs :large="!isMobile" :items="breadcrumbs"></v-breadcrumbs>
+        </v-col>
+      </v-row>
       <v-row>
         <v-col offset="2" cols="10">
           <nuxt />
@@ -46,7 +54,8 @@ export default class AdminLayout extends Vue {
     { text: 'Config', icon: 'mdi-card-bulleted-settings', to: '/admin/config' },
     { text: 'Cities', icon: 'mdi-map', to: '/admin/cities' },
     { text: 'Event Log', icon: 'mdi-table-clock', to: '/admin/events' },
-    { text: 'Theme', icon: 'mdi-theme-light-dark', to: '/admin/theme' }
+    { text: 'Theme', icon: 'mdi-theme-light-dark', to: '/admin/theme' },
+    { text: 'Web3 Sandbox', icon: 'mdi-ethereum', to: '/admin/web3' }
   ]
 
   get breadcrumbs(): Breadcrumb[] {
@@ -78,6 +87,17 @@ export default class AdminLayout extends Vue {
     }
 
     return ''
+  }
+
+  get isMobile() {
+    switch (this.$vuetify.breakpoint.name) {
+      case 'xs':
+      case 'sm':
+      case 'md': return true
+      case 'lg':
+      case 'xl':
+        default: return false
+    }
   }
 }
 </script>

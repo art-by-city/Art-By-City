@@ -1,5 +1,15 @@
 # Changelog
 
+## [2021-05-22](#2021-05-22)
+
+### Features
+- Renamed Account page to Settings
+- Artwork description can be blank
+
+### Bug Fixes
+- Fixed various site-wide mobile responsiveness issues
+- Fixed changelog notification icon issues
+
 ## [2021-01-29](#2021-01-29)
 
 ### Features
