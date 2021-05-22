@@ -30,3 +30,9 @@ const _debounce = (
 }
 
 export const debounce: MethodDecorator = <AnyFunction>_debounce
+
+export function isTouchDevice() {
+  return (('ontouchstart' in window) ||
+     (navigator.maxTouchPoints > 0) ||
+     (navigator.msMaxTouchPoints > 0));
+}

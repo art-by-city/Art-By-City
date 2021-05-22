@@ -31,7 +31,7 @@ export default class Artwork extends Entity {
   @MaxLength(1024, {
     message: 'description must be less than $constraint1 characters'
   })
-  description!: string
+  description?: string
 
   @IsString()
   @IsNotEmpty()

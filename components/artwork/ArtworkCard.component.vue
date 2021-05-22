@@ -1,7 +1,7 @@
 <template>
   <div class="artwork-card">
     <div v-if="artwork">
-      <v-hover>
+      <v-hover :disabled="disabled">
         <template v-slot:default="props">
           <v-img
             v-if="artwork"
@@ -12,7 +12,7 @@
             @click="onArtworkCardClicked"
           >
             <v-fade-transition>
-              <v-overlay v-if="props.hover" absolute class="artwork-overlay">
+              <v-overlay v-if="!disabled && props.hover" absolute class="artwork-overlay">
                 <v-row align="end" class="fill-height pa-1">
                   <v-col
                     cols="auto"
@@ -26,7 +26,7 @@
                       class="artwork-card-disable-overlay"
                     ></div>
                     <LikeButton :dark="true" :artwork="artwork" />
-                    <a class="white--text text-lowercase">
+                    <a class="artwork-card-title white--text text-lowercase">
                       {{ artwork.title }}
                     </a>
                   </v-col>

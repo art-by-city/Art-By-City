@@ -39,7 +39,8 @@ export default {
     '~/plugins/axios',
     '~/plugins/components.ts',
     '~/plugins/services.ts',
-    '~/plugins/filters.ts'
+    '~/plugins/filters.ts',
+    { src: '~/plugins/web3.ts', mode: 'client' },
   ],
   /*
    ** Nuxt.js dev-modules

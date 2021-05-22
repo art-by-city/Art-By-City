@@ -1,63 +1,40 @@
 <template>
-  <v-simple-table dense fixed-header>
-    <thead>
-      <tr>
-        <th class="text-left text-lowercase">ID</th>
-        <th class="text-left text-lowercase">Username</th>
-        <th class="text-left text-lowercase">Email</th>
-        <th class="text-left text-lowercase">City</th>
-        <th class="text-left text-lowercase">Roles</th>
-        <th class="text-left text-lowercase">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="user in users" :key="user.id">
-        <td class="text-lowercase">{{ user.id }}</td>
-        <td class="text-lowercase">
-          <nuxt-link :to="`/${user.username}`">
-            {{ user.username }}
-          </nuxt-link>
-        </td>
-        <td class="text-lowercase">
-          {{ user.email }}
-        </td>
-        <td>
-          <v-select
-            v-model="user.city"
-            name="city"
-            label="City"
-            class="text-lowercase"
-            :items="cities"
-            prepend-icon="mdi-map"
-            item-text="name"
-            item-value="id"
-            item-disabled="disabled"
-          >
-            <template v-slot:item="{ item }">
-              <span class="text-lowercase">{{ item.name }}</span>
-            </template>
-          </v-select>
-        </td>
-        <td>
-          <v-combobox
-            v-model="user.roles"
-            :items="roles"
-            multiple
-          ></v-combobox>
-        </td>
-        <td>
-          <v-btn
-            text
-            color="primary"
-            class="text-lowercase"
-            @click="saveUser(user)"
-          >
-            Save
-          </v-btn>
-        </td>
-      </tr>
-    </tbody>
-  </v-simple-table>
+  <div class="admin-users-page">
+    <v-data-table
+      :headers="headers"
+      :items="users"
+      item-key="id"
+      :search="searchTerm"
+      calculate-widths
+      dense
+    >
+      <template v-slot:item.username="props">
+        <nuxt-link :to="`/${props.item.username}`">
+          {{ props.item.username}}
+        </nuxt-link>
+      </template>
+      <template v-slot:item.city="props">
+        <span>{{ cityName(citiesById[props.item.city]) || '' }}</span>
+      </template>
+      <template v-slot:item.roles="props">
+        <v-combobox
+          v-model="props.item.roles"
+          :items="roles"
+          multiple
+        ></v-combobox>
+      </template>
+      <template v-slot:item.actions="props">
+        <v-btn
+          text
+          color="primary"
+          class="text-lowercase"
+          @click="saveUser(user)"
+        >
+          Save
+        </v-btn>
+      </template>
+    </v-data-table>
+  </div>
 </template>
 
 <script lang="ts">
@@ -73,24 +50,39 @@ import { debounce } from '~/helpers/helpers'
   layout: 'admin'
 })
 export default class AdminUserPage extends FormPageComponent {
-  roles = ['admin', 'artist']
+  roles = ['admin', 'artist', 'crypto']
   users: any[] = []
-  cities: any[] = []
+  citiesById: any = {}
+  searchTerm: string = ''
+  headers = [
+    { text: 'id', value: 'id' },
+    { text: 'username', value: 'username' },
+    { text: 'email', value: 'email' },
+    { text: 'city', value: 'city' },
+    { text: 'roles', value: 'roles' },
+    { text: 'actions', value: 'actions' }
+  ]
 
-  async asyncData({ $axios, app }: Context) {
+  cityName(city: any) {
+    return city?.code || ''
+  }
+
+  async asyncData({ $axios, app, store }: Context) {
     let users = [] as any[]
-    let cities = [] as any[]
 
     try {
       const usersResponse = await $axios.$get('/api/admin/users')
       users = usersResponse.payload || []
-      const citiesResponse = await $axios.$get('/api/admin/cities')
-      cities = citiesResponse.payload || []
     } catch (error) {
       app.$toastService.error(`error fetching: ${error}`)
     }
 
-    return { users, cities }
+    const citiesById: any = {}
+    store.state.config.cities.forEach((city: any) => {
+      citiesById[city.id] = city
+    })
+
+    return { users, citiesById }
   }
 
   @debounce

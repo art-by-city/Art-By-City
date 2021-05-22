@@ -1,7 +1,7 @@
 <template>
   <div class="admin-artwork-page">
     <v-data-table
-      :headers="artworkHeaders"
+      :headers="headers"
       :items="artworks"
       item-key="id"
       :search="artworkSearchTerm"
@@ -11,8 +11,6 @@
     >
       <template v-slot:top>
         <v-toolbar dense elevation="0">
-          <v-toolbar-title>artwork</v-toolbar-title>
-          <v-spacer></v-spacer>
           <v-text-field
             v-model="artworkSearchTerm"
             append-icon="mdi-filter"
@@ -39,7 +37,7 @@
         </td>
       </template>
       <template v-slot:item.id="props">
-        <nuxt-link :to="`/a/${props.item.id}`" >{{ props.item.id }}</nuxt-link>
+        <nuxt-link :to="`/a/${props.item.id}`">{{ props.item.id }}</nuxt-link>
       </template>
       <template v-slot:item.created="props">
         <DateWithTooltip :date="props.item.created" />
@@ -69,7 +67,6 @@
         <v-simple-checkbox v-model="props.item.approved" disabled></v-simple-checkbox>
       </template>
     </v-data-table>
-    <div>{{ citiesById }}</div>
   </div>
 </template>
 
@@ -109,7 +106,7 @@ export default class AdminEventsPage extends FormPageComponent {
     return city?.code || ''
   }
 
-  get artworkHeaders() {
+  get headers() {
     return [
       { text: 'id',        value: 'id' },
       { text: 'created',   value: 'created', },

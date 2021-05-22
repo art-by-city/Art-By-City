@@ -6,6 +6,7 @@ import ArtworkService from '~/services/artwork/service'
 import ConfigService from '~/services/config/service'
 import CityService from '~/services/city/service'
 import ToastService from '~/services/toast/service'
+import ChangelogService from '~/services/changelog/service'
 
 declare module 'vue/types/vue' {
   // this.$myInjectedFunction inside Vue components
@@ -16,6 +17,7 @@ declare module 'vue/types/vue' {
     $configService: ConfigService
     $cityService: CityService
     $toastService: ToastService
+    $changelogService: ChangelogService
   }
 }
 
@@ -29,6 +31,7 @@ declare module '@nuxt/types' {
     $configService: ConfigService
     $cityService: CityService
     $toastService: ToastService
+    $changelogService: ChangelogService
   }
   // nuxtContext.$myInjectedFunction
   interface Context {
@@ -38,6 +41,7 @@ declare module '@nuxt/types' {
     $configService: ConfigService
     $cityService: CityService
     $toastService: ToastService
+    $changelogService: ChangelogService
   }
 }
 
@@ -50,6 +54,7 @@ declare module 'vuex/types/index' {
     $configService: ConfigService
     $cityService: CityService
     $toastService: ToastService
+    $changelogService: ChangelogService
   }
 }
 
@@ -60,6 +65,7 @@ const servicesPlugin: Plugin = (context, inject) => {
   inject('configService', new ConfigService(context))
   inject('cityService', new CityService(context))
   inject('toastService', new ToastService(context))
+  inject('changelogService', new ChangelogService(context))
 }
 
 export default servicesPlugin

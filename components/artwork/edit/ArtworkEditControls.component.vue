@@ -11,6 +11,16 @@
         expand-on-hover
       >
         <v-list nav dense>
+          <v-list-item
+            dense
+          >
+            <v-list-item-action>
+              <v-icon color="primary">
+                {{ 'mdi-arrow-expand-right' }}
+              </v-icon>
+            </v-list-item-action>
+          </v-list-item>
+
           <v-list-item dense>
             <v-list-item-icon>
               <v-icon :color="published ? 'green' : 'grey'">
