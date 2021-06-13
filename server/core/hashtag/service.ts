@@ -34,10 +34,16 @@ export default class HashtagServiceImpl implements HashtagService {
   }
 
   async createOrUpdate(hashtag: string): Promise<void> {
-    const hashtagEntity = await this.hashtagRepository.findByHashtag(hashtag)
+    const _hashtag = hashtag.toLowerCase()
+    const hashtagEntity = await this.hashtagRepository.findByHashtag(_hashtag)
 
     if (!hashtagEntity) {
-      this.create({ id: '', created: new Date(), updated: new Date(), hashtag })
+      this.create({
+        id: '',
+        created: new Date(),
+        updated: new Date(),
+        hashtag: _hashtag
+      })
     }
   }
 }

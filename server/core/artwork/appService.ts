@@ -127,7 +127,7 @@ export default class ArtworkApplicationServiceImpl
       artwork.description = req.description
       artwork.type = req.type
       artwork.city = user.city
-      artwork.hashtags = req.hashtags
+      artwork.setHashtags(req.hashtags)
       artwork.images = await this.fileAppService.createFromFileUploadRequests(
         user.id,
         'artwork',

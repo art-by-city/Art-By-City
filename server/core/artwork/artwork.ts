@@ -92,11 +92,19 @@ export default class Artwork extends Entity {
     this.description = data.description
     this.type = data.type
     this.city = data.cityId
-    this.hashtags = data.hashtags
     this.images = data.images
     this.likes = []
     this.published = false
     this.approved = false
+
+    return this.setHashtags(data.hashtags)
+  }
+
+  setHashtags(hashtags: string[]) {
+    this.hashtags = []
+    for (let i = 0; i < hashtags.length; i++) {
+      this.hashtags.push(hashtags[i].toLowerCase())
+    }
 
     return this
   }
