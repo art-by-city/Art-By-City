@@ -20,6 +20,7 @@ export { default as Artwork } from './artwork'
 export { default as ArtworkViewModel } from './viewModels/artworkViewModel'
 export { default as ArtworkMapper } from './mapper'
 export { default as ArtworkType } from './artworkType/artworkType'
+export { default as ArtworkFilterOptionsBuilder } from './filterOptionsBuilder'
 
 export class ArtworkImage {
   @IsString()

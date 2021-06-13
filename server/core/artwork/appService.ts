@@ -18,7 +18,8 @@ import {
   ArtworkViewModel,
   ArtworkMapper,
   ArtworkCreateRequest,
-  ArtworkUpdateRequest
+  ArtworkUpdateRequest,
+  ArtworkFilterOptionsBuilder
 } from './'
 import { ConfigService } from '../config'
 import { FileApplicationService } from '../file'
@@ -158,7 +159,7 @@ export default class ArtworkApplicationServiceImpl
 
   async list(req: any): Promise<ApiServiceResult<ArtworkViewModel[]>> {
     try {
-      const opts: ArtworkFilterOptions = <ArtworkFilterOptions>req.query
+      const opts = ArtworkFilterOptionsBuilder.build(req.query)
       const user = await this.userService.getById((<User>req.user).id)
 
       if (!user) {
