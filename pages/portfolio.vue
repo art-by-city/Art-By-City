@@ -2,7 +2,7 @@
   <div>
     <v-layout column justify-center align-center>
       <h2 class="text-lowercase">My Portfolio</h2>
-      <nuxt-link to="/a/new" class="text-lowercase">
+      <nuxt-link to="/you/new" class="text-lowercase">
         Upload New Artwork
       </nuxt-link>
       <v-container fluid>
@@ -20,7 +20,7 @@
             ></v-img>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-btn icon :to="`/a/${item.id}`">
+            <v-btn icon :to="`/${item.owner.username}/${item.id}`">
               <v-icon>mdi-eye</v-icon>
             </v-btn>
           </template>

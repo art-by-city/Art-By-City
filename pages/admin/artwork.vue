@@ -36,8 +36,10 @@
           ></v-img>
         </td>
       </template>
-      <template v-slot:item.id="props">
-        <nuxt-link :to="`/a/${props.item.id}`">{{ props.item.id }}</nuxt-link>
+      <template v-slot:item.id="{ item }">
+        <nuxt-link :to="`/${item.owner.username}/${item.id}`">
+          {{ item.id }}
+        </nuxt-link>
       </template>
       <template v-slot:item.created="props">
         <DateWithTooltip :date="props.item.created" />
