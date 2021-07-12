@@ -118,6 +118,11 @@ export default class AppBar extends Vue {
       to: '/'
     },
     {
+      icon: 'mdi-upload',
+      title: 'upload',
+      to: '/upload'
+    },
+    {
       icon: 'mdi-account-cowboy-hat',
       title: 'admin',
       to: '/admin',

@@ -66,3 +66,17 @@ export default interface Artwork {
   published: boolean
   approved: boolean
 }
+
+export interface NewArtworkRequest {
+  owner: {
+    id: string
+    username: string
+  }
+  title: string
+  slug: string
+  description?: string
+  type: string
+  city: string
+  hashtags?: string[]
+  images: ArtworkImageFile[]
+}
