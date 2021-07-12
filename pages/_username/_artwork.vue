@@ -91,6 +91,8 @@
           :artwork="artwork"
           :baseUrl="$config.imgBaseUrl"
           @previewImageChanged="setPreviewImage()"
+          @save="saveArtwork"
+          @cancel="onCancelClicked"
         />
       </v-dialog>
     </v-container>

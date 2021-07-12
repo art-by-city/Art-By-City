@@ -89,7 +89,7 @@
       </div>
     </v-row>
     <v-row v-if="!cropMode" dense justify="center">
-      <v-col cols="12" md="auto">
+      <v-col cols="12">
         <v-text-field
           v-model="artwork.title"
           type="text"
@@ -118,10 +118,20 @@
           label="Description"
           hint="Enter a description for this Artwork"
           auto-grow
-          rows="1"
+          rows="2"
           class="text-lowercase"
           :rules="descriptionRules"
         ></v-textarea>
+      </v-col>
+    </v-row>
+    <v-row justify="center">
+      <v-col cols="auto">
+        <v-btn text color="error" class="text-lowercase" @click="cancel">
+          Cancel
+        </v-btn>
+        <v-btn text color="success" class="text-lowercase" @click="save">
+          Save
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -165,11 +175,18 @@ export default class ArtworkEditForm extends Vue {
   cropper?: Cropper
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
+  @Emit('save') save() {}
+  @Emit('cancel') cancel() {}
 
   @Prop({
     type: String,
     required: true
   }) readonly baseUrl!: string
+
+  @Prop({
+    type: String,
+    required: false
+  }) readonly owner!: string
 
   get titleRules() {
     return [(value: string = '') => {

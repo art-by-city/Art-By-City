@@ -8,7 +8,8 @@ import Artwork, {
   ImageFileRef,
   ImageUploadRequest,
   isFile,
-  isImageUploadPreview
+  isImageUploadPreview,
+  NewArtworkRequest
 } from '~/models/artwork/artwork'
 
 export default class ArtworkService {
@@ -40,12 +41,15 @@ export default class ArtworkService {
     return image
   }
 
-  async createArtwork(artwork: Artwork): Promise<Artwork | undefined> {
+  async createArtwork(artwork: Artwork | NewArtworkRequest):
+    Promise<Artwork | undefined> {
     ProgressService.start()
     try {
-      artwork.images = await Promise.all(artwork.images.map(async (image) => {
-        return this.prepareArtworkImageForUpload(image)
-      }))
+      artwork.images = await Promise.all(
+        artwork.images.map(async (image: ArtworkImageFile) => {
+          return this.prepareArtworkImageForUpload(image)
+        })
+      )
 
       const { payload } = await this.$axios.$post(
         '/api/artwork',
