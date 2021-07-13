@@ -84,6 +84,26 @@ export default class ArtworkRepositoryImpl
     }
   }
 
+  async getByIdOrSlug(idOrSlug: string): Promise<Artwork | null> {
+    try {
+      let artwork = await this.get(idOrSlug)
+
+      if (!artwork) {
+        artwork = await this.repository.whereEqualTo('slug', idOrSlug).findOne()
+      }
+
+      if (!artwork) {
+        throw new Error(`Artwork Not Found (${idOrSlug})`)
+      }
+
+      return artwork
+    } catch (error) {
+      const msg = `Error finding artwork: ${error.message}`
+      console.error(msg)
+      throw new Error(msg)
+    }
+  }
+
   getDocumentReference(id: string): DocumentReference<Artwork> {
     return <DocumentReference<Artwork>>this.client.doc(`Artworks/${id}`)
   }

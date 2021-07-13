@@ -23,6 +23,9 @@
             <v-btn icon :to="`/${item.owner.username}/${item.id}`">
               <v-icon>mdi-eye</v-icon>
             </v-btn>
+            <v-btn icon :to="`/${item.owner.username}/${item.slug}`">
+              <v-icon>mdi-eye</v-icon>
+            </v-btn>
           </template>
         </v-data-table>
       </v-container>

@@ -18,6 +18,7 @@ export default class ArtworkMapper implements EntityMapper<Artwork, ArtworkViewM
           roles: []
         },
       title: domainEntity.title,
+      slug: domainEntity.slug,
       description: domainEntity.description,
       type: domainEntity.type,
       city: domainEntity.city,

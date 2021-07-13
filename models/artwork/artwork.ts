@@ -53,6 +53,7 @@ export default interface Artwork {
   created: Date
   updated: Date
   title: string
+  slug: string
   owner: {
     id: string
     username: string

@@ -155,7 +155,8 @@ export default class UserProfilePage extends PageComponent {
 
   @debounce
   onArtworkCardClicked(artwork: any) {
-    this.$router.push(`/${this.profile.user.username}/${artwork.id}`)
+    const idOrSlug = artwork.slug || artwork.id
+    this.$router.push(`/${this.profile.user.username}/${idOrSlug}`)
   }
 
   @debounce

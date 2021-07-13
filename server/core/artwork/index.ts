@@ -35,6 +35,7 @@ export function isArtworkImage(image: ArtworkImageRequest):
 export interface ArtworkCreateRequest {
   userId: string
   title: string
+  slug: string
   description: string
   type: string
   city: string
@@ -45,6 +46,7 @@ export interface ArtworkUpdateRequest {
   userId: string
   id: string
   title: string
+  slug: string
   description: string
   type: string
   city: string
@@ -67,7 +69,7 @@ export interface ArtworkFilterOptions {
 export interface ArtworkController extends BaseControllerInterface {}
 export interface ArtworkApplicationService
   extends BaseApplicationServiceInterface {
-  get(id: string): Promise<ApiServiceResult<ArtworkViewModel>>
+  get(idOrSlug: string): Promise<ApiServiceResult<ArtworkViewModel>>
   delete(user: User, id: string): Promise<ApiServiceResult<void>>
   create(req: ArtworkCreateRequest): Promise<ApiServiceResult<ArtworkViewModel>>
   update(req: ArtworkUpdateRequest): Promise<ApiServiceResult<ArtworkViewModel>>
@@ -83,7 +85,7 @@ export interface ArtworkApplicationService
 }
 export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
   create(artwork: Artwork): Promise<Artwork | null>
-  get(id: string): Promise<Artwork | null>
+  get(idOrSlug: string): Promise<Artwork | null>
   update(artwork: Artwork, modifyUpdated?: boolean): Promise<Artwork>
   delete(id: string): Promise<void>
   list(opts?: ArtworkFilterOptions): Promise<Artwork[]>
@@ -91,7 +93,9 @@ export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
   listLikedByUser(user: User): Promise<Artwork[]>
 }
 export interface ArtworkRepository
-  extends BaseRepositoryInterface<Artwork, ArtworkFilterOptions> {}
+  extends BaseRepositoryInterface<Artwork, ArtworkFilterOptions> {
+  getByIdOrSlug(idOrSlug: string): Promise<Artwork | null>
+}
 
 export const ArtworkModule = new ContainerModule((bind) => {
   bind<ArtworkRepository>(Symbol.for('ArtworkRepository')).to(

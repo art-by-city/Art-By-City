@@ -73,6 +73,7 @@ export default class ArtworkApplicationServiceImpl
     const artwork = new Artwork().setProps({
       userId: user.id,
       title: req.title,
+      slug: req.slug,
       description: req.description,
       type: req.type,
       cityId: user.city,
@@ -124,6 +125,7 @@ export default class ArtworkApplicationServiceImpl
       }
 
       artwork.title = req.title
+      artwork.slug = req.slug
       artwork.description = req.description
       artwork.type = req.type
       artwork.city = user.city
@@ -277,8 +279,8 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
-  async get(id: string): Promise<ApiServiceResult<ArtworkViewModel>> {
-    const artwork = await this.artworkService.get(id)
+  async get(idOrSlug: string): Promise<ApiServiceResult<ArtworkViewModel>> {
+    const artwork = await this.artworkService.get(idOrSlug)
 
     if (!artwork) {
       throw new NotFoundError('artwork')
