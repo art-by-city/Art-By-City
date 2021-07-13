@@ -269,7 +269,7 @@ export default class ArtworkPage extends FormPageComponent {
         window.history.replaceState(
           window.history.state,
           document.title,
-          `/${artwork.owner.username}/${artwork.id}`
+          `/${artwork.owner.username}/${artwork.slug}`
         )
       }
       this.artwork = Object.assign({}, this.artwork, artwork)

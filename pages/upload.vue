@@ -53,7 +53,7 @@ export default class UploadPage extends FormPageComponent {
     const artwork = await this.$artworkService.createArtwork(this.artwork)
 
     if (artwork) {
-      this.$router.push(`/${artwork.owner.username}/${artwork.id}`)
+      this.$router.push(`/${artwork.owner.username}/${artwork.slug}`)
     }
   }
 

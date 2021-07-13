@@ -42,8 +42,8 @@ export default class ArtworkServiceImpl implements ArtworkService {
 
   }
 
-  get(id: string): Promise<Artwork | null> {
-    return this.artworkRepository.get(id)
+  get(idOrSlug: string): Promise<Artwork | null> {
+    return this.artworkRepository.getByIdOrSlug(idOrSlug)
   }
 
   list(opts?: ArtworkFilterOptions): Promise<Artwork[]> {

@@ -98,6 +98,14 @@
           class="text-lowercase"
           :rules="titleRules"
         ></v-text-field>
+        <v-text-field
+          v-model="artwork.slug"
+          type="text"
+          name="artworkSlug"
+          :label="slugBase"
+          class="text-lowercase"
+          :rules="slugRules"
+        ></v-text-field>
         <ArtworkTypeSelector
           v-model="artwork.type"
           :artworkTypes="$store.state.config.artworkTypes"
@@ -202,6 +210,26 @@ export default class ArtworkEditForm extends Vue {
     }]
   }
 
+  get slugRules() {
+    return [(value: string = '') => {
+      if (value.length < 1) {
+        return 'URL slug is required'
+      }
+
+      if (value.length > 128) {
+        return 'URL slug must be no more than 128 characters'
+      }
+
+      const validSlugRegex = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
+
+      if (!validSlugRegex.test(value)) {
+        return 'URL slug must be a valid slug (lowerchase alphanumerics, hyphen, underscore)'
+      }
+
+      return true
+    }]
+  }
+
   get descriptionRules() {
     return [(value: string = '') => {
       if (value.length > 1024) {
@@ -218,6 +246,10 @@ export default class ArtworkEditForm extends Vue {
     }
 
     return false
+  }
+
+  get slugBase(): string {
+    return `artby.city/${this.artwork.owner.username}/`
   }
 
   private async createImagePreview(image: File): Promise<ImageUploadPreview> {
