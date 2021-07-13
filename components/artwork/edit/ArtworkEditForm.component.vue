@@ -89,7 +89,7 @@
       </div>
     </v-row>
     <v-row v-if="!cropMode" dense justify="center">
-      <v-col cols="12" md="auto">
+      <v-col cols="12">
         <v-text-field
           v-model="artwork.title"
           type="text"
@@ -97,6 +97,14 @@
           label="Title"
           class="text-lowercase"
           :rules="titleRules"
+        ></v-text-field>
+        <v-text-field
+          v-model="artwork.slug"
+          type="text"
+          name="artworkSlug"
+          :label="slugBase"
+          class="text-lowercase"
+          :rules="slugRules"
         ></v-text-field>
         <ArtworkTypeSelector
           v-model="artwork.type"
@@ -118,10 +126,20 @@
           label="Description"
           hint="Enter a description for this Artwork"
           auto-grow
-          rows="1"
+          rows="2"
           class="text-lowercase"
           :rules="descriptionRules"
         ></v-textarea>
+      </v-col>
+    </v-row>
+    <v-row justify="center">
+      <v-col cols="auto">
+        <v-btn text color="error" class="text-lowercase" @click="cancel">
+          Cancel
+        </v-btn>
+        <v-btn text color="success" class="text-lowercase" @click="save">
+          Save
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>
@@ -165,11 +183,18 @@ export default class ArtworkEditForm extends Vue {
   cropper?: Cropper
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
+  @Emit('save') save() {}
+  @Emit('cancel') cancel() {}
 
   @Prop({
     type: String,
     required: true
   }) readonly baseUrl!: string
+
+  @Prop({
+    type: String,
+    required: false
+  }) readonly owner!: string
 
   get titleRules() {
     return [(value: string = '') => {
@@ -179,6 +204,26 @@ export default class ArtworkEditForm extends Vue {
 
       if (value.length > 128) {
         return 'title must be no more than 128 characters'
+      }
+
+      return true
+    }]
+  }
+
+  get slugRules() {
+    return [(value: string = '') => {
+      if (value.length < 1) {
+        return 'URL slug is required'
+      }
+
+      if (value.length > 128) {
+        return 'URL slug must be no more than 128 characters'
+      }
+
+      const validSlugRegex = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
+
+      if (!validSlugRegex.test(value)) {
+        return 'URL slug must be a valid slug (lowerchase alphanumerics, hyphen, underscore)'
       }
 
       return true
@@ -201,6 +246,10 @@ export default class ArtworkEditForm extends Vue {
     }
 
     return false
+  }
+
+  get slugBase(): string {
+    return `artby.city/${this.artwork.owner.username}/`
   }
 
   private async createImagePreview(image: File): Promise<ImageUploadPreview> {

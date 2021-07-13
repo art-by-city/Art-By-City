@@ -18,7 +18,8 @@ import {
   ArtworkViewModel,
   ArtworkMapper,
   ArtworkCreateRequest,
-  ArtworkUpdateRequest
+  ArtworkUpdateRequest,
+  ArtworkFilterOptionsBuilder
 } from './'
 import { ConfigService } from '../config'
 import { FileApplicationService } from '../file'
@@ -72,6 +73,7 @@ export default class ArtworkApplicationServiceImpl
     const artwork = new Artwork().setProps({
       userId: user.id,
       title: req.title,
+      slug: req.slug,
       description: req.description,
       type: req.type,
       cityId: user.city,
@@ -123,10 +125,11 @@ export default class ArtworkApplicationServiceImpl
       }
 
       artwork.title = req.title
+      artwork.slug = req.slug
       artwork.description = req.description
       artwork.type = req.type
       artwork.city = user.city
-      artwork.hashtags = req.hashtags
+      artwork.setHashtags(req.hashtags)
       artwork.images = await this.fileAppService.createFromFileUploadRequests(
         user.id,
         'artwork',
@@ -158,7 +161,7 @@ export default class ArtworkApplicationServiceImpl
 
   async list(req: any): Promise<ApiServiceResult<ArtworkViewModel[]>> {
     try {
-      const opts: ArtworkFilterOptions = <ArtworkFilterOptions>req.query
+      const opts = ArtworkFilterOptionsBuilder.build(req.query)
       const user = await this.userService.getById((<User>req.user).id)
 
       if (!user) {
@@ -276,8 +279,8 @@ export default class ArtworkApplicationServiceImpl
     }
   }
 
-  async get(id: string): Promise<ApiServiceResult<ArtworkViewModel>> {
-    const artwork = await this.artworkService.get(id)
+  async get(idOrSlug: string): Promise<ApiServiceResult<ArtworkViewModel>> {
+    const artwork = await this.artworkService.get(idOrSlug)
 
     if (!artwork) {
       throw new NotFoundError('artwork')

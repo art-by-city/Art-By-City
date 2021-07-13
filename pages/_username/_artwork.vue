@@ -91,6 +91,8 @@
           :artwork="artwork"
           :baseUrl="$config.imgBaseUrl"
           @previewImageChanged="setPreviewImage()"
+          @save="saveArtwork"
+          @cancel="onCancelClicked"
         />
       </v-dialog>
     </v-container>
@@ -137,8 +139,8 @@ export default class ArtworkPage extends FormPageComponent {
     let editMode = false
 
     try {
-      if (params.id !== 'new') {
-        const { payload } = await $axios.$get(`/api/artwork/${params.id}`)
+      if (params.artwork !== 'new') {
+        const { payload } = await $axios.$get(`/api/artwork/${params.artwork}`)
 
         if (!payload.city) {
           payload.city = null
@@ -264,7 +266,11 @@ export default class ArtworkPage extends FormPageComponent {
     if (artwork) {
       if (this.isNew) {
         this.previewImage = artwork.images[0]
-        window.history.replaceState(window.history.state, document.title, `/a/${artwork.id}`)
+        window.history.replaceState(
+          window.history.state,
+          document.title,
+          `/${artwork.owner.username}/${artwork.slug}`
+        )
       }
       this.artwork = Object.assign({}, this.artwork, artwork)
       this.toggleEditMode(false)

@@ -53,6 +53,7 @@ export default interface Artwork {
   created: Date
   updated: Date
   title: string
+  slug: string
   owner: {
     id: string
     username: string
@@ -65,4 +66,18 @@ export default interface Artwork {
   likes: string[]
   published: boolean
   approved: boolean
+}
+
+export interface NewArtworkRequest {
+  owner: {
+    id: string
+    username: string
+  }
+  title: string
+  slug: string
+  description?: string
+  type: string
+  city: string
+  hashtags?: string[]
+  images: ArtworkImageFile[]
 }

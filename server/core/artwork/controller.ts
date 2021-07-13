@@ -75,17 +75,17 @@ export default class ArtworkControllerImpl implements ArtworkController {
     /**
      * @openapi
      *
-     * /artworks/{artworkId}:
+     * /artworks/{artworkIdOrSlug}:
      *  get:
      *    summary: Fetch an Artwork
-     *    operationId: getArtworkById
+     *    operationId: getArtworkByIdOrSlug
      *    tags:
      *      - artworks
      *    parameters:
-     *      - name: artworkId
+     *      - name: artworkIdOrSlug
      *        in: path
      *        required: true
-     *        description: The Artwork ID
+     *        description: The Artwork ID or URL Slug
      *        schema:
      *          type: string
      *    responses:
@@ -96,9 +96,9 @@ export default class ArtworkControllerImpl implements ArtworkController {
      *            schema:
      *              $ref: "#/components/schemas/Artwork"
      */
-    router.get('/:id', normalLimit, async (req, res, next) => {
+    router.get('/:idOrSlug', normalLimit, async (req, res, next) => {
       try {
-        const result = await this.artworkAppService.get(req.params.id)
+        const result = await this.artworkAppService.get(req.params.idOrSlug)
 
         return res.send(result)
       } catch (error) {

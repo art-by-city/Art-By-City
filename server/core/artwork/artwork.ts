@@ -10,7 +10,8 @@ import {
   ArrayMaxSize,
   ValidateNested,
   IsNotEmpty,
-  MinLength
+  MinLength,
+  Matches
 } from 'class-validator'
 
 @Collection()
@@ -26,6 +27,18 @@ export default class Artwork extends Entity {
     message: 'title must be less than $constraint1 characters'
   })
   title!: string
+
+  @IsString()
+  @MinLength(1, {
+    message: 'URL slug must be at least 1 character'
+  })
+  @MaxLength(128, {
+    message: 'URL slug must be less than $constraint1 characters'
+  })
+  @Matches(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, {
+    message: 'URL slug must be a valid slug (lowerchase alphanumerics, hyphen, underscore)'
+  })
+  slug!: string
 
   @IsString()
   @MaxLength(1024, {
@@ -78,6 +91,7 @@ export default class Artwork extends Entity {
   setProps(data: {
     userId: string,
     title: string,
+    slug: string,
     description: string,
     type: string,
     cityId: string,
@@ -89,14 +103,23 @@ export default class Artwork extends Entity {
     this.updated = new Date()
     this.owner = data.userId
     this.title = data.title
+    this.slug = data.slug
     this.description = data.description
     this.type = data.type
     this.city = data.cityId
-    this.hashtags = data.hashtags
     this.images = data.images
     this.likes = []
     this.published = false
     this.approved = false
+
+    return this.setHashtags(data.hashtags)
+  }
+
+  setHashtags(hashtags: string[]) {
+    this.hashtags = []
+    for (let i = 0; i < hashtags.length; i++) {
+      this.hashtags.push(hashtags[i].toLowerCase())
+    }
 
     return this
   }
