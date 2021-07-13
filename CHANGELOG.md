@@ -1,5 +1,15 @@
 # Changelog
 
+## [2021-07-12](#2021-07-12)
+
+### Features
+- Artworks now require and can be retrieved by a valid url slug
+- New routing scheme: artworks now live under a user in the url (e.g. `artby.city/artist/artwork-title`)
+- Added dedicated `/upload` page
+
+### Bug Fixes
+- Hashtags matching bugfix
+
 ## [2021-05-22](#2021-05-22)
 
 ### Features
