@@ -117,8 +117,13 @@ export default class Artwork extends Entity {
 
   setHashtags(hashtags: string[]) {
     this.hashtags = []
+
     for (let i = 0; i < hashtags.length; i++) {
-      this.hashtags.push(hashtags[i].toLowerCase())
+      // NB: Force all hashtags to be lowercase & remove unwanted charss
+      const hashtag = hashtags[i]
+        .replace(/[^a-zA-Z0-9_]/g, '')
+        .toLowerCase()
+      this.hashtags.push(hashtag)
     }
 
     return this
