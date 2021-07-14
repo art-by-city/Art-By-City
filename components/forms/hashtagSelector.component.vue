@@ -91,7 +91,13 @@ export default class HashtagSelector extends Vue {
     this.hashtagSearchInput = ''
     if (hashtags.length > this.maxSelectable) {
       hashtags.pop()
-    } else {
+    } else if (hashtags.length > 0) {
+      // Clean last input
+      const lastIdx = hashtags.length - 1
+      const lastInput = hashtags[lastIdx]
+      hashtags[lastIdx] = lastInput.replace(/[^a-zA-Z0-9_]/g, '')
+
+      // NB: Emit a list of hashtags without # from the component
       this.$emit('input', hashtags.map((h) => {
         return h[0] === '#' ? h.slice(1) : h
       }))
