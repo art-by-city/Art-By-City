@@ -2,7 +2,7 @@
   <div>
     <v-layout column justify-center align-center>
       <h2 class="text-lowercase">My Portfolio</h2>
-      <nuxt-link to="/you/new" class="text-lowercase">
+      <nuxt-link to="/upload" class="text-lowercase">
         Upload New Artwork
       </nuxt-link>
       <v-container fluid>

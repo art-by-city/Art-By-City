@@ -33,6 +33,8 @@
             <v-hover v-slot:default="hoverProps">
               <v-img
                 aspect-ratio="1.7"
+                max-height="300px"
+                contain
                 :src="getImageSource(image, baseUrl)"
                 class="clickable"
               >
@@ -73,8 +75,7 @@
           </div>
           <div class="artwork-image-selector" v-if="!isAtMaxImages">
             <v-responsive
-              aspect-ratio="1.7"
-              style="border: 1px dashed black;"
+              style="border: 1px dashed black; height: 100%;"
             >
               <v-file-input
                 class="artwork-upload-button add-artwork-image-button"
@@ -291,8 +292,15 @@ export default class ArtworkEditForm extends Vue {
     )
 
     if (this.artwork.images.length === 1) {
+      await this.suggestMetadataFromFile(image)
       this.onPreviewImageChanged()
     }
+  }
+
+  private async suggestMetadataFromFile(image: File) {
+    // Suggested title is filename without extension
+    this.artwork.title = image.name.slice(0, image.name.lastIndexOf('.'))
+    this.artwork.slug = this.artwork.title.toLowerCase().replace(/[^a-z0-9_\-]/g, '')
   }
 
   @debounce
@@ -367,10 +375,23 @@ export default class ArtworkEditForm extends Vue {
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+.artwork-image-selector-container {
+  width: 100%;
+}
 .artwork-image-selector {
   height: 56px;
   width: 96px;
   margin: 5px;
+}
+.artwork-image-selector:nth-child(1) {
+  height: 300px;
+  width: 100%;
+  margin-bottom: 25px;
+  flex-basis: fill;
+}
+.break {
+  flex-basis: 100%;
+  height: 0;
 }
 .crop-image {
   display: block;
