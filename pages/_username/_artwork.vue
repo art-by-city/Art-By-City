@@ -342,5 +342,6 @@ export default class ArtworkPage extends FormPageComponent {
   height: 56px;
   width: 96px;
   margin: 5px;
+  display: inline-block;
 }
 </style>
