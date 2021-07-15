@@ -58,7 +58,7 @@ import { Vue, Component, Prop, PropSync } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers/helpers'
 
-const ZOOM_UPPER_LIMIT: number = 1
+const ZOOM_UPPER_LIMIT: number = 4.1
 const ZOOM_LOWER_LIMIT: number = -0.9
 
 @Component
