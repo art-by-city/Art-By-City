@@ -285,22 +285,29 @@ export default class ArtworkEditForm extends Vue {
 
   @debounce
   async onAddArtworkImageClicked(image: File) {
-    this.artwork.images.splice(
-      this.artwork.images.length,
-      0,
-      await this.createImagePreview(image)
-    )
+    // NG: There seems to be an issue with the v-file-input component where it
+    //     will sometimes trigger this function with undefined input if the
+    //     user cancels the filesystem dialog
+    if (image) {
+      this.artwork.images.splice(
+        this.artwork.images.length,
+        0,
+        await this.createImagePreview(image)
+      )
 
-    if (this.artwork.images.length === 1) {
-      await this.suggestMetadataFromFile(image)
-      this.onPreviewImageChanged()
+      if (this.artwork.images.length === 1) {
+        await this.suggestMetadataFromFile(image)
+        this.onPreviewImageChanged()
+      }
     }
   }
 
   private async suggestMetadataFromFile(image: File) {
     // Suggested title is filename without extension
     this.artwork.title = image.name.slice(0, image.name.lastIndexOf('.'))
-    this.artwork.slug = this.artwork.title.toLowerCase().replace(/[^a-z0-9_\-]/g, '')
+    this.artwork.slug = this.artwork.title
+      .toLowerCase()
+      .replace(/[^a-z0-9_\-]/g, '')
   }
 
   @debounce
