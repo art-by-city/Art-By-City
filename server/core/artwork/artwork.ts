@@ -47,7 +47,7 @@ export default class Artwork extends Entity {
   description?: string
 
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'artwork type is required' })
   type!: string
 
   @IsString()
@@ -72,9 +72,10 @@ export default class Artwork extends Entity {
   })
   hashtags!: string[]
 
-  @ArrayMinSize(1, {
-    message: 'image is required'
-  })
+  // NB: Temporarily disabling this here and manually checking in service
+  // @ArrayMinSize(1, {
+  //   message: 'image is required'
+  // })
   @ArrayMaxSize(12, {
     message: 'images must be no more than 12'
   })

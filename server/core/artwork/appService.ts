@@ -23,6 +23,7 @@ import {
 } from './'
 import { ConfigService } from '../config'
 import { FileApplicationService } from '../file'
+import ServiceResult from '../api/results/serviceResult.interface'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
@@ -57,7 +58,11 @@ export default class ArtworkApplicationServiceImpl
   }
 
   private async isSlugUnique(slug: string) {
-    return await this.artworkService.get(slug) ? false : true
+    try {
+      return await this.artworkService.get(slug) ? false : true
+    } catch (error) {
+      return true
+    }
   }
 
   async create(req: ArtworkCreateRequest): Promise<ApiServiceResult<ArtworkViewModel>> {
@@ -91,6 +96,13 @@ export default class ArtworkApplicationServiceImpl
         return result
       }
 
+      // Images are required
+      if (req.images.length < 1) {
+        result.errors?.push(new Error('Artwork image is required'))
+
+        return result
+      }
+
       const artwork = new Artwork().setProps({
         userId: user.id,
         title: req.title,
@@ -99,17 +111,27 @@ export default class ArtworkApplicationServiceImpl
         type: req.type,
         cityId: user.city,
         hashtags: req.hashtags,
-        images: await this.fileAppService.createFromFileUploadRequests(
+        images: []
+      })
+
+      const serviceResult: ServiceResult<Artwork> =
+        await this.artworkService.create(artwork)
+
+      if (!serviceResult.errors && serviceResult.payload) {
+        const createdArtwork = serviceResult.payload
+
+        createdArtwork.images = await this.fileAppService.createFromFileUploadRequests(
           user.id,
           'artwork',
           req.images
         )
-      })
+        this.artworkService.update(createdArtwork)
 
-      const createdArtwork = await this.artworkService.create(artwork)
-
-      if (createdArtwork) {
-        this.eventService.emit(UserEvents.Artwork.Created, user.id, createdArtwork.id)
+        this.eventService.emit(
+          UserEvents.Artwork.Created,
+          user.id,
+          createdArtwork.id
+        )
 
         createdArtwork.hashtags.forEach((hashtag) => {
           this.eventService.emit(ArtworkEvents.Hashtag.Added, hashtag)
@@ -123,7 +145,7 @@ export default class ArtworkApplicationServiceImpl
         )
       }
 
-      return { success: false }
+      return { success: false, errors: serviceResult.errors }
     } catch (error) {
       console.error(error)
       throw new UnknownError()
@@ -160,8 +182,16 @@ export default class ArtworkApplicationServiceImpl
       }
 
       // Check if desired slug is unique
-      if (!(await this.isSlugUnique(req.slug))) {
+      const artworkWithThisSlug = await this.artworkService.get(req.slug)
+      if (artworkWithThisSlug && artworkWithThisSlug.id !== artwork.id) {
         result.errors?.push(new Error('Slug must be unique'))
+
+        return result
+      }
+
+      // Images are required
+      if (req.images.length < 1) {
+        result.errors?.push(new Error('Artwork image is required'))
 
         return result
       }

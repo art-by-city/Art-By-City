@@ -9,6 +9,7 @@ import {
   ArtworkRepository,
   ArtworkFilterOptions
 } from './'
+import ServiceResult from '../api/results/serviceResult.interface'
 
 @injectable()
 export default class ArtworkServiceImpl implements ArtworkService {
@@ -21,11 +22,15 @@ export default class ArtworkServiceImpl implements ArtworkService {
     this.artworkRepository = artworkRepository
   }
 
-  async create(artwork: Artwork): Promise<Artwork | null> {
-    await validateArtwork(artwork)
+  async create(artwork: Artwork): Promise<ServiceResult<Artwork>> {
+    try {
+      await validateArtwork(artwork)
+    } catch (error) {
+      return { success: false, errors: [error] }
+    }
 
     try {
-      return this.artworkRepository.create(artwork)
+      return { success: true, payload: await this.artworkRepository.create(artwork) }
     } catch (error) {
       throw new UnknownError(error.message)
     }

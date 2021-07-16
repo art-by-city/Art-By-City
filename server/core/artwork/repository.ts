@@ -92,10 +92,6 @@ export default class ArtworkRepositoryImpl
         artwork = await this.repository.whereEqualTo('slug', idOrSlug).findOne()
       }
 
-      if (!artwork) {
-        throw new Error(`Artwork Not Found (${idOrSlug})`)
-      }
-
       return artwork
     } catch (error) {
       const msg = `Error finding artwork: ${error.message}`

@@ -53,6 +53,6 @@ export default async (artwork: Artwork): Promise<void> => {
       throw new ValidationError(messages)
     }
 
-    throw new UnknownError('Validation Error')
+    throw new ValidationError()
   }
 }
