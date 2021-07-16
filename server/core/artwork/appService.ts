@@ -56,19 +56,39 @@ export default class ArtworkApplicationServiceImpl
     this.fileAppService = fileAppService
   }
 
+  private async isSlugUnique(slug: string) {
+    return await this.artworkService.get(slug) ? false : true
+  }
+
   async create(req: ArtworkCreateRequest): Promise<ApiServiceResult<ArtworkViewModel>> {
     try {
+      let result: ApiServiceResult<ArtworkViewModel> = { success: false, errors: [] }
       const user = await this.userService.getById(req.userId)
 
+      // Sanity check that user exists
       if (!user) {
-        throw new UnauthorizedError()
+        result.errors?.push(new UnauthorizedError())
+
+        return result
       }
 
       // Non-artist users are restricted to max amount of artwork
       const config = await this.configService.getConfig()
       const maxArtworks = config ? config.maxUserArtworks : 10
       if (!user.hasRole('artist') && user.artworkCount >= maxArtworks) {
-        throw new Error(`Maximum number of ${maxArtworks} Artworks reached`)
+        result.errors?.push(
+          new Error(`Maximum number of ${maxArtworks} Artworks reached`)
+        )
+
+        return result
+      }
+
+      // Check if desired slug is unique
+      const isSlugUnique = await this.isSlugUnique(req.slug)
+      if (!isSlugUnique) {
+        result.errors?.push(new Error('Slug must be unique'))
+
+        return result
       }
 
       const artwork = new Artwork().setProps({
@@ -112,21 +132,38 @@ export default class ArtworkApplicationServiceImpl
 
   async update(req: ArtworkUpdateRequest): Promise<ApiServiceResult<ArtworkViewModel>> {
     try {
+      let result: ApiServiceResult<ArtworkViewModel> = { success: false, errors: [] }
       const user = await this.userService.getById(req.userId)
 
+      // Ensure user exists
       if (!user) {
-        throw new UnauthorizedError()
+        result.errors?.push(new UnauthorizedError())
+
+        return result
       }
 
       const artwork = await this.artworkService.get(req.id)
       const oldArtwork = { ...artwork }
 
+      // Ensure artwork exists
       if (!artwork) {
-        throw new NotFoundError('artwork')
+        result.errors?.push(new NotFoundError('artwork'))
+
+        return result
       }
 
+      // Ensure that user owns that artwork
       if (artwork.owner !== user.id) {
-        throw new UnauthorizedError()
+        result.errors?.push(new UnauthorizedError())
+
+        return result
+      }
+
+      // Check if desired slug is unique
+      if (!(await this.isSlugUnique(req.slug))) {
+        result.errors?.push(new Error('Slug must be unique'))
+
+        return result
       }
 
       artwork.title = req.title
