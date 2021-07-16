@@ -264,14 +264,12 @@ export default class ArtworkPage extends FormPageComponent {
       : await this.$artworkService.updateArtwork(this.artwork)
 
     if (artwork) {
-      if (this.isNew) {
-        this.previewImage = artwork.images[0]
-        window.history.replaceState(
-          window.history.state,
-          document.title,
-          `/${artwork.owner.username}/${artwork.slug}`
-        )
-      }
+      this.previewImage = artwork.images[0]
+      window.history.replaceState(
+        window.history.state,
+        document.title,
+        `/${artwork.owner.username}/${artwork.slug}`
+      )
       this.artwork = Object.assign({}, this.artwork, artwork)
       this.toggleEditMode(false)
     }

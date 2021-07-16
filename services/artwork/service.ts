@@ -45,15 +45,15 @@ export default class ArtworkService {
     Promise<Artwork | undefined> {
     ProgressService.start()
     try {
-      artwork.images = await Promise.all(
+      const images = await Promise.all(
         artwork.images.map(async (image: ArtworkImageFile) => {
-          return this.prepareArtworkImageForUpload(image)
+          return this.prepareArtworkImageForUpload(Object.assign({}, image))
         })
       )
 
       const { payload } = await this.$axios.$post(
         '/api/artwork',
-        { artwork }
+        { artwork: { ...artwork, images: images}  }
       )
 
       if (payload) {

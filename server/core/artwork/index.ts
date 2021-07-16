@@ -15,6 +15,7 @@ import ArtworkServiceImpl from './service'
 import ArtworkApplicationServiceImpl from './appService'
 import ArtworkControllerImpl from './controller'
 import { FileUploadRequest } from '../file'
+import ServiceResult from '../api/results/serviceResult.interface'
 
 export { default as Artwork } from './artwork'
 export { default as ArtworkViewModel } from './viewModels/artworkViewModel'
@@ -83,8 +84,9 @@ export interface ArtworkApplicationService
   approve(request: any): Promise<ApiServiceResult<void>>
   unapprove(request: any): Promise<ApiServiceResult<void>>
 }
-export interface ArtworkService extends BaseDomainServiceInterface<Artwork> {
-  create(artwork: Artwork): Promise<Artwork | null>
+// TODO -> re-extend base service interface
+export interface ArtworkService { //extends BaseDomainServiceInterface<Artwork> {
+  create(artwork: Artwork): Promise<ServiceResult<Artwork>>
   get(idOrSlug: string): Promise<Artwork | null>
   update(artwork: Artwork, modifyUpdated?: boolean): Promise<Artwork>
   delete(id: string): Promise<void>
