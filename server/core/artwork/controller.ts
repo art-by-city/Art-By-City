@@ -66,6 +66,10 @@ export default class ArtworkControllerImpl implements ArtworkController {
           ...req.body.artwork
         })
 
+        if (result.errors && result.errors.length > 0) {
+          throw result.errors[0]
+        }
+
         return res.send(result)
       } catch (error) {
         next(error)
@@ -174,6 +178,10 @@ export default class ArtworkControllerImpl implements ArtworkController {
           userId: (<User>req.user).id,
           ...req.body.artwork
         })
+
+        if (result.errors && result.errors.length > 0) {
+          throw result.errors[0]
+        }
 
         return res.send(result)
       } catch (error) {
