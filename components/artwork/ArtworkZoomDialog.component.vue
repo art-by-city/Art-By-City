@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, PropSync, Watch } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers/helpers'
 
@@ -64,10 +64,6 @@ const ZOOM_LOWER_LIMIT: number = -0.9
 @Component
 export default class ArtworkZoomDialog extends Vue {
   isDragging: boolean = false
-  _width: number | 'auto' = 'auto'
-  width: number | 'auto' = 'auto'
-  height: number | 'auto' = 'auto'
-  _height: number | 'auto' = 'auto'
   left: number = 0
   top: number = 0
   offsetX: number = 0
@@ -82,20 +78,24 @@ export default class ArtworkZoomDialog extends Vue {
     default: false
   }) zoom!: boolean
 
+  @Watch('zoom')
+  onDialogOpenedOrClosed() {
+    this.reset()
+  }
+
   @Prop({
     type: String,
     required: true
   }) readonly src!: string
 
   private reset() {
+    this.isDragging = false
     this.left = 0
     this.top = 0
     this.offsetX = 0
     this.offsetY = 0
     this.mouseDownX = 0
     this.mouseDownY = 0
-    this.width = this._width
-    this.height = this._height
     this.zoomFactor = 0
   }
 
@@ -121,8 +121,6 @@ export default class ArtworkZoomDialog extends Vue {
   @debounce
   onCloseZoomDialog() {
     this.zoom = false
-    this.isDragging = false
-    this.reset()
   }
 
   onImgTouchStart(evt: TouchEvent) {
@@ -178,35 +176,13 @@ export default class ArtworkZoomDialog extends Vue {
     this.magnify(evt.deltaY / 1000)
   }
 
-  private setImageDimensions() {
-    if (this.$refs.zoomImage) {
-      this._width = (<Element>this.$refs.zoomImage).clientWidth
-      this.width = this._width
-      this._height = (<Element>this.$refs.zoomImage).clientHeight
-      this.height = this._height
-    }
-  }
-
   get zoomImageStyle() {
-    if (
-      this.width === 'auto'
-      || this.height === 'auto') {
-      this.setImageDimensions()
-    }
-
     const left = `${this.left}px`
     const top = `${this.top}px`
 
     const scale = 1 + this.zoomFactor
 
-    const width = this.width === 'auto'
-      ? this.width
-      : `${this.width * scale}px`
-    const height = this.height === 'auto'
-      ? this.height
-      : `${this.height * scale}px`
-
-    return { left, top, width, height }
+    return { left, top, transform: `scale(${scale})` }
   }
 }
 </script>
