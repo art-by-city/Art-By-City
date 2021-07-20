@@ -65,22 +65,6 @@
               </v-form>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <!-- <v-expansion-panel>
-            <v-expansion-panel-header class="text-lowercase">
-              Ethereum Wallet
-            </v-expansion-panel-header>
-            <v-expansion-panel-content class="text-lowercase">
-              ethereum wallet stuff here
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header class="text-lowercase">
-              Arweave Wallet
-            </v-expansion-panel-header>
-            <v-expansion-panel-content class="text-lowercase">
-              arweave wallet stuff here
-            </v-expansion-panel-content>
-          </v-expansion-panel> -->
         </v-expansion-panels>
       </v-col>
     </v-row>
@@ -124,21 +108,16 @@ export default class AccountPage extends FormPageComponent {
     return getUser(this.$auth.user)
   }
 
-  async asyncData({ $axios, $auth, app, redirect }: Context) {
-    let user = {} as any
+  async asyncData({ $axios, app }: Context) {
+    let login = {} as any
     try {
-      const _user = getUser($auth.user)
-      if (_user) {
-        const { payload } = await $axios.$get(`/api/user/${_user.id}/account`)
-        user = payload
-      } else {
-        redirect('/login')
-      }
+      const { payload } = await $axios.$get(`/api/user/account`)
+      login = payload
     } catch (error) {
       app.$toastService.error('error fetching account')
     }
 
-    return { login: user }
+    return { login }
   }
 
   @debounce

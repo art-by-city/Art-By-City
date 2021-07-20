@@ -113,9 +113,9 @@ export default class UserControllerImpl implements UserController {
      *                statusCode: 500
      *                message: 'An unknown error has occurred'
      */
-    router.get('/:id/account', normalLimits, async (req, res, next) => {
+    router.get('/account', normalLimits, async (req, res, next) => {
       try {
-        const result = await this.userAppService.getUserAccount(req.params.id)
+        const result = await this.userAppService.getUserAccount((<User>req.user).id)
 
         return res.send(result)
       } catch (error) {
