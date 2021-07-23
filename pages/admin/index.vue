@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts">
-import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'

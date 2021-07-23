@@ -41,7 +41,7 @@ export default class UploadPage extends FormPageComponent {
         slug: '',
         description: '',
         type: '',
-        city: store.state.auth.user.city,
+        city: '',
         hashtags: [],
         images: []
       }
@@ -50,11 +50,11 @@ export default class UploadPage extends FormPageComponent {
 
   @debounce
   async save() {
-    const artwork = await this.$artworkService.createArtwork(this.artwork)
+    // const artwork = await this.$artworkService.createArtwork(this.artwork)
 
-    if (artwork) {
-      this.$router.push(`/${artwork.owner.username}/${artwork.slug}`)
-    }
+    // if (artwork) {
+    //   this.$router.push(`/${artwork.owner.username}/${artwork.slug}`)
+    // }
   }
 
   @debounce

@@ -34,7 +34,6 @@
 </template>
 
 <script lang="ts">
-import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
@@ -56,27 +55,27 @@ export default class UserArtworkPage extends PageComponent {
     { text: 'actions', value: 'actions' }
   ]
 
-  async asyncData({ $axios, store }: Context) {
-    try {
-      const { payload } = await $axios.$get('/api/user/portfolio')
-      const cities = store.state.config.cities
+  // async asyncData({ $axios, store }: Context) {
+  //   try {
+  //     const { payload } = await $axios.$get('/api/user/portfolio')
+  //     const cities = store.state.config.cities
 
-      return {
-        cities,
-        artworks: payload.map((a: any) => {
-          for (let i = 0; i < cities.length; i++) {
-            if (cities[i].id === a.city) {
-              a.city = cities[i].name
-            }
-          }
-          return a
-        })
-      }
-    } catch (error) {
-      console.error(error)
-      return { errors: error.response?.data?.messages }
-    }
-  }
+  //     return {
+  //       cities,
+  //       artworks: payload.map((a: any) => {
+  //         for (let i = 0; i < cities.length; i++) {
+  //           if (cities[i].id === a.city) {
+  //             a.city = cities[i].name
+  //           }
+  //         }
+  //         return a
+  //       })
+  //     }
+  //   } catch (error) {
+  //     console.error(error)
+  //     return { errors: error.response?.data?.messages }
+  //   }
+  // }
 
   totalLikes(artwork: any) {
     return artwork.likes?.length || 0

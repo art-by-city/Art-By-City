@@ -130,51 +130,51 @@ export default class RegisterPage extends FormPageComponent {
   repeatPasswordRules = repeatPasswordRules
   inviteCodeRules = inviteCodeRules
 
-  async asyncData({ store, query }: Context) {
-    // Temporarily restrict city to NYC, if found
-    const cities = store?.state?.config?.cities || []
-    let forceRegistrationCityId
-    for (let i = 0; i < cities.length; i++) {
-      if (cities[i].code === 'NYC') {
-        forceRegistrationCityId = cities[i].id
-      }
-    }
+  // async asyncData({ store, query }: Context) {
+  //   // Temporarily restrict city to NYC, if found
+  //   const cities = store?.state?.config?.cities || []
+  //   let forceRegistrationCityId
+  //   for (let i = 0; i < cities.length; i++) {
+  //     if (cities[i].code === 'NYC') {
+  //       forceRegistrationCityId = cities[i].id
+  //     }
+  //   }
 
-    return {
-      disableCityInput: !!forceRegistrationCityId,
-      disableInviteCodeInput: !!query.invite,
-      login: {
-        inviteCode: query.invite || '',
-        username: '',
-        email: '',
-        password: '',
-        city: forceRegistrationCityId || ''
-      }
-    }
-  }
+  //   return {
+  //     disableCityInput: !!forceRegistrationCityId,
+  //     disableInviteCodeInput: !!query.invite,
+  //     login: {
+  //       inviteCode: query.invite || '',
+  //       username: '',
+  //       email: '',
+  //       password: '',
+  //       city: forceRegistrationCityId || ''
+  //     }
+  //   }
+  // }
 
-  @debounce
-  async register() {
-    this.errors = []
-    const registrationResult = await this.$axios
-      .$put('/api/auth/register', this.login)
-      .catch((error) => {
-        this.errors = [error.response.data.error.message]
-      })
+  // @debounce
+  // async register() {
+  //   this.errors = []
+  //   const registrationResult = await this.$axios
+  //     .$put('/api/auth/register', this.login)
+  //     .catch((error) => {
+  //       this.errors = [error.response.data.error.message]
+  //     })
 
-    if (registrationResult && registrationResult.token) {
-      try {
-        await this.$auth.setUserToken(
-          registrationResult.token,
-          registrationResult.refresh_token
-        )
-        this.$router.push({ path: '/' })
-      } catch (err) {
-        // TODO -> Sentry
-        // eslint-disable-next-line no-console
-        console.error(err)
-      }
-    }
-  }
+  //   if (registrationResult && registrationResult.token) {
+  //     try {
+  //       await this.$auth.setUserToken(
+  //         registrationResult.token,
+  //         registrationResult.refresh_token
+  //       )
+  //       this.$router.push({ path: '/' })
+  //     } catch (err) {
+  //       // TODO -> Sentry
+  //       // eslint-disable-next-line no-console
+  //       console.error(err)
+  //     }
+  //   }
+  // }
 }
 </script>

@@ -1,6 +1,5 @@
 <template>
   <v-app-bar
-    v-if="user"
     :clipped-left="true"
     fixed
     app
@@ -40,12 +39,11 @@
 
     <v-toolbar-items>
       <template v-if="!user">
-        <v-btn text to="/register">sign up</v-btn>
-        <v-divider vertical />
-        <v-btn text to="/login">log in</v-btn>
+        <v-btn text>log in</v-btn>
       </template>
       <template v-if="user">
-        <v-menu offset-y>
+        hi :)
+        <!-- <v-menu offset-y>
           <template v-slot:activator="props">
             <v-btn class="avatar-menu-button" text right v-on="props.on">
               <UserAvatar
@@ -83,7 +81,7 @@
               </v-list-item-content>
             </v-list-item>
           </v-list>
-        </v-menu>
+        </v-menu> -->
       </template>
     </v-toolbar-items>
   </v-app-bar>
@@ -117,11 +115,11 @@ export default class AppBar extends Vue {
       title: 'home',
       to: '/'
     },
-    {
-      icon: 'mdi-upload',
-      title: 'upload',
-      to: '/upload'
-    },
+    // {
+    //   icon: 'mdi-upload',
+    //   title: 'upload',
+    //   to: '/upload'
+    // },
     {
       icon: 'mdi-account-cowboy-hat',
       title: 'admin',
