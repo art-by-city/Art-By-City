@@ -29,9 +29,17 @@ export default class AdminServiceImpl implements AdminService {
 
   async listUsers(): Promise<ApiServiceResult<UserAccountViewModel[]>> {
     const users = await this.userService.listUsers()
-    return new ApiServiceSuccessResult(users.map((user) => {
+    const mappedUsers = users.map((user) => {
       return new UserMapper().toUserAccountViewModel(user)
-    }))
+    }).filter<UserAccountViewModel>((value): value is UserAccountViewModel => {
+      if (value === null) {
+        return false
+      }
+
+      return true
+    })
+
+    return new ApiServiceSuccessResult(mappedUsers)
   }
 
   async listCities(): Promise<ApiServiceResult<CityViewModel[]>> {
@@ -51,7 +59,7 @@ export default class AdminServiceImpl implements AdminService {
         const user = await this.userService.getById(artwork.owner)
         return new ArtworkMapper().toViewModel(
           artwork,
-          user ? new UserMapper().toViewModel(user) : undefined
+          new UserMapper().toViewModel(user) || undefined
         )
       })
     )

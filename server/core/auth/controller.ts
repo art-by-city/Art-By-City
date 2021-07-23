@@ -83,9 +83,13 @@ export default class AuthControllerImpl implements AuthController {
      */
     router.post('/login', localAuth, (req, res, next) => {
       try {
-        const result = this.authService.login(new UserMapper().toViewModel(<User>req.user))
+        const viewModel = new UserMapper().toViewModel(<User>req.user)
+        if (viewModel) {
+          const result = this.authService.login(viewModel)
+          return res.json(result)
+        }
 
-        return res.json(result)
+        throw new UnknownError()
       } catch (error) {
         console.error(error)
         next(new UnknownError())

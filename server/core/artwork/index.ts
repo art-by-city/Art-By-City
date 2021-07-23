@@ -3,7 +3,7 @@ import { IsString, Matches } from 'class-validator'
 
 import BaseControllerInterface from '../controller.interface'
 import BaseApplicationServiceInterface from '../applicationService.interface'
-import BaseRepositoryInterface from '../repository.interface'
+import BaseRepositoryInterface from '../infra/repository.interface'
 import BaseDomainServiceInterface from '../domainService.interface'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import { User } from '../user'
@@ -15,7 +15,7 @@ import ArtworkServiceImpl from './service'
 import ArtworkApplicationServiceImpl from './appService'
 import ArtworkControllerImpl from './controller'
 import { FileUploadRequest } from '../file'
-import ServiceResult from '../api/results/serviceResult.interface'
+import { DomainServiceResult } from '../domain'
 
 export { default as Artwork } from './artwork'
 export { default as ArtworkViewModel } from './viewModels/artworkViewModel'
@@ -86,7 +86,7 @@ export interface ArtworkApplicationService
 }
 // TODO -> re-extend base service interface
 export interface ArtworkService { //extends BaseDomainServiceInterface<Artwork> {
-  create(artwork: Artwork): Promise<ServiceResult<Artwork>>
+  create(artwork: Artwork): Promise<DomainServiceResult<Artwork>>
   get(idOrSlug: string): Promise<Artwork | null>
   update(artwork: Artwork, modifyUpdated?: boolean): Promise<Artwork>
   delete(id: string): Promise<void>

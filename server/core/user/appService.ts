@@ -85,7 +85,7 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
             const user = await this.userService.getById(artwork.owner)
             return new ArtworkMapper().toViewModel(
               artwork,
-              user ? new UserMapper().toViewModel(user) : undefined
+              new UserMapper().toViewModel(user) || undefined
             )
           })
         )
@@ -107,7 +107,11 @@ export default class UserApplicationServiceImpl implements UserApplicationServic
       const userProfile = new UserMapper()
         .toUserAccountViewModel(user, { cityName: city?.name || undefined })
 
-      return new ApiServiceSuccessResult(userProfile)
+      if (userProfile) {
+        return new ApiServiceSuccessResult(userProfile)
+      } else {
+        throw new UnknownError()
+      }
     } else {
       throw new NotFoundError('user')
     }

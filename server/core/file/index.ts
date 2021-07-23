@@ -1,7 +1,7 @@
 import { ContainerModule } from 'inversify'
 
 import BaseApplicationServiceInterface from '../applicationService.interface'
-import BaseRepositoryInterface from '../repository.interface'
+import BaseRepositoryInterface from '../infra/repository.interface'
 import BaseDomainServiceInterface from '../domainService.interface'
 import File from './file'
 import FileRepositoryImpl from './repository'

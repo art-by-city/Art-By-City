@@ -122,7 +122,13 @@ export default class UserServiceImpl implements UserService {
 
       this.eventService.emit(UserEvents.Account.Registered, savedUser.id)
 
-      return new UserMapper().toViewModel(savedUser)
+      const viewModel = new UserMapper().toViewModel(savedUser)
+
+      if (viewModel) {
+        return viewModel
+      }
+
+      throw new Error('Error mapping view model')
     } catch (error) {
       console.error(error)
       throw new UnknownError()

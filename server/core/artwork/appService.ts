@@ -23,7 +23,7 @@ import {
 } from './'
 import { ConfigService } from '../config'
 import { FileApplicationService } from '../file'
-import ServiceResult from '../api/results/serviceResult.interface'
+import { DomainServiceResult } from '../domain'
 
 @injectable()
 export default class ArtworkApplicationServiceImpl
@@ -114,7 +114,7 @@ export default class ArtworkApplicationServiceImpl
         images: []
       })
 
-      const serviceResult: ServiceResult<Artwork> =
+      const serviceResult: DomainServiceResult<Artwork> =
         await this.artworkService.create(artwork)
 
       if (!serviceResult.errors && serviceResult.payload) {
@@ -140,7 +140,7 @@ export default class ArtworkApplicationServiceImpl
         return new ApiServiceSuccessResult(
           new ArtworkMapper().toViewModel(
             createdArtwork,
-            new UserMapper().toViewModel(user)
+            new UserMapper().toViewModel(user) || undefined
           )
         )
       }
@@ -219,7 +219,7 @@ export default class ArtworkApplicationServiceImpl
 
         return new ApiServiceSuccessResult(
           new ArtworkMapper().toViewModel(
-            savedArtwork, new UserMapper().toViewModel(user)
+            savedArtwork, new UserMapper().toViewModel(user) || undefined
           )
         )
       }
@@ -297,7 +297,7 @@ export default class ArtworkApplicationServiceImpl
           const user = await this.userService.getById(artwork.owner)
           return new ArtworkMapper().toViewModel(
             artwork,
-            user ? new UserMapper().toViewModel(user) : undefined
+            new UserMapper().toViewModel(user) || undefined
           )
         })
       )
@@ -318,7 +318,7 @@ export default class ArtworkApplicationServiceImpl
           const user = await this.userService.getById(artwork.owner)
           return new ArtworkMapper().toViewModel(
             artwork,
-            user ? new UserMapper().toViewModel(user) : undefined
+            new UserMapper().toViewModel(user) || undefined
           )
         })
       )
@@ -339,7 +339,7 @@ export default class ArtworkApplicationServiceImpl
           const user = await this.userService.getById(artwork.owner)
           return new ArtworkMapper().toViewModel(
             artwork,
-            user ? new UserMapper().toViewModel(user) : undefined
+            new UserMapper().toViewModel(user) || undefined
           )
         })
       )
@@ -364,7 +364,7 @@ export default class ArtworkApplicationServiceImpl
       return new ApiServiceSuccessResult(
         new ArtworkMapper().toViewModel(
           artwork,
-          user ? new UserMapper().toViewModel(user) : undefined
+          new UserMapper().toViewModel(user) || undefined
         )
       )
     } catch (error) {

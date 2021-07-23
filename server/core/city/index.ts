@@ -2,7 +2,7 @@ import { ContainerModule } from 'inversify'
 
 import BaseControllerInterface from '../controller.interface'
 import BaseApplicationServiceInterface from '../applicationService.interface'
-import BaseRepositoryInterface from '../repository.interface'
+import BaseRepositoryInterface from '../infra/repository.interface'
 import BaseDomainServiceInterface from '../domainService.interface'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import City from './city'

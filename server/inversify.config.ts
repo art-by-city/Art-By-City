@@ -14,6 +14,7 @@ import { InvitationModule } from './core/invitation'
 import { EmailModule } from './core/email'
 import { FileModule } from './core/file'
 import { ChangelogModule } from './core/changelog'
+import { WalletsModule } from './core/wallets'
 
 import GatewayModule from './gateway'
 import DatabaseModule from './core/db/module'
@@ -34,6 +35,7 @@ container.load(InvitationModule)
 container.load(EmailModule)
 container.load(FileModule)
 container.load(ChangelogModule)
+container.load(WalletsModule)
 
 container.load(GatewayModule)
 container.load(DatabaseModule)
