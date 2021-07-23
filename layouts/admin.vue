@@ -48,14 +48,13 @@ import { Breadcrumb } from '../components/types'
 })
 export default class AdminLayout extends Vue {
   adminPageLinks = [
-    { text: 'Artwork', icon: 'mdi-image-multiple', to: '/admin/artwork' },
-    { text: 'Users', icon: 'mdi-table-account', to: '/admin/users' },
-    { text: 'Invitations', icon: 'mdi-email-plus', to: '/admin/invitations' },
-    { text: 'Config', icon: 'mdi-card-bulleted-settings', to: '/admin/config' },
-    { text: 'Cities', icon: 'mdi-map', to: '/admin/cities' },
-    { text: 'Event Log', icon: 'mdi-table-clock', to: '/admin/events' },
-    { text: 'Theme', icon: 'mdi-theme-light-dark', to: '/admin/theme' },
-    { text: 'Web3 Sandbox', icon: 'mdi-ethereum', to: '/admin/web3' }
+    // { text: 'Artwork', icon: 'mdi-image-multiple', to: '/admin/artwork' },
+    // { text: 'Users', icon: 'mdi-table-account', to: '/admin/users' },
+    // { text: 'Invitations', icon: 'mdi-email-plus', to: '/admin/invitations' },
+    // { text: 'Config', icon: 'mdi-card-bulleted-settings', to: '/admin/config' },
+    // { text: 'Cities', icon: 'mdi-map', to: '/admin/cities' },
+    // { text: 'Event Log', icon: 'mdi-table-clock', to: '/admin/events' },
+    { text: 'Theme', icon: 'mdi-theme-light-dark', to: '/admin/theme' }
   ]
 
   get breadcrumbs(): Breadcrumb[] {

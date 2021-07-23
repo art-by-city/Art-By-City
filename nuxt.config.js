@@ -36,7 +36,6 @@ export default {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    '~/plugins/axios',
     '~/plugins/components.ts',
     '~/plugins/services.ts',
     '~/plugins/filters.ts',
@@ -51,7 +50,7 @@ export default {
    */
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    // '@nuxtjs/auth-next'
   ],
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
@@ -69,41 +68,41 @@ export default {
       : 'http://localhost:3000'
   },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
-  auth: {
-    localStorage: false,
-    cookie: {
-      options: {
-        secure: process.env.NODE_ENV === 'production'
-          || process.env.NODE_ENV === 'staging'
-      }
-    },
-    redirect: {
-      login: '/login',
-      logout: '/',
-      home: '/',
-      // callback: '/callback',
-      rewriteRedirects: true,
-      // resetOnError: true
-    },
-    strategies: {
-      local: {
-        scheme: 'refresh',
-        token: {
-          property: 'token',
-          maxAge: 1800
-        },
-        refreshToken: {
-          property: 'refresh_token',
-          data: 'refresh_token',
-          maxAge: 60 * 60 * 24 * 30
-        },
-        user: { property: 'user' },
-        login: { url: '/auth/login', method: 'post' },
-        logout: false,
-        user: { url: '/auth/user', method: 'get' }
-      }
-    }
-  },
+  // auth: {
+  //   localStorage: false,
+  //   cookie: {
+  //     options: {
+  //       secure: process.env.NODE_ENV === 'production'
+  //         || process.env.NODE_ENV === 'staging'
+  //     }
+  //   },
+  //   redirect: {
+  //     login: '/login',
+  //     logout: '/',
+  //     home: '/',
+  //     // callback: '/callback',
+  //     rewriteRedirects: true,
+  //     // resetOnError: true
+  //   },
+  //   strategies: {
+  //     local: {
+  //       scheme: 'refresh',
+  //       token: {
+  //         property: 'token',
+  //         maxAge: 1800
+  //       },
+  //       refreshToken: {
+  //         property: 'refresh_token',
+  //         data: 'refresh_token',
+  //         maxAge: 60 * 60 * 24 * 30
+  //       },
+  //       user: { property: 'user' },
+  //       login: { url: '/auth/login', method: 'post' },
+  //       logout: false,
+  //       user: { url: '/auth/user', method: 'get' }
+  //     }
+  //   }
+  // },
   router: {},
   /*
    ** Axios module configuration

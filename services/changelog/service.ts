@@ -12,21 +12,22 @@ export default class ChangelogService {
   }
 
   markLatestChangelogSeen() {
-    this._context.$auth.$storage.setUniversal(
-      lastVersionSeenKey,
-      this.$store.state.config.changelogLatestVersion
-    )
-    this._context.$auth.setUser({
-      ...this._context.$auth.user,
-      changelogLastVersionViewed: this.$store.state.config
-        .changelogLatestVersion
-    })
+    // this._context.$auth.$storage.setUniversal(
+    //   lastVersionSeenKey,
+    //   this.$store.state.config.changelogLatestVersion
+    // )
+    // this._context.$auth.setUser({
+    //   ...this._context.$auth.user,
+    //   changelogLastVersionViewed: this.$store.state.config
+    //     .changelogLatestVersion
+    // })
   }
 
   hasSeenLatestChangelog(): boolean {
-    return (
-      this.$store.state.config.changelogLatestVersion ===
-      this._context.$auth.$storage.getUniversal(lastVersionSeenKey)
-    )
+    return false
+    // return (
+    //   this.$store.state.config.changelogLatestVersion ===
+    //   this._context.$auth.$storage.getUniversal(lastVersionSeenKey)
+    // )
   }
 }

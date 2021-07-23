@@ -15,15 +15,15 @@ export default class ConfigService {
   }
 
   async fetchAndSetStoreConfig(): Promise<void> {
-    ProgressService.start()
-    try {
-      const config = await this.$axios.$get('/api/config')
-      this.$store.commit('config/setConfig', config)
-    } catch (error) {
-      console.error(error)
-      this._context.$toastService.error(error)
-    } finally {
-      ProgressService.stop()
-    }
+  //   ProgressService.start()
+  //   try {
+  //     const config = await this.$axios.$get('/api/config')
+  //     this.$store.commit('config/setConfig', config)
+  //   } catch (error) {
+  //     console.error(error)
+  //     this._context.$toastService.error(error)
+  //   } finally {
+  //     ProgressService.stop()
+  //   }
   }
 }

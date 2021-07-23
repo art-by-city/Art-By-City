@@ -85,7 +85,6 @@ import { debounce } from '~/helpers/helpers'
 import User, { getUser } from '../models/user/user'
 
 @Component({
-  middleware: 'auth',
   components: {
     CitySelector
   }
@@ -111,39 +110,39 @@ export default class AccountPage extends FormPageComponent {
     return getUser(this.$auth.user)
   }
 
-  async asyncData({ $axios, app }: Context) {
-    let login = {} as any
-    try {
-      const { payload } = await $axios.$get(`/api/user/account`)
-      login = payload
-    } catch (error) {
-      app.$toastService.error('error fetching account')
-    }
+  // async asyncData({ $axios, app }: Context) {
+  //   let login = {} as any
+  //   try {
+  //     const { payload } = await $axios.$get(`/api/user/account`)
+  //     login = payload
+  //   } catch (error) {
+  //     app.$toastService.error('error fetching account')
+  //   }
 
-    return { login }
-  }
+  //   return { login }
+  // }
 
   @debounce
   async save() {
     ProgressService.start()
 
-    try {
-      const success = await this.$axios.$post('/api/auth/update', {
-        username: this.login.username,
-        password: this.login.password,
-        newPassword: this.newPassword
-      })
+    // try {
+    //   const success = await this.$axios.$post('/api/auth/update', {
+    //     username: this.login.username,
+    //     password: this.login.password,
+    //     newPassword: this.newPassword
+    //   })
 
-      if (success) {
-        this.$toastService.success('account saved')
-      }
-    } catch (error) {
-      if (error.response.status === 401) {
-        this.$toastService.error('invalid credentials')
-      } else {
-        this.$toastService.error('an error has occurred')
-      }
-    }
+    //   if (success) {
+    //     this.$toastService.success('account saved')
+    //   }
+    // } catch (error) {
+    //   if (error.response.status === 401) {
+    //     this.$toastService.error('invalid credentials')
+    //   } else {
+    //     this.$toastService.error('an error has occurred')
+    //   }
+    // }
 
     ProgressService.stop()
   }

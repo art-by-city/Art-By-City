@@ -2,8 +2,6 @@
   <v-app dark>
     <AppBar
       :config="$config"
-      :user="user"
-      @logout="logout"
     />
 
     <v-main>
@@ -13,10 +11,7 @@
       </v-container>
     </v-main>
 
-    <Footer
-      :isLoggedIn="$auth.loggedIn"
-      :shouldChangelogIconBlink="shouldChangelogIconBlink()"
-    />
+    <Footer :shouldChangelogIconBlink="shouldChangelogIconBlink()" />
 
     <div class="toast-alerts-container">
       <v-alert
@@ -59,10 +54,6 @@ import { AppBar, Footer } from '~/components/layout'
   }
 })
 export default class DefaultLayout extends Vue {
-  get user(): User | null {
-    return getUser(this.$auth.user)
-  }
-
   shouldChangelogIconBlink(): boolean {
     return !this.$changelogService.hasSeenLatestChangelog()
   }
@@ -79,18 +70,14 @@ export default class DefaultLayout extends Vue {
         this.toasts = this.$store.state.toasts.list
       }
     )
-    if (this.$auth.loggedIn) {
-      this.$store.watch(
-        (state) => state.auth.user.changelogLastVersionViewed,
-        () => {
-          this.$forceUpdate()
-        }
-      )
-    }
-  }
-
-  private async logout() {
-    await this.$auth.logout()
+    // if (this.$auth.loggedIn) {
+    //   this.$store.watch(
+    //     (state) => state.auth.user.changelogLastVersionViewed,
+    //     () => {
+    //       this.$forceUpdate()
+    //     }
+    //   )
+    // }
   }
 }
 </script>

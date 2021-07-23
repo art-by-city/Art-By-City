@@ -5,6 +5,6 @@ export const state = () => ({...defaultState})
 export type IndexStoreState = ReturnType<typeof state>
 export const actions: ActionTree<IndexStoreState, any> = {
   async nuxtServerInit({ dispatch }): Promise<void> {
-    await dispatch('config/setConfig')
+    // await dispatch('config/setConfig')
   }
 }
