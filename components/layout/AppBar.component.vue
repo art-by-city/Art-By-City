@@ -151,6 +151,11 @@ export default class AppBar extends Vue {
         icon: 'mdi-account-settings',
         title: 'settings',
         to: '/settings'
+      },
+      {
+        icon: 'mdi-wallet',
+        title: 'wallet',
+        to: '/wallet'
       }
     ]
   }

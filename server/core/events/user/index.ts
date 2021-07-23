@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 
-import BaseRepositoryInterface from '../../repository.interface'
+import BaseRepositoryInterface from '../../infra/repository.interface'
 import UserEvent from './userEvent'
 
 export { default as UserEvent } from './userEvent'

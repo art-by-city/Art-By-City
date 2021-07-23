@@ -9,7 +9,7 @@ import {
   ArtworkRepository,
   ArtworkFilterOptions
 } from './'
-import ServiceResult from '../api/results/serviceResult.interface'
+import { DomainServiceResult } from '../domain'
 
 @injectable()
 export default class ArtworkServiceImpl implements ArtworkService {
@@ -22,7 +22,7 @@ export default class ArtworkServiceImpl implements ArtworkService {
     this.artworkRepository = artworkRepository
   }
 
-  async create(artwork: Artwork): Promise<ServiceResult<Artwork>> {
+  async create(artwork: Artwork): Promise<DomainServiceResult<Artwork>> {
     try {
       await validateArtwork(artwork)
     } catch (error) {

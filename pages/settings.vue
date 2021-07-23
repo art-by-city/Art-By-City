@@ -1,13 +1,15 @@
 <template>
   <v-container fluid>
     <v-row justify="center">
-      <h2 class="text-lowercase">Settings</h2>
+      <h2>Settings</h2>
     </v-row>
     <v-row justify="center">
       <v-col cols="11" sm="6">
-        <v-expansion-panels popout readonly :value="0">
+        <v-expansion-panels multiple :value="[0]">
           <v-expansion-panel>
-            <v-expansion-panel-header class="text-lowercase">Account</v-expansion-panel-header>
+            <v-expansion-panel-header>
+              Account
+            </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-form ref="form" v-model="valid" @submit.prevent="save">
                 <v-text-field
@@ -99,6 +101,7 @@ export default class AccountPage extends FormPageComponent {
   }
   passwordRules = passwordRules
   repeatPasswordRules = repeatPasswordRules
+  arweaveAddress = ''
 
   get userCity() {
     return this.user?.city || ''

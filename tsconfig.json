@@ -32,7 +32,8 @@
       "@nuxtjs/auth-next",
       "reflect-metadata",
       "@nuxtjs/axios",
-      "vuetify"
+      "vuetify",
+      "arconnect"
     ]
   },
   "exclude": [

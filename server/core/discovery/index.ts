@@ -1,6 +1,6 @@
 import { ContainerModule } from 'inversify'
 
-import BaseRepositoryInterface from '../repository.interface'
+import BaseRepositoryInterface from '../infra/repository.interface'
 import BaseDomainServiceInterface from '../domainService.interface'
 import BaseApplicationServiceInterface from '../applicationService.interface'
 

@@ -1,7 +1,7 @@
 import { ContainerModule } from 'inversify'
 
 import BaseControllerInterface from '../controller.interface'
-import BaseRepositoryInterface from '../repository.interface'
+import BaseRepositoryInterface from '../infra/repository.interface'
 import ApiServiceResult from '../api/results/apiServiceResult.interface'
 import User, { UserAvatar } from './user'
 import UserViewModel, { UserAvatarViewModel }

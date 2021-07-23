@@ -55,6 +55,12 @@ export default {
   ],
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+    arweave: (
+      process.env.NODE_ENV === 'production'
+      || process.env.NODE_ENV === 'staging'
+    )
+      ? { protocol: 'https', host: 'arweave.net', port: 443 }
+      : { protocol: 'http', host: 'localhost', port: 1984 },
     imgBaseUrl: (
       process.env.NODE_ENV === 'production'
       || process.env.NODE_ENV === 'staging'

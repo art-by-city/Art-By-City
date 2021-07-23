@@ -5,7 +5,6 @@ import passport from 'passport'
 import { ConfigController, ConfigService } from './'
 import roles from '../middleware/roles'
 
-
 @injectable()
 export default class ConfigControllerImpl implements ConfigController {
   private router!: Router

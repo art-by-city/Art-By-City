@@ -20,6 +20,7 @@ import {
 } from './core/invitation'
 import { FileApplicationService } from './core/file'
 import { ChangelogController } from './core/changelog'
+import { WalletsController } from './core/wallets'
 
 dotenv.config()
 
@@ -81,6 +82,10 @@ app.use(
 app.use(
   '/invitations',
   container.get<InvitationController>(Symbol.for('InvitationController')).getRouter()
+)
+app.use(
+  '/wallets',
+  container.get<WalletsController>(Symbol.for('WalletsController')).getRouter()
 )
 
 // Event Registration

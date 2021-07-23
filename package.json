@@ -70,6 +70,7 @@
   },
   "devDependencies": {
     "@textury/arlocal": "^1.0.27",
+    "arconnect": "^0.2.9",
     "babel-eslint": "^10.0.1",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.10.0",
