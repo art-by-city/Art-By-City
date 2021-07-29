@@ -1,11 +1,11 @@
 <template>
-  <v-app dark>
+  <v-app dark class="app">
     <AppBar
       :config="$config"
     />
 
-    <v-main>
-      <v-container fluid class="pl-0 pr-0 pt-0" style="height: 100%">
+    <v-main class="main">
+      <v-container fluid class="pl-4 pr-4 pt-7 main-container">
         <nuxt v-if="!$slots.default" />
         <slot />
       </v-container>
@@ -83,6 +83,16 @@ export default class DefaultLayout extends Vue {
 </script>
 
 <style scoped>
+.app {
+  background-color: #FAFAFA;
+}
+
+.main-container {
+  height: 100%;
+  width: 1250px;
+  background-color: white;
+}
+
 .toast-alerts-container {
   position: fixed;
   bottom: 32px;
