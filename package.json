@@ -22,6 +22,8 @@
   "dependencies": {
     "@google-cloud/firestore": "^3.8.0",
     "@google-cloud/storage": "^5.7.0",
+    "@nuxt/types": "^2.15.7",
+    "@nuxt/typescript-build": "^0.6.7",
     "@nuxt/typescript-runtime": "^0.4.10",
     "@nuxtjs/auth-next": "5.0.0-1624817847.21691f1",
     "@nuxtjs/axios": "^5.13.6",
@@ -40,6 +42,7 @@
     "@types/react": "^17.0.3",
     "@types/swagger-jsdoc": "^3.0.2",
     "@types/swagger-ui-express": "^4.1.2",
+    "arconnect": "^0.2.9",
     "body-parser": "^1.19.0",
     "class-validator": "^0.12.2",
     "cropperjs": "^1.5.9",
@@ -67,10 +70,7 @@
     "web3modal": "^1.9.3"
   },
   "devDependencies": {
-    "@nuxt/types": "^2.15.7",
-    "@nuxt/typescript-build": "^0.6.7",
     "@textury/arlocal": "^1.0.27",
-    "arconnect": "^0.2.9",
     "babel-eslint": "^10.0.1",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.10.0",
