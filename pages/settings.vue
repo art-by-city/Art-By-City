@@ -93,9 +93,9 @@ export default class AccountPage extends FormPageComponent {
   newPassword = ''
   repeatPassword = ''
   login = {
-    id: this.user?.id || '',
-    username: this.user?.username || '',
-    email: this.user?.email || '',
+    id: '', //this.user?.id || '',
+    username: '', //this.user?.username || '',
+    email: '', //this.user?.email || '',
     password: ''
   }
   passwordRules = passwordRules
@@ -103,7 +103,8 @@ export default class AccountPage extends FormPageComponent {
   arweaveAddress = ''
 
   get userCity() {
-    return this.user?.city || ''
+    // return this.user?.city || ''
+    return ''
   }
 
   get user(): User | null {

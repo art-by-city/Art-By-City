@@ -2,6 +2,9 @@
   <v-app dark class="app">
     <AppBar
       :config="$config"
+      :user="$auth.user"
+      @login="login"
+      @logout="logout"
     />
 
     <v-main class="main">
@@ -44,7 +47,6 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 
 import ToastMessage from '~/models/toasts/toastMessage'
-import User, { getUser } from '../models/user/user'
 import { AppBar, Footer } from '~/components/layout'
 
 @Component({
@@ -78,6 +80,18 @@ export default class DefaultLayout extends Vue {
     //     }
     //   )
     // }
+  }
+
+  async login() {
+    try {
+      await this.$auth.loginWith('arconnect')
+    } catch (error) {
+      this.$toastService.error(error)
+    }
+  }
+
+  async logout() {
+    await this.$auth.logout()
   }
 }
 </script>

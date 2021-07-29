@@ -26,7 +26,7 @@ export default class ProfileService {
       const _user = getUser(this._context.$auth.user)
       if (payload && _user) {
         const user = { ..._user }
-        user.avatar = payload
+        // user.avatar = payload
         this._context.$auth.setUser(user)
 
         return payload
@@ -45,9 +45,9 @@ export default class ProfileService {
   async updateProfile(user: User): Promise<boolean> {
     ProgressService.start()
     try {
-      await this.$axios.$post('/api/user/profile', {
-        name: user.name
-      })
+      // await this.$axios.$post('/api/user/profile', {
+      //   name: user.name
+      // })
 
       return true
     } catch (error) {

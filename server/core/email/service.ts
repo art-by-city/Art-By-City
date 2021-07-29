@@ -29,7 +29,7 @@ export default class EmailServiceImpl {
         console.log(
           isProduction
             ? `Email sent: ${result.messageId}`
-            : result.message
+            : result
         )
         return true
       }

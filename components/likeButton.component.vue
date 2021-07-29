@@ -37,31 +37,31 @@ export default class LikeButton extends Vue {
 
   @debounce
   toggleLike() {
-    if (!this.artwork.likes) {
-      this.artwork.likes = []
-    }
+    // if (!this.artwork.likes) {
+    //   this.artwork.likes = []
+    // }
 
-    if (this.user) {
-      if (!this.artwork.likes.includes(this.user.id)) {
-        this.artwork.likes.push(this.user.id)
-        try {
-          this.$axios.$put(`/api/artwork/${this.artwork.id}/like`)
-        } catch (error) {
-          this.$toastService.error('error liking artwork')
-        }
-      } else {
-        try {
-          this.$axios.$delete(`/api/artwork/${this.artwork.id}/like`)
-        } catch (error) {
-          this.$toastService.error('error unliking artwork')
-        }
-        this.artwork.likes = this.artwork.likes.filter((id: string) => {
-          return this.user && id !== this.user.id
-        })
-      }
-    }
+    // if (this.user) {
+    //   if (!this.artwork.likes.includes(this.user.id)) {
+    //     this.artwork.likes.push(this.user.id)
+    //     try {
+    //       this.$axios.$put(`/api/artwork/${this.artwork.id}/like`)
+    //     } catch (error) {
+    //       this.$toastService.error('error liking artwork')
+    //     }
+    //   } else {
+    //     try {
+    //       this.$axios.$delete(`/api/artwork/${this.artwork.id}/like`)
+    //     } catch (error) {
+    //       this.$toastService.error('error unliking artwork')
+    //     }
+    //     this.artwork.likes = this.artwork.likes.filter((id: string) => {
+    //       return this.user && id !== this.user.id
+    //     })
+    //   }
+    // }
 
-    this.$forceUpdate()
+    // this.$forceUpdate()
   }
 
   color() {
@@ -83,9 +83,9 @@ export default class LikeButton extends Vue {
   }
 
   isLiked() {
-    if (this.user && this.artwork.likes?.includes(this.user.id)) {
-      return true
-    }
+    // if (this.user && this.artwork.likes?.includes(this.user.id)) {
+    //   return true
+    // }
 
     return false
   }

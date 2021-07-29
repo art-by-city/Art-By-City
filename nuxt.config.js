@@ -50,7 +50,7 @@ export default {
    */
   modules: [
     '@nuxtjs/axios',
-    // '@nuxtjs/auth-next'
+    '@nuxtjs/auth-next'
   ],
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
@@ -67,42 +67,15 @@ export default {
       ? `https://storage.googleapis.com/${process.env.USER_UPLOAD_BUCKET_NAME}`
       : 'http://localhost:3000'
   },
-  serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
-  // auth: {
-  //   localStorage: false,
-  //   cookie: {
-  //     options: {
-  //       secure: process.env.NODE_ENV === 'production'
-  //         || process.env.NODE_ENV === 'staging'
-  //     }
-  //   },
-  //   redirect: {
-  //     login: '/login',
-  //     logout: '/',
-  //     home: '/',
-  //     // callback: '/callback',
-  //     rewriteRedirects: true,
-  //     // resetOnError: true
-  //   },
-  //   strategies: {
-  //     local: {
-  //       scheme: 'refresh',
-  //       token: {
-  //         property: 'token',
-  //         maxAge: 1800
-  //       },
-  //       refreshToken: {
-  //         property: 'refresh_token',
-  //         data: 'refresh_token',
-  //         maxAge: 60 * 60 * 24 * 30
-  //       },
-  //       user: { property: 'user' },
-  //       login: { url: '/auth/login', method: 'post' },
-  //       logout: false,
-  //       user: { url: '/auth/user', method: 'get' }
-  //     }
-  //   }
-  // },
+  // serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
+  auth: {
+    strategies: {
+      local: false,
+      arconnect: {
+        scheme: '~/schemes/arconnect'
+      }
+    }
+  },
   router: {},
   /*
    ** Axios module configuration
@@ -130,7 +103,11 @@ export default {
      ** You can extend webpack config here
      */
     // @ts-ignore
-    extend(config, ctx) {},
+    extend(config, ctx) {
+      config.node = {
+        fs: 'empty'
+      }
+    },
     plugins: [
       new IgnoreNotFoundExportPlugin()
     ]
