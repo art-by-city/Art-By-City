@@ -29,9 +29,9 @@
     "types": [
       "node",
       "@nuxt/types",
+      "@nuxtjs/axios",
       "@nuxtjs/auth-next",
       "reflect-metadata",
-      "@nuxtjs/axios",
       "vuetify",
       "arconnect"
     ]

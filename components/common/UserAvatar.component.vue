@@ -74,17 +74,19 @@ export default class UserAvatar extends Vue {
   }
 
   get currentColor() {
-    if (this.user.avatar) {
-      return 'white'
-    } else {
+    // if (this.user.avatar) {
+    //   return 'white'
+    // } else {
       return this.color
-    }
+    // }
   }
 
   get username() {
     return this.abbr
-      ? this.user.username[0]
-      : this.user.username
+      ? this.user.address[0]
+      : this.user.address
+      // ? this.user.username[0]
+      // : this.user.username
   }
 
   get _size() {
@@ -103,7 +105,8 @@ export default class UserAvatar extends Vue {
   }
 
   get src() {
-    return this.baseUrl + '/avatar-images/' + this.user.avatar.source
+    // return this.baseUrl + '/avatar-images/' + this.user.avatar.source
+    return ''
   }
 }
 </script>

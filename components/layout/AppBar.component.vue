@@ -14,9 +14,14 @@
 
     <v-spacer></v-spacer>
 
-    <template v-if="!user">
-      <v-btn text>log in</v-btn>
+    <template v-if="user">
+      {{ user.address }}
+      <v-btn text @click="onLogoutClicked">log out</v-btn>
     </template>
+    <template v-else>
+      <v-btn text @click="onLoginClicked">log in</v-btn>
+    </template>
+
   </v-app-bar>
 </template>
 
@@ -25,6 +30,7 @@ import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import User from '~/models/user/user'
 import { ConfigStoreState } from '~/store/config'
+import { debounce } from '~/helpers/helpers'
 
 @Component
 export default class AppBar extends Vue {
@@ -39,6 +45,10 @@ export default class AppBar extends Vue {
     required: true
   }) readonly config!: ConfigStoreState
 
+  @debounce
+  @Emit('login') onLoginClicked() {}
+
+  @debounce
   @Emit('logout') onLogoutClicked() {}
 }
 </script>
