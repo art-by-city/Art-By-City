@@ -14,7 +14,7 @@
 import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers/helpers'
-import User, { getUser } from '../models/user/user'
+import User from '../models/user/user'
 
 interface Artwork {
   id: string
@@ -32,7 +32,7 @@ export default class LikeButton extends Vue {
   @Model('change', { type: Object, required: true }) artwork!: Artwork
 
   get user(): User | null {
-    return getUser(this.$auth.user)
+    return this.$auth.user
   }
 
   @debounce
