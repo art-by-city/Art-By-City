@@ -82,7 +82,7 @@ import { passwordRules, repeatPasswordRules } from '~/models/user/validation'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ProgressService from '~/services/progress/service'
 import { debounce } from '~/helpers/helpers'
-import User, { getUser } from '../models/user/user'
+import { User } from '~/models'
 
 @Component({
   components: {
@@ -108,7 +108,7 @@ export default class AccountPage extends FormPageComponent {
   }
 
   get user(): User | null {
-    return getUser(this.$auth.user)
+    return this.$auth.user
   }
 
   // async asyncData({ $axios, app }: Context) {

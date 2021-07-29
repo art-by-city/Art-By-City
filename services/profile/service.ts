@@ -2,7 +2,7 @@ import { Context } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
 import ProgressService from '~/services/progress/service'
-import User, { UserAvatar, getUser } from '~/models/user/user'
+import User, { UserAvatar } from '~/models/user/user'
 import { readFileAsDataUrlAsync } from '~/helpers/helpers'
 
 export default class ProfileService {
@@ -23,7 +23,7 @@ export default class ProfileService {
         type: image.type
       })
 
-      const _user = getUser(this._context.$auth.user)
+      const _user = this._context.$auth.user
       if (payload && _user) {
         const user = { ..._user }
         // user.avatar = payload
