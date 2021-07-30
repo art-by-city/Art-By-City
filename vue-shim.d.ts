@@ -7,6 +7,14 @@ declare module '*.vue' {
 // @nuxtjs/auth-next
 // see https://github.com/nuxt-community/auth-module/issues/559
 declare module '~auth/runtime' {
-  export { BaseScheme, SchemeOptions } from '@nuxtjs/auth-next'
+  export {
+    BaseScheme,
+    RequestHandler,
+    SchemeCheck,
+    SchemeOptions,
+    Token,
+    TokenableScheme,
+    TokenableSchemeOptions
+  } from '@nuxtjs/auth-next'
   export type { Auth } from '@nuxtjs/auth-next'
 }
