@@ -1,26 +1,41 @@
 <template>
-  <v-hover v-slot:default="hoverProps">
-    <v-avatar :color="currentColor" :size="_size">
-      <template v-if="user.avatar">
-        <v-img :src="src"></v-img>
-      </template>
-      <template v-else>
-        <span class="white--text text-lowercase">
-          {{ username }}
+  <div class="user-avatar">
+    <v-hover v-slot:default="hoverProps">
+      <v-avatar :color="currentColor" :size="_size">
+        <template v-if="user.avatar">
+          <v-img :src="src"></v-img>
+        </template>
+        <template v-else>
+          <span class="white--text text-lowercase">
+            {{ username }}
+          </span>
+        </template>
+        <v-overlay :value="editable && hoverProps.hover">
+          <v-file-input
+            class="avatar-upload-button"
+            accept="image/png, image/jpeg"
+            hide-input
+            @change="onAvatarFileInputChanged"
+            prepend-icon="mdi-camera"
+          >
+          </v-file-input>
+        </v-overlay>
+      </v-avatar>
+    </v-hover>
+    <v-tooltip right>
+      <template v-slot:activator="{ on, attrs }">
+        <span
+          v-bind="attrs"
+          v-on="on"
+          class="ml-2"
+          style="display: inline-flex;"
+        >
+          <span class="text-truncate app-bar-username">{{ fullUsername }}</span>
         </span>
       </template>
-      <v-overlay :value="editable && hoverProps.hover">
-        <v-file-input
-          class="avatar-upload-button"
-          accept="image/png, image/jpeg"
-          hide-input
-          @change="onAvatarFileInputChanged"
-          prepend-icon="mdi-camera"
-        >
-        </v-file-input>
-      </v-overlay>
-    </v-avatar>
-  </v-hover>
+      {{ fullUsername }}
+    </v-tooltip>
+  </div>
 </template>
 
 <script lang="ts">
@@ -69,6 +84,12 @@ export default class UserAvatar extends Vue {
     default: false
   }) readonly editable: boolean | undefined
 
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly showUsername: boolean | undefined
+
   @Emit('onChange') onAvatarFileInputChanged(image: File) {
     return image
   }
@@ -87,6 +108,10 @@ export default class UserAvatar extends Vue {
       : this.user.address
       // ? this.user.username[0]
       // : this.user.username
+  }
+
+  get fullUsername() {
+    return this.user.address
   }
 
   get _size() {
@@ -126,5 +151,8 @@ export default class UserAvatar extends Vue {
   margin-left: 0px;
   margin-top: 0px;
   margin-bottom: 0px;
+}
+.app-bar-username {
+  max-width: 120px;
 }
 </style>
