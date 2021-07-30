@@ -8,7 +8,7 @@
     />
 
     <v-main class="main">
-      <v-container fluid class="pl-4 pr-4 pt-7 main-container">
+      <v-container fluid class="pl-4 pr-4 pt-7 main-container content-container">
         <nuxt v-if="!$slots.default" />
         <slot />
       </v-container>
@@ -103,7 +103,6 @@ export default class DefaultLayout extends Vue {
 
 .main-container {
   height: 100%;
-  width: 1250px;
   background-color: white;
 }
 

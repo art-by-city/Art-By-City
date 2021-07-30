@@ -8,7 +8,7 @@
     dark
     class="app-bar"
   >
-    <v-btn text plain to="/">
+    <v-btn class="app-logo" text plain to="/">
       ART &times; BY &times; CITY
     </v-btn>
 
@@ -56,10 +56,10 @@ export default class AppBar extends Vue {
 <style scoped>
 .app-bar >>> .v-toolbar__content {
 /* .app-bar { */
-  width: 1250px;
   height: 100%;
   margin-left: auto;
   margin-right: auto;
+  padding: 0;
 }
 
 .app-bar >>> a {
