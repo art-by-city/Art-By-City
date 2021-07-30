@@ -1,3 +1,36 @@
+.content-container {
+  width: 1240px !important;
+}
+header.app-bar div.v-toolbar__content {
+  width: 1240px !important;
+}
+.app-logo {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+$breakpoints: (
+  1264px: 1080px,
+  1080px: 960px,
+  960px: 840px,
+  840px: 100%
+);
+@each $screenWidth, $containerWidth in $breakpoints {
+  @media screen and (max-width: $screenWidth) {
+    .content-container {
+      width: $containerWidth !important;
+    }
+    header.app-bar div.v-toolbar__content {
+      width: $containerWidth !important;
+    }
+  }
+}
+@media screen and (max-width: 840px) {
+  header.app-bar {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
 $condensed-input-font-size: 14px;
 $condensed-input-height: 24px;
 .condensed-input {
