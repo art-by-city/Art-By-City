@@ -52,11 +52,6 @@ export default class UserAvatar extends Vue {
 
   @Prop({
     type: String,
-    required: true
-  }) readonly baseUrl!: string
-
-  @Prop({
-    type: String,
     required: false,
     default: 'indigo'
   }) readonly color!: string
@@ -130,7 +125,6 @@ export default class UserAvatar extends Vue {
   }
 
   get src() {
-    // return this.baseUrl + '/avatar-images/' + this.user.avatar.source
     return ''
   }
 }

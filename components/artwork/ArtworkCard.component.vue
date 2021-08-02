@@ -44,10 +44,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
-import Artwork, {
-  isImageFileRef,
-  isImageUploadPreview
-} from '~/models/artwork/artwork'
+import { Artwork } from '~/types'
 
 @Component({
   components: {
@@ -63,25 +60,15 @@ export default class ArtworkCard extends Vue {
   @Prop()
   disabled?: boolean
 
-  @Prop({
-    type: String,
-    required: true
-  }) readonly baseUrl!: string
-
   @Emit('click') onArtworkCardClicked() {
     return this.artwork
   }
 
   get src() {
-    if (this.artwork) {
+    if (this.artwork && this.artwork.images.length > 0) {
       const image = this.artwork.images[0]
-      if (isImageFileRef(image)) {
-        return `${this.baseUrl}/artwork-images/${image.source}`
-      }
 
-      if (isImageUploadPreview(image)) {
-        return `data:${image.type};base64, ${image.ascii}`
-      }
+      return image.dataUrl
     }
 
     return ''

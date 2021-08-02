@@ -1,6 +1,6 @@
 import { ActionTree } from 'vuex'
 
-import ArtworkType from '~/models/artwork/artworkType'
+import { ArtworkType } from '~/types'
 
 const defaultState = {
   cities: [] as any[],
