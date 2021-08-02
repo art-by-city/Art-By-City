@@ -1,6 +1,6 @@
 import { ActionTree, MutationTree } from 'vuex'
 
-import ArtworkOptions from '../models/artwork/artworkOptions'
+import { ArtworkOptions } from '~/types'
 import ProgressService from '~/services/progress/service'
 
 const maxArtworkHistory = 5

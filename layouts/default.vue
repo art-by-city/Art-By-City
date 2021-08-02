@@ -57,7 +57,8 @@ import { AppBar, Footer } from '~/components/layout'
 })
 export default class DefaultLayout extends Vue {
   shouldChangelogIconBlink(): boolean {
-    return !this.$changelogService.hasSeenLatestChangelog()
+    // return !this.$changelogService.hasSeenLatestChangelog()
+    return false
   }
 
   toasts: ToastMessage[] = []

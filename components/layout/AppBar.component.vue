@@ -8,14 +8,18 @@
     dark
     class="app-bar"
   >
-    <v-btn class="app-logo" text plain to="/">
+    <v-btn class="app-logo" text color="white" plain to="/">
       ART &times; BY &times; CITY
     </v-btn>
 
     <v-spacer></v-spacer>
 
     <template v-if="user">
-      <UserAvatar abbr dense :user="user" baseUrl="" />
+      <v-btn text to="/publish">publish</v-btn>
+
+      <v-divider vertical dark class="mx-4" />
+
+      <UserAvatar abbr dense :user="user" />
 
       <v-divider vertical dark class="mx-4" />
 
@@ -40,7 +44,6 @@
     <template v-else>
       <v-btn text @click="onLoginClicked">log in</v-btn>
     </template>
-
   </v-app-bar>
 </template>
 
@@ -85,5 +88,9 @@ export default class AppBar extends Vue {
   /* color: rgba(0, 0, 0, 0.87); */
   color: white;
   text-decoration: none;
+}
+
+.app-logo >>> .v-btn__content {
+  opacity: 1 !important;
 }
 </style>

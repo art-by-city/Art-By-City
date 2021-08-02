@@ -13,7 +13,7 @@
           <template v-slot:item.images="{ item }">
             <v-img
               :src="
-                $config.imgBaseUrl + '/artwork-images/' + item.images[0].source
+                '/artwork-images/' + item.images[0].source
               "
               width="100"
               height="100"

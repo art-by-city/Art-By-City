@@ -22,7 +22,9 @@ export default {
    ** Customize the progress-bar color
    */
   loading: {
-    color: '#000000',
+    color: 'blue',
+    height: '5px',
+    duration: 10000,
     throttle: 0
   },
   /*
@@ -34,12 +36,15 @@ export default {
   ],
   /*
    ** Plugins to load before mounting the App
+   *
+   *  NB: Order of plugins matters, as plugins may rely on other plugins
    */
   plugins: [
+    { src: '~/plugins/arweave.ts' },
+    { src: '~/plugins/ardb.ts' },
+    { src: '~/plugins/services.ts', mode: 'client' },
     '~/plugins/components.ts',
-    '~/plugins/services.ts',
-    '~/plugins/filters.ts',
-    { src: '~/plugins/web3.ts', mode: 'client' },
+    '~/plugins/filters.ts'
   ],
   /*
    ** Nuxt.js dev-modules
@@ -54,21 +59,25 @@ export default {
   ],
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
-    arweave: (
-      process.env.NODE_ENV === 'production'
-      || process.env.NODE_ENV === 'staging'
-    )
-      ? { protocol: 'https', host: 'arweave.net', port: 443 }
-      : { protocol: 'http', host: 'localhost', port: 1984 },
-    imgBaseUrl: (
-      process.env.NODE_ENV === 'production'
-      || process.env.NODE_ENV === 'staging'
-    )
-      ? `https://storage.googleapis.com/${process.env.USER_UPLOAD_BUCKET_NAME}`
-      : 'http://localhost:3000'
+    arweave: {
+      appConfig: {
+        name: process.env.APP_NAME || 'ArtByCity',
+        version: process.env.APP_VERSION || 'development'
+      },
+      apiConfig: {
+        protocol: process.env.ARWEAVE_PROTOCOL || 'http',
+        host: process.env.ARWEAVE_HOST || 'localhost',
+        port: process.env.ARWEAVE_PORT || 1984
+      }
+    },
+
   },
   // serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
+    redirect: {
+      login: '/',
+      logout: '/'
+    },
     strategies: {
       local: false,
       arconnect: {

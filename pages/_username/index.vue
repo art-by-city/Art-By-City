@@ -9,7 +9,6 @@
           <UserAvatar
             class="user-profile-avatar"
             :user="profile.user"
-            :baseUrl="$config.imgBaseUrl"
             :editable="$auth.user.id === profile.user.id"
             :size="$vuetify.breakpoint.name"
             @onChange="onUserAvatarChanged"
@@ -93,7 +92,6 @@
               <v-lazy transition="fade-transition">
                 <ArtworkCard
                   :artwork="artwork"
-                  :baseUrl="$config.imgBaseUrl"
                   @click="onArtworkCardClicked(artwork)"
                 />
               </v-lazy>
@@ -126,9 +124,9 @@ export default class UserProfilePage extends PageComponent {
   async asyncData({ $axios, params, app, error }: Context) {
     let profile
     try {
-      const { payload } = await $axios.$get(`/api/user/${params.username}/profile`)
+      // const { payload } = await $axios.$get(`/api/user/${params.username}/profile`)
 
-      profile = payload
+      // profile = payload
     } catch (err) {
       if (err.response?.status === 404) {
         return error({ statusCode: 404, message: 'user profile not found' })

@@ -6,12 +6,12 @@
           class="preview-artwork"
           max-height="75vh"
           max-width="75vw"
-          :src="getImageSource(previewImage, $config.imgBaseUrl)"
+          :src="previewImage.dataUrl"
           contain
           @click="onPreviewArtworkClicked"
         ></v-img>
       </v-row>
-      <v-row dense justify="center" v-if="artwork.images.length > 1">
+      <v-row dense justify="center" v-if="artwork.images && artwork.images.length > 1">
         <div class="artwork-image-selector-container">
           <div
             class="artwork-image-selector"
@@ -20,7 +20,7 @@
           >
             <v-img
               aspect-ratio="1.7"
-              :src="getImageSource(image, $config.imgBaseUrl)"
+              :src="image.dataUrl"
               class="clickable"
               :class="{ 'highlighted': image === previewImage }"
               @click="setPreviewImage(image)"
@@ -40,10 +40,7 @@
             <span class="text-lowercase text-h4 text-sm-h2">{{ artwork.title }}</span>
           </v-row>
           <v-row dense>
-            <ArtistTag
-              :user="artwork.owner"
-              :baseUrl="$config.imgBaseUrl"
-            />
+            Created by: {{ artwork.creator.address }}
           </v-row>
           <v-row dense>
             <div class="text-lowercase" style="width: 100%">
@@ -53,7 +50,7 @@
         </v-col>
         <v-col cols="5">
           <div style="align-self: flex-end">
-            <LikeButton :artwork="artwork"/>
+            <!-- <LikeButton :artwork="artwork"/> -->
           </div>
           <div class="text-lowercase">{{ artwork.type }}</div>
           <div class="text-lowercase">{{ cityName }}</div>
@@ -61,25 +58,10 @@
         </v-col>
       </v-row>
 
-      <ArtworkEditControls
-        :isNew="!artwork.id"
-        :isOwner="isOwner"
-        :isAdmin="isAdmin"
-        :editMode="editMode"
-        :published="artwork.published"
-        :approved="artwork.approved"
-        @edit="toggleEditMode"
-        @save="saveArtwork"
-        @cancel="onCancelClicked"
-        @delete="deleteArtwork"
-        @publish="publishOrApproveArtwork('publish')"
-        @approve="publishOrApproveArtwork('approve')"
-      />
-
       <ArtworkZoomDialog
         v-if="previewImage"
         :show.sync="zoom"
-        :src="getImageSource(previewImage, $config.imgBaseUrl)"
+        :src="previewImage.dataUrl"
       />
 
       <v-dialog
@@ -89,9 +71,7 @@
       >
         <ArtworkEditForm
           :artwork="artwork"
-          :baseUrl="$config.imgBaseUrl"
           @previewImageChanged="setPreviewImage()"
-          @save="saveArtwork"
           @cancel="onCancelClicked"
         />
       </v-dialog>
@@ -102,6 +82,7 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
+import Arweave from 'arweave'
 
 import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
@@ -110,11 +91,7 @@ import {
   ArtworkEditControls,
   ArtworkEditForm
 } from '~/components/artwork/edit'
-import Artwork, {
-  ArtworkImageFile,
-  getImageSource
-} from '~/models/artwork/artwork'
-import ProgressService from '~/services/progress/service'
+import { Artwork, ArtworkImage } from '~/types'
 import { debounce } from '~/helpers/helpers'
 
 @Component({
@@ -127,49 +104,50 @@ import { debounce } from '~/helpers/helpers'
 })
 export default class ArtworkPage extends FormPageComponent {
   artwork!: Artwork
-  previewImage?: ArtworkImageFile
+  previewImage?: ArtworkImage
   cachedArtwork!: Artwork
   editMode = false
   zoom = false
 
-  getImageSource = getImageSource
-
-  async asyncData({ $axios, store, params, app, error }: Context) {
+  async asyncData({ params, app, error, redirect }: Context) {
     let artwork, previewImage
     let editMode = false
 
     try {
-      if (params.artwork !== 'new') {
-        const { payload } = await $axios.$get(`/api/artwork/${params.artwork}`)
-
-        if (!payload.city) {
-          payload.city = null
-        }
-
-        artwork = payload
-        previewImage = payload.images[0]
+      const arweave = new Arweave({
+        host: 'localhost',
+        port: 1984,
+        protocol: 'http'
+      })
+      // const ardb = new ArDB(arweave, 0)
+      // const tx = await ardb
+      //   .search('transactions')
+      //   .appName('ArtByCity')
+      //   .from(params.username)
+      //   .tag('Slug', params.artwork)
+      //   .findOne()
+      // console.log('_artwork.vue -> asyncData()', 4, tx)
+      // if (tx) {
+        // const res = await arweave.api.get(tx.id)
+        // console.log('_artwork.vue -> asyncData()', 4, params.artwork)
+      const res = await arweave.api.get(params.artwork)
+        // console.log('_artwork.vue -> asyncData()', 5, res.data)
+        // artwork = res.data
+        // previewImage = payload.images[0]
+      if (!res.data.error) {
+        artwork = res.data
+        previewImage = res.data.images[0]
       } else {
-        artwork = {
-          owner: {
-            id: store.state.auth.user.id,
-            username: store.state.auth.user.username
-          },
-          images: [],
-          hashtags: [],
-          likes: [],
-          type: '',
-          city: store.state.auth.user.city,
-          published: false,
-          approved: false
-        }
-        previewImage = null
-        editMode = true
+        redirect('/')
       }
+      // }
+
     } catch (err) {
       if (err.response?.status === 404) {
         return error({ statusCode: 404, message: 'artwork not found' })
       } else {
-        app.$toastService.error('error fetching artwork')
+        console.error(err)
+        app.$toastService.error(err)
       }
     } finally {
       return { artwork, previewImage, editMode }
@@ -195,35 +173,20 @@ export default class ArtworkPage extends FormPageComponent {
     return '500px'
   }
 
-  get isNew() {
-    return !this.artwork.id || this.artwork.id === 'new'
-  }
-
-  get isOwner() {
-    return this.$store.state?.auth?.user?.id === this.artwork?.owner?.id
-  }
-
-  get isAdmin() {
-    return this.$store.state?.auth?.user?.roles?.includes('admin')
-  }
-
-  get isOwnerOrAdmin() {
-    return this.isOwner || this.isAdmin
-  }
-
   get cityName() {
-    for (let i = 0; i < this.$store.state.config.cities.length; i++) {
-      if (this.$store.state.config.cities[i].id === this.artwork.city) {
-        return this.$store.state.config.cities[i].name
-      }
-    }
+    // for (let i = 0; i < this.$store.state.config.cities.length; i++) {
+    //   if (this.$store.state.config.cities[i].id === this.artwork.city) {
+    //     return this.$store.state.config.cities[i].name
+    //   }
+    // }
+    return ''
   }
 
   get hashtagsString() {
     return this.artwork.hashtags.map((h) => { return `#${h}` }).join(', ')
   }
 
-  setPreviewImage(image?: ArtworkImageFile) {
+  setPreviewImage(image?: ArtworkImage) {
     this.previewImage = image
       ? image
       : this.artwork.images[0]
@@ -236,92 +199,92 @@ export default class ArtworkPage extends FormPageComponent {
 
   @debounce
   toggleEditMode(forceState?: boolean) {
-    if (!this.editMode) {
-      this.cachedArtwork = { ...this.artwork }
-      this.cachedArtwork.images = [ ...this.artwork.images ]
-    }
-    if (typeof forceState !== 'undefined') {
-      this.editMode = !!forceState
-    } else {
-      this.editMode = !this.editMode
-    }
+    // if (!this.editMode) {
+    //   this.cachedArtwork = { ...this.artwork }
+    //   this.cachedArtwork.images = [ ...this.artwork.images ]
+    // }
+    // if (typeof forceState !== 'undefined') {
+    //   this.editMode = !!forceState
+    // } else {
+    //   this.editMode = !this.editMode
+    // }
   }
 
   @debounce
   onCancelClicked() {
-    if (this.isNew) {
-      this.$router.push('/portfolio')
-    } else {
-      this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
-      this.toggleEditMode(false)
-    }
+    // if (this.isNew) {
+    //   this.$router.push('/portfolio')
+    // } else {
+    //   this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
+    //   this.toggleEditMode(false)
+    // }
   }
 
   @debounce
   async saveArtwork() {
-    const artwork = this.isNew
-      ? await this.$artworkService.createArtwork(this.artwork)
-      : await this.$artworkService.updateArtwork(this.artwork)
+    // const artwork = this.isNew
+    //   ? await this.$artworkService.createArtwork(this.artwork)
+    //   : await this.$artworkService.updateArtwork(this.artwork)
 
-    if (artwork) {
-      this.previewImage = artwork.images[0]
-      window.history.replaceState(
-        window.history.state,
-        document.title,
-        `/${artwork.owner.username}/${artwork.slug}`
-      )
-      this.artwork = Object.assign({}, this.artwork, artwork)
-      this.toggleEditMode(false)
-    }
+    // if (artwork) {
+    //   this.previewImage = artwork.images[0]
+    //   window.history.replaceState(
+    //     window.history.state,
+    //     document.title,
+    //     `/${artwork.owner.username}/${artwork.slug}`
+    //   )
+    //   this.artwork = Object.assign({}, this.artwork, artwork)
+    //   this.toggleEditMode(false)
+    // }
   }
 
   @debounce
   async publishOrApproveArtwork(intent: 'publish' | 'approve') {
-    ProgressService.start()
-    try {
-      const action = intent === 'publish'
-        ? this.artwork.published
-          ? 'unpublish'
-          : 'publish'
-        : this.artwork.approved
-          ? 'unapprove'
-          : 'approve'
-      const { success } = await this.$axios.$post(`/api/artwork/${this.artwork.id}/${action}`)
+    // ProgressService.start()
+    // try {
+    //   const action = intent === 'publish'
+    //     ? this.artwork.published
+    //       ? 'unpublish'
+    //       : 'publish'
+    //     : this.artwork.approved
+    //       ? 'unapprove'
+    //       : 'approve'
+    //   const { success } = await this.$axios.$post(`/api/artwork/${this.artwork.id}/${action}`)
 
-      if (success) {
-        const published = intent === 'publish' ? !this.artwork.published : this.artwork.published
-        const approved = intent === 'approve' ? !this.artwork.approved : this.artwork.approved
-        this.artwork = {
-          ...this.artwork,
-          published,
-          approved
-        }
-        this.$toastService.success(`artwork updated`)
-      }
-    } catch (error) {
-      this.$toastService.error(`error updating artwork`)
-    }
-    ProgressService.stop()
+    //   if (success) {
+    //     const published = intent === 'publish' ? !this.artwork.published : this.artwork.published
+    //     const approved = intent === 'approve' ? !this.artwork.approved : this.artwork.approved
+    //     this.artwork = {
+    //       ...this.artwork,
+    //       published,
+    //       approved
+    //     }
+    //     this.$toastService.success(`artwork updated`)
+    //   }
+    // } catch (error) {
+    //   this.$toastService.error(`error updating artwork`)
+    // }
+    // ProgressService.stop()
   }
 
   @debounce
   async deleteArtwork() {
-    if (confirm('Are you sure you want to delete this artwork?')) {
-      ProgressService.start()
-      try {
-        const { success } = await this.$axios.$delete(
-          `/api/artwork/${this.artwork.id}`
-        )
+    // if (confirm('Are you sure you want to delete this artwork?')) {
+    //   ProgressService.start()
+    //   try {
+    //     const { success } = await this.$axios.$delete(
+    //       `/api/artwork/${this.artwork.id}`
+    //     )
 
-        if (success) {
-          this.$toastService.success('artwork deleted')
-          this.$router.push('/portfolio')
-        }
-      } catch (error) {
-        this.$toastService.error('error deleting artwork')
-      }
-      ProgressService.stop()
-    }
+    //     if (success) {
+    //       this.$toastService.success('artwork deleted')
+    //       this.$router.push('/portfolio')
+    //     }
+    //   } catch (error) {
+    //     this.$toastService.error('error deleting artwork')
+    //   }
+    //   ProgressService.stop()
+    // }
   }
 }
 </script>
