@@ -23,9 +23,9 @@
         </div>
         <img
           class="artwork-zoom-image"
-          ref="zoomImage"
+          ref="image"
           :class="{ 'dragging': isDragging }"
-          :src="src"
+          :src="image.src"
           :style="zoomImageStyle"
         />
       </div>
@@ -72,6 +72,16 @@ export default class ArtworkZoomDialog extends Vue {
   mouseDownY: number = 0
   zoomFactor: number = 0
 
+  image: {
+    width: number
+    height: number
+    src: string
+  } = {
+    width: 0,
+    height: 0,
+    src: ''
+  }
+
   @PropSync('show', {
     type: Boolean,
     required: true,
@@ -87,6 +97,18 @@ export default class ArtworkZoomDialog extends Vue {
     type: String,
     required: true
   }) readonly src!: string
+
+  mounted() {
+    const image = new Image()
+
+    image.onload = () => {
+      this.image.src = image.src
+      this.image.width = image.width
+      this.image.height = image.height
+    }
+
+    image.src = this.src
+  }
 
   private reset() {
     this.isDragging = false
@@ -177,12 +199,12 @@ export default class ArtworkZoomDialog extends Vue {
   }
 
   get zoomImageStyle() {
-    const left = `${this.left}px`
-    const top = `${this.top}px`
-
     const scale = 1 + this.zoomFactor
 
-    return { left, top, transform: `scale(${scale})` }
+    let left = this.left - Math.floor(this.image.width / 2)
+    let top = this.top - Math.floor(this.image.height / 2)
+
+    return { transform: `scale(${scale}) translate(${left}px, ${top}px)` }
   }
 }
 </script>
@@ -202,7 +224,9 @@ export default class ArtworkZoomDialog extends Vue {
 .artwork-zoom-image {
   z-index: 9991;
   display: inline-block;
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: unset;
   display: block;
   margin-left: auto;
