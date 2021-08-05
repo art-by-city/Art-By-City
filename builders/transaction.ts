@@ -1,19 +1,21 @@
 import Arweave from 'arweave'
 import Transaction from 'arweave/node/lib/transaction'
+import ArDB from '@textury/ardb'
+import ArdbBlock from '@textury/ardb/lib/models/block'
+import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 
-type DomainEntityCategory = 'artwork'
-interface ArweaveAppConfig {
-  name: string
-  version: string
-}
+import { ArweaveAppConfig, DomainEntityCategory } from '../types'
+
 
 export default class TransactionBuilder {
   private arweave!: Arweave
   private config!: ArweaveAppConfig
+  private ardb!: ArDB
 
-  constructor(arweave: Arweave, config: ArweaveAppConfig) {
+  constructor(arweave: Arweave, ardb: ArDB, config: ArweaveAppConfig) {
     this.arweave = arweave
     this.config = config
+    this.ardb = ardb
   }
 
   async buildEntityTransaction(
@@ -33,5 +35,15 @@ export default class TransactionBuilder {
     }
 
     return tx
+  }
+
+  async searchTransactions(category: DomainEntityCategory):
+    Promise<ArdbTransaction[] | ArdbBlock[]> {
+    return await this.ardb
+      .search('transactions')
+      .appName(this.config.name)
+      .type('application/json')
+      .tag('Category', category)
+      .find({ sort: 'HEIGHT_ASC' })
   }
 }

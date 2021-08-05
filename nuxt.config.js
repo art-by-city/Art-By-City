@@ -42,7 +42,7 @@ export default {
   plugins: [
     { src: '~/plugins/arweave.ts' },
     { src: '~/plugins/ardb.ts' },
-    { src: '~/plugins/services.ts', mode: 'client' },
+    { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',
     '~/plugins/filters.ts'
   ],

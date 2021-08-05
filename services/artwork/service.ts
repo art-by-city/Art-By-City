@@ -2,8 +2,9 @@ import Arweave from 'arweave'
 import ArDB from '@textury/ardb'
 import { Context } from '@nuxt/types'
 
-import { Artwork } from '~/types'
+import { Artwork, FeedItem } from '~/types'
 import { TransactionBuilder } from '~/builders'
+import { uuidv4 } from '~/helpers'
 
 export default class ArtworkService {
   $arweave!: Arweave
@@ -15,6 +16,7 @@ export default class ArtworkService {
     this.$ardb = context.$ardb
     this.transactionBuilder = new TransactionBuilder(
       this.$arweave,
+      this.$ardb,
       context.$config.arweave.appConfig
     )
   }
@@ -40,5 +42,22 @@ export default class ArtworkService {
     res.data.id = tx.id
 
     return res.data
+  }
+
+  async fetchArtworkFeed(): Promise<FeedItem[]> {
+    const items: FeedItem[] = []
+
+    const txs = await this.transactionBuilder.searchTransactions('artwork')
+
+    for (const ardbTx of txs) {
+      const res = await this.$arweave.api.get(ardbTx.id)
+      const tx = await this.$arweave.transactions.get(ardbTx.id)
+
+      res.data.id = tx.id
+
+      items.push({ tx, artwork: res.data, guid: uuidv4() })
+    }
+
+    return items
   }
 }
