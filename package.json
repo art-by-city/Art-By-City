@@ -17,7 +17,7 @@
     "docs": "nodemon -e js,ts,json,mjs ./server/docs/server.js",
     "deploy:staging": "gcloud app deploy app.staging.yaml --project art-by-city-staging-299519",
     "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919",
-    "arlocal": "arlocal"
+    "arlocal": "ts-node arlocal.ts"
   },
   "dependencies": {
     "@google-cloud/firestore": "^3.8.0",
