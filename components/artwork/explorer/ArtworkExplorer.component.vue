@@ -38,7 +38,7 @@ import _ from 'lodash'
 
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
 import ArtworkCard from '../ArtworkCard.component.vue'
-import { debounce, isTouchDevice } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
 import { ArtworkOptions } from '~/types'
 
 @Component({

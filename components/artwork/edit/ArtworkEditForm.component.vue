@@ -180,7 +180,7 @@ import { Artwork, ArtworkImage } from '~/types'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
-import { debounce, uuidv4 } from '~/helpers/helpers'
+import { debounce, uuidv4 } from '~/helpers'
 
 @Component({
   components: {

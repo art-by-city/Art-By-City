@@ -92,7 +92,7 @@ import {
   ArtworkEditForm
 } from '~/components/artwork/edit'
 import { Artwork, ArtworkImage } from '~/types'
-import { debounce } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
 
 @Component({
   components: {

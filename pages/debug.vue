@@ -19,7 +19,7 @@
 import { Component } from 'nuxt-property-decorator'
 import Arweave from 'arweave'
 
-import { debounce } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
 import FormPageComponent from '../components/pages/formPage.component'
 import ProgressService from '~/services/progress/service'
 

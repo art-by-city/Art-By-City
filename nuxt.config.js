@@ -72,7 +72,6 @@ export default {
     },
 
   },
-  // serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     redirect: {
       login: '/',

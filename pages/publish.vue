@@ -19,7 +19,7 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ArtworkEditForm } from '~/components/artwork/edit'
 import { Artwork } from '~/types'
-import { debounce } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
 import ProgressService from '~/services/progress/service'
 
 @Component({

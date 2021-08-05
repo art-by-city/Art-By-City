@@ -52,7 +52,7 @@ import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import User from '~/models/user/user'
 import { ConfigStoreState } from '~/store/config'
-import { debounce } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
 
 @Component
 export default class AppBar extends Vue {

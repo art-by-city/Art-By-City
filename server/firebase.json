@@ -1,7 +1,0 @@
-{
-  "emulators": {
-    "database": {
-      "port": 9000
-    }
-  }
-}

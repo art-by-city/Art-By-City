@@ -1,1 +1,0 @@
-export { ChangelogParser } from './parser'
