@@ -13,7 +13,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
 import User from '../models/user/user'
 
 interface Artwork {

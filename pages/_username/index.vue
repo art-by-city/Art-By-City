@@ -109,7 +109,7 @@ import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import { debounce } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
 
 @Component({
   components: {
