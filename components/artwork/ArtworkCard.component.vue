@@ -25,7 +25,7 @@
                       v-if="disabled"
                       class="artwork-card-disable-overlay"
                     ></div>
-                    <LikeButton :dark="true" :artwork="artwork" />
+                    <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
                     <a class="artwork-card-title white--text text-lowercase">
                       {{ artwork.title }}
                     </a>
