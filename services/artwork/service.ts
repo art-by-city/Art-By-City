@@ -44,10 +44,11 @@ export default class ArtworkService {
     return res.data
   }
 
-  async fetchArtworkFeed(): Promise<FeedItem[]> {
+  async fetchArtworkFeed(creator?: string): Promise<FeedItem[]> {
     const items: FeedItem[] = []
 
-    const txs = await this.transactionBuilder.searchTransactions('artwork')
+    const txs = await this.transactionBuilder
+      .searchTransactions('artwork', creator)
 
     for (const ardbTx of txs) {
       const res = await this.$arweave.api.get(ardbTx.id)

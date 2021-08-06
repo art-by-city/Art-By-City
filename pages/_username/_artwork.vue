@@ -40,7 +40,9 @@
             <span class="text-lowercase text-h4 text-sm-h2">{{ artwork.title }}</span>
           </v-row>
           <v-row dense>
-            Created by: {{ artwork.creator.address }}
+            Created by: <nuxt-link :to="`/${artwork.creator.address}`">
+              {{ artwork.creator.address }}
+            </nuxt-link>
           </v-row>
           <v-row dense>
             <div class="text-lowercase" style="width: 100%">

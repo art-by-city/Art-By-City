@@ -9,10 +9,7 @@
     <v-container>
       <v-row>
         <v-col v-for="(post, i) in feed" :key="post.guid" cols="4">
-          <ArtworkCard
-            :artwork="post.artwork"
-            @click="onArtworkCardClicked"
-          />
+          <ArtworkCard :artwork="post.artwork" />
         </v-col>
       </v-row>
     </v-container>
@@ -24,8 +21,8 @@ import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import { FeedItem, Artwork } from '~/types'
-import { debounce } from '~/helpers'
+import { FeedItem } from '~/types'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   components: {
@@ -37,17 +34,15 @@ export default class HomePage extends PageComponent {
   feed: FeedItem[] = []
 
   async fetch() {
+    ProgressService.start()
     try {
       this.feed = await this.$artworkService.fetchArtworkFeed()
     } catch (error) {
       console.error(error)
       this.$toastService.error(error)
+    } finally {
+      ProgressService.stop()
     }
-  }
-
-  @debounce
-  onArtworkCardClicked(artwork: Artwork) {
-    this.$router.push(`/${artwork.creator.address}/${artwork.id}`)
   }
 }
 </script>
