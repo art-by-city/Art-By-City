@@ -1,6 +1,6 @@
 <template>
   <div class="user-profile-page">
-    <v-container v-if="profile" fluid>
+    <v-container fluid>
       <v-row align="end">
         <v-col
           cols="1" offset="3"
@@ -8,69 +8,26 @@
         >
           <UserAvatar
             class="user-profile-avatar"
-            :user="profile.user"
-            :editable="$auth.user.id === profile.user.id"
+            abbr
+            :user="artist"
             :size="$vuetify.breakpoint.name"
-            @onChange="onUserAvatarChanged"
           />
         </v-col>
         <v-col
           cols="6" offset="2"
             sm="4" offset-sm="1"
         >
-          <v-hover>
-            <template v-slot:default="props">
-              <div class="user-profile-info">
-                <div class="
-                  user-profile-username
-                  text-lowercase
-                  font-weight-black
-                  text-body-1
-                  text-sm-h2
-                ">
-                  {{ profile.user.username }}
-                </div>
-                <div class="text-caption text-lowercase">
-                  <span v-if="!editMode">{{ profile.user.name }}</span>
-                  <v-text-field
-                    v-if="editMode"
-                    v-model="profile.user.name"
-                    type="text"
-                    name="name"
-                    label="Name"
-                    class="text-lowercase"
-                    autocomplete="off"
-                    aria-autocomplete="off"
-                  ></v-text-field>
-                </div>
-                <div class="text-caption text-lowercase">
-                  {{ profile.user.city }}
-                </div>
-                <div class="profile-edit-controls">
-                  <v-btn
-                    v-if="editMode || (props.hover && $auth.user.id === profile.user.id)"
-                    icon
-                    @click="toggleEditMode"
-                  >
-                    <v-icon>
-                      {{
-                        editMode
-                          ? 'mdi-content-save'
-                          : 'mdi-square-edit-outline'
-                      }}
-                    </v-icon>
-                  </v-btn>
-                  <v-btn
-                    v-if="editMode"
-                    icon
-                    @click="toggleEditMode(false)"
-                  >
-                    <v-icon>mdi-cancel</v-icon>
-                  </v-btn>
-                </div>
-              </div>
-            </template>
-          </v-hover>
+          <div class="user-profile-info">
+            <div class="
+              user-profile-username
+              text-lowercase
+              font-weight-black
+              text-body-2
+
+            ">
+              {{ artist.address }}
+            </div>
+          </div>
         </v-col>
       </v-row>
       <v-row>
@@ -85,15 +42,12 @@
         >
           <v-row>
             <v-col
-              v-for="(artwork, i) in profile.artworks"
-              :key="i"
+              v-for="(post, i) in feed"
+              :key="post.guid"
               cols="4"
             >
               <v-lazy transition="fade-transition">
-                <ArtworkCard
-                  :artwork="artwork"
-                  @click="onArtworkCardClicked(artwork)"
-                />
+                <ArtworkCard :artwork="post.artwork" />
               </v-lazy>
             </v-col>
           </v-row>
@@ -104,12 +58,13 @@
 </template>
 
 <script lang="ts">
-import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import { debounce } from '~/helpers'
+import { User } from '~/models'
+import { FeedItem } from '~/types'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   components: {
@@ -117,55 +72,21 @@ import { debounce } from '~/helpers'
   }
 })
 export default class UserProfilePage extends PageComponent {
-  profile: any | null
-  modalArtwork: any | null = null
-  editMode = false
+  feed: FeedItem[] = []
+  artist: User = { address: '' }
 
-  async asyncData({ $axios, params, app, error }: Context) {
-    let profile
+  async fetch() {
+    ProgressService.start()
     try {
-      // const { payload } = await $axios.$get(`/api/user/${params.username}/profile`)
-
-      // profile = payload
-    } catch (err) {
-      if (err.response?.status === 404) {
-        return error({ statusCode: 404, message: 'user profile not found' })
-      } else {
-        app.$toastService.error('error fetching user profile')
-      }
-    } finally {
-      return { profile }
-    }
-  }
-
-  @debounce
-  async toggleEditMode(save: boolean = true) {
-    let success = true
-
-    if (this.editMode && save) {
-      success = await this.$profileService.updateProfile(this.profile.user)
-    }
-
-    if (success) {
-      this.editMode = !this.editMode
-    }
-  }
-
-  @debounce
-  onArtworkCardClicked(artwork: any) {
-    const idOrSlug = artwork.slug || artwork.id
-    this.$router.push(`/${this.profile.user.username}/${idOrSlug}`)
-  }
-
-  @debounce
-  async onUserAvatarChanged(image: File) {
-    const avatar = await this.$profileService.uploadUserAvatar(image)
-    if (avatar) {
-      this.profile = Object.assign(
-        {},
-        this.profile,
-        { user: { ...this.profile.user, avatar } }
+      this.artist.address = this.$route.params.username
+      this.feed = await this.$artworkService.fetchArtworkFeed(
+        this.artist.address
       )
+    } catch (error) {
+      console.error(error)
+      this.$toastService.error(error)
+    } finally {
+      ProgressService.stop()
     }
   }
 }

@@ -45,6 +45,7 @@ import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
 import { Artwork } from '~/types'
+import { debounce } from '~/helpers'
 
 @Component({
   components: {
@@ -60,8 +61,11 @@ export default class ArtworkCard extends Vue {
   @Prop()
   disabled?: boolean
 
+  @debounce
   @Emit('click') onArtworkCardClicked() {
-    return this.artwork
+    if (this.artwork) {
+      this.$router.push(`/${this.artwork.creator.address}/${this.artwork.id}`)
+    }
   }
 
   get src() {

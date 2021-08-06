@@ -22,7 +22,7 @@
         </v-overlay>
       </v-avatar>
     </v-hover>
-    <v-tooltip right>
+    <v-tooltip right v-if="dense">
       <template v-slot:activator="{ on, attrs }">
         <span
           v-bind="attrs"
