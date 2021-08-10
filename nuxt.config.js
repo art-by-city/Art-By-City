@@ -111,10 +111,12 @@ export default {
      ** You can extend webpack config here
      */
     // @ts-ignore
-    extend(config, ctx) {
+    extend(config, _context) {
       config.node = {
         fs: 'empty'
       }
+      // Exclude /contracts directory from webpack build
+      config.module.rules.push({ exclude: [`${__dirname}/contracts`] })
     },
     plugins: [
       new IgnoreNotFoundExportPlugin()

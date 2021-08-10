@@ -89,3 +89,6 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# Transpiled SmartWeave Contracts
+contracts/src/*/contract.js
