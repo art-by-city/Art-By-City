@@ -34,7 +34,8 @@
       "@nuxtjs/auth-next",
       "reflect-metadata",
       "vuetify",
-      "arconnect"
+      "arconnect",
+      "@types/prettier"
     ]
   },
   "exclude": [

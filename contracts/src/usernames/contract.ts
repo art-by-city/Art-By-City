@@ -6,7 +6,7 @@ import {
 import { ContractError, ContractAssert } from '../../environment'
 
 interface UsernamesContractState {
-  names: {
+  usernames: {
     [username: string]: {
       owner: string
     }
@@ -28,86 +28,72 @@ export function handle(
   action: ContractInteraction
 ): ContractHandlerResult {
   if (action.input.function === 'register') {
-    ContractAssert(
-      typeof action.input.name !== 'string',
-      'name must be a string'
-    )
+    const username = action.input.username
 
-    ContractAssert(
-      action.input.name.length < 2,
-      'name must be at least 2 characters'
-    )
+    ContractAssert(typeof username === 'string', 'name must be a string')
+    ContractAssert(username.length > 1, 'name must be at least 2 characters')
+    ContractAssert(!RESERVED_NAMES.includes(username), 'name is reserved')
+    ContractAssert(!(state.usernames[username]), 'name already registered')
 
-    ContractAssert(
-      RESERVED_NAMES.includes(action.input.name),
-      'name is reserved'
-    )
-
-    ContractAssert(
-      !!(state.names[action.input.name]),
-      'name already registered'
-    )
-
-    state.names[action.input.name] = {
+    state.usernames[username] = {
       owner: action.caller
     }
 
     return { state }
   }
 
-  // if (action.input.function === 'update') {
-  //   if (typeof action.input.name !== 'string' || action.input.name.length < 3) {
-  //     throw new ContractError(`Invalid name provided: ${action.input.name}`)
-  //   }
-  //   if (typeof action.input.data !== 'string') {
-  //     throw new ContractError('Must provide data to be associated with the name')
-  //   }
-  //   if (!state.names[action.input.name]) {
-  //     throw new ContractError('Name not registered')
-  //   }
-  //   if (state.names[action.input.name].owner !== action.caller) {
-  //     throw new ContractError('Name not owned by caller')
-  //   }
+  if (action.input.function === 'update') {
+    const username = action.input.username
 
-  //   state.names[action.input.name].username = action.input.data
+    ContractAssert(typeof username === 'string', 'name must be a string')
+    ContractAssert(username.length > 1, 'name must be at least 2 characters')
+    ContractAssert(!!(state.usernames[username]), 'name not registered')
+    ContractAssert(
+      state.usernames[username].owner === action.caller,
+      'name not owned by caller'
+    )
 
-  //   return { state }
-  // }
+    state.usernames[username].owner = action.caller
 
-  // if (action.input.function === 'transfer') {
-  //   if (typeof action.input.name !== 'string' || action.input.name.length < 3) {
-  //     throw new ContractError(`Invalid name provided: ${action.input.name}`)
-  //   }
-  //   if (typeof action.input.target !== 'string') {
-  //     throw new ContractError('Must provide a target to transfer the name to')
-  //   }
-  //   if (!state.names[action.input.name]) {
-  //     throw new ContractError('Name not registered')
-  //   }
-  //   if (state.names[action.input.name].owner !== action.caller) {
-  //     throw new ContractError('Name not owned by caller')
-  //   }
+    return { state }
+  }
 
-  //   state.names[action.input.name].owner = action.input.target
+  if (action.input.function === 'transfer') {
+    const username = action.input.username
+    const target = action.input.target
 
-  //   return { state }
-  // }
+    ContractAssert(typeof username === 'string', 'name must be a string')
+    ContractAssert(username.length > 1, 'name must be at least 2 characters')
+    ContractAssert(
+      typeof target === 'string',
+      'target must be provided to transfer name to'
+    )
+    ContractAssert(!!(state.usernames[username]), 'name not registered')
+    ContractAssert(
+      state.usernames[username].owner === action.caller,
+      'name not owned by caller'
+    )
 
-  // if (action.input.function === 'giveup') {
-  //   if (typeof action.input.name !== 'string' || action.input.name.length < 3) {
-  //     throw new ContractError(`Invalid name provided: ${action.input.name}`)
-  //   }
-  //   if (!state.names[action.input.name]) {
-  //     throw new ContractError('Name not registered')
-  //   }
-  //   if (state.names[action.input.name].owner !== action.caller) {
-  //     throw new ContractError('Name not owned by caller')
-  //   }
+    state.usernames[username].owner = target
 
-  //   delete state.names[action.input.name]
+    return { state }
+  }
 
-  //   return { state }
-  // }
+  if (action.input.function === 'giveup') {
+    const username = action.input.username
 
-  throw new Error('Invalid input')
+    ContractAssert(typeof username === 'string', 'name must be a string')
+    ContractAssert(username.length > 1, 'name must be at least 2 characters')
+    ContractAssert(!!(state.usernames[username]), 'name not registered')
+    ContractAssert(
+      state.usernames[username].owner === action.caller,
+      'name not owned by caller'
+    )
+
+    delete state.usernames[username]
+
+    return { state }
+  }
+
+  throw new ContractError('Invalid input')
 }

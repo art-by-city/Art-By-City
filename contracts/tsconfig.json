@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig",
   "module": "ES6",
   "target": "ES6",
   "resolveJsonModule": true

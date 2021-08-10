@@ -16,7 +16,8 @@
     "arlocal": "ts-node --project node.tsconfig.json arlocal.js",
     "build:contracts": "ts-node --project node.tsconfig.json contracts/scripts/build.ts",
     "deploy:contracts": "ts-node --project node.tsconfig.json contracts/scripts/deploy.ts",
-    "test:contracts": "ts-node --project node.tsconfig.json contracts/scripts/getLatestState.ts"
+    "test:contracts": "ts-node --project node.tsconfig.json contracts/scripts/getLatestState.ts",
+    "test:contracts2": "ts-node --project node.tsconfig.json contracts/scripts/updateState.ts"
   },
   "dependencies": {
     "@nuxt/types": "^2.15.7",
@@ -29,6 +30,7 @@
     "@nuxtjs/vuetify": "^1.11.2",
     "@textury/ardb": "^1.1.1",
     "@types/lodash": "^4.14.155",
+    "@types/prettier": "^2.3.2",
     "@types/prop-types": "^15.7.3",
     "@types/react": "^17.0.3",
     "@types/swagger-jsdoc": "^3.0.2",

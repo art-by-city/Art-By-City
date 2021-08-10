@@ -1,6 +1,7 @@
 import path from 'path'
 import fs from 'fs/promises'
 import { transformAsync } from '@babel/core'
+import prettier from 'prettier'
 
 const contracts = [
   'usernames'
@@ -15,10 +16,12 @@ async function build() {
   for (const name of contracts) {
     const src = await fs.readFile(`contracts/src/${name}/contract.ts`)
 
-    const out = await transformAsync(src.toString(), opts)
+    const babelResult = await transformAsync(src.toString(), opts)
 
-    if (out?.code) {
-      await fs.writeFile(`contracts/src/${name}/contract.js`, out.code)
+    if (babelResult?.code) {
+      const prettyCode = prettier.format(babelResult.code, { parser: 'babel' })
+
+      await fs.writeFile(`contracts/src/${name}/contract.js`, prettyCode)
     }
   }
 }

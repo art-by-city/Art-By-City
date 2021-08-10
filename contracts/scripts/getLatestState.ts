@@ -15,7 +15,7 @@ async function getLatestState(contractId: string) {
 
 (async () => {
   try {
-    await getLatestState('ePx3JV9aBi9oRcj3GT0bQh0Y6dLnp4gDKHLGfZ0hYL0')
+    await getLatestState('AfctuG5LxuNFdUjulh6JF2RetVWCG7-TINyAsMWUQf8')
   } catch (error) {
     console.error(error.message)
   }
