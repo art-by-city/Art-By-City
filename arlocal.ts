@@ -54,9 +54,9 @@ const startServer = async () => {
     try {
       console.log('trying to mine!')
       const res = await fetch(`http://${HOST}:1984/mine`)
-      if (LOGGING) {
+      // if (LOGGING) {
         console.log('mining result', await res.json())
-      }
+      // }
     } catch (error) {
       console.error('Error calling /mine endpoint', error)
     }
@@ -67,9 +67,9 @@ const startServer = async () => {
   })
 }
 
-(async () => {
-  await startServer()
-})()
+// (async () => {
+//   await startServer()
+// })()
 
 // Let normal Nuxt requests go where they need to go!
 export default function (_req: any, _res: any, next: () => {} ) { next() }

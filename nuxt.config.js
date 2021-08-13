@@ -67,7 +67,7 @@ export default {
       apiConfig: {
         protocol: process.env.ARWEAVE_PROTOCOL || 'http',
         host: process.env.ARWEAVE_HOST || 'localhost',
-        port: process.env.ARWEAVE_PORT || 1987
+        port: process.env.ARWEAVE_PORT || 1984
       }
     },
 
@@ -85,7 +85,6 @@ export default {
     }
   },
   router: {},
-  serverMiddleware: [{ handler: '~/arlocal.ts' }],
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
