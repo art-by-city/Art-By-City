@@ -45,12 +45,14 @@ const startServer = async () => {
 
   // Wire proxy to ArLocal
   app.use((req, res) => {
+    console.log('proxy endpoint hit!')
     arlocalProxy.web(req, res)
   })
 
   // Mining cron task
   cron.schedule('* * * * *', async () => {
     try {
+      console.log('trying to mine!')
       const res = await fetch(`http://${HOST}:1984/mine`)
       if (LOGGING) {
         console.log('mining result', await res.json())
