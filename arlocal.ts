@@ -4,14 +4,16 @@ import express, { Response } from 'express'
 import cron from 'node-cron'
 import fetch from 'node-fetch'
 
+const HOST = process.env.ARWEAVE_HOST || 'localhost'
+
 const PROXY_OPTS = {
   target: {
     protocol: 'http',
-    host: 'localhost',
+    host: HOST,
     port: 1984
   }
 }
-const PROXY_PORT = 1987
+const PROXY_PORT = process.env.ARWEAVE_PORT || 1987
 
 const LOGGING = false
 
@@ -46,9 +48,13 @@ const startServer = async () => {
 
   // Mining cron task
   cron.schedule('* * * * *', async () => {
-    const res = await fetch('http://localhost:1984/mine')
-    if (LOGGING) {
-      console.log('mining result', await res.json())
+    try {
+      const res = await fetch(`http://localhost:1984/mine`)
+      if (LOGGING) {
+        console.log('mining result', await res.json())
+      }
+    } catch (error) {
+      console.error('Error calling /mine endpoint', error)
     }
   })
 
