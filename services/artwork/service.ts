@@ -17,7 +17,7 @@ export default class ArtworkService {
     this.transactionBuilder = new TransactionBuilder(
       this.$arweave,
       this.$ardb,
-      context.$config.arweave.apiConfig
+      context.$config.arweave.appConfig
     )
   }
 
