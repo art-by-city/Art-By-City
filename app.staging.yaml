@@ -16,6 +16,10 @@ handlers:
     script: auto
     secure: always
 
+network:
+  forwarded_ports:
+    - 1987/tcp
+
 env_variables:
   HOST: '0.0.0.0'
   BASE_URL: https://staging.artby.city
