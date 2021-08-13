@@ -27,7 +27,7 @@ env_variables:
   USER_UPLOAD_BUCKET_NAME: art-by-city-staging-user-uploads
   APP_NAME: ArtByCity
   APP_VERSION: development
-  ARWEAVE_PROTOCOL: http
+  ARWEAVE_PROTOCOL: https
   ARWEAVE_HOST: '0.0.0.0'
   ARWEAVE_PORT: 1987
 
