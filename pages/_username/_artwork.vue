@@ -111,16 +111,12 @@ export default class ArtworkPage extends FormPageComponent {
   editMode = false
   zoom = false
 
-  async asyncData({ params, app, error, redirect }: Context) {
+  async asyncData({ params, app, error, redirect, $config }: Context) {
     let artwork, previewImage
     let editMode = false
 
     try {
-      const arweave = new Arweave({
-        host: 'localhost',
-        port: 1984,
-        protocol: 'http'
-      })
+      // const arweave = new Arweave($config.arweave.apiConfig)
       // const ardb = new ArDB(arweave, 0)
       // const tx = await ardb
       //   .search('transactions')
@@ -132,7 +128,7 @@ export default class ArtworkPage extends FormPageComponent {
       // if (tx) {
         // const res = await arweave.api.get(tx.id)
         // console.log('_artwork.vue -> asyncData()', 4, params.artwork)
-      const res = await arweave.api.get(params.artwork)
+      const res = await app.$arweave.api.get(params.artwork)
         // console.log('_artwork.vue -> asyncData()', 5, res.data)
         // artwork = res.data
         // previewImage = payload.images[0]
