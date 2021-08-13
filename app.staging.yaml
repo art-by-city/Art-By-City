@@ -28,7 +28,7 @@ env_variables:
   APP_NAME: ArtByCity
   APP_VERSION: development
   ARWEAVE_PROTOCOL: https
-  ARWEAVE_HOST: testnet.artby.city
+  ARWEAVE_HOST: art-by-city-testnet-322812.ue.r.appspot.com
   ARWEAVE_PORT: 443
 
 includes:
