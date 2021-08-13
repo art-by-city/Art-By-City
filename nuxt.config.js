@@ -70,7 +70,6 @@ export default {
         port: process.env.ARWEAVE_PORT || 1984
       }
     },
-
   },
   auth: {
     redirect: {
