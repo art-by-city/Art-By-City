@@ -19,7 +19,6 @@ build_staging:
   artifacts:
     paths:
       - .nuxt
-      - node_modules
 
 build_production:
   stage: build
