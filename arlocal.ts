@@ -4,7 +4,7 @@ import express, { Response } from 'express'
 import cron from 'node-cron'
 import fetch from 'node-fetch'
 
-const HOST = process.env.ARWEAVE_HOST || 'localhost'
+const HOST = process.env.HOST || 'localhost'
 
 const PROXY_OPTS = {
   target: {
@@ -49,7 +49,7 @@ const startServer = async () => {
   // Mining cron task
   cron.schedule('* * * * *', async () => {
     try {
-      const res = await fetch(`http://localhost:1984/mine`)
+      const res = await fetch(`http://${HOST}:1984/mine`)
       if (LOGGING) {
         console.log('mining result', await res.json())
       }
