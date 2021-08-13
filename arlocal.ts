@@ -15,13 +15,15 @@ const PROXY_OPTS = {
 }
 const PROXY_PORT = process.env.ARWEAVE_PORT || 1987
 
+const ARLOCAL_DB_PATH = process.env.ARLOCAL_DB_PATH || undefined
+
 const LOGGING = false
 
 const app = express()
 
 const startServer = async () => {
   // Setup ArLocal
-  const arLocal = new ArLocal(1984, LOGGING)
+  const arLocal = new ArLocal(1984, LOGGING, ARLOCAL_DB_PATH)
   await arLocal.start()
 
   // Setup ArLocal Proxy

@@ -28,8 +28,9 @@ env_variables:
   APP_NAME: ArtByCity
   APP_VERSION: development
   ARWEAVE_PROTOCOL: https
-  ARWEAVE_HOST: 'staging.artby.city'
+  ARWEAVE_HOST: staging.artby.city
   ARWEAVE_PORT: 1987
+  ARLOCAL_DB_PATH: /tmp/.arlocaldb
 
 includes:
   - secrets.yaml
