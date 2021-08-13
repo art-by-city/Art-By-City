@@ -67,7 +67,7 @@ export default {
       apiConfig: {
         protocol: process.env.ARWEAVE_PROTOCOL || 'http',
         host: process.env.ARWEAVE_HOST || 'localhost',
-        port: process.env.ARWEAVE_PORT || 1984
+        port: process.env.ARWEAVE_PORT || 1987
       }
     },
 
@@ -85,6 +85,7 @@ export default {
     }
   },
   router: {},
+  serverMiddleware: [{ handler: '~/arlocal.ts' }],
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
@@ -111,10 +112,12 @@ export default {
      ** You can extend webpack config here
      */
     // @ts-ignore
-    extend(config, ctx) {
+    extend(config, _context) {
       config.node = {
         fs: 'empty'
       }
+      // Exclude /contracts directory from webpack build
+      config.module.rules.push({ exclude: [`${__dirname}/contracts`] })
     },
     plugins: [
       new IgnoreNotFoundExportPlugin()
