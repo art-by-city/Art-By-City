@@ -54,9 +54,11 @@ export default class ArtworkService {
       const res = await this.$arweave.api.get(ardbTx.id)
       const tx = await this.$arweave.transactions.get(ardbTx.id)
 
-      res.data.id = tx.id
+      if (res.data) {
+        res.data.id = tx.id
 
-      items.push({ tx, artwork: res.data, guid: uuidv4() })
+        items.push({ tx, artwork: res.data, guid: uuidv4() })
+      }
     }
 
     return items
