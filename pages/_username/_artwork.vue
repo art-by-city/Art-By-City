@@ -11,7 +11,11 @@
           @click="onPreviewArtworkClicked"
         ></v-img>
       </v-row>
-      <v-row dense justify="center" v-if="artwork.images && artwork.images.length > 1">
+      <v-row
+        v-if="artwork.images && artwork.images.length > 1"
+        justify="center"
+        dense
+      >
         <div class="artwork-image-selector-container">
           <div
             class="artwork-image-selector"
@@ -37,26 +41,41 @@
       <v-row dense>
         <v-col offset="1" offset-sm="2" cols="6" sm="5">
           <v-row dense>
-            <span class="text-lowercase text-h4 text-sm-h2">{{ artwork.title }}</span>
+            <span class="text-h4 text-sm-h2">{{ artwork.title }}</span>
           </v-row>
           <v-row dense>
-            Created by: <nuxt-link :to="`/${artwork.creator.address}`">
+            Created by:&nbsp;
+            <nuxt-link :to="`/${artwork.creator.address}`">
               {{ artwork.creator.address }}
             </nuxt-link>
           </v-row>
           <v-row dense>
-            <div class="text-lowercase" style="width: 100%">
+            <div style="width: 100%">
               {{ artwork.description }}
             </div>
           </v-row>
+          <v-row dense v-if="artwork.license">
+            License:&nbsp;
+            <span>{{ artwork.license.name }}</span>&nbsp;
+            <a
+              :href="artwork.license.reference"
+              target="_blank"
+              class="license-anchor"
+            >
+              Learn More
+              <v-icon small dense class="adjust-icon">
+                mdi-open-in-new
+              </v-icon>
+            </a>
+          </v-row>
         </v-col>
         <v-col cols="5">
-          <div style="align-self: flex-end">
-            <!-- <LikeButton :artwork="artwork"/> -->
+          <!-- <div style="align-self: flex-end">
+            <LikeButton :artwork="artwork"/>
           </div>
           <div class="text-lowercase">{{ artwork.type }}</div>
           <div class="text-lowercase">{{ cityName }}</div>
-          <div class="text-lowercase">{{ hashtagsString }}</div>
+          <div class="text-lowercase">{{ hashtagsString }}</div> -->
         </v-col>
       </v-row>
 
@@ -84,7 +103,6 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
-import Arweave from 'arweave'
 
 import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
@@ -111,35 +129,18 @@ export default class ArtworkPage extends FormPageComponent {
   editMode = false
   zoom = false
 
-  async asyncData({ params, app, error, redirect, $config }: Context) {
+  async asyncData({ params, app, error, redirect }: Context) {
     let artwork, previewImage
     let editMode = false
 
     try {
-      // const arweave = new Arweave($config.arweave.apiConfig)
-      // const ardb = new ArDB(arweave, 0)
-      // const tx = await ardb
-      //   .search('transactions')
-      //   .appName('ArtByCity')
-      //   .from(params.username)
-      //   .tag('Slug', params.artwork)
-      //   .findOne()
-      // console.log('_artwork.vue -> asyncData()', 4, tx)
-      // if (tx) {
-        // const res = await arweave.api.get(tx.id)
-        // console.log('_artwork.vue -> asyncData()', 4, params.artwork)
       const res = await app.$arweave.api.get(params.artwork)
-        // console.log('_artwork.vue -> asyncData()', 5, res.data)
-        // artwork = res.data
-        // previewImage = payload.images[0]
       if (!res.data.error) {
         artwork = res.data
         previewImage = res.data.images[0]
       } else {
         redirect('/')
       }
-      // }
-
     } catch (err) {
       if (err.response?.status === 404) {
         return error({ statusCode: 404, message: 'artwork not found' })
@@ -302,5 +303,8 @@ export default class ArtworkPage extends FormPageComponent {
   width: 96px;
   margin: 5px;
   display: inline-block;
+}
+.adjust-icon {
+  margin-top: -3px;
 }
 </style>

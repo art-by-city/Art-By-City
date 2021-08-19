@@ -113,7 +113,6 @@
             type="text"
             name="artworkTitle"
             label="Title"
-            class="text-lowercase"
             :rules="titleRules"
           ></v-text-field>
           <v-text-field
@@ -121,7 +120,6 @@
             type="text"
             name="artworkSlug"
             :label="slugBase"
-            class="text-lowercase"
             :rules="slugRules"
           ></v-text-field>
           <!-- <ArtworkTypeSelector
@@ -134,10 +132,10 @@
             :cities="$store.state.config.cities"
             disabled
           /> -->
-          <HashtagSelector
+          <!-- <HashtagSelector
             v-model="artwork.hashtags"
             :hashtags="$store.state.config.hashtags"
-          />
+          /> -->
           <v-textarea
             v-model="artwork.description"
             name="artworkDescription"
@@ -145,9 +143,9 @@
             hint="Enter a description for this Artwork"
             auto-grow
             rows="2"
-            class="text-lowercase"
             :rules="descriptionRules"
           ></v-textarea>
+          <LicenseSelector v-model="artwork.license" />
         </v-col>
       </v-row>
       <v-row dense justify="center">
@@ -179,6 +177,7 @@ import Cropper from 'cropperjs'
 import { Artwork, ArtworkImage } from '~/types'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
+import LicenseSelector from '~/components/forms/licenseSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
 import { debounce, uuidv4 } from '~/helpers'
 
@@ -187,7 +186,8 @@ import { debounce, uuidv4 } from '~/helpers'
     CitySelector,
     ArtworkTypeSelector,
     HashtagSelector,
-    draggable
+    draggable,
+    LicenseSelector
   }
 })
 export default class ArtworkEditForm extends Vue {

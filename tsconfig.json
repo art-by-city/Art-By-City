@@ -9,6 +9,7 @@
       "dom"
     ],
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,
     "sourceMap": true,
