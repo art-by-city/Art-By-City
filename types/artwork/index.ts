@@ -10,6 +10,7 @@ export interface Artwork {
   type?: string
   hashtags: string[]
   images: ArtworkImage[]
+  license?: License
 }
 
 export interface ArtworkCreator {
@@ -25,6 +26,18 @@ export interface BaseArtworkImage extends TrackableEntity {
 
 export interface DataURLArtworkImage extends BaseArtworkImage {
   dataUrl: string
+}
+
+export interface License {
+  reference: string
+  isDeprecatedLicenseId: boolean
+  detailsUrl: string
+  referenceNumber: number
+  name: string
+  licenseId: string
+  seeAlso: string[]
+  isOsiApproved: boolean
+  isFsfLibre?: undefined
 }
 
 /**
