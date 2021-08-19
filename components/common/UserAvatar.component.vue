@@ -98,11 +98,17 @@ export default class UserAvatar extends Vue {
   }
 
   get username() {
-    return this.abbr
-      ? this.user.address[0]
-      : this.user.address
-      // ? this.user.username[0]
-      // : this.user.username
+    const username = this.user.username || this.user.address
+
+    if (this.abbr) {
+      if (this.dense) {
+        return username[0]
+      } else {
+        return username.substring(0, 3)
+      }
+    }
+
+    return username
   }
 
   get fullUsername() {

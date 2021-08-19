@@ -48,7 +48,7 @@ export default class ArtworkService {
     const items: FeedItem[] = []
 
     const txs = await this.transactionBuilder
-      .searchTransactions('artwork', creator)
+      .searchTransactions('artwork', { owner: creator })
 
     for (const ardbTx of txs) {
       const res = await this.$arweave.api.get(ardbTx.id)

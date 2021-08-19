@@ -4,6 +4,7 @@ export interface UserAvatar {
 
 export default interface User {
   address: string
+  username?: string
   // id: string
   // username: string
   // name: string

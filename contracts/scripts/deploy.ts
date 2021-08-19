@@ -1,6 +1,5 @@
 import fs from 'fs/promises'
 import Arweave from 'arweave'
-import testWeaveJWK from 'testweave-sdk/src/assets/arweave-keyfile-MlV6DeOtRmakDOf6vgOBlif795tcWimgyPsYYNQ8q1Y.json'
 
 const arweave = new Arweave({
   protocol: process.env.ARWEAVE_PROTOCOL || 'http',
@@ -8,17 +7,21 @@ const arweave = new Arweave({
   port: process.env.ARWEAVE_PORT || 1984
 })
 
-// TODO -> get wallet from environment
-const wallet = testWeaveJWK
-
 const APP_NAME = process.env.APP_NAME || 'ArtByCity'
 const APP_VERSION = process.env.APP_VERSION || 'development'
 
 async function deployContract(name: string) {
-  // TODO -> Read contract source
-  const contractSourceJS = await fs.readFile(`contracts/src/${name}/contract.js`)
+  // Read wallet file, path from environment
+  const wallet = JSON.parse(
+    (await fs.readFile(process.env.DEPLOYER_KEYFILE || '')).toString()
+  )
 
-  // TODO -> Read initial state
+  // Read contract source JS file
+  const contractSourceJS = await fs.readFile(
+    `contracts/dist/${name}/contract.js`
+  )
+
+  // Read initial state JSON file
   const initialStateJSON = await fs.readFile(`contracts/src/${name}/state.json`)
 
   // Create contract tx
@@ -46,6 +49,7 @@ async function deployContract(name: string) {
   initialStateTx.addTag('App-Version', APP_VERSION)
   initialStateTx.addTag('Content-Type', 'application/json')
   initialStateTx.addTag('Contract-Src', contractTxId)
+  initialStateTx.addTag('Contract-Name', `${name}`)
 
   // Sign initial state tx
   await arweave.transactions.sign(initialStateTx, wallet)

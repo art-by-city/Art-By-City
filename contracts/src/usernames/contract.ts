@@ -5,7 +5,7 @@ import {
 
 import { ContractError, ContractAssert } from '../../environment'
 
-interface UsernamesContractState {
+export interface UsernamesContractState {
   usernames: {
     [username: string]: {
       owner: string
@@ -33,7 +33,10 @@ export function handle(
     ContractAssert(typeof username === 'string', 'name must be a string')
     ContractAssert(username.length > 1, 'name must be at least 2 characters')
     ContractAssert(!RESERVED_NAMES.includes(username), 'name is reserved')
+    console.log('contract', state)
     ContractAssert(!(state.usernames[username]), 'name already registered')
+
+    // TODO -> only allow users to own 1 username at a time
 
     state.usernames[username] = {
       owner: action.caller

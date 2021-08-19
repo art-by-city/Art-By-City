@@ -38,20 +38,31 @@ export default class TransactionBuilder {
   }
 
   async searchTransactions(
-    category: DomainEntityCategory,
-    owner?: string
+    category: DomainEntityCategory | 'contract',
+    opts?: {
+      owner?: string
+      contractName?: string
+    },
+    sort?: 'HEIGHT_ASC' | 'HEIGHT_DESC'
   ):
     Promise<ArdbTransaction[] | ArdbBlock[]> {
     let query = this.ardb
       .search('transactions')
       .appName(this.config.name)
       .type('application/json')
-      .tag('Category', category)
 
-    if (owner) {
-      query = query.from(owner)
+    if (category !== 'contract') {
+      query = query.tag('Category', category)
     }
 
-    return await query.find({ sort: 'HEIGHT_ASC' })
+    if (opts?.owner) {
+      query = query.from(opts.owner)
+    }
+
+    if (opts?.contractName) {
+      query = query.tag('Contract-Name', opts.contractName)
+    }
+
+    return await query.find({ sort })
   }
 }

@@ -40,8 +40,8 @@
             <span class="text-lowercase text-h4 text-sm-h2">{{ artwork.title }}</span>
           </v-row>
           <v-row dense>
-            Created by: <nuxt-link :to="`/${artwork.creator.address}`">
-              {{ artwork.creator.address }}
+            Created by: <nuxt-link :to="`/${username}`">
+              {{ username }}
             </nuxt-link>
           </v-row>
           <v-row dense>
@@ -84,7 +84,6 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
-import Arweave from 'arweave'
 
 import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
@@ -110,40 +109,32 @@ export default class ArtworkPage extends FormPageComponent {
   cachedArtwork!: Artwork
   editMode = false
   zoom = false
+  username?: string
 
   async asyncData({ params, app, error, redirect }: Context) {
-    let artwork, previewImage
+    let artwork, previewImage, username
     let editMode = false
 
     try {
-      const arweave = new Arweave({
-        host: 'localhost',
-        port: 1984,
-        protocol: 'http'
-      })
-      // const ardb = new ArDB(arweave, 0)
-      // const tx = await ardb
-      //   .search('transactions')
-      //   .appName('ArtByCity')
-      //   .from(params.username)
-      //   .tag('Slug', params.artwork)
-      //   .findOne()
-      // console.log('_artwork.vue -> asyncData()', 4, tx)
-      // if (tx) {
-        // const res = await arweave.api.get(tx.id)
-        // console.log('_artwork.vue -> asyncData()', 4, params.artwork)
-      const res = await arweave.api.get(params.artwork)
-        // console.log('_artwork.vue -> asyncData()', 5, res.data)
-        // artwork = res.data
-        // previewImage = payload.images[0]
+      const res = await app.$arweave.api.get(params.artwork)
+
+      // Try to lookup username
+      const _username = await app.$usernameService.resolveUsername(
+        params.username
+      )
+
+      if (_username) {
+        username = _username
+      } else {
+        username = params.username
+      }
+
       if (!res.data.error) {
         artwork = res.data
         previewImage = res.data.images[0]
       } else {
         redirect('/')
       }
-      // }
-
     } catch (err) {
       if (err.response?.status === 404) {
         return error({ statusCode: 404, message: 'artwork not found' })
@@ -152,7 +143,7 @@ export default class ArtworkPage extends FormPageComponent {
         app.$toastService.error(err)
       }
     } finally {
-      return { artwork, previewImage, editMode }
+      return { artwork, previewImage, editMode, username }
     }
   }
 

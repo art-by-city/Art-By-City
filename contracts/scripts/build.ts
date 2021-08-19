@@ -21,7 +21,7 @@ async function build() {
     if (babelResult?.code) {
       const prettyCode = prettier.format(babelResult.code, { parser: 'babel' })
 
-      await fs.writeFile(`contracts/src/${name}/contract.js`, prettyCode)
+      await fs.writeFile(`contracts/dist/${name}/contract.js`, prettyCode)
     }
   }
 }

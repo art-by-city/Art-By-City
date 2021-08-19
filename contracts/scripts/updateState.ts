@@ -1,6 +1,6 @@
+import fs from 'fs/promises'
 import Arweave from 'arweave'
 import { interactWrite } from 'smartweave'
-import testWeaveJWK from 'testweave-sdk/src/assets/arweave-keyfile-MlV6DeOtRmakDOf6vgOBlif795tcWimgyPsYYNQ8q1Y.json'
 
 const arweave = new Arweave({
   protocol: process.env.ARWEAVE_PROTOCOL || 'http',
@@ -8,10 +8,12 @@ const arweave = new Arweave({
   port: process.env.ARWEAVE_PORT || 1984
 })
 
-// TODO -> get wallet from environment
-const wallet = testWeaveJWK
-
 async function updateState(contractId: string) {
+  // Read wallet file, path from environment
+  const wallet = JSON.parse(
+    (await fs.readFile(process.env.DEPLOYER_KEYFILE || '')).toString()
+  )
+
   const input = {
     function: 'register',
     username: 'Jim'

@@ -62,7 +62,8 @@ export default {
     arweave: {
       appConfig: {
         name: process.env.APP_NAME || 'ArtByCity',
-        version: process.env.APP_VERSION || 'development'
+        version: process.env.APP_VERSION || 'development',
+        deployer: process.env.CONTRACT_DEPLOYER_ADDRESS || ''
       },
       apiConfig: {
         protocol: process.env.ARWEAVE_PROTOCOL || 'http',
