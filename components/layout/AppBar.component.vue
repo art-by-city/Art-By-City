@@ -43,6 +43,8 @@
     </template>
     <template v-else>
       <v-btn text @click="onLoginClicked">log in</v-btn>
+      <v-divider vertical style="border-color: white;" />
+      <v-btn text @click="onSignUpClicked">sign up</v-btn>
     </template>
   </v-app-bar>
 </template>
@@ -69,6 +71,9 @@ export default class AppBar extends Vue {
 
   @debounce
   @Emit('login') onLoginClicked() {}
+
+  @debounce
+  @Emit('signup') onSignUpClicked() {}
 
   @debounce
   @Emit('logout') onLogoutClicked() {}

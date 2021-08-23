@@ -5,6 +5,7 @@
       :user="$auth.user"
       @login="login"
       @logout="logout"
+      @signup="showSignupModal"
     />
 
     <v-main class="main">
@@ -16,7 +17,7 @@
 
     <Footer />
 
-    <GetArConnect :show.sync="showGetArConnectModal" />
+    <AuthDialog @login="login" :show.sync="showAuthDialog" />
 
     <div class="toast-alerts-container">
       <v-alert
@@ -49,19 +50,19 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 
 import ToastMessage from '~/models/toasts/toastMessage'
-import { AppBar, Footer, GetArConnect } from '~/components'
+import { AppBar, Footer, AuthDialog } from '~/components'
 import { ArConnectNotInstalledError } from '~/schemes/arconnect'
 
 @Component({
   components: {
     AppBar,
     Footer,
-    GetArConnect
+    AuthDialog
   }
 })
 export default class DefaultLayout extends Vue {
   toasts: ToastMessage[] = []
-  showGetArConnectModal: boolean = false
+  showAuthDialog: string = ''
 
   removeToast(toast: ToastMessage) {
     this.$store.commit('toasts/remove', toast)
@@ -89,7 +90,7 @@ export default class DefaultLayout extends Vue {
       await this.$auth.loginWith('arconnect')
     } catch (error) {
       if (error instanceof ArConnectNotInstalledError) {
-        this.showGetArConnectModal = true
+        this.showAuthDialog = 'get-wallet'
       } else {
         this.$toastService.error(error)
       }
@@ -98,6 +99,10 @@ export default class DefaultLayout extends Vue {
 
   async logout() {
     await this.$auth.logout()
+  }
+
+  async showSignupModal() {
+    this.showAuthDialog = 'sign-up'
   }
 }
 </script>
