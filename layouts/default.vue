@@ -14,7 +14,9 @@
       </v-container>
     </v-main>
 
-    <Footer :shouldChangelogIconBlink="shouldChangelogIconBlink()" />
+    <Footer />
+
+    <GetArConnect :show.sync="showGetArConnectModal" />
 
     <div class="toast-alerts-container">
       <v-alert
@@ -47,21 +49,20 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 
 import ToastMessage from '~/models/toasts/toastMessage'
-import { AppBar, Footer } from '~/components/layout'
+import { AppBar, Footer, GetArConnect } from '~/components'
+import { ArConnectNotInstalledError } from '~/schemes/arconnect'
 
 @Component({
   components: {
     AppBar,
-    Footer
+    Footer,
+    GetArConnect
   }
 })
 export default class DefaultLayout extends Vue {
-  shouldChangelogIconBlink(): boolean {
-    // return !this.$changelogService.hasSeenLatestChangelog()
-    return false
-  }
-
   toasts: ToastMessage[] = []
+  showGetArConnectModal: boolean = false
+
   removeToast(toast: ToastMessage) {
     this.$store.commit('toasts/remove', toast)
   }
@@ -87,7 +88,11 @@ export default class DefaultLayout extends Vue {
     try {
       await this.$auth.loginWith('arconnect')
     } catch (error) {
-      this.$toastService.error(error)
+      if (error instanceof ArConnectNotInstalledError) {
+        this.showGetArConnectModal = true
+      } else {
+        this.$toastService.error(error)
+      }
     }
   }
 
