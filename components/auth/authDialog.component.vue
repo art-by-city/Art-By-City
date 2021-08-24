@@ -10,10 +10,22 @@
     <template v-if="content === 'sign-up'">
       <v-container dense class="pa-1">
         <v-row dense>
-          <v-col class="pa-0" dense cols="6">
+          <v-col
+            class="pa-0"
+            dense
+            cols="12"
+            md="6"
+          >
             <GetArConnect @login="login" />
           </v-col>
-          <v-col class="pa-0" dense cols="6">
+          <v-col
+            class="pa-0"
+            dense
+            cols="12"
+            md="6"
+            order="first"
+            order-md="last"
+          >
             <SignUp @signUp="onSignUp" />
           </v-col>
         </v-row>
