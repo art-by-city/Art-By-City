@@ -13,7 +13,6 @@
         @click="onSignUpClicked"
       >
         <span class="mx-2">Sign Up</span>
-        <v-icon dense>mdi-open-in-new</v-icon>
       </v-btn>
     </v-card-actions>
   </v-card>
