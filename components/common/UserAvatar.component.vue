@@ -6,9 +6,12 @@
           <v-img :src="src"></v-img>
         </template>
         <template v-else>
-          <span class="white--text text-lowercase">
+          <nuxt-link
+            class="white--text text-lowercase"
+            :to="`/${fullUsername}`"
+          >
             {{ username }}
-          </span>
+          </nuxt-link>
         </template>
         <v-overlay :value="editable && hoverProps.hover">
           <v-file-input
@@ -22,7 +25,7 @@
         </v-overlay>
       </v-avatar>
     </v-hover>
-    <v-tooltip right v-if="dense">
+    <v-tooltip bottom v-if="dense">
       <template v-slot:activator="{ on, attrs }">
         <span
           v-bind="attrs"
@@ -30,7 +33,12 @@
           class="ml-2"
           style="display: inline-flex;"
         >
-          <span class="text-truncate app-bar-username">{{ fullUsername }}</span>
+          <nuxt-link
+            class="white--text text-truncate app-bar-username"
+            :to="`/${fullUsername}`"
+          >
+            {{ fullUsername }}
+          </nuxt-link>
         </span>
       </template>
       {{ fullUsername }}

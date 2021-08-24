@@ -2,7 +2,6 @@
   <v-app dark class="app">
     <AppBar
       :config="$config"
-      :user="$auth.user"
       @login="login"
       @logout="logout"
       @signup="showSignupModal"
