@@ -14,36 +14,14 @@
 
     <v-spacer></v-spacer>
 
-    <template v-if="user">
+    <template v-if="$auth.loggedIn">
       <v-btn text to="/publish">publish</v-btn>
-
-      <v-divider vertical dark class="mx-4" />
-
-      <UserAvatar abbr dense :user="user" />
-
-      <v-divider vertical dark class="mx-4" />
-
-      <v-menu offset-y>
-        <template v-slot:activator="props">
-          <v-btn icon v-on="props.on" style="margin-right: 0px;">
-            <v-icon>mdi-dots-horizontal</v-icon>
-          </v-btn>
-        </template>
-        <v-list dense>
-          <v-list-item dense @click="onLogoutClicked">
-            <v-list-item-action>
-              <v-icon>mdi-logout-variant</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>log out</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+      <v-divider vertical class="mx-4 white-divider" />
+      <AccountMenu @logout="onLogoutClicked" />
     </template>
     <template v-else>
       <v-btn text @click="onLoginClicked">log in</v-btn>
-      <v-divider vertical style="border-color: white;" />
+      <v-divider vertical class="white-divider" />
       <v-btn text @click="onSignUpClicked">sign up</v-btn>
     </template>
   </v-app-bar>
@@ -52,18 +30,16 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import User from '~/models/user/user'
 import { ConfigStoreState } from '~/store/config'
 import { debounce } from '~/helpers'
+import AccountMenu from './AccountMenu.component.vue'
 
-@Component
+@Component({
+  components: {
+    AccountMenu
+  }
+})
 export default class AppBar extends Vue {
-  @Prop({
-    type: Object,
-    required: false,
-    default: null
-  }) readonly user!: User | null
-
   @Prop({
     type: Object,
     required: true
@@ -75,7 +51,6 @@ export default class AppBar extends Vue {
   @debounce
   @Emit('signup') onSignUpClicked() {}
 
-  @debounce
   @Emit('logout') onLogoutClicked() {}
 }
 </script>
@@ -97,5 +72,9 @@ export default class AppBar extends Vue {
 
 .app-logo >>> .v-btn__content {
   opacity: 1 !important;
+}
+
+.white-divider {
+  border-color: white;
 }
 </style>
