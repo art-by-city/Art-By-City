@@ -30,7 +30,6 @@ import ProgressService from '~/services/progress/service'
   }
 })
 export default class HomePage extends PageComponent {
-  fetchOnServer = false
   feed: FeedItem[] = []
 
   async fetch() {
