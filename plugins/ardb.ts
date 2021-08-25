@@ -29,10 +29,9 @@ declare module 'vuex/types/index' {
   }
 }
 
-export default ({ $config }: Context, inject: Inject) => {
+export default ({ app }: Context, inject: Inject) => {
   try {
-    const arweave = new Arweave($config.arweave?.apiConfig || {})
-    inject('ardb', new ArDB(arweave, 2))
+    inject('ardb', new ArDB(app.$arweave, 2))
   } catch (error) {
     console.error('Error during ArDB plugin bootstrap', error)
   }
