@@ -27,7 +27,7 @@ const APP_NAME = 'ArtByCity-DEV'
 
 type ArweaveDataType = string | Uint8Array | ArrayBuffer | undefined
 type FileUploadRequest = {
-  data: ArrayBuffer//ArweaveDataType
+  data: ArrayBuffer//string//ArrayBuffer//ArweaveDataType
   type: string
 }
 
@@ -55,17 +55,16 @@ export default class DebugPage extends FormPageComponent {
         reject(error)
       }
       reader.onload = async (evt) => {
-        if (!evt.target || !reader.result) {
+        if (!evt.target || !evt.target.result) {
           reject('Error reading file')
           return
         }
 
         resolve({
-          data: reader.result as ArrayBuffer,
+          data: evt.target.result as ArrayBuffer,
           type: file.type
         })
       }
-      // reader.readAsDataURL(file)
       reader.readAsArrayBuffer(file)
     })
   }
@@ -78,11 +77,6 @@ export default class DebugPage extends FormPageComponent {
     try {
       ProgressService.start()
       const arweave = new Arweave(this.$config.arweave.apiConfig)
-
-      const data = this.request.data
-
-      console.log('data', data)
-
       const tx = await arweave.createTransaction({
         data: this.request.data
       })
