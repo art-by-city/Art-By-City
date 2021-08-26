@@ -8,9 +8,10 @@
         >
           <UserAvatar
             class="user-profile-avatar"
-            abbr
             :user="artist"
             :size="$vuetify.breakpoint.name"
+            :editable="artist.address === $auth.user.address"
+            @change="uploadAvatar"
           />
         </v-col>
         <v-col
@@ -20,10 +21,8 @@
           <div class="user-profile-info">
             <div class="
               user-profile-username
-              text-lowercase
               font-weight-black
               text-body-2
-
             ">
               {{ artist.address }}
             </div>
@@ -60,11 +59,12 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import PageComponent from '~/components/pages/page.component'
-import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 import { User } from '~/models'
 import { FeedItem } from '~/types'
+import { readFileAsDataUrlAsync } from '~/helpers'
 import ProgressService from '~/services/progress/service'
+import PageComponent from '~/components/pages/page.component'
+import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 
 @Component({
   components: {
@@ -88,6 +88,16 @@ export default class UserProfilePage extends PageComponent {
     } finally {
       ProgressService.stop()
     }
+  }
+
+  async uploadAvatar(image: File) {
+    const avatar = {
+      src: await readFileAsDataUrlAsync(image)
+    }
+
+    const uploadedAvatar = await this.$avatarService.uploadAvatar(avatar)
+
+    this.artist.avatar = uploadedAvatar
   }
 }
 </script>

@@ -3,20 +3,24 @@
     <v-hover v-slot:default="hoverProps">
       <v-avatar :color="currentColor" :size="_size">
         <template v-if="user.avatar">
-          <v-img :src="src"></v-img>
+          <v-img :src="user.avatar.src"></v-img>
         </template>
         <template v-else>
           <nuxt-link
-            class="white--text text-lowercase"
+            v-if="dense"
+            class="white--text avatar-username"
             :to="`/${fullUsername}`"
           >
             {{ username }}
           </nuxt-link>
+          <span v-else class="white--text avatar-username">
+            {{ username }}
+          </span>
         </template>
         <v-overlay :value="editable && hoverProps.hover">
           <v-file-input
             class="avatar-upload-button"
-            accept="image/png, image/jpeg"
+            accept="image/*"
             hide-input
             @change="onAvatarFileInputChanged"
             prepend-icon="mdi-camera"
@@ -50,6 +54,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import User from '~/models/user/user'
+import { debounce } from '~/helpers'
 
 @Component
 export default class UserAvatar extends Vue {
@@ -93,7 +98,8 @@ export default class UserAvatar extends Vue {
     default: false
   }) readonly showUsername: boolean | undefined
 
-  @Emit('onChange') onAvatarFileInputChanged(image: File) {
+  @debounce
+  @Emit('change') onAvatarFileInputChanged(image: File): File {
     return image
   }
 
@@ -109,8 +115,6 @@ export default class UserAvatar extends Vue {
     return this.abbr
       ? this.user.address[0]
       : this.user.address
-      // ? this.user.username[0]
-      // : this.user.username
   }
 
   get fullUsername() {
@@ -130,10 +134,6 @@ export default class UserAvatar extends Vue {
       case 'xl':
         default: return 192
     }
-  }
-
-  get src() {
-    return ''
   }
 }
 </script>
@@ -156,5 +156,8 @@ export default class UserAvatar extends Vue {
 }
 .app-bar-username {
   max-width: 120px;
+}
+.avatar-username {
+  word-break: break-word;
 }
 </style>
