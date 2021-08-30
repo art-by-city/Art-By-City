@@ -120,13 +120,13 @@ export default class DefaultLayout extends Vue {
   position: fixed;
   bottom: 32px;
   right: 32px;
-  z-index: 5;
+  z-index: 9999;
 }
 
 .progress-bar {
   top: 48px;
   position: fixed;
-  z-index: 5;
+  z-index: 9999;
 }
 
 .notification-icon >>> .v-badge__badge {

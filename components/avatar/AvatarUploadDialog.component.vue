@@ -47,6 +47,7 @@ import { Vue, Component, Emit, PropSync } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers'
 import { ArtworkImage, Avatar } from '~/types'
+import ProgressService from '~/services/progress/service'
 
 @Component
 export default class AvatarUploadDialog extends Vue {
@@ -69,6 +70,7 @@ export default class AvatarUploadDialog extends Vue {
         src: this.images[0].dataUrl
       }
 
+      ProgressService.start()
       this.isUploading = true
       try {
         const uploadedAvatar = await this.$avatarService.uploadAvatar(avatar)
@@ -79,6 +81,7 @@ export default class AvatarUploadDialog extends Vue {
       } catch (error) {
         this.$toastService.error(error)
       } finally {
+        ProgressService.stop()
         this.isUploading = false
       }
     }
