@@ -1,6 +1,7 @@
 <template>
   <v-dialog
     :value="open"
+    persistent
     @click:outside="onCloseDialog"
     width="300"
   >
@@ -90,7 +91,9 @@ export default class AvatarUploadDialog extends Vue {
 
   @debounce
   onCloseDialog() {
-    this.close()
+    if (!this.isUploading) {
+      this.close()
+    }
   }
 
   @debounce

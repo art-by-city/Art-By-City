@@ -1,6 +1,6 @@
 <template>
   <div class="user-avatar">
-    <v-avatar :color="color" :size="_size">
+    <v-avatar :color="bgColor" :size="_size">
       <template v-if="user.avatar">
         <v-img :src="user.avatar.src"></v-img>
       </template>
@@ -73,6 +73,14 @@ export default class UserAvatar extends Vue {
     required: false,
     default: false
   }) readonly showUsername: boolean | undefined
+
+  get bgColor() {
+    if (this.user?.avatar?.src) {
+      return 'transparent'
+    } else {
+      return this.color
+    }
+  }
 
   get username() {
     return this.abbr
