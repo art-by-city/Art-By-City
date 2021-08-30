@@ -25,6 +25,7 @@ export default {
     color: 'blue',
     height: '5px',
     duration: 10000,
+    continuous: true,
     throttle: 0
   },
   /*
