@@ -1,5 +1,6 @@
 import { Context } from '@nuxt/types'
 
+import ToastMessage from '../../models/toasts/toastMessage'
 import ToastType from '../../models/toasts/toastType'
 
 interface AxiosError {
@@ -27,13 +28,17 @@ export default class ToastService {
   }
 
   toast(message: string, type: ToastType) {
-    const toast = {
+    const toast: ToastMessage = {
       message,
       type,
       show: true,
-      timeout: TOAST_TIMEOUT_MS,
       timestamp: Date.now()
     }
+
+    if (type !== 'error') {
+      toast.timeout = TOAST_TIMEOUT_MS
+    }
+
     this._context.store.commit('toasts/add', toast)
     this._context.store.dispatch('toasts/destroyOnExpiration', toast)
   }
