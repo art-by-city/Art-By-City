@@ -98,7 +98,7 @@
               </v-responsive>
               <span
                 v-if="this.hasImageValidationErrors"
-                class="red--text caption"s
+                class="red--text caption"
               >
                 At least 1 image is required
               </span>

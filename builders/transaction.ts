@@ -39,7 +39,8 @@ export default class TransactionBuilder {
 
   async searchTransactions(
     category: DomainEntityCategory,
-    owner?: string
+    owner?: string,
+    sort: 'HEIGHT_ASC' | 'HEIGHT_DESC' = 'HEIGHT_DESC'
   ):
     Promise<ArdbTransaction[] | ArdbBlock[]> {
     let query = this.ardb
@@ -52,6 +53,6 @@ export default class TransactionBuilder {
       query = query.from(owner)
     }
 
-    return await query.find({ sort: 'HEIGHT_ASC' })
+    return await query.find({ sort })
   }
 }

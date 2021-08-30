@@ -47,10 +47,6 @@ export class ArConnectNotInstalledError extends Error {
   }
 }
 
-export interface ArweaveUser {
-  address: string | boolean
-}
-
 export default class ArConnectScheme<
     OptionsT extends TokenableSchemeOptions = TokenableSchemeOptions
   >
@@ -148,15 +144,13 @@ export default class ArConnectScheme<
   }
 
   async fetchUser(): Promise<void> {
-    const user: ArweaveUser = {
-      address: this.token.get()
+    let address = this.token.get()
+
+    if (!address || address === true) {
+      address = await window.arweaveWallet.getActiveAddress()
     }
 
-    if (!user.address) {
-      user.address = await window.arweaveWallet.getActiveAddress()
-    }
-
-    this.token.set(user.address)
-    this.$auth.setUser(user)
+    this.token.set(address)
+    this.$auth.setUser(await this.$auth.ctx.$userService.fetchUser(address))
   }
 }

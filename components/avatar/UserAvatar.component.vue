@@ -1,30 +1,22 @@
 <template>
   <div class="user-avatar">
-    <v-hover v-slot:default="hoverProps">
-      <v-avatar :color="currentColor" :size="_size">
-        <template v-if="user.avatar">
-          <v-img :src="src"></v-img>
-        </template>
-        <template v-else>
-          <nuxt-link
-            class="white--text text-lowercase"
-            :to="`/${fullUsername}`"
-          >
-            {{ username }}
-          </nuxt-link>
-        </template>
-        <v-overlay :value="editable && hoverProps.hover">
-          <v-file-input
-            class="avatar-upload-button"
-            accept="image/png, image/jpeg"
-            hide-input
-            @change="onAvatarFileInputChanged"
-            prepend-icon="mdi-camera"
-          >
-          </v-file-input>
-        </v-overlay>
-      </v-avatar>
-    </v-hover>
+    <v-avatar :color="color" :size="_size">
+      <template v-if="user.avatar">
+        <v-img :src="user.avatar.src"></v-img>
+      </template>
+      <template v-else>
+        <nuxt-link
+          v-if="dense"
+          class="white--text avatar-username"
+          :to="`/${fullUsername}`"
+        >
+          {{ username }}
+        </nuxt-link>
+        <span v-else class="white--text avatar-username">
+          {{ username }}
+        </span>
+      </template>
+    </v-avatar>
     <v-tooltip bottom v-if="dense">
       <template v-slot:activator="{ on, attrs }">
         <span
@@ -47,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
+import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 import User from '~/models/user/user'
 
@@ -65,11 +57,6 @@ export default class UserAvatar extends Vue {
   }) readonly color!: string
 
   @Prop({
-    type: String,
-    required: false
-  }) readonly size!: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | undefined
-
-  @Prop({
     type: Boolean,
     required: false,
     default: false
@@ -85,32 +72,12 @@ export default class UserAvatar extends Vue {
     type: Boolean,
     required: false,
     default: false
-  }) readonly editable: boolean | undefined
-
-  @Prop({
-    type: Boolean,
-    required: false,
-    default: false
   }) readonly showUsername: boolean | undefined
-
-  @Emit('onChange') onAvatarFileInputChanged(image: File) {
-    return image
-  }
-
-  get currentColor() {
-    // if (this.user.avatar) {
-    //   return 'white'
-    // } else {
-      return this.color
-    // }
-  }
 
   get username() {
     return this.abbr
       ? this.user.address[0]
       : this.user.address
-      // ? this.user.username[0]
-      // : this.user.username
   }
 
   get fullUsername() {
@@ -122,7 +89,7 @@ export default class UserAvatar extends Vue {
       return 32
     }
 
-    switch (this.size) {
+    switch (this.$vuetify.breakpoint.name) {
       case 'xs': return 128
       case 'sm':
       case 'md':
@@ -130,10 +97,6 @@ export default class UserAvatar extends Vue {
       case 'xl':
         default: return 192
     }
-  }
-
-  get src() {
-    return ''
   }
 }
 </script>
@@ -156,5 +119,8 @@ export default class UserAvatar extends Vue {
 }
 .app-bar-username {
   max-width: 120px;
+}
+.avatar-username {
+  word-break: break-word;
 }
 </style>

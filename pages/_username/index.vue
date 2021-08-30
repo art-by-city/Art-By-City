@@ -6,28 +6,47 @@
           cols="1" offset="3"
             sm="2" offset-sm="3"
         >
-          <UserAvatar
-            class="user-profile-avatar"
-            abbr
-            :user="artist"
-            :size="$vuetify.breakpoint.name"
-          />
+          <UserAvatar class="user-profile-avatar" :user="artist" />
         </v-col>
         <v-col
           cols="6" offset="2"
             sm="4" offset-sm="1"
         >
-          <div class="user-profile-info">
-            <div class="
-              user-profile-username
-              text-lowercase
-              font-weight-black
-              text-body-2
-
-            ">
+          <v-card elevation="0">
+            <v-card-title>
+              <!-- TODO: Username -->
+            </v-card-title>
+            <v-card-subtitle>
               {{ artist.address }}
-            </div>
-          </div>
+            </v-card-subtitle>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+                <v-btn
+                  v-if="isOwner"
+                  text
+                  outlined
+                  @click="onEditProfileClicked"
+                >
+                  Edit
+                </v-btn>
+                <template v-else>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span v-on="on" v-bind="attrs">
+                        <v-btn
+                          text
+                          outlined
+                          disabled
+                        >
+                          Follow
+                        </v-btn>
+                      </span>
+                    </template>
+                    Coming soon!
+                  </v-tooltip>
+                </template>
+            </v-card-actions>
+          </v-card>
         </v-col>
       </v-row>
       <v-row>
@@ -54,31 +73,51 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <AvatarUploadDialog
+      :show.sync="showAvatarUploadDialog"
+      @upload="onAvatarUploaded"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
+import { User } from '~/models'
+import { FeedItem, Avatar } from '~/types'
+import { debounce } from '~/helpers'
+import ProgressService from '~/services/progress/service'
 import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import { User } from '~/models'
-import { FeedItem } from '~/types'
-import ProgressService from '~/services/progress/service'
+import AvatarUploadDialog from '~/components/avatar/AvatarUploadDialog.component.vue'
 
 @Component({
   components: {
-    ArtworkCard
+    ArtworkCard,
+    AvatarUploadDialog
   }
 })
 export default class UserProfilePage extends PageComponent {
   feed: FeedItem[] = []
-  artist: User = { address: '' }
+  artist: User = { address: this.$route.params.username }
+  showAvatarUploadDialog: boolean = false
+
+  get isOwner(): boolean {
+    return this.$auth.user && this.artist.address === this.$auth.user.address
+  }
 
   async fetch() {
     ProgressService.start()
     try {
-      this.artist.address = this.$route.params.username
+      const avatar = await this.$avatarService.fetchAvatar(
+        this.artist.address
+      )
+
+      if (avatar) {
+        this.setAvatar(avatar)
+      }
+
       this.feed = await this.$artworkService.fetchArtworkFeed(
         this.artist.address
       )
@@ -88,6 +127,20 @@ export default class UserProfilePage extends PageComponent {
     } finally {
       ProgressService.stop()
     }
+  }
+
+  @debounce
+  onEditProfileClicked() {
+    this.showAvatarUploadDialog = true
+  }
+
+  onAvatarUploaded(avatar: Avatar) {
+    this.setAvatar(avatar)
+    this.$auth.setUser(Object.assign({}, this.$auth.user, { avatar }))
+  }
+
+  setAvatar(avatar: Avatar) {
+    this.artist = Object.assign({}, this.artist, { avatar })
   }
 }
 </script>

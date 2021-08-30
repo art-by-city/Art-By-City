@@ -4,7 +4,8 @@ import {
   ArtistTag,
   DateWithTooltip,
   SplashLogo,
-  UserAvatar
+  UserAvatar,
+  ImageFileInput
 } from '~/components/common'
 
 Vue.use({
@@ -13,5 +14,6 @@ Vue.use({
     vue.component('UserAvatar', UserAvatar)
     vue.component('ArtistTag', ArtistTag)
     vue.component('SplashLogo', SplashLogo)
+    vue.component('ImageFileInput', ImageFileInput)
   }
 })
