@@ -4,9 +4,8 @@
       <v-col cols="6">
         <ArtworkEditForm
           :artwork="artwork"
-          @save="save"
-          @cancel="cancel"
-          :loading="isLoading"
+          @save="onSave"
+          @cancel="onCancel"
         />
       </v-col>
     </v-row>
@@ -19,8 +18,6 @@ import { Component } from 'nuxt-property-decorator'
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ArtworkEditForm } from '~/components/artwork/edit'
 import { Artwork } from '~/types'
-import { debounce } from '~/helpers'
-import ProgressService from '~/services/progress/service'
 
 @Component({
   middleware: 'auth',
@@ -40,31 +37,11 @@ export default class UploadPage extends FormPageComponent {
     images: []
   }
 
-  isLoading = false
-
-  @debounce
-  async save(valid?: boolean) {
-    if (!valid) { return }
-
-    ProgressService.start()
-    this.isLoading = true
-    try {
-      const artwork = await this.$artworkService.createArtwork(this.artwork)
-
-      if (artwork) {
-        const profile = artwork.creator.address
-        const slug = artwork.id
-        this.$router.push(`/${profile}/${slug}`)
-      }
-    } catch (error) {
-      this.$toastService.error(error)
-    } finally {
-      ProgressService.stop()
-    }
+  onSave(txId: string) {
+    this.$router.push(`/${this.$auth.user.address}/${txId}`)
   }
 
-  @debounce
-  cancel() {
+  onCancel() {
     if (confirm('Are you sure you want to cancel this upload?')) {
       // NB: Hard reload the page to clear state and re-render on server
       this.$router.go(0)

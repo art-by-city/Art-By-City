@@ -138,9 +138,11 @@ export default class UserProfilePage extends PageComponent {
     this.showAvatarUploadDialog = true
   }
 
-  onAvatarUploaded(avatar: Avatar) {
-    this.setAvatar(avatar)
-    this.$auth.setUser(Object.assign({}, this.$auth.user, { avatar }))
+  onAvatarUploaded(txId: string) {
+    // TODO -> Send to tx store with callback with code below?
+
+    // this.setAvatar(avatar)
+    // this.$auth.setUser(Object.assign({}, this.$auth.user, { avatar }))
   }
 
   setAvatar(avatar: Avatar) {

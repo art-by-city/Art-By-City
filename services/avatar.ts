@@ -1,24 +1,10 @@
-import Arweave from 'arweave'
-import ArDB from '@textury/ardb'
-import { Context } from '@nuxt/types'
+import Transaction from 'arweave/node/lib/transaction'
 
-import { TransactionBuilder } from '~/builders'
 import { Avatar } from '~/types'
-import { ArDBService } from './'
+import { TransactionService } from './'
 
-export default class AvatarService extends ArDBService {
-  transactionBuilder!: TransactionBuilder
-
-  constructor(context: Context) {
-    super(context)
-    this.transactionBuilder = new TransactionBuilder(
-      this.$arweave,
-      this.$ardb,
-      context.$config.arweave.appConfig
-    )
-  }
-
-  async uploadAvatar(avatar: Avatar): Promise<Avatar | undefined> {
+export default class AvatarService extends TransactionService {
+  async createAvatarTransaction(avatar: Avatar): Promise<Transaction> {
     const data = JSON.stringify({ ...avatar })
 
     const tx = await this.transactionBuilder.buildEntityTransaction(
@@ -26,13 +12,7 @@ export default class AvatarService extends ArDBService {
       data
     )
 
-    await this.$arweave.transactions.sign(tx)
-    await this.$arweave.transactions.post(tx)
-
-    const res = await this.$arweave.api.get(tx.id)
-    res.data.id = tx.id
-
-    return res.data as Avatar
+    return tx
   }
 
   async fetchAvatar(address: string): Promise<Avatar | undefined> {
