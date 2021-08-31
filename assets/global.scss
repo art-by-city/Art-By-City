@@ -127,3 +127,7 @@ $condensed-input-height: 24px;
   -ms-user-select: none;
   user-select: none;
 }
+
+.cursor--not-allowed {
+  cursor: not-allowed !important;
+}
