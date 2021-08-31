@@ -2,12 +2,12 @@ import { Plugin } from '@nuxt/types'
 
 import InvitationService from '~/services/invitation/service'
 import ProfileService from '~/services/profile/service'
-import ArtworkService from '~/services/artwork/service'
 import ConfigService from '~/services/config/service'
 import CityService from '~/services/city/service'
 import ToastService from '~/services/toast/service'
 import ChangelogService from '~/services/changelog/service'
 import {
+  ArtworkService,
   AvatarService,
   UserService
 } from '~/services'

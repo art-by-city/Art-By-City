@@ -3,7 +3,7 @@
     :value="open"
     persistent
     @click:outside="onCloseDialog"
-    width="300"
+    width="400"
   >
     <v-container dense class="pa-1">
       <v-row dense>
@@ -14,26 +14,12 @@
               <ImageFileInput v-model="images" />
             </v-card-text>
             <v-card-actions>
-              <v-btn
-                text
-                outlined
-                color="error"
-                :disabled="isUploading"
-                @click="onCancelClicked"
-              >
-                Cancel
-              </v-btn>
-              <v-spacer></v-spacer>
-              <v-btn
-                text
-                outlined
-                color="primary"
+              <TransactionFormControls
+                :transaction="transaction"
                 :loading="isUploading"
-                :disabled="isUploading"
-                @click="onUploadClicked"
-              >
-                Upload
-              </v-btn>
+                @cancel="onCancel"
+                @submit="onSubmit"
+              />
             </v-card-actions>
           </v-card>
         </v-col>
@@ -43,15 +29,32 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, PropSync } from 'nuxt-property-decorator'
+import { Vue, Component, Emit, PropSync, Watch } from 'nuxt-property-decorator'
+import Transaction from 'arweave/node/lib/transaction'
 
 import { debounce } from '~/helpers'
-import { ArtworkImage, Avatar } from '~/types'
+import { ArtworkImage } from '~/types'
+import TransactionFormControls from '~/components/forms/transactionFormControls.component.vue'
 import ProgressService from '~/services/progress/service'
 
-@Component
+@Component({
+  components: {
+    TransactionFormControls
+  }
+})
 export default class AvatarUploadDialog extends Vue {
   images: ArtworkImage[] = []
+  @Watch('images', {
+    deep: true,
+    immediate: true
+  }) async onImagesChanges(images: ArtworkImage[]) {
+    if (images.length > 0) {
+      this.transaction = await this.$avatarService.createAvatarTransaction(
+        { src: images[0].dataUrl }
+      )
+    }
+  }
+  transaction: Transaction | null = null
   isUploading: boolean = false
 
   @PropSync('show', {
@@ -59,30 +62,38 @@ export default class AvatarUploadDialog extends Vue {
     required: false
   }) open?: boolean
 
-  @Emit('upload') onUpload(avatar: Avatar): Avatar {
-    return avatar
+  @Emit('upload') onUpload(txId: string): string {
+    return txId
   }
 
-  @debounce
-  async onUploadClicked() {
-    if (this.images.length > 0) {
-      const avatar = {
-        src: this.images[0].dataUrl
-      }
+  async onSubmit() {
+    const valid = this.images.length > 0
 
-      ProgressService.start()
+    if (valid) {
+      const txId = await this.submitTransaction()
+
+      if (txId) {
+        return this.onUpload(txId)
+      }
+    }
+  }
+
+  private async submitTransaction(): Promise<string | undefined> {
+    if (this.transaction) {
       this.isUploading = true
+      ProgressService.start()
       try {
-        const uploadedAvatar = await this.$avatarService.uploadAvatar(avatar)
-        if (uploadedAvatar) {
-          this.onUpload(uploadedAvatar)
-          this.close()
+        await this.$arweave.transactions.sign(this.transaction)
+        const res = await this.$arweave.transactions.post(this.transaction)
+
+        if (res.status === 200 || res.status === 208) {
+          return this.transaction.id
         }
       } catch (error) {
         this.$toastService.error(error)
       } finally {
-        ProgressService.stop()
         this.isUploading = false
+        ProgressService.stop()
       }
     }
   }
@@ -99,8 +110,7 @@ export default class AvatarUploadDialog extends Vue {
     }
   }
 
-  @debounce
-  onCancelClicked() {
+  onCancel() {
     this.close()
   }
 }

@@ -1,27 +1,11 @@
-import Arweave from 'arweave'
-import ArDB from '@textury/ardb'
-import { Context } from '@nuxt/types'
+import Transaction from 'arweave/node/lib/transaction'
 
+import { TransactionService } from '.'
 import { Artwork, FeedItem } from '~/types'
-import { TransactionBuilder } from '~/builders'
 import { uuidv4 } from '~/helpers'
 
-export default class ArtworkService {
-  $arweave!: Arweave
-  $ardb!: ArDB
-  transactionBuilder!: TransactionBuilder
-
-  constructor(context: Context) {
-    this.$arweave = context.$arweave
-    this.$ardb = context.$ardb
-    this.transactionBuilder = new TransactionBuilder(
-      this.$arweave,
-      this.$ardb,
-      context.$config.arweave.appConfig
-    )
-  }
-
-  async createArtwork(artwork: Artwork): Promise<Artwork | undefined> {
+export default class ArtworkService extends TransactionService {
+  async createArtworkTransaction(artwork: Artwork): Promise<Transaction> {
     const data = JSON.stringify({ ...artwork })
     const tags: { name: string, value: string }[] = []
 
@@ -35,13 +19,7 @@ export default class ArtworkService {
       tags
     )
 
-    await this.$arweave.transactions.sign(tx)
-    await this.$arweave.transactions.post(tx)
-
-    const res = await this.$arweave.api.get(tx.id)
-    res.data.id = tx.id
-
-    return res.data
+    return tx
   }
 
   async fetchArtworkFeed(creator?: string): Promise<FeedItem[]> {

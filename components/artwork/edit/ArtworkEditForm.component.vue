@@ -148,38 +148,32 @@
           <LicenseSelector v-model="artwork.license" />
         </v-col>
       </v-row>
-      <v-row dense justify="center">
-        <template v-if="loading">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular></template>
-        <template v-else>
-          <v-col cols="auto">
-            <v-btn text color="error" class="text-lowercase" @click="cancel">
-              Cancel
-            </v-btn>
-            <v-btn text color="primary" class="text-lowercase" @click="onSaveClicked">
-              Publish
-            </v-btn>
-          </v-col>
-        </template>
+      <v-row dense justify="center" v-if="transaction">
+        <TransactionFormControls
+          :transaction="transaction"
+          :loading="isUploading"
+          @cancel="onCancel"
+          @submit="onSubmit"
+        />
       </v-row>
     </v-form>
   </v-container>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, Emit, Watch } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
+import Transaction from 'arweave/node/lib/transaction'
 
 import { Artwork, ArtworkImage } from '~/types'
+import { debounce, uuidv4 } from '~/helpers'
+import ProgressService from '~/services/progress/service'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import LicenseSelector from '~/components/forms/licenseSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
-import { debounce, uuidv4 } from '~/helpers'
+import TransactionFormControls from '~/components/forms/transactionFormControls.component.vue'
 
 @Component({
   components: {
@@ -187,13 +181,21 @@ import { debounce, uuidv4 } from '~/helpers'
     ArtworkTypeSelector,
     HashtagSelector,
     draggable,
-    LicenseSelector
+    LicenseSelector,
+    TransactionFormControls
   }
 })
 export default class ArtworkEditForm extends Vue {
   @Prop({ type: Object, required: true }) artwork!: Artwork
-  @Prop({ type: Boolean, required: false, default: false }) loading!: boolean
-
+  @Watch('artwork', {
+    deep: true,
+    immediate: true
+  }) async onArtworkChanged(artwork: Artwork) {
+    this.transaction = await this.$artworkService.createArtworkTransaction(
+      artwork
+    )
+  }
+  transaction: Transaction | null = null
   $refs!: {
     cropImage: HTMLImageElement,
     form: Vue & {
@@ -207,12 +209,13 @@ export default class ArtworkEditForm extends Vue {
   cropper?: Cropper
   valid = false
   dirty = false
+  isUploading: boolean = false
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
-  @Emit('save') _save() {
-    return this.valid
+  @Emit('save') _save(txId: string) {
+    return txId
   }
-  @Emit('cancel') cancel() {}
+  @Emit('cancel') onCancel() {}
 
   get titleRules() {
     return [(value: string = '') => {
@@ -337,8 +340,7 @@ export default class ArtworkEditForm extends Vue {
     this.cropper?.destroy()
   }
 
-  @debounce
-  onSaveClicked() {
+  async onSubmit() {
     this.dirty = true
     this.valid = this.$refs.form.validate()
 
@@ -346,7 +348,33 @@ export default class ArtworkEditForm extends Vue {
       this.valid = false
     }
 
-    this._save()
+    if (this.valid) {
+      const txId = await this.submitTransaction()
+
+      if (txId) {
+        return this._save(txId)
+      }
+    }
+  }
+
+  private async submitTransaction(): Promise<string | undefined> {
+    if (this.transaction) {
+      this.isUploading = true
+      ProgressService.start()
+      try {
+        await this.$arweave.transactions.sign(this.transaction)
+        const res = await this.$arweave.transactions.post(this.transaction)
+
+        if (res.status === 200 || res.status === 208) {
+          return this.transaction.id
+        }
+      } catch (error) {
+        this.$toastService.error(error)
+      } finally {
+        this.isUploading = false
+        ProgressService.stop()
+      }
+    }
   }
 
   private async processArtworkImage(image: File): Promise<ArtworkImage> {
