@@ -32,7 +32,11 @@
                 <template v-else>
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
-                      <span v-on="on" v-bind="attrs">
+                      <span
+                        v-on="on"
+                        v-bind="attrs"
+                        class="cursor--not-allowed"
+                      >
                         <v-btn
                           text
                           outlined
