@@ -8,10 +8,10 @@
     />
 
     <v-main class="main">
-      <v-container fluid class="pl-4 pr-4 pt-7 main-container content-container">
-        <nuxt v-if="!$slots.default" />
-        <slot />
-      </v-container>
+      <!-- <v-container fluid class="pl-4 pr-4 pt-7 main-container"> -->
+      <nuxt v-if="!$slots.default" />
+      <slot />
+      <!-- </v-container> -->
     </v-main>
 
     <Footer />
@@ -108,7 +108,7 @@ export default class DefaultLayout extends Vue {
 
 <style scoped>
 .app {
-  background-color: #FAFAFA;
+  background-color: white;
 }
 
 .main-container {
