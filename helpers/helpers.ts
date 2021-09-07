@@ -17,3 +17,5 @@ export function isTouchDevice() {
      (navigator.maxTouchPoints > 0) ||
      (navigator.msMaxTouchPoints > 0));
 }
+
+export const arweaveTxRegex = /^\/?([a-z0-9-_]{43})/i

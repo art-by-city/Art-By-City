@@ -69,7 +69,8 @@ export default {
         protocol: process.env.ARWEAVE_PROTOCOL || 'http',
         host: process.env.ARWEAVE_HOST || 'localhost',
         port: process.env.ARWEAVE_PORT || 1984
-      }
+      },
+      waitForConfirmations: process.env.ARWEAVE_TX_CONFIRMATIONS || 12
     },
   },
   auth: {

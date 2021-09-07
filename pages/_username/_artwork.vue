@@ -97,6 +97,12 @@
         />
       </v-dialog>
     </v-container>
+    <v-container v-else>
+      <TransactionConfirmationProgress
+        :txId="txId"
+        @confirmed="onTxConfirmed"
+      />
+    </v-container>
   </div>
 </template>
 
@@ -106,41 +112,77 @@ import { Component } from 'nuxt-property-decorator'
 
 import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
-import ArtworkZoomDialog from '~/components/artwork/ArtworkZoomDialog.component.vue'
+import ArtworkZoomDialog from
+  '~/components/artwork/ArtworkZoomDialog.component.vue'
 import {
   ArtworkEditControls,
   ArtworkEditForm
 } from '~/components/artwork/edit'
+import TransactionConfirmationProgress from
+  '~/components/common/TransactionConfirmationProgress.component.vue'
 import { Artwork, ArtworkImage } from '~/types'
-import { debounce } from '~/helpers'
+import { debounce, arweaveTxRegex } from '~/helpers'
 
 @Component({
   components: {
     LikeButton,
     ArtworkZoomDialog,
     ArtworkEditControls,
-    ArtworkEditForm
+    ArtworkEditForm,
+    TransactionConfirmationProgress
   }
 })
 export default class ArtworkPage extends FormPageComponent {
-  artwork!: Artwork
+  artwork: Artwork | null = null
   previewImage?: ArtworkImage
   cachedArtwork!: Artwork
   editMode = false
   zoom = false
+  txId!: string
 
-  async asyncData({ params, app, error, redirect }: Context) {
-    let artwork, previewImage
-    let editMode = false
+  async asyncData({ params, app, error, $config }: Context) {
+    let artwork, previewImage, txId
 
     try {
-      const res = await app.$arweave.api.get(params.artwork)
-      if (!res.data.error) {
-        artwork = res.data
-        previewImage = res.data.images[0]
-      } else {
-        redirect('/')
+      // if (arweaveTxRegex.test(params.artwork)) {
+        txId = params.artwork
+      // } else {
+      //   txId = await app.$artworkService.resolveSlug(
+      //     params.username,
+      //     params.artwork
+      //   )
+      // }
+
+      const txStatus = await app.$arweave.transactions.getStatus(txId)
+
+      if (txStatus.status === 404) {
+        return error({
+          statusCode: 404,
+          message: 'artwork transaction not found'
+        })
       }
+
+      if (txStatus.status === 200) {
+        const confirmations = txStatus.confirmed?.number_of_confirmations || 0
+        if (confirmations >= $config.arweave.waitForConfirmations) {
+          // tx is ready!
+          // const tx = await app.$arweave.transactions.get(txId)
+
+          // TODO -> MAKE SURE THIS IS AN ARTWORK TX
+          // tx.get('tags').forEach()
+
+          // TODO -> MAKE SURE THIS TX DATA CONFORMS TO AN ARTWORK TYPE
+          const txData = await app.$arweave.transactions.getData(txId, {
+            decode: true, string: true
+          }) as string
+
+          artwork = JSON.parse(txData) as Artwork
+          previewImage = artwork.images[0]
+          artwork.id = txId
+        }
+      }
+
+      return { artwork, previewImage, txId }
     } catch (err) {
       if (err.response?.status === 404) {
         return error({ statusCode: 404, message: 'artwork not found' })
@@ -148,9 +190,25 @@ export default class ArtworkPage extends FormPageComponent {
         console.error(err)
         app.$toastService.error(err)
       }
-    } finally {
-      return { artwork, previewImage, editMode }
     }
+  }
+
+  async onTxConfirmed() {
+    // tx is ready!
+    // const tx = await this.$arweave.transactions.get(this.txId)
+
+    // TODO -> MAKE SURE THIS IS AN ARTWORK TX
+    // tx.get('tags').forEach()
+
+    // TODO -> MAKE SURE THIS TX DATA CONFORMS TO AN ARTWORK TYPE
+    const txData = await this.$arweave.transactions.getData(this.txId, {
+      decode: true, string: true
+    }) as string
+
+    const artwork = JSON.parse(txData)
+
+    this.previewImage = artwork.images[0]
+    this.artwork = artwork
   }
 
   get isMobile() {
@@ -182,13 +240,13 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   get hashtagsString() {
-    return this.artwork.hashtags.map((h) => { return `#${h}` }).join(', ')
+    return this.artwork?.hashtags.map((h) => { return `#${h}` }).join(', ') || ''
   }
 
   setPreviewImage(image?: ArtworkImage) {
     this.previewImage = image
       ? image
-      : this.artwork.images[0]
+      : this.artwork?.images[0]
   }
 
   @debounce
