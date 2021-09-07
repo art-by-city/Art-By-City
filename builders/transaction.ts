@@ -6,6 +6,9 @@ import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 
 import { ArweaveAppConfig, DomainEntityCategory } from '../types'
 
+export interface TransactionSearchOptions {
+  sort?: 'HEIGHT_ASC' | 'HEIGHT_DESC'
+}
 
 export default class TransactionBuilder {
   private arweave!: Arweave
@@ -40,9 +43,8 @@ export default class TransactionBuilder {
   async searchTransactions(
     category: DomainEntityCategory,
     owner?: string,
-    sort: 'HEIGHT_ASC' | 'HEIGHT_DESC' = 'HEIGHT_DESC'
-  ):
-    Promise<ArdbTransaction[] | ArdbBlock[]> {
+    opts?: TransactionSearchOptions
+  ): Promise<ArdbTransaction[] | ArdbBlock[]> {
     let query = this.ardb
       .search('transactions')
       .appName(this.config.name)
@@ -52,6 +54,8 @@ export default class TransactionBuilder {
     if (owner) {
       query = query.from(owner)
     }
+
+    const sort = opts?.sort || 'HEIGHT_DESC'
 
     return await query.find({ sort })
   }

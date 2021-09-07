@@ -22,6 +22,12 @@ export default class ArtworkService extends TransactionService {
     return tx
   }
 
+  async resolveSlug(owner: string, slug: string): Promise<string> {
+    const txs = await this.transactionBuilder.searchTransactions('artwork', owner)
+
+    return 'fake-tx-id'
+  }
+
   async fetchArtworkFeed(creator?: string): Promise<FeedItem[]> {
     const items: FeedItem[] = []
 
