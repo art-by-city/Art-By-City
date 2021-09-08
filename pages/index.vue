@@ -1,6 +1,9 @@
 <template>
   <div>
-    <HeroSection @click="onHeroCallToActionClicked" />
+    <HeroSection
+      @click="onHeroCallToActionClicked"
+      @scroll="onHeroScrollClicked"
+    />
 
     <section id="yourArtForever">
       <v-container fluid>
@@ -36,7 +39,6 @@
               outlined
               x-large
               elevation="2"
-              color="primary"
               @click="onPublishNowClicked"
             >
               PUBLISH NOW
@@ -66,7 +68,6 @@
               outlined
               x-large
               elevation="2"
-              color="primary"
               @click="onStartMonetizingClicked"
             >
               START MONETIZING
@@ -96,7 +97,6 @@
               outlined
               x-large
               elevation="2"
-              color="primary"
               @click="onGetVerifiedClicked"
             >
               GET VERIFIED
@@ -120,8 +120,12 @@ import HeroSection from '~/components/pitch/HeroSection.component.vue'
   }
 })
 export default class HomePage extends Vue {
-  onHeroCallToActionClicked() {
+  onHeroScrollClicked() {
     this.$vuetify.goTo('#yourArtForever')
+  }
+
+  onHeroCallToActionClicked() {
+    this.checkAuthAndNavToPublish()
   }
 
   @debounce
