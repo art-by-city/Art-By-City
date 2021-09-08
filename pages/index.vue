@@ -1,58 +1,148 @@
 <template>
-  <div class="index-page-wrapper" style="height: 100%">
-    <h2 class="d-inline">Recent Publications</h2>
+  <div>
+    <HeroSection @click="onHeroCallToActionClicked" />
 
-    <v-btn icon @click="$fetch" :disabled="$fetchState.pending">
-      <v-icon :class="{ pending: $fetchState.pending }">mdi-refresh</v-icon>
-    </v-btn>
+    <section id="yourArtForever">
+      <v-container fluid>
+        <v-row dense justify="center">
+          <v-col cols="auto">
+            <p class="text-h2">
+              your art
+              <span class="font-weight-black text-uppercase text-h1">
+                forever
+              </span>
+            </p>
+          </v-col>
+        </v-row>
+      </v-container>
+    </section>
 
-    <v-container>
-      <v-row>
-        <v-col v-for="(post, i) in feed" :key="post.guid" cols="4">
-          <ArtworkCard :artwork="post.artwork" />
-        </v-col>
-      </v-row>
-    </v-container>
+    <section id="permanentStorage" class="mx-auto my-16">
+      <v-container fluid>
+        <v-row>
+          <v-col cols="4" offset="2">
+            <span class="text-h2 font-weight-bold">
+              Welcome to the Artist's Permaweb
+            </span>
+          </v-col>
+          <v-col cols="4">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
+              fermentum neque et sodales rutrum. Mauris lobortis aliquet
+              commodo. Vestibulum eget lacus in erat luctus pellentesque vel
+              eget lectus.
+            </p>
+            <v-btn
+              outlined
+              x-large
+              elevation="2"
+              color="primary"
+              @click="onPublishNowClicked"
+            >
+              PUBLISH NOW
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </section>
+
+    <section id="monetization" class="mx-auto my-16">
+      <v-container fluid>
+        <v-row>
+          <v-col cols="4" offset="2">
+            <span class="text-h2 font-weight-bold">
+              Turn-key Monetization
+            </span>
+          </v-col>
+          <v-col cols="4">
+            <p>
+              Quisque gravida, tortor nec ullamcorper fringilla, urna enim
+              suscipit magna, sed fringilla magna ipsum nec erat. Phasellus
+              eros mi, suscipit sed consequat at, efficitur a dolor. Duis
+              venenatis, libero at porta laoreet, arcu sem sollicitudin sem,
+              vitae lobortis mi eros vitae ex.
+            </p>
+            <v-btn
+              outlined
+              x-large
+              elevation="2"
+              color="primary"
+              @click="onStartMonetizingClicked"
+            >
+              START MONETIZING
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </section>
+
+    <section id="verification" class="mx-auto my-16">
+      <v-container fluid>
+        <v-row>
+          <v-col cols="4" offset="2">
+            <span class="text-h2 font-weight-bold">
+              Verified Art &amp; Artists
+            </span>
+          </v-col>
+          <v-col cols="4">
+            <p>
+              Integer eget urna odio. Proin blandit elit ante, a aliquam lorem
+              porta et. Vivamus posuere cursus mi ac semper. Vestibulum eu
+              sapien vel dui commodo consectetur accumsan sollicitudin libero.
+              Fusce viverra augue sed est posuere luctus. Integer cursus
+              faucibus tellus, at egestas est faucibus quis.
+            </p>
+            <v-btn
+              outlined
+              x-large
+              elevation="2"
+              color="primary"
+              @click="onGetVerifiedClicked"
+            >
+              GET VERIFIED
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </section>
   </div>
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 
-import PageComponent from '~/components/pages/page.component'
-import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import { FeedItem } from '~/types'
-import ProgressService from '~/services/progress/service'
+import { debounce } from '~/helpers'
+import HeroSection from '~/components/pitch/HeroSection.component.vue'
 
 @Component({
   components: {
-    ArtworkCard
+    HeroSection
   }
 })
-export default class HomePage extends PageComponent {
-  feed: FeedItem[] = []
+export default class HomePage extends Vue {
+  onHeroCallToActionClicked() {
+    this.$vuetify.goTo('#yourArtForever')
+  }
 
-  async fetch() {
-    ProgressService.start()
-    try {
-      this.feed = await this.$artworkService.fetchArtworkFeed()
-    } catch (error) {
-      console.error(error)
-      this.$toastService.error(error)
-    } finally {
-      ProgressService.stop()
-    }
+  @debounce
+  onPublishNowClicked() {
+    this.checkAuthAndNavToPublish()
+  }
+
+  @debounce
+  onStartMonetizingClicked() {
+    this.checkAuthAndNavToPublish()
+  }
+
+  @debounce
+  onGetVerifiedClicked() {
+    this.$router.push('/register')
+  }
+
+  private checkAuthAndNavToPublish() {
+    this.$nuxt.$emit('needs-auth', () => {
+      this.$router.push('/publish')
+    })
   }
 }
 </script>
-
-<style scoped>
-.pending {
-  -webkit-animation:spin 1s linear infinite;
-  -moz-animation:spin 1s linear infinite;
-  animation:spin 1s linear infinite;
-}
-@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
-</style>

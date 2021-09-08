@@ -82,11 +82,23 @@ export default class DefaultLayout extends Vue {
     //     }
     //   )
     // }
+
+    this.$nuxt.$on('needs-auth', (cb: Function) => {
+      if (this.$auth.loggedIn) {
+        cb()
+      } else {
+        this.$nuxt.$once('auth-completed', () => {
+          cb()
+        })
+        this.showSignupModal()
+      }
+    })
   }
 
   async login() {
     try {
       await this.$auth.loginWith('arconnect')
+      this.$nuxt.$emit('auth-completed')
     } catch (error) {
       if (error instanceof ArConnectNotInstalledError) {
         this.showAuthDialog = 'get-wallet'

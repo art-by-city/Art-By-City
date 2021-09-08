@@ -1,10 +1,10 @@
 <template>
-  <span
-    class="splash-logo text-h3 text-sm-h1"
-    @click="onClick"
-  >
-    art x by x city
-  </span>
+  <v-img
+    src="logo/logo_by_daliah_ammar_dark_transparent.png"
+    max-width="960px"
+    contain
+    class="mt-16 mx-auto"
+  ></v-img>
 </template>
 
 <script lang="ts">
