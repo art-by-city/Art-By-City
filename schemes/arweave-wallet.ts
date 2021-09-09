@@ -13,7 +13,7 @@ import { PermissionType } from 'arconnect'
 // TODO -> Extend TokenableSchemeOptions and add these
 const APP_INFO = {
   name: 'Art x By x City',
-  // TODO -> logo
+  logo: 'logo/logo_by_daliah_ammar_square.png'
 }
 
 // TODO -> Extend TokenableSchemeOptions and add these
@@ -22,7 +22,7 @@ const APP_PERMISSIONS = [
 ]
 
 const DEFAULTS: TokenableSchemeOptions = {
-  name: 'arconnect',
+  name: 'arweave',
   token: {
     property: 'token',
     type: false,
@@ -40,14 +40,14 @@ const DEFAULTS: TokenableSchemeOptions = {
   }
 }
 
-export class ArConnectNotInstalledError extends Error {
+export class ArweaveWalletNotInstalledError extends Error {
   constructor() {
-    super('ArConnect not installed')
-    this.name = 'ArConnectNotInstalledError'
+    super('Arweave Wallet extension not installed')
+    this.name = 'ArweaveWalletNotInstalledError'
   }
 }
 
-export default class ArConnectScheme<
+export default class ArweaveWalletScheme<
     OptionsT extends TokenableSchemeOptions = TokenableSchemeOptions
   >
   extends BaseScheme<OptionsT>
@@ -124,7 +124,7 @@ export default class ArConnectScheme<
       )
       await this.fetchUser()
     } else {
-      const error = new ArConnectNotInstalledError()
+      const error = new ArweaveWalletNotInstalledError()
 
       this.$auth.callOnError(error, { method: 'login' })
 
