@@ -5,10 +5,10 @@
     :max-width="maxWidth"
   >
     <template v-if="content === 'get-wallet'">
-      <GetArConnect @login="login" />
+      <GetArweaveWallet @login="login" />
     </template>
     <template v-if="content === 'sign-up'">
-      <v-container dense class="pa-1">
+      <v-container fluid class="pa-1">
         <v-row dense>
           <v-col
             class="pa-0"
@@ -16,7 +16,7 @@
             cols="12"
             md="6"
           >
-            <GetArConnect @login="login" />
+            <GetArweaveWallet @login="login" />
           </v-col>
           <v-col
             class="pa-0"
@@ -37,12 +37,12 @@
 <script lang="ts">
 import { Vue, Component, PropSync, Emit } from 'nuxt-property-decorator'
 
-import GetArConnect from './getArConnect.component.vue'
+import GetArweaveWallet from './getArweaveWallet.component.vue'
 import SignUp from './signUp.component.vue'
 
 @Component({
   components: {
-    GetArConnect,
+    GetArweaveWallet,
     SignUp
   }
 })

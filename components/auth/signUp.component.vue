@@ -1,20 +1,23 @@
 <template>
-  <v-card tile outlined height="200">
+  <v-card tile outlined height="250">
     <v-card-title>Sign Up</v-card-title>
     <v-card-text>
       <p>Sign Up for our mailing list to get notified when
         <strong>Art By City Accounts</strong> are available
       </p>
     </v-card-text>
-    <v-card-actions>
-      <v-btn
-        elevation="6"
-        class="mx-auto"
-        @click="onSignUpClicked"
-      >
-        <span class="mx-2">Sign Up</span>
-      </v-btn>
-    </v-card-actions>
+    <v-container fluid>
+      <v-row justify="center">
+        <v-btn
+          elevation="2"
+          outlined
+          class="mx-auto"
+          @click="onSignUpClicked"
+        >
+          <span class="mx-2">Sign Up</span>
+        </v-btn>
+      </v-row>
+    </v-container>
   </v-card>
 </template>
 

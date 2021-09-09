@@ -75,13 +75,12 @@ export default {
   },
   auth: {
     redirect: {
-      login: '/',
       logout: '/'
     },
     strategies: {
       local: false,
-      arconnect: {
-        scheme: '~/schemes/arconnect'
+      'arweave-wallet': {
+        scheme: '~/schemes/arweave-wallet'
       }
     }
   },

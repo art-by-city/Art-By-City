@@ -50,7 +50,7 @@ import { Vue, Component } from 'nuxt-property-decorator'
 
 import ToastMessage from '~/models/toasts/toastMessage'
 import { AppBar, Footer, AuthDialog } from '~/components'
-import { ArConnectNotInstalledError } from '~/schemes/arconnect'
+import { ArweaveWalletNotInstalledError } from '~/schemes/arweave-wallet'
 
 @Component({
   components: {
@@ -97,10 +97,10 @@ export default class DefaultLayout extends Vue {
 
   async login() {
     try {
-      await this.$auth.loginWith('arconnect')
+      await this.$auth.loginWith('arweave-wallet')
       this.$nuxt.$emit('auth-completed')
     } catch (error) {
-      if (error instanceof ArConnectNotInstalledError) {
+      if (error instanceof ArweaveWalletNotInstalledError) {
         this.showAuthDialog = 'get-wallet'
       } else {
         this.$toastService.error(error)
