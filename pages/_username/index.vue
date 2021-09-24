@@ -78,10 +78,7 @@
       </v-row>
     </v-container>
 
-    <AvatarUploadDialog
-      :show.sync="showAvatarUploadDialog"
-      @upload="onAvatarUploaded"
-    />
+    <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
   </div>
 </template>
 
@@ -89,12 +86,14 @@
 import { Component } from 'nuxt-property-decorator'
 
 import { User } from '~/models'
-import { FeedItem, Avatar } from '~/types'
+import { FeedItem, Avatar, SetUserTransactionStatusPayload } from '~/types'
 import { debounce } from '~/helpers'
 import ProgressService from '~/services/progress/service'
 import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import AvatarUploadDialog from '~/components/avatar/AvatarUploadDialog.component.vue'
+import AvatarUploadDialog from
+  '~/components/avatar/AvatarUploadDialog.component.vue'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 
 @Component({
   components: {
@@ -133,16 +132,27 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
+  created() {
+    if (this.$auth.loggedIn && this.artist.address === this.$auth.user.address) {
+      this.$store.subscribe(async (mutation, state) => {
+        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+          const payload = mutation.payload as SetUserTransactionStatusPayload
+          if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {
+            const avatar = await this.$avatarService.fetchAvatar(
+              this.$auth.user.address
+            )
+            if (avatar) {
+              this.setAvatar(avatar)
+            }
+          }
+        }
+      })
+    }
+  }
+
   @debounce
   onEditProfileClicked() {
     this.showAvatarUploadDialog = true
-  }
-
-  onAvatarUploaded(txId: string) {
-    // TODO -> Send to tx store with callback with code below?
-
-    // this.setAvatar(avatar)
-    // this.$auth.setUser(Object.assign({}, this.$auth.user, { avatar }))
   }
 
   setAvatar(avatar: Avatar) {

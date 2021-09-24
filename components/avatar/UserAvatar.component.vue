@@ -42,6 +42,8 @@
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 import User from '~/models/user/user'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import { SetUserTransactionStatusPayload } from '~/types'
 
 @Component
 export default class UserAvatar extends Vue {
@@ -104,6 +106,22 @@ export default class UserAvatar extends Vue {
       case 'lg':
       case 'xl':
         default: return 192
+    }
+  }
+
+  created() {
+    if (this.$auth.loggedIn && this.user.address === this.$auth.user.address) {
+      this.$store.subscribe(async (mutation, _state) => {
+        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+          const payload = mutation.payload as SetUserTransactionStatusPayload
+          if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {
+            const avatar = await this.$avatarService.fetchAvatar(
+              this.$auth.user.address
+            )
+            this.$auth.setUser(Object.assign({}, this.$auth.user, { avatar }))
+          }
+        }
+      })
     }
   }
 }

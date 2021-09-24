@@ -18,6 +18,8 @@
       <v-btn text to="/publish">publish</v-btn>
       <v-divider vertical class="mx-4 white-divider" />
       <AccountMenu @logout="onLogoutClicked" />
+      <NotificationsMenu />
+      <TransactionsMenu />
     </template>
     <template v-else>
       <v-btn text @click="onLoginClicked">log in</v-btn>
@@ -33,10 +35,14 @@ import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 import { ConfigStoreState } from '~/store/config'
 import { debounce } from '~/helpers'
 import AccountMenu from './AccountMenu.component.vue'
+import TransactionsMenu from './TransactionsMenu.component.vue'
+import NotificationsMenu from './NotificationsMenu.component.vue'
 
 @Component({
   components: {
-    AccountMenu
+    AccountMenu,
+    TransactionsMenu,
+    NotificationsMenu
   }
 })
 export default class AppBar extends Vue {

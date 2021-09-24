@@ -10,7 +10,7 @@ export interface TransactionSearchOptions {
   sort?: 'HEIGHT_ASC' | 'HEIGHT_DESC'
 }
 
-export default class TransactionBuilder {
+export default class TransactionFactory {
   private arweave!: Arweave
   private config!: ArweaveAppConfig
   private ardb!: ArDB

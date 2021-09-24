@@ -32,6 +32,7 @@
       "@nuxt/types",
       "@nuxtjs/axios",
       "@nuxtjs/auth-next",
+      "@types/async",
       "reflect-metadata",
       "vuetify",
       "arconnect"

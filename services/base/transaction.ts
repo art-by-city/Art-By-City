@@ -1,14 +1,14 @@
 import { Context } from '@nuxt/types'
 
 import { ArDBService } from './'
-import { TransactionBuilder } from '~/builders'
+import { TransactionFactory } from '~/factories'
 
 export default class TransactionService extends ArDBService {
-  transactionBuilder!: TransactionBuilder
+  transactionFactory!: TransactionFactory
 
   constructor(context: Context) {
     super(context)
-    this.transactionBuilder = new TransactionBuilder(
+    this.transactionFactory = new TransactionFactory(
       this.$arweave,
       this.$ardb,
       context.$config.arweave.appConfig
