@@ -1,5 +1,6 @@
 import { Plugin } from '@nuxt/types'
 
+import { RootState } from '~/store'
 import InvitationService from '~/services/invitation/service'
 import ProfileService from '~/services/profile/service'
 import ConfigService from '~/services/config/service'
@@ -9,6 +10,7 @@ import ChangelogService from '~/services/changelog/service'
 import {
   ArtworkService,
   AvatarService,
+  TransactionQueueService,
   UserService
 } from '~/services'
 
@@ -24,6 +26,7 @@ declare module 'vue/types/vue' {
     $changelogService: ChangelogService
     $avatarService: AvatarService
     $userService: UserService
+    $txQueueService: TransactionQueueService
   }
 }
 
@@ -40,6 +43,7 @@ declare module '@nuxt/types' {
     $changelogService: ChangelogService
     $avatarService: AvatarService
     $userService: UserService
+    $txQueueService: TransactionQueueService
   }
   // nuxtContext.$myInjectedFunction
   interface Context {
@@ -52,6 +56,7 @@ declare module '@nuxt/types' {
     $changelogService: ChangelogService
     $avatarService: AvatarService
     $userService: UserService
+    $txQueueService: TransactionQueueService
   }
 }
 
@@ -67,6 +72,7 @@ declare module 'vuex/types/index' {
     $changelogService: ChangelogService
     $avatarService: AvatarService
     $userService: UserService
+    $txQueueService: TransactionQueueService
   }
 }
 
@@ -80,6 +86,7 @@ const servicesPlugin: Plugin = (context, inject) => {
   inject('changelogService', new ChangelogService(context))
   inject('avatarService', new AvatarService(context))
   inject('userService', new UserService(context))
+  inject('txQueueService', new TransactionQueueService(context))
 }
 
 export default servicesPlugin

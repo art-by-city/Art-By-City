@@ -3,8 +3,8 @@
     <v-row dense justify="center" class="transaction-form-controls">
       <v-col cols="12" sm="auto" order="2" order-sm="1" class="center-text">
         <v-btn
-          text
           outlined
+          elevation="2"
           color="error"
           :disabled="loading"
           @click="onCancelClicked"
@@ -17,8 +17,8 @@
       </v-col>
       <v-col cols="12" sm="auto" order="3" order-sm="3" class="center-text">
         <v-btn
-          text
           outlined
+          elevation="2"
           color="primary"
           :disabled="loading"
           :loading="loading"
@@ -67,7 +67,9 @@ export default class TransactionFormControls extends Vue {
   @Emit('cancel') onCancelClicked() {}
 
   @debounce
-  @Emit('submit') onSubmitClicked() {}
+  @Emit('submit') onSubmitClicked() {
+    return this.transaction
+  }
 }
 </script>
 

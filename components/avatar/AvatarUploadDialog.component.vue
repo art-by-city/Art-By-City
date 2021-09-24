@@ -10,6 +10,7 @@
         <v-col dense cols="12" class="pa-0">
           <v-card>
             <v-card-title>Upload Avatar</v-card-title>
+            <v-divider></v-divider>
             <v-card-text>
               <ImageFileInput v-model="images" />
             </v-card-text>
@@ -33,9 +34,9 @@ import { Vue, Component, Emit, PropSync, Watch } from 'nuxt-property-decorator'
 import Transaction from 'arweave/node/lib/transaction'
 
 import { debounce } from '~/helpers'
-import { ArtworkImage } from '~/types'
-import TransactionFormControls from '~/components/forms/transactionFormControls.component.vue'
-import ProgressService from '~/services/progress/service'
+import { ArtworkImage, CreateUserTransactionPayload } from '~/types'
+import TransactionFormControls from
+  '~/components/forms/transactionFormControls.component.vue'
 
 @Component({
   components: {
@@ -47,7 +48,7 @@ export default class AvatarUploadDialog extends Vue {
   @Watch('images', {
     deep: true,
     immediate: true
-  }) async onImagesChanges(images: ArtworkImage[]) {
+  }) async onImagesChanged(images: ArtworkImage[]) {
     if (images.length > 0) {
       this.transaction = await this.$avatarService.createAvatarTransaction(
         { src: images[0].dataUrl }
@@ -66,41 +67,27 @@ export default class AvatarUploadDialog extends Vue {
     return txId
   }
 
-  async onSubmit() {
+  async onSubmit(transaction: Transaction) {
     const valid = this.images.length > 0
 
     if (valid) {
-      const txId = await this.submitTransaction()
-
-      if (txId) {
-        return this.onUpload(txId)
-      }
-    }
-  }
-
-  private async submitTransaction(): Promise<string | undefined> {
-    if (this.transaction) {
       this.isUploading = true
-      ProgressService.start()
-      try {
-        await this.$arweave.transactions.sign(this.transaction)
-        const res = await this.$arweave.transactions.post(this.transaction)
 
-        if (res.status === 200 || res.status === 208) {
-          return this.transaction.id
-        }
-      } catch (error) {
-        this.$toastService.error(error)
-      } finally {
-        this.isUploading = false
-        ProgressService.stop()
-      }
+      await this.$arweave.transactions.sign(transaction)
+
+      this.$accessor.transactions.queueTransaction({
+        type: 'avatar',
+        transaction
+      })
+
+      this.close()
     }
   }
 
   private close() {
     this.open = false
     this.images = []
+    this.isUploading = false
   }
 
   @debounce

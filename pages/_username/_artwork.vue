@@ -98,10 +98,16 @@
       </v-dialog>
     </v-container>
     <v-container v-else>
-      <TransactionConfirmationProgress
-        :txId="txId"
-        @confirmed="onTxConfirmed"
-      />
+      <v-row justify="center">
+        <v-col cols="auto">
+          <template v-if="tx">
+            <TransactionConfirmationProgress :tx="tx" />
+          </template>
+          <template v-else>
+            <h1>404 Artwork not found :(</h1>
+          </template>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
@@ -120,8 +126,9 @@ import {
 } from '~/components/artwork/edit'
 import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
-import { Artwork, ArtworkImage } from '~/types'
-import { debounce, arweaveTxRegex } from '~/helpers'
+import { Artwork, ArtworkImage, UserTransaction, SetUserTransactionStatusPayload } from '~/types'
+import { debounce } from '~/helpers'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 
 @Component({
   components: {
@@ -138,33 +145,16 @@ export default class ArtworkPage extends FormPageComponent {
   cachedArtwork!: Artwork
   editMode = false
   zoom = false
-  txId!: string
+  txId?: string
 
-  async asyncData({ params, app, error, $config }: Context) {
-    let artwork, previewImage, txId
-
+  async asyncData({ params, app, $config }: Context) {
     try {
-      // if (arweaveTxRegex.test(params.artwork)) {
-        txId = params.artwork
-      // } else {
-      //   txId = await app.$artworkService.resolveSlug(
-      //     params.username,
-      //     params.artwork
-      //   )
-      // }
-
+      const txId = params.artwork
       const txStatus = await app.$arweave.transactions.getStatus(txId)
 
-      if (txStatus.status === 404) {
-        return error({
-          statusCode: 404,
-          message: 'artwork transaction not found'
-        })
-      }
-
       if (txStatus.status === 200) {
-        const confirmations = txStatus.confirmed?.number_of_confirmations || 0
-        if (confirmations >= $config.arweave.waitForConfirmations) {
+        const confirms = txStatus.confirmed?.number_of_confirmations || 0
+        if (confirms >= $config.arweave.waitForConfirmations) {
           // tx is ready!
           // const tx = await app.$arweave.transactions.get(txId)
 
@@ -176,39 +166,56 @@ export default class ArtworkPage extends FormPageComponent {
             decode: true, string: true
           }) as string
 
-          artwork = JSON.parse(txData) as Artwork
-          previewImage = artwork.images[0]
+          const artwork = JSON.parse(txData) as Artwork
           artwork.id = txId
+          const previewImage = artwork.images[0]
+
+          return { artwork, previewImage }
         }
       }
 
-      return { artwork, previewImage, txId }
+      return { txId }
     } catch (err) {
-      if (err.response?.status === 404) {
-        return error({ statusCode: 404, message: 'artwork not found' })
-      } else {
-        console.error(err)
-        app.$toastService.error(err)
-      }
+      console.error(err)
+      app.$toastService.error(err)
     }
   }
 
-  async onTxConfirmed() {
+  created() {
+    if (this.txId && !this.artwork) {
+      const txId = this.txId
+      this.$store.subscribe(async (mutation) => {
+        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+          const payload = mutation.payload as SetUserTransactionStatusPayload
+          if (payload.status === 'CONFIRMED' && payload.type === 'artwork') {
+            this.artwork = await this.fetchArtwork(txId)
+            this.previewImage = this.artwork.images[0]
+          }
+        }
+      })
+    }
+  }
+
+  private async fetchArtwork(txId: string): Promise<Artwork> {
     // tx is ready!
-    // const tx = await this.$arweave.transactions.get(this.txId)
+    // const tx = await app.$arweave.transactions.get(txId)
 
     // TODO -> MAKE SURE THIS IS AN ARTWORK TX
     // tx.get('tags').forEach()
 
     // TODO -> MAKE SURE THIS TX DATA CONFORMS TO AN ARTWORK TYPE
-    const txData = await this.$arweave.transactions.getData(this.txId, {
+    const txData = await this.$arweave.transactions.getData(txId, {
       decode: true, string: true
     }) as string
 
-    const artwork = JSON.parse(txData)
+    const artwork = JSON.parse(txData) as Artwork
+    artwork.id = txId
 
-    this.previewImage = artwork.images[0]
-    this.artwork = artwork
+    return artwork
+  }
+
+  get tx(): UserTransaction | null {
+    return this.txId ? this.$accessor.transactions.getById(this.txId) : null
   }
 
   get isMobile() {

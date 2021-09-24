@@ -34,7 +34,7 @@ export const mutations = {
 }
 
 export const actions: ActionTree<ConfigStoreState, any> = {
-  async setConfig({ commit }): Promise<void> {
+  async setConfig2({ commit }): Promise<void> {
     try {
       const config = await this.$axios.$get('/api/config')
       commit('setConfig', config)

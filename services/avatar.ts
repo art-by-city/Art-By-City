@@ -7,7 +7,7 @@ export default class AvatarService extends TransactionService {
   async createAvatarTransaction(avatar: Avatar): Promise<Transaction> {
     const data = JSON.stringify({ ...avatar })
 
-    const tx = await this.transactionBuilder.buildEntityTransaction(
+    const tx = await this.transactionFactory.buildEntityTransaction(
       'avatar',
       data
     )
@@ -16,7 +16,7 @@ export default class AvatarService extends TransactionService {
   }
 
   async fetchAvatar(address: string): Promise<Avatar | undefined> {
-    const txs = await this.transactionBuilder.searchTransactions(
+    const txs = await this.transactionFactory.searchTransactions(
       'avatar',
       address
     )

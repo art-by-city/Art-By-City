@@ -13,7 +13,7 @@ export default class ArtworkService extends TransactionService {
       tags.push({ name: 'slug', value: artwork.slug })
     }
 
-    const tx = await this.transactionBuilder.buildEntityTransaction(
+    const tx = await this.transactionFactory.buildEntityTransaction(
       'artwork',
       data,
       tags
@@ -23,7 +23,7 @@ export default class ArtworkService extends TransactionService {
   }
 
   async resolveSlug(owner: string, slug: string): Promise<string> {
-    const txs = await this.transactionBuilder.searchTransactions('artwork', owner)
+    const txs = await this.transactionFactory.searchTransactions('artwork', owner)
 
     return 'fake-tx-id'
   }
@@ -31,7 +31,7 @@ export default class ArtworkService extends TransactionService {
   async fetchArtworkFeed(creator?: string): Promise<FeedItem[]> {
     const items: FeedItem[] = []
 
-    const txs = await this.transactionBuilder
+    const txs = await this.transactionFactory
       .searchTransactions('artwork', creator)
 
     for (const ardbTx of txs) {

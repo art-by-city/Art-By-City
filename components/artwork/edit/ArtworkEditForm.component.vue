@@ -340,7 +340,7 @@ export default class ArtworkEditForm extends Vue {
     this.cropper?.destroy()
   }
 
-  async onSubmit() {
+  async onSubmit(transaction: Transaction) {
     this.dirty = true
     this.valid = this.$refs.form.validate()
 
@@ -349,31 +349,18 @@ export default class ArtworkEditForm extends Vue {
     }
 
     if (this.valid) {
-      const txId = await this.submitTransaction()
-
-      if (txId) {
-        return this._save(txId)
-      }
-    }
-  }
-
-  private async submitTransaction(): Promise<string | undefined> {
-    if (this.transaction) {
       this.isUploading = true
-      ProgressService.start()
-      try {
-        await this.$arweave.transactions.sign(this.transaction)
-        const res = await this.$arweave.transactions.post(this.transaction)
 
-        if (res.status === 200 || res.status === 208) {
-          return this.transaction.id
-        }
-      } catch (error) {
-        this.$toastService.error(error)
-      } finally {
-        this.isUploading = false
-        ProgressService.stop()
-      }
+      await this.$arweave.transactions.sign(transaction)
+
+      this.$accessor.transactions.queueTransaction({
+        type: 'artwork',
+        transaction
+      })
+
+      this.isUploading = false
+
+      return this._save(transaction.id)
     }
   }
 
