@@ -15,7 +15,6 @@ const actions = actionTree({ state, getters, mutations }, {
     const tx: UserTransaction = { ...payload, status: 'PENDING_SUBMISSION' }
     const accessor = (<typeof accessorType>this.app.$accessor)
 
-    this.app.$txQueueService.push(tx)
     accessor.transactions[ADD_TRANSACTION](tx)
   },
   updateStatus(
