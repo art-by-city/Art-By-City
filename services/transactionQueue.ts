@@ -3,6 +3,7 @@ import { queue, QueueObject } from 'async'
 
 import { accessorType } from '~/store'
 import { UserTransaction, UserTransactionStatus } from '~/types'
+import { ADD_TRANSACTION } from '~/store/transactions/mutations'
 import { ArweaveService } from './base'
 
 export default class TransactionQueueService extends ArweaveService {
@@ -21,9 +22,15 @@ export default class TransactionQueueService extends ArweaveService {
     this.queue.error((error) => {
       console.error('TransactionQueueError', error)
     })
+
+    context.store.subscribe((mutation) => {
+      if (mutation.type === `transactions/${ADD_TRANSACTION}`) {
+        this.push(mutation.payload)
+      }
+    })
   }
 
-  async push(tx: UserTransaction | UserTransaction[], delay?: number) {
+  private async push(tx: UserTransaction | UserTransaction[], delay?: number) {
     if (delay) {
       setTimeout(() => { this.queue.push(tx) }, delay, this)
     } else {
