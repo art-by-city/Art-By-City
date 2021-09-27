@@ -18,6 +18,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
+    "useUnknownInCatchVariables": false,
     "baseUrl": ".",
     "paths": {
       "~/*": [
