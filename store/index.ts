@@ -1,6 +1,10 @@
 import { ActionTree, GetterTree, MutationTree } from 'vuex'
 import { getAccessorType } from 'typed-vuex'
 
+import {
+  CLEAR_MUTATION,
+  RESTORE_MUTATION
+} from '~/plugins/persist-store'
 import transactionsState from './transactions/state'
 import transactionsGetters from './transactions/getters'
 import transactionsMutations from './transactions/mutations'
@@ -14,7 +18,10 @@ const defaultState = {}
 export const state = () => ({...defaultState})
 export type RootState = ReturnType<typeof state>
 export const getters: GetterTree<RootState, RootState> = {}
-export const mutations: MutationTree<RootState> = {}
+export const mutations: MutationTree<RootState> = {
+  CLEAR_MUTATION,
+  RESTORE_MUTATION
+}
 export const actions: ActionTree<RootState, RootState> = {}
 
 export const accessorType = getAccessorType({

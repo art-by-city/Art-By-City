@@ -1,6 +1,6 @@
 import { Notification } from '~/models'
 
-const DEFAULT_STATE = {
+export const DEFAULT_STATE = {
   notifications: [] as Notification[]
 }
 

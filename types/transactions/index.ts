@@ -1,14 +1,25 @@
 import Transaction from 'arweave/node/lib/transaction'
 import { DomainEntityCategory } from '../common'
 
-export type UserTransactionType =
-  | DomainEntityCategory
+export type UserTransactionType = DomainEntityCategory
+
+export const processingStatuses = [
+  'PENDING_SUBMISSION',
+  'PENDING_CONFIRMATION',
+  'DROPPED',
+  'CONFIRMING'
+] as const
+
+export type ProcessingUserTransactionStatus =
+  typeof processingStatuses[number]
+
+export function isProcessing(status: string):
+  status is ProcessingUserTransactionStatus {
+  return processingStatuses.includes(status as ProcessingUserTransactionStatus)
+}
 
 export type UserTransactionStatus =
-  | 'PENDING_SUBMISSION'
-  | 'PENDING_CONFIRMATION'
-  | 'DROPPED'
-  | 'CONFIRMING'
+  | ProcessingUserTransactionStatus
   | 'CONFIRMED'
 
 export interface CreateUserTransactionPayload {

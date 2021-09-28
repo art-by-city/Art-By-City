@@ -46,6 +46,7 @@
     "fuse.js": "^6.4.0",
     "http-proxy": "^1.18.1",
     "ignore-not-found-export-webpack-plugin": "^1.0.1",
+    "localforage": "^1.10.0",
     "lodash": "^4.17.15",
     "moment": "^2.27.0",
     "node-cron": "^3.0.0",

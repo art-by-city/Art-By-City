@@ -19,3 +19,8 @@ export function isTouchDevice() {
 }
 
 export const arweaveTxRegex = /^\/?([a-z0-9-_]{43})/i
+
+export function isDev() {
+  return process.env.NODE_ENV !== 'production' &&
+         process.env.NODE_ENV !== 'staging'
+}
