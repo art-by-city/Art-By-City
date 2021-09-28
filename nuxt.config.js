@@ -45,7 +45,8 @@ export default {
     { src: '~/plugins/ardb.ts' },
     { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',
-    '~/plugins/filters.ts'
+    '~/plugins/filters.ts',
+    { src: '~/plugins/localforage.ts', ssr: false },
   ],
   /*
    ** Nuxt.js dev-modules
@@ -86,7 +87,10 @@ export default {
       'arweave-wallet': {
         scheme: '~/schemes/arweave-wallet'
       }
-    }
+    },
+    plugins: [
+      { src: '~/plugins/persist-store.ts', ssr: false }
+    ]
   },
   router: {},
   /*

@@ -2,7 +2,7 @@ import { Context } from '@nuxt/types'
 import { queue, QueueObject } from 'async'
 
 import { accessorType } from '~/store'
-import { UserTransaction, UserTransactionStatus } from '~/types'
+import { UserTransaction, UserTransactionStatus, isProcessing } from '~/types'
 import { ADD_TRANSACTION } from '~/store/transactions/mutations'
 import { ArweaveService } from './base'
 
@@ -11,6 +11,7 @@ export default class TransactionQueueService extends ArweaveService {
   private $accessor!: typeof accessorType
   private waitForConfirmations!: number
   private sleep: number = 2000
+  private timestamp = Date.now()
 
   constructor(context: Context) {
     super(context)
@@ -18,16 +19,45 @@ export default class TransactionQueueService extends ArweaveService {
     this.$accessor = context.app.$accessor
     this.waitForConfirmations =
       context.$config.arweave.waitForConfirmations || 12
+
+    this.buildQueue()
+
+    context.store.subscribe((mutation) => {
+      switch (mutation.type) {
+        case `transactions/${ADD_TRANSACTION}`:
+          this.push(mutation.payload)
+          break
+        case 'RESTORE_MUTATION':
+          if (
+            mutation.payload.transactions &&
+            mutation.payload.transactions.transactions
+          ) {
+            const transactions =
+              mutation.payload.transactions.transactions as UserTransaction[]
+            this.push(transactions.filter((tx) => isProcessing(tx.status)))
+          }
+          break
+        case 'auth/SET':
+          if (mutation.payload.key === 'loggedIn' && !mutation.payload.value) {
+            this.rebuildQueue()
+          }
+        default:
+          break
+      }
+    })
+  }
+
+  private buildQueue() {
     this.queue = queue(this.processUserTransaction.bind(this))
     this.queue.error((error) => {
       console.error('TransactionQueueError', error)
     })
+  }
 
-    context.store.subscribe((mutation) => {
-      if (mutation.type === `transactions/${ADD_TRANSACTION}`) {
-        this.push(mutation.payload)
-      }
-    })
+  private rebuildQueue() {
+    this.queue.pause()
+    this.queue.kill()
+    this.buildQueue()
   }
 
   private async push(tx: UserTransaction | UserTransaction[], delay?: number) {
