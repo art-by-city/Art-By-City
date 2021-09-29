@@ -1,11 +1,21 @@
 <template>
   <v-list-item class="notification" dense three-line>
-    <v-list-item-avatar tile left size="24">
-      <v-img
-        contain
-        max-width="24px"
-        src="/icons/transfer.svg"
-      />
+    <v-list-item-avatar tile left size="24" class="overflow-visible">
+      <v-badge
+        color="primary"
+        transition="fade"
+        overlap
+        left
+        dot
+        icon="mdi-exclamation-thick"
+        :value="!this.notification.read"
+      >
+        <v-img
+          contain
+          max-width="24px"
+          src="/icons/transfer.svg"
+        />
+      </v-badge>
     </v-list-item-avatar>
     <v-list-item-content>
       <v-list-item-title
@@ -36,5 +46,9 @@ export default class NotificationComponent extends Vue {
 <style scoped>
 .notification-message {
   white-space: normal;
+}
+
+.overflow-visible {
+  overflow: visible;
 }
 </style>
