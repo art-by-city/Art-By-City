@@ -1,9 +1,18 @@
 import { Context } from '@nuxt/types'
+import { MutationPayload } from 'vuex'
 import { queue, QueueObject } from 'async'
 
 import { accessorType } from '~/store'
-import { UserTransaction, UserTransactionStatus, isProcessing } from '~/types'
-import { ADD_TRANSACTION } from '~/store/transactions/mutations'
+import {
+  UserTransaction,
+  UserTransactionStatus,
+  isProcessing,
+  SetUserTransactionStatusPayload
+} from '~/types'
+import {
+  ADD_TRANSACTION,
+  SET_TRANSACTION_STATUS
+} from '~/store/transactions/mutations'
 import { ArweaveService } from './base'
 
 export default class TransactionQueueService extends ArweaveService {
@@ -11,7 +20,6 @@ export default class TransactionQueueService extends ArweaveService {
   private $accessor!: typeof accessorType
   private waitForConfirmations!: number
   private sleep: number = 2000
-  private timestamp = Date.now()
 
   constructor(context: Context) {
     super(context)
@@ -22,29 +30,63 @@ export default class TransactionQueueService extends ArweaveService {
 
     this.buildQueue()
 
-    context.store.subscribe((mutation) => {
-      switch (mutation.type) {
-        case `transactions/${ADD_TRANSACTION}`:
-          this.push(mutation.payload)
-          break
-        case 'RESTORE_MUTATION':
-          if (
-            mutation.payload.transactions &&
-            mutation.payload.transactions.transactions
-          ) {
-            const transactions =
-              mutation.payload.transactions.transactions as UserTransaction[]
-            this.push(transactions.filter((tx) => isProcessing(tx.status)))
-          }
-          break
-        case 'auth/SET':
-          if (mutation.payload.key === 'loggedIn' && !mutation.payload.value) {
-            this.rebuildQueue()
-          }
-        default:
-          break
+    context.store.subscribe(this.subscription.bind(this))
+  }
+
+  private subscription(mutation: MutationPayload) {
+    switch (mutation.type) {
+      case `transactions/${ADD_TRANSACTION}`:
+        this.onAddTransactionMutation(mutation)
+        break
+      case `transactions/${SET_TRANSACTION_STATUS}`:
+        this.onSetTransactionStatusMutation(mutation)
+        break
+      case 'RESTORE_MUTATION':
+        this.onRestoreMutation(mutation)
+        break
+      case 'auth/SET':
+        this.onLoggedOutMutation(mutation)
+      default:
+        break
+    }
+  }
+
+  private onSetTransactionStatusMutation(mutation: MutationPayload) {
+    const payload = mutation.payload as SetUserTransactionStatusPayload
+
+    if (
+      [
+        'PENDING_SUBMISSION',
+        'PENDING_CONFIRMATION',
+        'CONFIRMING'
+      ].includes(payload.status)) {
+      const tx = this.$accessor.transactions.getById(payload.id)
+
+      if (tx) {
+        this.push(tx, this.sleep)
       }
-    })
+    }
+  }
+
+  private onAddTransactionMutation(mutation: MutationPayload) {
+    this.push(mutation.payload)
+  }
+
+  private onRestoreMutation(mutation: MutationPayload) {
+    if (
+      mutation.payload.transactions &&
+      mutation.payload.transactions.transactions
+    ) {
+      const transactions =
+        mutation.payload.transactions.transactions as UserTransaction[]
+      this.push(transactions.filter((tx) => isProcessing(tx.status)))
+    }
+  }
+
+  private onLoggedOutMutation(mutation: MutationPayload) {
+    if (mutation.payload.key === 'loggedIn' && !mutation.payload.value) {
+      this.rebuildQueue()
+    }
   }
 
   private buildQueue() {
@@ -68,10 +110,7 @@ export default class TransactionQueueService extends ArweaveService {
     }
   }
 
-  private async processUserTransaction(
-    tx: UserTransaction,
-    done: Function
-  ) {
+  private async processUserTransaction(tx: UserTransaction, done: Function) {
     switch (tx.status) {
       case 'PENDING_SUBMISSION':
         this.submitUserTransaction(tx, done)
@@ -81,12 +120,10 @@ export default class TransactionQueueService extends ArweaveService {
         this.checkUserTransactionStatus(tx, done)
         break
       case 'CONFIRMED':
+      case 'DROPPED':
+      default:
         done()
         break
-      case 'DROPPED':
-        done(new Error(
-          `Transaction seems to have been dropped: ${tx.transaction.id}`
-        ))
     }
   }
 
@@ -96,42 +133,30 @@ export default class TransactionQueueService extends ArweaveService {
   ) {
     const res = await this.$arweave.transactions.getStatus(tx.transaction.id)
 
-    let error
+    let status: UserTransactionStatus ='CONFIRMING'
+    let confirmations: number
     if (res.status === 200 && res.confirmed) {
-      let status: UserTransactionStatus = 'CONFIRMING'
+      status = 'CONFIRMING'
       if (res.confirmed.number_of_confirmations >= this.waitForConfirmations) {
         status = 'CONFIRMED'
       }
-
-      this.$accessor.transactions.updateStatus({
-        id: tx.transaction.id,
-        status,
-        confirmations: res.confirmed.number_of_confirmations,
-        type: tx.type
-      })
-      if (status === 'CONFIRMING') {
-        this.push(tx, this.sleep)
-      }
+      confirmations = res.confirmed.number_of_confirmations
     } else if (res.status === 202) {
-      this.$accessor.transactions.updateStatus({
-        id: tx.transaction.id,
-        status: 'PENDING_CONFIRMATION',
-        type: tx.type
-      })
-      this.push(tx, this.sleep)
-    } else {
-      error = new Error(
-        `Failed to get tx status (${res.status}) for tx id ${tx.transaction.id}`
-      )
+      status = 'PENDING_CONFIRMATION'
+    } else if (res.status === 404) {
+      status = 'DROPPED'
     }
 
-    done(error)
+    this.$accessor.transactions.updateStatus({
+      id: tx.transaction.id,
+      status,
+      type: tx.type
+    })
+
+    done()
   }
 
-  private async submitUserTransaction(
-    tx: UserTransaction,
-    done: Function
-  ) {
+  private async submitUserTransaction(tx: UserTransaction, done: Function) {
     const res = await this.$arweave.transactions.post(tx.transaction)
 
     let error
@@ -141,8 +166,6 @@ export default class TransactionQueueService extends ArweaveService {
         status: 'PENDING_CONFIRMATION',
         type: tx.type
       })
-
-      this.push(tx, this.sleep)
     } else {
       error = new Error(
         `Failed to submit tx (${res.status}): ${res.statusText}`
