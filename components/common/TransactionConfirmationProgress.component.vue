@@ -10,7 +10,7 @@
         <v-icon>mdi-progress-upload</v-icon>
       </v-col>
       <v-col cols="10">
-        <v-row dense>
+        <v-row dense align="center">
           <strong>Status:&nbsp;</strong>
           <span v-if="tx.status === 'PENDING_SUBMISSION'">
             Pending Submission
@@ -18,7 +18,22 @@
           <span v-if="tx.status === 'PENDING_CONFIRMATION'">
             Pending Confirmation
           </span>
-          <span v-if="tx.status === 'DROPPED'">Dropped</span>
+          <template v-if="tx.status === 'DROPPED'">
+            <v-col cols="auto" class="pa-0">
+              <span>Dropped</span>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="auto">
+              <v-btn
+                outlined
+                elevation="2"
+                color="primary"
+                @click="onResubmitClicked"
+              >
+                Resubmit
+              </v-btn>
+            </v-col>
+          </template>
           <span v-if="tx.status === 'CONFIRMING'">Confirming</span>
           <span v-if="tx.status === 'CONFIRMED'">Ready!</span>
         </v-row>
@@ -36,6 +51,7 @@
 import { Component, Vue, Prop } from 'nuxt-property-decorator'
 
 import { UserTransaction } from '~/types'
+import { debounce } from '~/helpers'
 
 @Component
 export default class TransactionConfirmationProgress extends Vue {
@@ -52,6 +68,15 @@ export default class TransactionConfirmationProgress extends Vue {
     return Math.floor(
       (this.confirmations / this.$config.arweave.waitForConfirmations) * 100
     )
+  }
+
+  @debounce
+  onResubmitClicked() {
+    this.$accessor.transactions.updateStatus({
+      id: this.tx.transaction.id,
+      status: 'PENDING_SUBMISSION',
+      type: this.tx.type
+    })
   }
 }
 </script>

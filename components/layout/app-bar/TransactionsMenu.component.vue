@@ -22,7 +22,7 @@
             contain
             max-width="32px"
             class="dark-svg"
-            :class="{ 'spin': txs.length > 0 }"
+            :class="{ 'spin': shouldIconAnimate }"
             src="/icons/transfer.svg"
           />
         </v-badge>
@@ -91,6 +91,18 @@ export default class TransactionsMenu extends Vue {
     }
 
     return 'white'
+  }
+
+  get shouldIconAnimate(): boolean {
+    if (this.txs.length < 1) {
+      return false
+    }
+
+    if (this.txs.every((tx) => tx.status === 'DROPPED')) {
+      return false
+    }
+
+    return true
   }
 }
 </script>

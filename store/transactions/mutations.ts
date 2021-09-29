@@ -10,6 +10,7 @@ const mutations = mutationTree(state, {
   [ADD_TRANSACTION](state, payload: UserTransaction) {
     state.transactions.unshift(payload)
   },
+
   [SET_TRANSACTION_STATUS](state, payload: SetUserTransactionStatusPayload) {
     const idx = state.transactions.findIndex(
       (tx) => tx.transaction.id === payload.id
