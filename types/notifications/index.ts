@@ -5,3 +5,7 @@ export type TransactionNotificationType =
   | 'Accepted'
   | 'Dropped'
   | 'Confirmed'
+
+export interface MarkNotificationsReadPayload {
+  readtime: number
+}
