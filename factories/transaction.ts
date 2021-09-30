@@ -42,7 +42,7 @@ export default class TransactionFactory {
 
   async searchTransactions(
     category: DomainEntityCategory,
-    owner?: string,
+    owner?: string | string[],
     opts?: TransactionSearchOptions
   ): Promise<ArdbTransaction[] | ArdbBlock[]> {
     let query = this.ardb
