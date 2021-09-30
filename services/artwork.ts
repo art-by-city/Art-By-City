@@ -37,7 +37,11 @@ export default class ArtworkService extends TransactionService {
           creator = []
           break
         case 'staging':
-          creator = []
+          creator = [
+            'x3GW6wfBZ3wHTflETInuzJ5rOv_6JvlFi-dl6yYAr8Y',
+            '07x1amh71n9OSHVbuZ4GRTrZSkJ9ZYkevGuXy70HJB4',
+            'uc8wFvl6oJO0QymalfxFFCTLkdl2HmF9xQrWvzk8uXM'
+          ]
           break
         default:
           creator = [
