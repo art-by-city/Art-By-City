@@ -85,7 +85,7 @@ export default {
     strategies: {
       local: false,
       'arweave-wallet': {
-        scheme: '~/schemes/arweave-wallet'
+        scheme: '~/schemes/arweave-wallet.ts'
       }
     },
     plugins: [
