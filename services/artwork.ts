@@ -28,8 +28,23 @@ export default class ArtworkService extends TransactionService {
     return 'fake-tx-id'
   }
 
-  async fetchArtworkFeed(creator?: string): Promise<FeedItem[]> {
+  async fetchArtworkFeed(creator?: string | string[]): Promise<FeedItem[]> {
     const items: FeedItem[] = []
+
+    if (!creator) {
+      switch (process.env.NODE_ENV) {
+        case 'production':
+          creator = []
+          break
+        case 'staging':
+          creator = []
+          break
+        default:
+          creator = [
+            'MlV6DeOtRmakDOf6vgOBlif795tcWimgyPsYYNQ8q1Y' // TestWeave :)
+          ]
+      }
+    }
 
     const txs = await this.transactionFactory
       .searchTransactions('artwork', creator)
