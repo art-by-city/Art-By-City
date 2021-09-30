@@ -32,11 +32,11 @@ export default class ArtworkService extends TransactionService {
     const items: FeedItem[] = []
 
     if (!creator) {
-      switch (process.env.NODE_ENV) {
-        case 'production':
+      switch (process.env.APP_NAME) {
+        case 'ArtByCity':
           creator = []
           break
-        case 'staging':
+        case 'ArtByCity-Staging':
           creator = [
             'x3GW6wfBZ3wHTflETInuzJ5rOv_6JvlFi-dl6yYAr8Y',
             '07x1amh71n9OSHVbuZ4GRTrZSkJ9ZYkevGuXy70HJB4',

@@ -67,7 +67,7 @@ export default {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
     arweave: {
       appConfig: {
-        name: process.env.APP_NAME || 'ArtByCity',
+        name: process.env.APP_NAME || 'ArtByCity-Development',
         version: process.env.APP_VERSION || 'development'
       },
       apiConfig: {
