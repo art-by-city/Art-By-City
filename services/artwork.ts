@@ -32,7 +32,7 @@ export default class ArtworkService extends TransactionService {
     const items: FeedItem[] = []
 
     if (!creator) {
-      switch (process.env.APP_NAME) {
+      switch (this.config.name) {
         case 'ArtByCity':
           creator = []
           break
