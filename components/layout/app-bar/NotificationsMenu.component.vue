@@ -5,11 +5,11 @@
       fixed
       left
       tile
-      :value="open"
+      :value.sync="open"
       max-height="80vh"
       min-width="400"
       content-class="notifications-menu"
-      @input="onMenuOpenOrClosed"
+      @input="onMenuOpened"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-btn icon tile x-large v-on="on" v-bind="attrs">
@@ -42,6 +42,7 @@
             <NotificationComponent
               :key="notif.guid"
               :notification="notif"
+              :showUnread="i <= lastUnreadCount - 1"
             />
           </v-lazy>
           <v-divider v-if="i !== notifs.length - 1"></v-divider>
@@ -97,6 +98,8 @@ export default class NotificationsMenu extends Vue {
   open: boolean = false
   popupNotifs: Notification[] = []
   popupTimeouts: number[] = []
+  lastUnreadCount: number = 0
+  lastUnreadTimeout?: number
 
   get notifs(): Notification[] {
     return this.$accessor.notifications.list
@@ -130,15 +133,20 @@ export default class NotificationsMenu extends Vue {
 
   destroyed() {
     this.popupTimeouts.forEach(clearTimeout)
+    clearTimeout(this.lastUnreadTimeout)
   }
 
   @debounce
-  onMenuOpenOrClosed(opened: boolean) {
-    if (opened) {
-      this.$accessor.notifications[MARK_NOTIFICATIONS_READ]({
-        readtime: new Date().getTime()
-      })
-    }
+  onMenuOpened() {
+    this.lastUnreadCount = this.unread.length
+
+    this.$accessor.notifications[MARK_NOTIFICATIONS_READ]({
+      readtime: new Date().getTime()
+    })
+
+    this.lastUnreadTimeout = setTimeout(() => {
+      this.lastUnreadCount = 0
+    }, 10000, this)
   }
 }
 </script>

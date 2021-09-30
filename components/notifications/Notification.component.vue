@@ -8,7 +8,7 @@
         left
         dot
         icon="mdi-exclamation-thick"
-        :value="!this.notification.read"
+        :value="!this.notification.read || showUnread"
       >
         <v-img
           contain
@@ -40,6 +40,8 @@ import { Notification } from '~/models'
 @Component
 export default class NotificationComponent extends Vue {
   @Prop({ type: Object, required: true }) notification!: Notification
+
+  @Prop({ type: Boolean, required: false }) showUnread?: boolean
 }
 </script>
 
