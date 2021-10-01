@@ -40,7 +40,10 @@ export default class ArtworkService extends TransactionService {
           creator = [
             'x3GW6wfBZ3wHTflETInuzJ5rOv_6JvlFi-dl6yYAr8Y',
             '07x1amh71n9OSHVbuZ4GRTrZSkJ9ZYkevGuXy70HJB4',
-            'uc8wFvl6oJO0QymalfxFFCTLkdl2HmF9xQrWvzk8uXM'
+            'uc8wFvl6oJO0QymalfxFFCTLkdl2HmF9xQrWvzk8uXM',
+            'LtILfPM8agd7RU6AaQmwh0SFEvxPu-tb06E_iHksvUM',
+            'P9TlkKY8NEuiBWf-YGIcVV9ZVWjhh9WgtoM8ej8jhJ8',
+            'lULoyhunyPeZGVrZnDnTfDBxS-XOFV-qaNphiwPH2Ps'
           ]
           break
         default:
