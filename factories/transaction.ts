@@ -1,7 +1,6 @@
 import Arweave from 'arweave'
 import Transaction from 'arweave/node/lib/transaction'
 import ArDB from '@textury/ardb'
-import ArdbBlock from '@textury/ardb/lib/models/block'
 import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 
 import { ArweaveAppConfig, DomainEntityCategory } from '../types'
@@ -44,7 +43,7 @@ export default class TransactionFactory {
     category: DomainEntityCategory,
     owner?: string | string[],
     opts?: TransactionSearchOptions
-  ): Promise<ArdbTransaction[] | ArdbBlock[]> {
+  ): Promise<ArdbTransaction[]> {
     let query = this.ardb
       .search('transactions')
       .appName(this.config.name)
@@ -57,6 +56,8 @@ export default class TransactionFactory {
 
     const sort = opts?.sort || 'HEIGHT_DESC'
 
-    return await query.find({ sort })
+    const results = await query.find({ sort })
+
+    return results as ArdbTransaction[]
   }
 }

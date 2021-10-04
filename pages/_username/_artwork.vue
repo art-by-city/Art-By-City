@@ -74,7 +74,6 @@
             <LikeButton :artwork="artwork"/>
           </div>
           <div class="text-lowercase">{{ artwork.type }}</div>
-          <div class="text-lowercase">{{ cityName }}</div>
           <div class="text-lowercase">{{ hashtagsString }}</div> -->
         </v-col>
       </v-row>
@@ -84,18 +83,6 @@
         :show.sync="zoom"
         :src="previewImage.dataUrl"
       />
-
-      <v-dialog
-        :value="editMode"
-        persistent
-        :max-width="editDialogMaxWidth"
-      >
-        <ArtworkEditForm
-          :artwork="artwork"
-          @previewImageChanged="setPreviewImage()"
-          @cancel="onCancelClicked"
-        />
-      </v-dialog>
     </v-container>
     <v-container v-else>
       <v-row justify="center">
@@ -113,7 +100,6 @@
 </template>
 
 <script lang="ts">
-import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import LikeButton from '~/components/likeButton.component.vue'
@@ -126,9 +112,15 @@ import {
 } from '~/components/artwork/edit'
 import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
-import { Artwork, ArtworkImage, UserTransaction, SetUserTransactionStatusPayload } from '~/types'
+import {
+  Artwork,
+  ArtworkImage,
+  UserTransaction,
+  SetUserTransactionStatusPayload
+  } from '~/types'
 import { debounce } from '~/helpers'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   components: {
@@ -143,111 +135,46 @@ export default class ArtworkPage extends FormPageComponent {
   artwork: Artwork | null = null
   previewImage?: ArtworkImage
   cachedArtwork!: Artwork
-  editMode = false
   zoom = false
+  txIdOrSlug: string = this.$route.params.artwork
   txId?: string
+  tx: UserTransaction | null = null
 
-  async asyncData({ params, app, $config }: Context) {
+  async fetch() {
+    ProgressService.start()
     try {
-      const txId = params.artwork
-      const txStatus = await app.$arweave.transactions.getStatus(txId)
+      const artwork = await this.$artworkService.fetch(this.txIdOrSlug)
 
-      if (txStatus.status === 200) {
-        const confirms = txStatus.confirmed?.number_of_confirmations || 0
-        if (confirms >= $config.arweave.waitForConfirmations) {
-          // tx is ready!
-          // const tx = await app.$arweave.transactions.get(txId)
-
-          // TODO -> MAKE SURE THIS IS AN ARTWORK TX
-          // tx.get('tags').forEach()
-
-          // TODO -> MAKE SURE THIS TX DATA CONFORMS TO AN ARTWORK TYPE
-          const txData = await app.$arweave.transactions.getData(txId, {
-            decode: true, string: true
-          }) as string
-
-          const artwork = JSON.parse(txData) as Artwork
-          artwork.id = txId
-          const previewImage = artwork.images[0]
-
-          return { artwork, previewImage }
-        }
-      }
-
-      return { txId }
-    } catch (err) {
-      console.error(err)
-      app.$toastService.error(err)
-    }
-  }
-
-  created() {
-    if (this.txId && !this.artwork) {
-      const txId = this.txId
-      this.$store.subscribe(async (mutation) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED' && payload.type === 'artwork') {
-            this.artwork = await this.fetchArtwork(txId)
-            this.previewImage = this.artwork.images[0]
+      if (artwork) {
+        this.artwork = artwork
+        this.setPreviewImage()
+      } else {
+        this.txId = this.txIdOrSlug
+        this.tx = this.$accessor.transactions.getById(this.txId)
+        this.$store.subscribe(async (mutation) => {
+          if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+            const payload = mutation.payload as SetUserTransactionStatusPayload
+            if (payload.type === 'artwork' && payload.id === this.txId) {
+              console.log('mutation payload', payload)
+              if (payload.status === 'CONFIRMED') {
+                this.$fetch()
+              } else {
+                this.tx = this.$accessor.transactions.getById(this.txId)
+              }
+            }
           }
-        }
-      })
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      this.$toastService.error(error)
+    } finally {
+      ProgressService.stop()
     }
-  }
-
-  private async fetchArtwork(txId: string): Promise<Artwork> {
-    // tx is ready!
-    // const tx = await app.$arweave.transactions.get(txId)
-
-    // TODO -> MAKE SURE THIS IS AN ARTWORK TX
-    // tx.get('tags').forEach()
-
-    // TODO -> MAKE SURE THIS TX DATA CONFORMS TO AN ARTWORK TYPE
-    const txData = await this.$arweave.transactions.getData(txId, {
-      decode: true, string: true
-    }) as string
-
-    const artwork = JSON.parse(txData) as Artwork
-    artwork.id = txId
-
-    return artwork
-  }
-
-  get tx(): UserTransaction | null {
-    return this.txId ? this.$accessor.transactions.getById(this.txId) : null
-  }
-
-  get isMobile() {
-    switch (this.$vuetify.breakpoint.name) {
-      case 'xs':
-      case 'sm':
-      case 'md': return true
-      case 'lg':
-      case 'xl':
-        default: return false
-    }
-  }
-
-  get editDialogMaxWidth() {
-    if (this.isMobile) {
-      return '1785px'
-    }
-
-    return '500px'
-  }
-
-  get cityName() {
-    // for (let i = 0; i < this.$store.state.config.cities.length; i++) {
-    //   if (this.$store.state.config.cities[i].id === this.artwork.city) {
-    //     return this.$store.state.config.cities[i].name
-    //   }
-    // }
-    return ''
   }
 
   get hashtagsString() {
-    return this.artwork?.hashtags.map((h) => { return `#${h}` }).join(', ') || ''
+    return this.artwork?.hashtags.map(h => `#${h}`).join(', ') || ''
   }
 
   setPreviewImage(image?: ArtworkImage) {
@@ -259,96 +186,6 @@ export default class ArtworkPage extends FormPageComponent {
   @debounce
   onPreviewArtworkClicked() {
     this.zoom = true
-  }
-
-  @debounce
-  toggleEditMode(forceState?: boolean) {
-    // if (!this.editMode) {
-    //   this.cachedArtwork = { ...this.artwork }
-    //   this.cachedArtwork.images = [ ...this.artwork.images ]
-    // }
-    // if (typeof forceState !== 'undefined') {
-    //   this.editMode = !!forceState
-    // } else {
-    //   this.editMode = !this.editMode
-    // }
-  }
-
-  @debounce
-  onCancelClicked() {
-    // if (this.isNew) {
-    //   this.$router.push('/portfolio')
-    // } else {
-    //   this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
-    //   this.toggleEditMode(false)
-    // }
-  }
-
-  @debounce
-  async saveArtwork() {
-    // const artwork = this.isNew
-    //   ? await this.$artworkService.createArtwork(this.artwork)
-    //   : await this.$artworkService.updateArtwork(this.artwork)
-
-    // if (artwork) {
-    //   this.previewImage = artwork.images[0]
-    //   window.history.replaceState(
-    //     window.history.state,
-    //     document.title,
-    //     `/${artwork.owner.username}/${artwork.slug}`
-    //   )
-    //   this.artwork = Object.assign({}, this.artwork, artwork)
-    //   this.toggleEditMode(false)
-    // }
-  }
-
-  @debounce
-  async publishOrApproveArtwork(intent: 'publish' | 'approve') {
-    // ProgressService.start()
-    // try {
-    //   const action = intent === 'publish'
-    //     ? this.artwork.published
-    //       ? 'unpublish'
-    //       : 'publish'
-    //     : this.artwork.approved
-    //       ? 'unapprove'
-    //       : 'approve'
-    //   const { success } = await this.$axios.$post(`/api/artwork/${this.artwork.id}/${action}`)
-
-    //   if (success) {
-    //     const published = intent === 'publish' ? !this.artwork.published : this.artwork.published
-    //     const approved = intent === 'approve' ? !this.artwork.approved : this.artwork.approved
-    //     this.artwork = {
-    //       ...this.artwork,
-    //       published,
-    //       approved
-    //     }
-    //     this.$toastService.success(`artwork updated`)
-    //   }
-    // } catch (error) {
-    //   this.$toastService.error(`error updating artwork`)
-    // }
-    // ProgressService.stop()
-  }
-
-  @debounce
-  async deleteArtwork() {
-    // if (confirm('Are you sure you want to delete this artwork?')) {
-    //   ProgressService.start()
-    //   try {
-    //     const { success } = await this.$axios.$delete(
-    //       `/api/artwork/${this.artwork.id}`
-    //     )
-
-    //     if (success) {
-    //       this.$toastService.success('artwork deleted')
-    //       this.$router.push('/portfolio')
-    //     }
-    //   } catch (error) {
-    //     this.$toastService.error('error deleting artwork')
-    //   }
-    //   ProgressService.stop()
-    // }
   }
 }
 </script>

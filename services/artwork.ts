@@ -1,8 +1,9 @@
 import Transaction from 'arweave/node/lib/transaction'
 
-import { TransactionService } from '.'
 import { Artwork, FeedItem } from '~/types'
 import { uuidv4 } from '~/helpers'
+import { TransactionService } from './'
+import { ArtworkFactory } from '../factories'
 
 export default class ArtworkService extends TransactionService {
   async createArtworkTransaction(artwork: Artwork): Promise<Transaction> {
@@ -28,7 +29,27 @@ export default class ArtworkService extends TransactionService {
     return 'fake-tx-id'
   }
 
-  async fetchArtworkFeed(creator?: string | string[]): Promise<FeedItem[]> {
+  async fetch(id: string): Promise<Artwork | null> {
+    try {
+      const txDataString = await this.$arweave.transactions.getData(id, {
+        decode: true,
+        string: true
+      }) as string
+
+      const txData = JSON.parse(txDataString)
+      txData.id = id
+
+      const artwork = new ArtworkFactory().create(txData)
+
+      return artwork
+    } catch (error) {
+      console.error(error)
+
+      return null
+    }
+  }
+
+  async fetchFeed(creator?: string | string[]): Promise<FeedItem[]> {
     const items: FeedItem[] = []
 
     if (!creator) {
@@ -57,13 +78,21 @@ export default class ArtworkService extends TransactionService {
       .searchTransactions('artwork', creator)
 
     for (const ardbTx of txs) {
-      const res = await this.$arweave.api.get(ardbTx.id)
-      const tx = await this.$arweave.transactions.get(ardbTx.id)
+      const txId = ardbTx.id
+      try {
+        const txDataString = await this.$arweave.transactions.getData(txId, {
+          decode: true,
+          string: true
+        }) as string
 
-      if (res.data) {
-        res.data.id = tx.id
+        const txData = JSON.parse(txDataString)
+        txData.id = txId
 
-        items.push({ tx, artwork: res.data, guid: uuidv4() })
+        const artwork = new ArtworkFactory().create(txData)
+
+        items.push({ guid: uuidv4(), artwork })
+      } catch (error) {
+        console.error(error)
       }
     }
 

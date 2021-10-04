@@ -26,7 +26,7 @@ export default class FeedComponent extends Vue {
   async fetch() {
     ProgressService.start()
     try {
-      this.feed = await this.$artworkService.fetchArtworkFeed()
+      this.feed = await this.$artworkService.fetchFeed()
     } catch (error) {
       console.error(error)
       this.$toastService.error(error)
