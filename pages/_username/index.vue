@@ -121,7 +121,7 @@ export default class UserProfilePage extends PageComponent {
         this.setAvatar(avatar)
       }
 
-      this.feed = await this.$artworkService.fetchArtworkFeed(
+      this.feed = await this.$artworkService.fetchFeed(
         this.artist.address
       )
     } catch (error) {

@@ -4,4 +4,6 @@ export interface IFactory<T> {
 
 export { default as TransactionFactory } from './transaction'
 
+export * from './artwork'
+export * from './error'
 export * from './notification'

@@ -134,7 +134,7 @@ export default class TransactionQueueService extends ArweaveService {
     const res = await this.$arweave.transactions.getStatus(tx.transaction.id)
 
     let status: UserTransactionStatus ='CONFIRMING'
-    let confirmations: number
+    let confirmations: number | undefined = undefined
     if (res.status === 200 && res.confirmed) {
       status = 'CONFIRMING'
       if (res.confirmed.number_of_confirmations >= this.waitForConfirmations) {
@@ -150,6 +150,7 @@ export default class TransactionQueueService extends ArweaveService {
     this.$accessor.transactions.updateStatus({
       id: tx.transaction.id,
       status,
+      confirmations,
       type: tx.type
     })
 

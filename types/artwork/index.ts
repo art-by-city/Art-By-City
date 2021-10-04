@@ -1,7 +1,7 @@
 import { TrackableEntity } from '../common'
 
 export interface Artwork {
-  id?: string
+  id: string
   published?: Date
   creator: ArtworkCreator
   title: string

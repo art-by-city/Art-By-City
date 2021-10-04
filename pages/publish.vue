@@ -27,6 +27,7 @@ import { Artwork } from '~/types'
 })
 export default class UploadPage extends FormPageComponent {
   artwork: Artwork = {
+    id: '',
     creator: {
       address: this.$auth.user.address
     },
