@@ -12,7 +12,11 @@ import mutations, { ADD_TRANSACTION, SET_TRANSACTION_STATUS } from './mutations'
 
 const actions = actionTree({ state, getters, mutations }, {
   queueTransaction({}, payload: CreateUserTransactionPayload) {
-    const tx: UserTransaction = { ...payload, status: 'PENDING_SUBMISSION' }
+    const tx: UserTransaction = {
+      ...payload,
+      status: 'PENDING_SUBMISSION',
+      created: new Date().getTime()
+    }
     const accessor = (<typeof accessorType>this.app.$accessor)
 
     accessor.transactions[ADD_TRANSACTION](tx)

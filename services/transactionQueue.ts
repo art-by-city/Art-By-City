@@ -20,6 +20,7 @@ export default class TransactionQueueService extends ArweaveService {
   private $accessor!: typeof accessorType
   private waitForConfirmations!: number
   private sleep: number = 2000
+  private waitToFlagAsDropped: number = 1000 * 60 * 60 * 1 // NB: 1 hour
 
   constructor(context: Context) {
     super(context)
@@ -143,7 +144,11 @@ export default class TransactionQueueService extends ArweaveService {
       confirmations = res.confirmed.number_of_confirmations
     } else if (res.status === 202) {
       status = 'PENDING_CONFIRMATION'
-    } else if (res.status === 404) {
+    } else if (
+      res.status === 404
+      && ['PENDING_CONFIRMATION', 'CONFIRMING'].includes(tx.status)
+      && new Date().getTime() - tx.created > this.waitToFlagAsDropped
+    ) {
       status = 'DROPPED'
     }
 

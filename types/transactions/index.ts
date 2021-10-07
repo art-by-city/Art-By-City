@@ -30,7 +30,7 @@ export interface CreateUserTransactionPayload {
 export interface UserTransaction extends CreateUserTransactionPayload {
   status: UserTransactionStatus
   confirmations?: number
-  updated?: string
+  created: number
 }
 
 export interface SetUserTransactionStatusPayload {
