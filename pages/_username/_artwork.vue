@@ -133,7 +133,7 @@ import ProgressService from '~/services/progress/service'
 })
 export default class ArtworkPage extends FormPageComponent {
   artwork: Artwork | null = null
-  previewImage?: ArtworkImage
+  previewImage: ArtworkImage | null = null
   cachedArtwork!: Artwork
   zoom = false
   txIdOrSlug: string = this.$route.params.artwork
@@ -178,9 +178,17 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   setPreviewImage(image?: ArtworkImage) {
-    this.previewImage = image
-      ? image
-      : this.artwork?.images[0]
+    if (image) {
+      this.previewImage = image
+    } else if (
+      this.artwork
+      && this.artwork.images
+      && this.artwork.images.length > 0
+    ) {
+      this.previewImage = this.artwork.images[0]
+    } else {
+      this.previewImage = null
+    }
   }
 
   @debounce
