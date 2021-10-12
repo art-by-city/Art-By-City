@@ -351,16 +351,26 @@ export default class ArtworkEditForm extends Vue {
     if (this.valid) {
       this.isUploading = true
 
-      await this.$arweave.transactions.sign(transaction)
+      let signed = false
+      try {
+        await this.$arweave.transactions.sign(transaction)
+        signed = true
+      } catch (error) {
+        error.message
+          ? this.$toastService.error(error.message)
+          : this.$toastService.error('Transaction rejected.')
+      }
 
-      this.$accessor.transactions.queueTransaction({
-        type: 'artwork',
-        transaction
-      })
+      if (signed) {
+        this.$accessor.transactions.queueTransaction({
+          type: 'artwork',
+          transaction
+        })
+
+        return this._save(transaction.id)
+      }
 
       this.isUploading = false
-
-      return this._save(transaction.id)
     }
   }
 

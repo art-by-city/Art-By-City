@@ -73,14 +73,26 @@ export default class AvatarUploadDialog extends Vue {
     if (valid) {
       this.isUploading = true
 
-      await this.$arweave.transactions.sign(transaction)
+      let signed = false
+      try {
+        await this.$arweave.transactions.sign(transaction)
+        signed = true
+      } catch (error) {
+        error.message
+          ? this.$toastService.error(error.message)
+          : this.$toastService.error('Transaction rejected.')
+      }
 
-      this.$accessor.transactions.queueTransaction({
-        type: 'avatar',
-        transaction
-      })
+      if (signed) {
+        this.$accessor.transactions.queueTransaction({
+          type: 'avatar',
+          transaction
+        })
 
-      this.close()
+        this.close()
+      }
+
+      this.isUploading = false
     }
   }
 
