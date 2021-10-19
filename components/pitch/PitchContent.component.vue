@@ -28,13 +28,13 @@
               Welcome to the Artist's Permaweb
             </span>
           </v-col>
-          <v-col cols="4">
-            <p>
+          <v-col cols="4" align-self="center">
+            <!-- <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
               fermentum neque et sodales rutrum. Mauris lobortis aliquet
               commodo. Vestibulum eget lacus in erat luctus pellentesque vel
               eget lectus.
-            </p>
+            </p> -->
             <v-btn
               outlined
               x-large
@@ -56,14 +56,14 @@
               Turn-key Monetization
             </span>
           </v-col>
-          <v-col cols="4">
-            <p>
+          <v-col cols="4" align-self="center">
+            <!-- <p>
               Quisque gravida, tortor nec ullamcorper fringilla, urna enim
               suscipit magna, sed fringilla magna ipsum nec erat. Phasellus
               eros mi, suscipit sed consequat at, efficitur a dolor. Duis
               venenatis, libero at porta laoreet, arcu sem sollicitudin sem,
               vitae lobortis mi eros vitae ex.
-            </p>
+            </p> -->
             <v-btn
               outlined
               x-large
@@ -85,14 +85,14 @@
               Verified Art &amp; Artists
             </span>
           </v-col>
-          <v-col cols="4">
-            <p>
+          <v-col cols="4" align-self="center">
+            <!-- <p>
               Integer eget urna odio. Proin blandit elit ante, a aliquam lorem
               porta et. Vivamus posuere cursus mi ac semper. Vestibulum eu
               sapien vel dui commodo consectetur accumsan sollicitudin libero.
               Fusce viverra augue sed est posuere luctus. Integer cursus
               faucibus tellus, at egestas est faucibus quis.
-            </p>
+            </p> -->
             <v-btn
               outlined
               x-large
