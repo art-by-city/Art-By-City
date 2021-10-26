@@ -2,11 +2,12 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="6">
-        <v-file-input
+        <!-- <v-file-input
           accept="image/*"
           prepend-icon="mdi-camera-plus"
           @change="onFileChanged"
-        ></v-file-input>
+        ></v-file-input> -->
+        <ImageFileInput v-model="images" />
       </v-col>
       <v-col cols="6">
         <v-btn @click="postToArweave">post</v-btn>
@@ -16,26 +17,27 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 import Arweave from 'arweave'
 
-import { debounce } from '~/helpers'
-import FormPageComponent from '../components/pages/formPage.component'
+import { debounce, dataUrlToArrayBuffer } from '~/helpers'
+import { ArtworkImage } from '~/types'
 import ProgressService from '~/services/progress/service'
 
 const APP_NAME = 'ArtByCity-DEV'
 
 type ArweaveDataType = string | Uint8Array | ArrayBuffer | undefined
 type FileUploadRequest = {
-  data: ArweaveDataType
+  data: ArrayBuffer//string//ArrayBuffer//ArweaveDataType
   type: string
 }
 
 @Component({
   middleware: 'env/dev'
 })
-export default class DebugPage extends FormPageComponent {
+export default class DebugPage extends Vue {
   request!: FileUploadRequest
+  images: ArtworkImage[] = []
 
   @debounce
   async onFileChanged(file: File) {
@@ -55,34 +57,36 @@ export default class DebugPage extends FormPageComponent {
         reject(error)
       }
       reader.onload = async (evt) => {
-        if (!evt.target) {
+        if (!evt.target || !evt.target.result) {
           reject('Error reading file')
           return
         }
 
         resolve({
-          data: reader.result?.toString() || '',
+          data: evt.target.result as ArrayBuffer,
           type: file.type
         })
       }
-      // reader.readAsDataURL(file)
       reader.readAsArrayBuffer(file)
     })
   }
 
   async postToArweave() {
-    if (!this.request) {
-      this.$toastService.error('add a file first')
-      return
-    }
+    // if (!this.request) {
+    //   this.$toastService.error('add a file first')
+    //   return
+    // }
+    // const data = this.request.data
+    // const type = this.request.type
+    const data = dataUrlToArrayBuffer(this.images[0].dataUrl)
+    const type = this.images[0].imageType
     try {
       ProgressService.start()
-      // rq5F6F8dJt9HdpqjT9rb4okcGCfcErLfWeLNii5qwFw
       const arweave = new Arweave(this.$config.arweave.apiConfig)
 
-      const tx = await arweave.createTransaction({ data: this.request.data })
+      const tx = await arweave.createTransaction({ data })
       tx.addTag('App-Name', APP_NAME)
-      tx.addTag('Content-Type', this.request.type)
+      tx.addTag('Content-Type', type)
       await arweave.transactions.sign(tx)
       await arweave.transactions.post(tx)
 
