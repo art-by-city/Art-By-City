@@ -1,17 +1,27 @@
+import { Context } from '@nuxt/types'
 import Transaction from 'arweave/node/lib/transaction'
 
 import { Artwork, FeedItem } from '~/types'
 import { uuidv4 } from '~/helpers'
-import { TransactionService } from './'
+import { TransactionService, LikesService } from './'
 import { ArtworkFactory } from '../factories'
+import { LIKED_ENTITY_TAG } from './likes'
 
 export default class ArtworkService extends TransactionService {
+  $likesService!: LikesService
+
+  constructor(context: Context) {
+    super(context)
+
+    this.$likesService = context.$likesService
+  }
+
   async createArtworkTransaction(artwork: Artwork): Promise<Transaction> {
     const data = JSON.stringify({ ...artwork })
-    const tags: { name: string, value: string }[] = []
+    const tags: { tag: string, value: string }[] = []
 
     if (artwork.slug) {
-      tags.push({ name: 'slug', value: artwork.slug })
+      tags.push({ tag: 'slug', value: artwork.slug })
     }
 
     const tx = await this.transactionFactory.buildEntityTransaction(
@@ -91,6 +101,40 @@ export default class ArtworkService extends TransactionService {
         const artwork = new ArtworkFactory().create(txData)
 
         items.push({ guid: uuidv4(), artwork })
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    return items
+  }
+
+  async fetchLikedArtworkFeed(address: string): Promise<FeedItem[]> {
+    const items: FeedItem[] = []
+    const likeTxs = await this.$likesService.fetchUserLikes(address)
+
+    for (const likeTx of likeTxs) {
+      try {
+        const tags: { name: string, value: string }[] = (likeTx as any)._tags
+        const likedEntityTag = tags.find((tag) => tag.name === LIKED_ENTITY_TAG)
+
+        if (likedEntityTag) {
+          const entityTxId = likedEntityTag.value
+          const txDataString = await this.$arweave.transactions.getData(
+            likedEntityTag.value,
+            {
+              decode: true,
+              string: true
+            }
+          ) as string
+
+          const txData = JSON.parse(txDataString)
+          txData.id = entityTxId
+
+          const artwork = new ArtworkFactory().create(txData)
+
+          items.push({ guid: uuidv4(), artwork })
+        }
       } catch (error) {
         console.error(error)
       }

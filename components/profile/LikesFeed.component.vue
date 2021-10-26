@@ -1,0 +1,40 @@
+<template>
+  <div class="likes-feed">
+    <v-row>
+      <v-col
+        v-for="(post, i) in feed"
+        :key="post.guid"
+        cols="4"
+      >
+        <v-lazy transition="fade-transition">
+          <ArtworkCard :artwork="post.artwork" />
+        </v-lazy>
+      </v-col>
+    </v-row>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'nuxt-property-decorator'
+
+import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
+import { FeedItem } from '~/types'
+
+@Component({
+  components: {
+    ArtworkCard
+  }
+})
+export default class LikesFeed extends Vue {
+  feed: FeedItem[] = []
+
+  @Prop({
+    type: String,
+    required: true
+  }) readonly address!: string
+
+  async fetch() {
+    this.feed = await this.$artworkService.fetchLikedArtworkFeed(this.address)
+  }
+}
+</script>

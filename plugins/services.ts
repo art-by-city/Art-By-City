@@ -1,6 +1,5 @@
 import { Plugin } from '@nuxt/types'
 
-import { RootState } from '~/store'
 import InvitationService from '~/services/invitation/service'
 import ProfileService from '~/services/profile/service'
 import ConfigService from '~/services/config/service'
@@ -11,7 +10,8 @@ import {
   ArtworkService,
   AvatarService,
   TransactionQueueService,
-  UserService
+  UserService,
+  LikesService
 } from '~/services'
 
 declare module 'vue/types/vue' {
@@ -27,6 +27,7 @@ declare module 'vue/types/vue' {
     $avatarService: AvatarService
     $userService: UserService
     $txQueueService: TransactionQueueService
+    $likesService: LikesService
   }
 }
 
@@ -44,6 +45,7 @@ declare module '@nuxt/types' {
     $avatarService: AvatarService
     $userService: UserService
     $txQueueService: TransactionQueueService
+    $likesService: LikesService
   }
   // nuxtContext.$myInjectedFunction
   interface Context {
@@ -57,6 +59,7 @@ declare module '@nuxt/types' {
     $avatarService: AvatarService
     $userService: UserService
     $txQueueService: TransactionQueueService
+    $likesService: LikesService
   }
 }
 
@@ -73,13 +76,13 @@ declare module 'vuex/types/index' {
     $avatarService: AvatarService
     $userService: UserService
     $txQueueService: TransactionQueueService
+    $likesService: LikesService
   }
 }
 
 const servicesPlugin: Plugin = (context, inject) => {
   inject('invitationService', new InvitationService(context))
   inject('profileService', new ProfileService(context))
-  inject('artworkService', new ArtworkService(context))
   inject('configService', new ConfigService(context))
   inject('cityService', new CityService(context))
   inject('toastService', new ToastService(context))
@@ -87,6 +90,10 @@ const servicesPlugin: Plugin = (context, inject) => {
   inject('avatarService', new AvatarService(context))
   inject('userService', new UserService(context))
   inject('txQueueService', new TransactionQueueService(context))
+  inject('likesService', new LikesService(context))
+
+  // Injected last, depends on LikesService
+  inject('artworkService', new ArtworkService(context))
 }
 
 export default servicesPlugin

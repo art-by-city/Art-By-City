@@ -1,12 +1,16 @@
 import Arweave from 'arweave'
-import Transaction from 'arweave/node/lib/transaction'
+import Transaction from 'arweave/web/lib/transaction'
+import { CreateTransactionInterface } from 'arweave/web/common'
 import ArDB from '@textury/ardb'
 import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 
 import { ArweaveAppConfig, DomainEntityCategory } from '../types'
 
+
 export interface TransactionSearchOptions {
-  sort?: 'HEIGHT_ASC' | 'HEIGHT_DESC'
+  type?: 'application/json',
+  sort?: 'HEIGHT_ASC' | 'HEIGHT_DESC',
+  tags?: { tag: string, value: string }[]
 }
 
 export default class TransactionFactory {
@@ -22,18 +26,33 @@ export default class TransactionFactory {
 
   async buildEntityTransaction(
     category: DomainEntityCategory,
-    data: string | Uint8Array | ArrayBuffer | undefined,
-    tags: { name: string, value: string }[] = []
+    data?: string | Uint8Array | ArrayBuffer,
+    tags: { tag: string, value: string }[] = [],
+    target?: string,
+    quantity?: string
   ): Promise<Transaction> {
-    const tx = await this.arweave.createTransaction({ data })
+    const opts: Partial<CreateTransactionInterface> = {}
+
+    if (data) {
+      opts.data = data
+    }
+
+    if (target && quantity) {
+      opts.target = target
+      opts.quantity = this.arweave.ar.arToWinston(quantity)
+    }
+
+    const tx = await this.arweave.createTransaction(opts)
 
     tx.addTag('App-Name', this.config.name)
     tx.addTag('App-Version', this.config.version)
-    tx.addTag('Content-Type', 'application/json')
+    if (data) {
+      tx.addTag('Content-Type', 'application/json')
+    }
     tx.addTag('Category', category)
 
     for (const tag of tags) {
-      tx.addTag(tag.name, tag.value)
+      tx.addTag(tag.tag, tag.value)
     }
 
     return tx
@@ -42,16 +61,29 @@ export default class TransactionFactory {
   async searchTransactions(
     category: DomainEntityCategory,
     owner?: string | string[],
-    opts?: TransactionSearchOptions
+    opts: TransactionSearchOptions = {
+      type: 'application/json',
+      sort: 'HEIGHT_DESC',
+      tags: []
+    }
   ): Promise<ArdbTransaction[]> {
     let query = this.ardb
       .search('transactions')
       .appName(this.config.name)
-      .type('application/json')
       .tag('Category', category)
 
     if (owner) {
       query = query.from(owner)
+    }
+
+    if (opts.type) {
+      query = query.type(opts.type)
+    }
+
+    if (opts.tags) {
+      for (const tag of opts.tags) {
+        query = query.tag(tag.tag, tag.value)
+      }
     }
 
     const sort = opts?.sort || 'HEIGHT_DESC'

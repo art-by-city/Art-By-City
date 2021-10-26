@@ -34,7 +34,7 @@ import { Vue, Component, Emit, PropSync, Watch } from 'nuxt-property-decorator'
 import Transaction from 'arweave/node/lib/transaction'
 
 import { debounce } from '~/helpers'
-import { ArtworkImage, CreateUserTransactionPayload } from '~/types'
+import { ArtworkImage } from '~/types'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 
@@ -80,7 +80,7 @@ export default class AvatarUploadDialog extends Vue {
       } catch (error) {
         error.message
           ? this.$toastService.error(error.message)
-          : this.$toastService.error('Transaction rejected.')
+          : this.$toastService.error('Avatar transaction rejected.')
       }
 
       if (signed) {

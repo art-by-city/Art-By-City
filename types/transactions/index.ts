@@ -25,6 +25,8 @@ export type UserTransactionStatus =
 export interface CreateUserTransactionPayload {
   type: UserTransactionType
   transaction: Transaction
+  target?: string
+  entityId?: string
 }
 
 export interface UserTransaction extends CreateUserTransactionPayload {
