@@ -2,7 +2,9 @@
   <div class="user-avatar">
     <v-avatar :color="bgColor" :size="_size">
       <template v-if="user.avatar">
-        <v-img :src="user.avatar.src"></v-img>
+        <nuxt-link :to="`/${fullUsername}`">
+          <v-img :src="user.avatar.src"></v-img>
+        </nuxt-link>
       </template>
       <template v-else>
         <nuxt-link
