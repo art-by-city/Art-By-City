@@ -15,10 +15,20 @@
           <v-card elevation="0">
             <v-card-title>
               <!-- TODO: Username -->
+              {{ artist.address }}
             </v-card-title>
             <v-card-subtitle>
-              {{ artist.address }}
+              <!-- TODO: address here if username -->
             </v-card-subtitle>
+            <v-card-text>
+              <v-btn
+                v-if="likesCount > 0"
+                text
+                :to="`${this.artist.address}/likes`"
+              >
+                Liked Art: {{ likesCount }}
+              </v-btn>
+            </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
                 <v-btn
@@ -63,17 +73,7 @@
           cols="12"
             sm="6"  offset-sm="3"
         >
-          <v-row>
-            <v-col
-              v-for="(post, i) in feed"
-              :key="post.guid"
-              cols="4"
-            >
-              <v-lazy transition="fade-transition">
-                <ArtworkCard :artwork="post.artwork" />
-              </v-lazy>
-            </v-col>
-          </v-row>
+          <ArtistFeed :address="artist.address" />
         </v-col>
       </v-row>
     </v-container>
@@ -86,25 +86,25 @@
 import { Component } from 'nuxt-property-decorator'
 
 import { User } from '~/models'
-import { FeedItem, Avatar, SetUserTransactionStatusPayload } from '~/types'
+import { Avatar, SetUserTransactionStatusPayload } from '~/types'
 import { debounce } from '~/helpers'
 import ProgressService from '~/services/progress/service'
 import PageComponent from '~/components/pages/page.component'
-import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 
 @Component({
   components: {
-    ArtworkCard,
-    AvatarUploadDialog
+    AvatarUploadDialog,
+    ArtistFeed
   }
 })
 export default class UserProfilePage extends PageComponent {
-  feed: FeedItem[] = []
   artist: User = { address: this.$route.params.username }
   showAvatarUploadDialog: boolean = false
+  likesCount: number = 0
 
   get isOwner(): boolean {
     return this.$auth.user && this.artist.address === this.$auth.user.address
@@ -121,7 +121,7 @@ export default class UserProfilePage extends PageComponent {
         this.setAvatar(avatar)
       }
 
-      this.feed = await this.$artworkService.fetchFeed(
+      this.likesCount = await this.$likesService.fetchTotalLikedByUser(
         this.artist.address
       )
     } catch (error) {
@@ -134,7 +134,7 @@ export default class UserProfilePage extends PageComponent {
 
   created() {
     if (this.$auth.loggedIn && this.artist.address === this.$auth.user.address) {
-      this.$store.subscribe(async (mutation, state) => {
+      this.$store.subscribe(async (mutation) => {
         if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
           const payload = mutation.payload as SetUserTransactionStatusPayload
           if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {

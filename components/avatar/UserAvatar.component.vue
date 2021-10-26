@@ -6,15 +6,11 @@
       </template>
       <template v-else>
         <nuxt-link
-          v-if="dense"
           class="white--text avatar-username"
           :to="`/${fullUsername}`"
         >
           {{ username }}
         </nuxt-link>
-        <span v-else class="white--text avatar-username">
-          {{ username }}
-        </span>
       </template>
     </v-avatar>
     <v-tooltip bottom v-if="dense">
@@ -26,7 +22,8 @@
           style="display: inline-flex;"
         >
           <nuxt-link
-            class="white--text text-truncate app-bar-username"
+            :class="`${textColor}--text text-truncate`"
+            :style="`max-width: ${usernameWidth}`"
             :to="`/${fullUsername}`"
           >
             {{ fullUsername }}
@@ -76,12 +73,32 @@ export default class UserAvatar extends Vue {
     default: false
   }) readonly showUsername: boolean | undefined
 
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly dark: boolean | undefined
+
+  @Prop({
+    type: String,
+    required: false,
+    default: '100%'
+  }) readonly usernameWidth!: string
+
+  get textColor() {
+    if (this.dark) {
+      return 'white'
+    }
+
+    return 'black'
+  }
+
   get bgColor() {
     if (this.user?.avatar?.src) {
       return 'transparent'
-    } else {
-      return this.color
     }
+
+    return this.color
   }
 
   get username() {
@@ -143,10 +160,8 @@ export default class UserAvatar extends Vue {
   margin-top: 0px;
   margin-bottom: 0px;
 }
-.app-bar-username {
-  max-width: 120px;
-}
 .avatar-username {
   word-break: break-word;
+  text-decoration: none;
 }
 </style>

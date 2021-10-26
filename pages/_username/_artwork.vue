@@ -70,11 +70,16 @@
           </v-row>
         </v-col>
         <v-col cols="5">
-          <!-- <div style="align-self: flex-end">
-            <LikeButton :artwork="artwork"/>
+          <div style="align-self: flex-end">
+            <LikeButton
+              :entityOwner="artwork.creator.address"
+              :entityTxId="artwork.id"
+            />
           </div>
-          <div class="text-lowercase">{{ artwork.type }}</div>
-          <div class="text-lowercase">{{ hashtagsString }}</div> -->
+          <!--
+            <div class="text-lowercase">{{ artwork.type }}</div>
+            <div class="text-lowercase">{{ hashtagsString }}</div>
+          -->
         </v-col>
       </v-row>
 
@@ -155,7 +160,6 @@ export default class ArtworkPage extends FormPageComponent {
           if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
             const payload = mutation.payload as SetUserTransactionStatusPayload
             if (payload.type === 'artwork' && payload.id === this.txId) {
-              console.log('mutation payload', payload)
               if (payload.status === 'CONFIRMED') {
                 this.$fetch()
               } else {
