@@ -135,6 +135,7 @@ export default class TransactionQueueService extends ArweaveService {
     done: Function
   ) {
     const res = await this.$arweave.transactions.getStatus(tx.transaction.id)
+    const lastSubmission = tx.lastSubmission || tx.created
 
     let status: UserTransactionStatus ='CONFIRMING'
     let confirmations: number | undefined = undefined
@@ -149,7 +150,7 @@ export default class TransactionQueueService extends ArweaveService {
     } else if (
       res.status === 404
       && ['PENDING_CONFIRMATION', 'CONFIRMING'].includes(tx.status)
-      && new Date().getTime() - tx.created > this.waitToFlagAsDropped
+      && new Date().getTime() - lastSubmission > this.waitToFlagAsDropped
     ) {
       status = 'DROPPED'
     }
@@ -172,7 +173,8 @@ export default class TransactionQueueService extends ArweaveService {
       this.$accessor.transactions.updateStatus({
         id: tx.transaction.id,
         status: 'PENDING_CONFIRMATION',
-        type: tx.type
+        type: tx.type,
+        lastSubmission: new Date().getTime()
       })
     } else {
       error = new Error(

@@ -32,7 +32,8 @@ export interface CreateUserTransactionPayload {
 export interface UserTransaction extends CreateUserTransactionPayload {
   status: UserTransactionStatus
   confirmations?: number
-  created: number
+  created: number // time
+  lastSubmission?: number // time
 }
 
 export interface SetUserTransactionStatusPayload {
@@ -40,4 +41,5 @@ export interface SetUserTransactionStatusPayload {
   status: UserTransactionStatus
   type: UserTransactionType
   confirmations?: number
+  lastSubmission?: number
 }
