@@ -19,6 +19,9 @@ const mutations = mutationTree(state, {
     if (idx >=0) {
       state.transactions[idx].status = payload.status
       state.transactions[idx].confirmations = payload.confirmations
+      if (payload.lastSubmission) {
+        state.transactions[idx].lastSubmission = payload.lastSubmission
+      }
 
       state.transactions[idx] = { ...state.transactions[idx] }
       state.transactions = [ ...state.transactions ]
