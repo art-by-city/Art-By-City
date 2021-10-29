@@ -53,12 +53,7 @@ export default ({ store, $auth, $localforage }: Context) => {
       $auth.user.address
     ))
 
-    if (isDev()) {
-      // NB: store is in strict-mode for development
-      store.commit('RESTORE_MUTATION', savedState)
-    } else {
-      store.replaceState(Object.assign(store.state, savedState))
-    }
+    store.commit('RESTORE_MUTATION', savedState)
   }
 
   store.restored = new Promise(async (resolve) => {
