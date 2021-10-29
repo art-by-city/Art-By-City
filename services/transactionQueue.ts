@@ -80,7 +80,11 @@ export default class TransactionQueueService extends ArweaveService {
     ) {
       const transactions =
         mutation.payload.transactions.transactions as UserTransaction[]
-      this.push(transactions.filter((tx) => isProcessing(tx.status)))
+      console.log('onRestoreMutation() transactions', transactions)
+      const processingTransactions =
+        transactions.filter((tx) => isProcessing(tx.status))
+      console.log('onRestoreMutation() processingTransactions', processingTransactions)
+      this.push(processingTransactions)
     }
   }
 
@@ -151,6 +155,8 @@ export default class TransactionQueueService extends ArweaveService {
     ) {
       status = 'DROPPED'
     }
+
+    console.log('checkUserTransactionStatus() tx, status, confirmations', tx, status, confirmations)
 
     this.$accessor.transactions.updateStatus({
       id: tx.transaction.id,
