@@ -1,4 +1,4 @@
-export * from './base'
+export * from '../app/infra/services/base'
 export { default as ArtworkService } from './artwork'
 export { default as AvatarService } from './avatar'
 export { default as UserService } from './user'

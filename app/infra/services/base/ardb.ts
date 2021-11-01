@@ -1,7 +1,7 @@
 import ArDB from '@textury/ardb'
 import { Context } from '@nuxt/types'
 
-import { ArweaveService } from './'
+import { ArweaveService } from '.'
 
 export default class ArDBService extends ArweaveService {
   $ardb!: ArDB

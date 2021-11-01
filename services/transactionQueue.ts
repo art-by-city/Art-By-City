@@ -13,7 +13,7 @@ import {
   ADD_TRANSACTION,
   SET_TRANSACTION_STATUS
 } from '~/store/transactions/mutations'
-import { ArweaveService } from './base'
+import { ArweaveService } from '../app/infra/services/base'
 
 export default class TransactionQueueService extends ArweaveService {
   private queue!: QueueObject<UserTransaction>
