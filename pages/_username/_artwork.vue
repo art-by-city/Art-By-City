@@ -44,18 +44,20 @@
             <span class="text-h4 text-sm-h2">{{ artwork.title }}</span>
           </v-row>
           <v-row dense>
-            Created by:&nbsp;
+            <strong>Created by</strong>
+            &nbsp;
             <nuxt-link :to="`/${artwork.creator.address}`">
               {{ artwork.creator.address }}
             </nuxt-link>
           </v-row>
           <v-row dense>
-            <div style="width: 100%">
-              {{ artwork.description }}
-            </div>
+            <strong>Transaction ID</strong>
+            &nbsp;
+            <span>{{ artwork.id }}</span>
           </v-row>
           <v-row dense v-if="artwork.license">
-            License:&nbsp;
+            <strong>License</strong>
+            &nbsp;
             <span>{{ artwork.license.name }}</span>&nbsp;
             <a
               :href="artwork.license.reference"
@@ -67,6 +69,11 @@
                 mdi-open-in-new
               </v-icon>
             </a>
+          </v-row>
+          <v-row>
+            <div style="width: 100%">
+              {{ artwork.description }}
+            </div>
           </v-row>
         </v-col>
         <v-col cols="5">
@@ -148,7 +155,10 @@ export default class ArtworkPage extends FormPageComponent {
   async fetch() {
     ProgressService.start()
     try {
-      const artwork = await this.$artworkService.fetch(this.txIdOrSlug)
+      const artwork = await this.$artworkService.fetchByTxIdOrSlug(
+        this.txIdOrSlug,
+        this.$route.params.username
+      )
 
       if (artwork) {
         this.artwork = artwork
