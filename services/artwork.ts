@@ -33,10 +33,24 @@ export default class ArtworkService extends TransactionService {
     return tx
   }
 
-  async resolveSlug(owner: string, slug: string): Promise<string> {
-    const txs = await this.transactionFactory.searchTransactions('artwork', owner)
+  async fetchByTxIdOrSlug(txIdOrSlug: string, owner: string):
+    Promise<Artwork | null> {
+    const txsBySlug = await this.transactionFactory.searchTransactions(
+      'artwork',
+      owner,
+      {
+        type: 'application/json',
+        sort: 'HEIGHT_DESC',
+        tags: [{ tag: 'slug', value: txIdOrSlug }]
+      }
+    )
 
-    return 'fake-tx-id'
+    if (txsBySlug[0]) {
+      return await this.fetch(txsBySlug[0].id)
+    }
+
+    // If no slug matches, try treating it as a txid
+    return await this.fetch(txIdOrSlug)
   }
 
   async fetch(id: string): Promise<Artwork | null> {
