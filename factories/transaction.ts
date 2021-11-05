@@ -55,6 +55,8 @@ export default class TransactionFactory {
       tx.addTag(tag.tag, tag.value)
     }
 
+    tx.reward = Math.floor(Number.parseInt(tx.reward) * 1.1).toString()
+
     return tx
   }
 

@@ -64,7 +64,13 @@ export default class ArtworkCard extends Vue {
   @debounce
   @Emit('click') onArtworkCardClicked() {
     if (this.artwork) {
-      this.$router.push(`/${this.artwork.creator.address}/${this.artwork.id}`)
+      if (this.artwork.slug) {
+        this.$router.push(
+          `/${this.artwork.creator.address}/${this.artwork.slug}`
+        )
+      } else {
+        this.$router.push(`/${this.artwork.creator.address}/${this.artwork.id}`)
+      }
     }
   }
 

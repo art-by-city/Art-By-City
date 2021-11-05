@@ -19,8 +19,9 @@ export default class TransactionQueueService extends ArweaveService {
   private queue!: QueueObject<UserTransaction>
   private $accessor!: typeof accessorType
   private waitForConfirmations!: number
-  private sleep: number = 2000
-  private waitToFlagAsDropped: number = 1000 * 60 * 60 * 1 // NB: 1 hour
+  private sleep: number = 5000
+  private waitToFlagAsDroppedConfirms: number = 50
+  private waitToFlagAsDroppedTime: number = 1000 * 60 * 60 * 1 // NB: 1 hour
 
   constructor(context: Context) {
     super(context)
@@ -150,9 +151,38 @@ export default class TransactionQueueService extends ArweaveService {
     } else if (
       res.status === 404
       && ['PENDING_CONFIRMATION', 'CONFIRMING'].includes(tx.status)
-      && new Date().getTime() - lastSubmission > this.waitToFlagAsDropped
     ) {
-      status = 'DROPPED'
+      let waitedLongEnough: boolean = false
+      if (tx.transaction.last_tx) {
+        try {
+          // NB: check tx anchor for >50 confirms
+          const anchor = await this.$arweave.transactions.getStatus(
+            tx.transaction.last_tx
+          )
+
+          if (
+            anchor.status === 200
+            && anchor.confirmed
+            && anchor.confirmed.number_of_confirmations
+              > this.waitToFlagAsDroppedConfirms
+          ) {
+            waitedLongEnough = true
+          }
+        } catch (error) {
+          console.error('bad tx anchor')
+        }
+      }
+
+      // NB: if this is the wallet's first tx, they might not have a tx anchor
+      //     also, the above code might throw given a bad tx anchor
+      if (!waitedLongEnough) {
+        const now = new Date().getTime()
+        waitedLongEnough = (now - lastSubmission) > this.waitToFlagAsDroppedTime
+      }
+
+      if (waitedLongEnough) {
+        status = 'DROPPED'
+      }
     }
 
     this.$accessor.transactions.updateStatus({
