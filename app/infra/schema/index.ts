@@ -1,7 +1,11 @@
 type MetadataPropertiesValues = string | number | string[] | number[]
 type MetadataPropertiesBase = { [key: string]: MetadataPropertiesValues }
-type MetadataPropertiesBaseAndValues = MetadataPropertiesBase | MetadataPropertiesValues
-type MetadataProperties = { [key: string]: MetadataPropertiesBaseAndValues } | MetadataPropertiesBaseAndValues
+type MetadataPropertiesBaseAndValues =
+  | MetadataPropertiesBase
+  | MetadataPropertiesValues
+type MetadataProperties =
+  | { [key: string]: MetadataPropertiesBaseAndValues }
+  | MetadataPropertiesBaseAndValues
 
 export interface ERC721MetadataJSONSchema {
   name: string
