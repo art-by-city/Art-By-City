@@ -18,6 +18,3 @@ declare module '~auth/runtime' {
   } from '@nuxtjs/auth-next'
   export type { Auth } from '@nuxtjs/auth-next'
 }
-
-// ArLocal
-declare module '@textury/arlocal'
