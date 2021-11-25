@@ -1,18 +1,13 @@
 <template>
-  <v-card tile outlined height="250">
+  <v-card tile outlined>
     <v-card-title>Log In with Arweave Wallet</v-card-title>
-    <v-card-text>
-      <p>
-        An <strong>Arweave Wallet</strong> is required to log in<br />
-      </p>
-    </v-card-text>
     <v-container fluid>
       <template v-if="isArweaveWalletInstalled">
         <v-row justify="center">
           <v-btn
             elevation="2"
             outlined
-            class="mx-auto"
+            class="mx-auto mb-2"
             @click="onLoginClicked"
           >
             <v-img
