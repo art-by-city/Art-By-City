@@ -1,11 +1,6 @@
 <template>
-  <v-card tile outlined height="250">
-    <v-card-title>Sign Up</v-card-title>
-    <v-card-text>
-      <p>Sign Up for our mailing list to get notified when
-        <strong>Art By City Accounts</strong> are available
-      </p>
-    </v-card-text>
+  <v-card tile outlined height="100%">
+    <v-card-title>Artist Pre-Registration</v-card-title>
     <v-container fluid>
       <v-row justify="center">
         <v-btn

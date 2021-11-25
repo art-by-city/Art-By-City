@@ -10,6 +10,21 @@
     <template v-if="content === 'sign-up'">
       <v-container fluid class="pa-1">
         <v-row dense>
+          <v-card tile width="100%">
+            <v-card-title class="text-h2">
+              <strong>Art By City</strong>
+            </v-card-title>
+            <v-card-text>
+              is a decentralized application and community.
+              This means that an <strong>Arweave Wallet</strong> is required to
+              log in.  If you're unfamiliar with Arweave, Web 3.0, decentralized
+              applications (dApps), or blockchain technology you can sign up for
+              our <strong>Artist Pre-Registration</strong> program and we'll get
+              in touch to help you get started on your Web 3.0 journey.
+            </v-card-text>
+          </v-card>
+        </v-row>
+        <v-row dense>
           <v-col
             class="pa-0"
             dense
