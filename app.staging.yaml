@@ -26,6 +26,7 @@ env_variables:
   ARWEAVE_PROTOCOL: https
   ARWEAVE_HOST: arweave.net
   ARWEAVE_PORT: 443
+  ARTIST_PREREGISTRATION_URL: https://us-central1-art-by-city-staging-299519.cloudfunctions.net/artist-preregistration
 
 includes:
   - secrets.yaml
