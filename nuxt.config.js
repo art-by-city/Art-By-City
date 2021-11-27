@@ -77,6 +77,7 @@ export default {
       },
       waitForConfirmations: process.env.ARWEAVE_TX_CONFIRMATIONS || 12
     },
+    artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081'
   },
   auth: {
     redirect: {

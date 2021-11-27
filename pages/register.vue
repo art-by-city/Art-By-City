@@ -25,7 +25,15 @@
         </p>
       </v-col>
     </v-row>
-    <v-row justify="center">
+    <v-row v-if="hasSubmitted" justify="center">
+      <v-col cols="auto" sm="5">
+        <p class="text-h5">
+          <v-icon color="green">mdi-check</v-icon>
+          Thanks for your submission!  We'll be in touch!
+        </p>
+      </v-col>
+    </v-row>
+    <v-row v-else justify="center">
       <v-col cols="auto" sm="6">
         <v-stepper v-model="signUpStep" vertical flat non-linear>
 
@@ -454,6 +462,7 @@ type VForm = Vue & {
 export default class RegisterPage extends Vue {
   signUpStep: number = 1
   submitting: boolean = false
+  hasSubmitted: boolean = false
 
   // Form Fields
   fields: { [key: string]: { label: string, value: string, valid: boolean } } = {
@@ -502,7 +511,6 @@ export default class RegisterPage extends Vue {
     try {
       const ref = (this.$refs[refName] as Vue)
       const el = (ref.$el as HTMLElement)
-      console.log(refName, el.tagName)
       if (el.tagName === 'BUTTON') {
         el.focus()
       } else {
@@ -541,7 +549,16 @@ export default class RegisterPage extends Vue {
         }
       }
 
-      // TODO -> submit
+      try {
+        await this.$axios.$post(
+          this.$config.artistPreregistrationUrl,
+          submission
+        )
+        this.hasSubmitted = true
+      } catch (err) {
+        console.error(err)
+        this.$toastService.error('Error submitting response')
+      }
 
       this.submitting = false
     }
