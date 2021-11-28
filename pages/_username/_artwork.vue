@@ -103,7 +103,7 @@
             <TransactionConfirmationProgress :tx="tx" />
           </template>
           <template v-else>
-            <h1>404 Artwork not found :(</h1>
+            <!-- <h1>404 Artwork not found :(</h1> -->
           </template>
         </v-col>
       </v-row>
