@@ -52,7 +52,7 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload } from '~/types'
+import { SetUserTransactionStatusPayload, UserTransaction } from '~/types'
 import LikedByList from '~/components/likes/LikedByList.component.vue'
 
 @Component({
@@ -150,18 +150,27 @@ export default class LikeButton extends Vue {
       const signed = await this.$arweaveService.sign(transaction)
 
       if (signed) {
-        this.$accessor.transactions.queueTransaction({
-          type: 'like',
+        const tx: UserTransaction = {
           transaction,
+          type: 'like',
+          status: 'PENDING_CONFIRMATION',
+          created: new Date().getTime(),
           target: this.entityOwner,
           entityId: this.entityTxId
+        }
+
+        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
+          this.isUploading = false
+          if (err) {
+            this.$toastService.error(err.message)
+          } else {
+            this.isSubmittingLikeTx = true
+            this.subscribeToLikeTx()
+          }
         })
-
-        this.isSubmittingLikeTx = true
-        this.subscribeToLikeTx()
+      } else {
+        this.isUploading = false
       }
-
-      this.isUploading = false
     }
   }
 

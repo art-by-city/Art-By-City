@@ -166,7 +166,7 @@ import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
 import Transaction from 'arweave/node/lib/transaction'
 
-import { Artwork, ArtworkImage } from '~/types'
+import { Artwork, ArtworkImage, UserTransaction } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
@@ -353,15 +353,24 @@ export default class ArtworkEditForm extends Vue {
       const signed = await this.$arweaveService.sign(transaction)
 
       if (signed) {
-        this.$accessor.transactions.queueTransaction({
+        const tx: UserTransaction = {
+          transaction,
           type: 'artwork',
-          transaction
+          status: 'PENDING_CONFIRMATION',
+          created: new Date().getTime()
+        }
+
+        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
+          this.isUploading = false
+          if (err) {
+            this.$toastService.error(err.message)
+          } else {
+            return this._save(transaction.id)
+          }
         })
-
-        return this._save(transaction.id)
+      } else {
+        this.isUploading = false
       }
-
-      this.isUploading = false
     }
   }
 
