@@ -168,7 +168,6 @@ import Transaction from 'arweave/node/lib/transaction'
 
 import { Artwork, ArtworkImage } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
-import ProgressService from '~/services/progress/service'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
 import LicenseSelector from '~/components/forms/licenseSelector.component.vue'
