@@ -13,7 +13,7 @@
           >
             <v-fade-transition>
               <v-overlay v-if="!disabled && props.hover" absolute class="artwork-overlay">
-                <v-row align="end" class="fill-height pa-1">
+                <v-row align="end" class="fill-height pa-1 pl-4">
                   <v-col
                     cols="auto"
                     class="
@@ -26,8 +26,12 @@
                       class="artwork-card-disable-overlay"
                     ></div>
                     <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
-                    <a class="artwork-card-title white--text text-lowercase">
+                    <a class="artwork-card-title white--text">
                       {{ artwork.title }}
+                    </a>
+                    <br />
+                    <a class="artwork-card-title white--text font-italic font-weight-thin">
+                      {{ artwork.creator.address }}
                     </a>
                   </v-col>
                 </v-row>

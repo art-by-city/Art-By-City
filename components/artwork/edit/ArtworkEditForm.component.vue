@@ -113,15 +113,19 @@
             type="text"
             name="artworkTitle"
             label="Title"
-            :rules="titleRules"
+            counter="128"
+            :rules="[rules.required, rules.maxLength(128)]"
           ></v-text-field>
+
           <v-text-field
             v-model="artwork.slug"
             type="text"
             name="artworkSlug"
+            counter="128"
             :label="slugBase"
-            :rules="slugRules"
+            :rules="[rules.required, rules.maxLength(128), rules.slug]"
           ></v-text-field>
+
           <!-- <ArtworkTypeSelector
             v-model="artwork.type"
             :artworkTypes="$store.state.config.artworkTypes"
@@ -136,6 +140,33 @@
             v-model="artwork.hashtags"
             :hashtags="$store.state.config.hashtags"
           /> -->
+
+          <v-text-field
+            v-model="artwork.created"
+            name="artworkCreated"
+            label="Created (Year)"
+            placeholder="2021"
+            :rules="[rules.year]"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="artwork.city"
+            name="artworkCity"
+            label="City Code"
+            placeholder="NYC"
+            :rules="[rules.city]"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="artwork.medium"
+            type="text"
+            name="artworkMedium"
+            label="Medium"
+            counter="240"
+            placeholder="e.g. Oil on Canvas, Digital"
+            :rules="[rules.maxLength(240)]"
+          ></v-text-field>
+
           <v-textarea
             v-model="artwork.description"
             name="artworkDescription"
@@ -143,8 +174,10 @@
             hint="Enter a description for this Artwork"
             auto-grow
             rows="2"
-            :rules="descriptionRules"
+            counter="1024"
+            :rules="[rules.maxLength(1024)]"
           ></v-textarea>
+
           <LicenseSelector v-model="artwork.license" />
         </v-col>
       </v-row>
@@ -216,48 +249,60 @@ export default class ArtworkEditForm extends Vue {
   }
   @Emit('cancel') onCancel() {}
 
-  get titleRules() {
-    return [(value: string = '') => {
-      if (value.length < 1) {
-        return 'title is required'
+  rules = {
+    required: (value: string = '') => value.length < 1 ? 'Required' : true,
+    minLength: (minLength: number) => (value: string = '') => {
+      if (!value) {
+        return true
+      }
+      return value.length < minLength
+        ? `Minimum 3 characters`
+        : true
+    },
+    maxLength: (maxLength: number) => (value: string = '') => {
+      return value.length > maxLength
+        ? `Maximum ${maxLength} characters`
+        : true
+    },
+    city: (value: string = '') => {
+      if (!value) {
+        return true
       }
 
-      if (value.length > 128) {
-        return 'title must be no more than 128 characters'
+      const validCityCodeRegex = /^[a-zA-Z]{3}$/
+
+      if (!validCityCodeRegex.test(value)) {
+        return 'Must be a valid city code'
       }
 
       return true
-    }]
-  }
-
-  get slugRules() {
-    return [(value: string = '') => {
-      if (value.length < 1) {
-        return 'URL slug is required'
+    },
+    year: (value: string = '') => {
+      if (!value) {
+        return true
       }
 
-      if (value.length > 128) {
-        return 'URL slug must be no more than 128 characters'
+      const year = Number.parseInt(value)
+
+      if (
+        Number.isNaN(year)
+        || year > (new Date()).getFullYear()
+        || year < 1000
+      ) {
+        return 'Must be a valid year'
       }
 
+      return true
+    },
+    slug: (value: string = '') => {
       const validSlugRegex = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
 
       if (!validSlugRegex.test(value)) {
-        return 'URL slug must be a valid slug (lowerchase alphanumerics, hyphen, underscore)'
+        return 'Must be a valid URL slug (lowerchase alphanumerics, hyphen, underscore)'
       }
 
       return true
-    }]
-  }
-
-  get descriptionRules() {
-    return [(value: string = '') => {
-      if (value.length > 1024) {
-        return 'description must be no more than 1024 characters'
-      }
-
-      return true
-    }]
+    }
   }
 
   get isAtMaxImages(): Boolean {

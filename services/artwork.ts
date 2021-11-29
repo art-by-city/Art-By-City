@@ -1,7 +1,7 @@
 import { Context } from '@nuxt/types'
 import Transaction from 'arweave/node/lib/transaction'
 
-import { Artwork, FeedItem } from '~/types'
+import { Artwork, DataURLArtworkImage, FeedItem } from '~/types'
 import { uuidv4 } from '~/helpers'
 import { TransactionService, LikesService } from './'
 import { ArtworkFactory } from '../factories'
@@ -17,7 +17,24 @@ export default class ArtworkService extends TransactionService {
   }
 
   async createArtworkTransaction(artwork: Artwork): Promise<Transaction> {
-    const data = JSON.stringify({ ...artwork })
+    const artworkData: Partial<Artwork> = { ...artwork }
+
+    delete artworkData.id
+    delete artworkData.hashtags
+
+    if (artworkData.images) {
+      (artworkData.images as Partial<DataURLArtworkImage>[]).forEach(image => {
+        delete image.guid
+      })
+    }
+
+    artworkData.published = new Date()
+
+    if (artworkData.city) {
+      artworkData.city = artworkData.city.toLowerCase()
+    }
+
+    const jsonData = JSON.stringify(artworkData)
     const tags: { tag: string, value: string }[] = []
 
     if (artwork.slug) {
@@ -26,7 +43,7 @@ export default class ArtworkService extends TransactionService {
 
     const tx = await this.transactionFactory.buildEntityTransaction(
       'artwork',
-      data,
+      jsonData,
       tags
     )
 
