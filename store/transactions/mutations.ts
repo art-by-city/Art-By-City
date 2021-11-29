@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { mutationTree } from 'typed-vuex'
 
 import { SetUserTransactionStatusPayload, UserTransaction } from '~/types'
@@ -17,14 +18,11 @@ const mutations = mutationTree(state, {
     )
 
     if (idx >=0) {
-      state.transactions[idx].status = payload.status
-      state.transactions[idx].confirmations = payload.confirmations
+      Vue.set(state.transactions[idx], 'status', payload.status)
+      Vue.set(state.transactions[idx], 'confirmations', payload.confirmations)
       if (payload.lastSubmission) {
-        state.transactions[idx].lastSubmission = payload.lastSubmission
+        Vue.set(state.transactions[idx], 'lastSubmission', payload.lastSubmission)
       }
-
-      state.transactions[idx] = { ...state.transactions[idx] }
-      state.transactions = [ ...state.transactions ]
     }
   }
 })
