@@ -86,6 +86,7 @@ export default class AvatarUploadDialog extends Vue {
         this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
           if (err) {
             this.$toastService.error(err.message)
+            this.isUploading = false
           } else {
             this.close()
           }
