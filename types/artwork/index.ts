@@ -3,6 +3,7 @@ import { TrackableEntity } from '../common'
 export interface Artwork {
   id: string
   published?: Date
+  created?: number
   creator: ArtworkCreator
   title: string
   slug?: string
@@ -11,6 +12,8 @@ export interface Artwork {
   hashtags: string[]
   images: ArtworkImage[]
   license?: License
+  medium?: string
+  city?: string
 }
 
 export interface ArtworkCreator {
@@ -30,14 +33,10 @@ export interface DataURLArtworkImage extends BaseArtworkImage {
 
 export interface License {
   reference: string
-  isDeprecatedLicenseId: boolean
   detailsUrl: string
-  referenceNumber: number
   name: string
   licenseId: string
   seeAlso: string[]
-  isOsiApproved: boolean
-  isFsfLibre?: undefined
 }
 
 /**

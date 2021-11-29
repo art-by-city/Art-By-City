@@ -45,7 +45,13 @@ export default class LicenseSelector extends Vue {
     }
 
     return this._licenses.map(license => {
-      return { text: license.name, value: license }
+      return { text: license.name, value: {
+        reference: license.reference,
+        detailsUrl: license.detailsUrl,
+        name: license.name,
+        licenseId: license.licenseId,
+        seeAlso: license.seeAlso
+      } }
     })
   }
 }

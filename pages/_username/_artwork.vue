@@ -50,15 +50,49 @@
               {{ artwork.creator.address }}
             </nuxt-link>
           </v-row>
+          <v-row dense v-if="artwork.created">
+            <strong>Created</strong>
+            &nbsp;
+            <span>{{ artwork.created }}</span>
+          </v-row>
+          <v-row dense v-if="artwork.city">
+            <strong>City</strong>
+            &nbsp;
+            <span class="text-uppercase">{{ artwork.city }}</span>
+          </v-row>
+          <v-row dense v-if="artwork.medium">
+            <strong>Medium</strong>
+            &nbsp;
+            <span>{{ artwork.medium }}</span>
+          </v-row>
+          <v-row dense v-if="artwork.published">
+            <strong>Published</strong>
+            &nbsp;
+            <span>
+              {{ (new Date(artwork.published)).toLocaleDateString() }}
+            </span>
+          </v-row>
           <v-row dense>
             <strong>Transaction ID</strong>
             &nbsp;
             <span>{{ artwork.id }}</span>
+            &nbsp;
+            <a
+              :href="`https://viewblock.io/arweave/tx/${artwork.id}`"
+              target="_blank"
+              class="license-anchor"
+            >
+              ViewBlock
+              <v-icon small dense class="adjust-icon">
+                mdi-open-in-new
+              </v-icon>
+            </a>
           </v-row>
           <v-row dense v-if="artwork.license">
             <strong>License</strong>
             &nbsp;
-            <span>{{ artwork.license.name }}</span>&nbsp;
+            <span>{{ artwork.license.name }}</span>
+            &nbsp;
             <a
               :href="artwork.license.reference"
               target="_blank"
@@ -70,7 +104,8 @@
               </v-icon>
             </a>
           </v-row>
-          <v-row>
+          <v-row dense v-if="artwork.description">
+            <strong>Description</strong>
             <div style="width: 100%">
               {{ artwork.description }}
             </div>
