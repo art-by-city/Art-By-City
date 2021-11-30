@@ -13,9 +13,11 @@ const mutations = mutationTree(state, {
   },
 
   [MARK_NOTIFICATIONS_READ](state, payload: MarkNotificationsReadPayload) {
-    state.notifications
-      .filter((notif) => !notif.read)
-      .forEach((notif) => notif.read = payload.readtime)
+    state.notifications.forEach((notif) => {
+        if (!notif.read) {
+          notif.read = payload.readtime
+        }
+      })
 
     state.notifications = [ ...state.notifications ]
   }

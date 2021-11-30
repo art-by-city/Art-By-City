@@ -39,8 +39,6 @@ import { debounce } from '~/helpers'
 
 @Component
 export default class TransactionFormControls extends Vue {
-  estimate: string = '...'
-
   @Prop({
     type: Object,
     required: false
@@ -51,16 +49,15 @@ export default class TransactionFormControls extends Vue {
     required: false
   }) loading?: boolean
 
-  @Watch('transaction', {
-    deep: true,
-    immediate: true
-  }) async onTransactionChanged(tx?: Transaction) {
-    if (tx) {
-      const price = this.$arweave.ar.winstonToAr(tx.reward, {
+  get estimate(): string {
+    if (this.transaction) {
+      const price = this.$arweave.ar.winstonToAr(this.transaction.reward, {
         decimals: 6
       })
-      this.estimate = `≈ ${price} AR`
+      return `≈ ${price} AR`
     }
+
+    return '...'
   }
 
   @debounce

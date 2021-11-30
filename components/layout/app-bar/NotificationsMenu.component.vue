@@ -5,7 +5,7 @@
       fixed
       left
       tile
-      :value.sync="open"
+      :value="open"
       max-height="80vh"
       min-width="400"
       content-class="notifications-menu"
@@ -106,7 +106,7 @@ export default class NotificationsMenu extends Vue {
   }
 
   get unread(): Notification[] {
-    return this.notifs.filter((n) => !n.read)
+    return this.$accessor.notifications.listUnread
   }
 
   get humanReadableUnreadCount(): string {

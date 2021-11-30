@@ -34,7 +34,7 @@ import { Vue, Component, Emit, PropSync, Watch } from 'nuxt-property-decorator'
 import Transaction from 'arweave/node/lib/transaction'
 
 import { debounce } from '~/helpers'
-import { ArtworkImage } from '~/types'
+import { ArtworkImage, UserTransaction } from '~/types'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 
@@ -76,15 +76,24 @@ export default class AvatarUploadDialog extends Vue {
       const signed = await this.$arweaveService.sign(transaction)
 
       if (signed) {
-        this.$accessor.transactions.queueTransaction({
+        const tx: UserTransaction = {
+          transaction,
           type: 'avatar',
-          transaction
+          status: 'PENDING_CONFIRMATION',
+          created: new Date().getTime()
+        }
+
+        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
+          if (err) {
+            this.$toastService.error(err.message)
+            this.isUploading = false
+          } else {
+            this.close()
+          }
         })
-
-        this.close()
+      } else {
+        this.isUploading = false
       }
-
-      this.isUploading = false
     }
   }
 

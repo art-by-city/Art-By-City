@@ -76,17 +76,33 @@ export default class TransactionsMenu extends Vue {
   open: boolean = false
 
   get txs(): UserTransaction[] {
-    return this.$accessor.transactions.listProcessing.concat()
+    return this.$accessor.transactions.listProcessing
   }
 
   get badgeColor(): string {
-    if (this.txs.some((tx) => tx.status === 'DROPPED')) {
+    let hasDroppedTx = false, hasPendingTx = false, hasConfirmingTx = false
+    for (let i = 0; i < this.txs.length; i++) {
+      const tx = this.txs[i]
+
+      switch (tx.status) {
+        case 'DROPPED':
+          hasDroppedTx = true
+          break
+        case 'PENDING_SUBMISSION':
+        case 'PENDING_CONFIRMATION':
+          hasPendingTx = true
+          break
+        case 'CONFIRMING':
+          hasConfirmingTx = true
+          break
+      }
+    }
+
+    if (hasDroppedTx) {
       return 'red'
-    } else if (this.txs.some((tx) => {
-      return ['PENDING_SUBMISSION', 'PENDING_CONFIRMATION'].includes(tx.status)
-    })) {
+    } else if (hasPendingTx) {
       return 'yellow'
-    } else if (this.txs.some((tx) => tx.status === 'CONFIRMING')) {
+    } else if (hasConfirmingTx) {
       return 'green'
     }
 

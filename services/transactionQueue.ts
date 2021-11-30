@@ -195,17 +195,22 @@ export default class TransactionQueueService extends ArweaveService {
     done()
   }
 
-  private async submitUserTransaction(tx: UserTransaction, done: Function) {
+  async submitUserTransaction(tx: UserTransaction, done: Function) {
     const res = await this.$arweave.transactions.post(tx.transaction)
 
     let error
     if ([200, 202].includes(res.status)) {
-      this.$accessor.transactions.updateStatus({
-        id: tx.transaction.id,
-        status: 'PENDING_CONFIRMATION',
-        type: tx.type,
-        lastSubmission: new Date().getTime()
-      })
+      // call store queue transaction
+      // PENDING_CONFIRMATION
+      this.$accessor.transactions.queueTransaction(tx)
+      // this.$accessor.transactions.updateStatus({
+      //   id: tx.transaction.id,
+      //   status: 'PENDING_CONFIRMATION',
+      //   type: tx.type,
+      //   lastSubmission: new Date().getTime()
+      // })
+    } else if ([410].includes(res.status)) {
+      error = new Error('Insufficient funds')
     } else {
       error = new Error(
         `Failed to submit tx (${res.status}): ${res.statusText}`

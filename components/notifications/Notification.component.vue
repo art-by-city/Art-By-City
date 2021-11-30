@@ -8,7 +8,7 @@
         left
         dot
         icon="mdi-exclamation-thick"
-        :value="!this.notification.read || showUnread"
+        :value="shouldShowUnreadBadge"
       >
         <v-img
           contain
@@ -42,6 +42,10 @@ export default class NotificationComponent extends Vue {
   @Prop({ type: Object, required: true }) notification!: Notification
 
   @Prop({ type: Boolean, required: false }) showUnread?: boolean
+
+  get shouldShowUnreadBadge(): boolean {
+    return !this.notification.read || !!this.showUnread
+  }
 }
 </script>
 
