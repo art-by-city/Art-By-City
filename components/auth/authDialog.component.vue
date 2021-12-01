@@ -54,14 +54,27 @@
               <strong>Art By City - Alpha</strong>
             </v-card-title>
             <v-card-text>
-              <strong>Art By City</strong>
-              is currently in <strong>Alpha Testing</strong>.<br />
-
-              By using <strong>Art By City</strong> you acknowledge that you may
-              experience bugs, so please bear with us as we work to build
-              <strong>The Artist's Permaweb</strong>.  Please feel free to help
-              us test the app, and provide us with feedback!
-              <br />
+              <p>
+                <strong>Art By City</strong>
+                is currently in <strong>Alpha Testing</strong>.  This dapp is our
+                submission to the 5th run of the
+                <a
+                  href="https://owf.dev"
+                  target="_blank"
+                  style="text-decoration-none"
+                >
+                  Open Web Foundry
+                  <v-icon small dense style="margin-top: -4px;">
+                    mdi-open-in-new
+                  </v-icon>
+                </a> hackathon.
+              </p>
+              <p>
+                By using <strong>Art By City</strong> you acknowledge that you may
+                experience bugs or errors, so please bear with us as we work to build
+                <strong>The Artist's Permaweb</strong>.  Please feel free to help
+                us test the app, and provide us with feedback!
+              </p>
               <br />
               <v-btn
                 color="green"
@@ -114,6 +127,9 @@ export default class AuthDialog extends Vue {
   }
 
   private onCloseDialog() {
+    if (this.content === 'alpha-agreement') {
+      return
+    }
     this.close()
   }
 
