@@ -96,7 +96,13 @@ export default class ArtworkService extends TransactionService {
     if (!creator) {
       switch (this.config.name) {
         case 'ArtByCity':
-          creator = []
+          creator = [
+            'mKRPxOSIe08BddCnrL9en8C3hUGqwA5l1sUZilGsjDg',
+            'zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc',
+            'hyL5aEp4K7fd7hYEjKxi6caxjyL2UANONOnnnFe7jwc',
+            'aJIPwBoPqt1FGaa4pRoMotuDZr68PHRAoXe3lUerFTs',
+            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE'
+          ]
           break
         case 'ArtByCity-Staging':
           creator = [
@@ -105,12 +111,24 @@ export default class ArtworkService extends TransactionService {
             'uc8wFvl6oJO0QymalfxFFCTLkdl2HmF9xQrWvzk8uXM',
             'LtILfPM8agd7RU6AaQmwh0SFEvxPu-tb06E_iHksvUM',
             'P9TlkKY8NEuiBWf-YGIcVV9ZVWjhh9WgtoM8ej8jhJ8',
-            'lULoyhunyPeZGVrZnDnTfDBxS-XOFV-qaNphiwPH2Ps'
+            'lULoyhunyPeZGVrZnDnTfDBxS-XOFV-qaNphiwPH2Ps',
+
+            'mKRPxOSIe08BddCnrL9en8C3hUGqwA5l1sUZilGsjDg',
+            'zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc',
+            'hyL5aEp4K7fd7hYEjKxi6caxjyL2UANONOnnnFe7jwc',
+            'aJIPwBoPqt1FGaa4pRoMotuDZr68PHRAoXe3lUerFTs',
+            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE'
           ]
           break
         default:
           creator = [
-            'MlV6DeOtRmakDOf6vgOBlif795tcWimgyPsYYNQ8q1Y' // TestWeave :)
+            'MlV6DeOtRmakDOf6vgOBlif795tcWimgyPsYYNQ8q1Y',
+
+            'mKRPxOSIe08BddCnrL9en8C3hUGqwA5l1sUZilGsjDg',
+            'zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc',
+            'hyL5aEp4K7fd7hYEjKxi6caxjyL2UANONOnnnFe7jwc',
+            'aJIPwBoPqt1FGaa4pRoMotuDZr68PHRAoXe3lUerFTs',
+            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE'
           ]
       }
     }
