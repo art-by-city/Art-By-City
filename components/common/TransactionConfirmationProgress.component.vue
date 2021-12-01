@@ -23,7 +23,7 @@
               <span>Dropped</span>
             </v-col>
             <v-spacer></v-spacer>
-            <v-col cols="auto">
+            <!-- <v-col cols="auto">
               <v-btn
                 outlined
                 elevation="2"
@@ -32,7 +32,7 @@
               >
                 Resubmit
               </v-btn>
-            </v-col>
+            </v-col> -->
           </template>
           <span v-if="tx.status === 'CONFIRMING'">Confirming</span>
           <span v-if="tx.status === 'CONFIRMED'">Ready!</span>

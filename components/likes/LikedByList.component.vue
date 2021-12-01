@@ -22,7 +22,13 @@ export default class LikedByList extends Vue {
   }) readonly entityTxId!: string
 
   async fetch() {
-    this.users = await this.$likesService.fetchLikedBy(this.entityTxId)
+    const users = await this.$likesService.fetchLikedBy(this.entityTxId)
+
+    for (let i = 0; i < users.length; i++) {
+      users[i].avatar = await this.$avatarService.fetchAvatar(users[i].address)
+    }
+
+    this.users = users
   }
 }
 </script>
