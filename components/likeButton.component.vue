@@ -1,27 +1,65 @@
 <template>
-  <v-chip
-    v-ripple="{ class: 'red--text' }"
-    color="rgba(0,0,0,0)"
-    @click.stop="toggleLike"
-  >
-    <v-icon small :color="color()">{{ icon() }}</v-icon>
-    &nbsp;
-    <span v-if="totalLikes() > 0">{{ totalLikes() }}</span>
-  </v-chip>
+  <span class="like-button">
+    <v-btn
+      class="like-icon px-0"
+      :ripple="{ class: 'red--text' }"
+      color="black"
+      text
+      max-width="36"
+      min-width="36"
+      @click="toggleLike"
+    >
+      <v-icon :color="color">{{ icon }}</v-icon>
+    </v-btn>
+    <v-btn
+      class="like-count"
+      text
+      mid-width="64"
+      @click="showLikedByPopup"
+    >
+      <span
+        v-if="totalLikes > 0"
+        :style="`color: ${color};`"
+      >
+        {{ totalLikes }} <span v-if="isSubmittingLikeTx">+1</span>
+      </span>
+    </v-btn>
+    <v-dialog
+      :value="popupOpen"
+      width="400"
+      persistent
+      @click:outside="onCloseDialog"
+    >
+      <v-container dense class="pa-1">
+        <v-row dense>
+          <v-col dense cols="12" class="pa-0">
+            <v-card>
+              <v-card-title>Liked By</v-card-title>
+              <v-divider></v-divider>
+              <v-card-text>
+                <LikedByList :entityTxId="entityTxId" />
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-dialog>
+  </span>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
+import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers/helpers'
-import User, { getUser } from '../models/user/user'
+import { debounce } from '~/helpers'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import { SetUserTransactionStatusPayload, UserTransaction } from '~/types'
+import LikedByList from '~/components/likes/LikedByList.component.vue'
 
-interface Artwork {
-  id: string
-  likes: string[]
-}
-
-@Component
+@Component({
+  components: {
+    LikedByList
+  }
+})
 export default class LikeButton extends Vue {
   @Prop({
     type: Boolean,
@@ -29,69 +67,146 @@ export default class LikeButton extends Vue {
     default: false
   }) readonly dark: boolean | undefined
 
-  @Model('change', { type: Object, required: true }) artwork!: Artwork
+  @Prop({
+    type: String,
+    required: true
+  }) readonly entityTxId!: string
 
-  get user(): User | null {
-    return getUser(this.$auth.user)
+  @Prop({
+    type: String,
+    required: true
+  }) readonly entityOwner!: string
+
+  private isLiked: boolean = false
+  private totalLikes: number = 0
+  private popupOpen: boolean = false
+  private isResolvingIsLiked: boolean = true
+  private isSubmittingLikeTx: boolean = false
+  private isUploading: boolean = false
+  private fetchOnServer: boolean = false
+  async fetch() {
+    this.isSubmittingLikeTx = this.$auth.loggedIn
+      && this.$accessor.transactions.listProcessing.some(
+        (tx) => {
+          return tx.type === 'like'
+            && this.entityOwner === tx.target
+            && this.entityTxId === tx.entityId
+        }
+      )
+
+    if (!this.isSubmittingLikeTx && this.$auth.loggedIn) {
+      this.isLiked = await this.$likesService.isEntityLikedBy(
+        this.entityTxId,
+        this.$auth.user.address
+      )
+    } else {
+      // TODO -> subscribe to store here & resolve this.isLiked
+      this.subscribeToLikeTx()
+    }
+
+    this.isResolvingIsLiked = false
+
+    await this.fetchLikeCount()
+  }
+
+  get color() {
+    if (this.isLiked) {
+      return 'red'
+    }
+
+    if (this.dark) {
+      return 'white'
+    }
+
+    return 'black'
+  }
+
+  get icon() {
+    if (
+      this.isUploading
+        || this.isResolvingIsLiked
+        || this.isSubmittingLikeTx
+    ) {
+      return 'mdi-heart-pulse'
+    }
+
+    if (this.isLiked) {
+      return 'mdi-heart'
+    }
+
+    return 'mdi-heart-outline'
   }
 
   @debounce
-  toggleLike() {
-    if (!this.artwork.likes) {
-      this.artwork.likes = []
-    }
+  async toggleLike() {
+    if (!this.isLiked && !this.isResolvingIsLiked && !this.isUploading) {
+      this.isUploading = true
 
-    if (this.user) {
-      if (!this.artwork.likes.includes(this.user.id)) {
-        this.artwork.likes.push(this.user.id)
-        try {
-          this.$axios.$put(`/api/artwork/${this.artwork.id}/like`)
-        } catch (error) {
-          this.$toastService.error('error liking artwork')
+      const transaction = await this.$likesService.createLikeTransaction(
+        this.entityTxId,
+        this.entityOwner
+      )
+
+      const signed = await this.$arweaveService.sign(transaction)
+
+      if (signed) {
+        const tx: UserTransaction = {
+          transaction,
+          type: 'like',
+          status: 'PENDING_CONFIRMATION',
+          created: new Date().getTime(),
+          target: this.entityOwner,
+          entityId: this.entityTxId
         }
-      } else {
-        try {
-          this.$axios.$delete(`/api/artwork/${this.artwork.id}/like`)
-        } catch (error) {
-          this.$toastService.error('error unliking artwork')
-        }
-        this.artwork.likes = this.artwork.likes.filter((id: string) => {
-          return this.user && id !== this.user.id
+
+        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
+          this.isUploading = false
+          if (err) {
+            this.$toastService.error(err.message)
+          } else {
+            this.isSubmittingLikeTx = true
+            this.subscribeToLikeTx()
+          }
         })
+      } else {
+        this.isUploading = false
       }
     }
-
-    this.$forceUpdate()
   }
 
-  color() {
-    if (this.isLiked()) {
-      return 'red'
-    } else if (this.dark) {
-      return 'white'
-    } else {
-      return 'black'
-    }
+  @debounce
+  showLikedByPopup() {
+    this.popupOpen = true
   }
 
-  icon() {
-    if (this.isLiked()) {
-      return 'mdi-heart'
-    } else {
-      return 'mdi-heart-outline'
-    }
+  @debounce
+  onCloseDialog() {
+    this.popupOpen = false
   }
 
-  isLiked() {
-    if (this.user && this.artwork.likes?.includes(this.user.id)) {
-      return true
-    }
-
-    return false
+  private subscribeToLikeTx() {
+    this.$store.subscribe(async (mutation, _state) => {
+      if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+        const payload = mutation.payload as SetUserTransactionStatusPayload
+        if (payload.status === 'CONFIRMED' && payload.type === 'like') {
+          this.isLiked = true
+          this.isSubmittingLikeTx = false
+          await this.fetchLikeCount()
+        }
+      }
+    })
   }
 
-  totalLikes() {
-    return this.artwork.likes?.length || ''
+  private async fetchLikeCount() {
+    this.totalLikes = await this.$likesService.fetchTotalLikes(this.entityTxId)
   }
 }
 </script>
+
+<style scoped>
+.like-count {
+  justify-content: left;
+  padding-right: 0px !important;
+  padding-left: 6px !important;
+}
+</style>

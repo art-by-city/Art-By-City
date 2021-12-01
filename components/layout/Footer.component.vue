@@ -1,25 +1,16 @@
 <template>
-  <v-footer dark style="z-index: 5;">
-    <div class="text-lowercase text-caption">
-      <nuxt-link class="white--text mr-2" to="/">Home</nuxt-link>
-      <nuxt-link class="white--text mr-2" to="/about">About</nuxt-link>
-      <template v-if="isLoggedIn">
-        <v-badge
-          dot
-          overlap
-          color="rgb(110, 81, 255)"
-          :value="shouldChangelogIconBlink"
-          class="notification-icon"
-        >
-          <nuxt-link class="white--text mr-2" to="/changelog">
-            What's New
-          </nuxt-link>
-        </v-badge>
-      </template>
-    </div>
-    <v-spacer></v-spacer>
-    <div class="text-lowercase text-caption">
-      &copy; art x by x city {{ new Date().getFullYear() }}
+  <v-footer dark class="app-footer">
+    <!-- <v-container class="app-footer-container"> -->
+    <div class="app-footer-container content-container">
+      <div class="text-lowercase text-caption">
+        <nuxt-link class="white--text mr-2" to="/">Home</nuxt-link>
+        <nuxt-link class="white--text mr-2" to="/about">About</nuxt-link>
+      </div>
+      <v-spacer></v-spacer>
+      <div class="text-lowercase text-caption">
+        &copy; art x by x city {{ new Date().getFullYear() }}
+      </div>
+    <!-- </v-container> -->
     </div>
   </v-footer>
 </template>
@@ -42,3 +33,20 @@ export default class Footer extends Vue {
   }) readonly shouldChangelogIconBlink!: boolean
 }
 </script>
+
+<style scoped lang="scss">
+.app-footer {
+  z-index: 5;
+}
+.app-footer-container {
+  align-items: inherit;
+  display: inherit;
+  flex: inherit;
+  flex-wrap: inherit;
+  transition-duration: inherit;
+  transition-property: inherit;
+  transition-timing-function: inherit;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>

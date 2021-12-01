@@ -22,7 +22,10 @@ export default {
    ** Customize the progress-bar color
    */
   loading: {
-    color: '#000000',
+    color: 'blue',
+    height: '5px',
+    duration: 10000,
+    continuous: true,
     throttle: 0
   },
   /*
@@ -34,18 +37,25 @@ export default {
   ],
   /*
    ** Plugins to load before mounting the App
+   *
+   *  NB: Order of plugins matters, as plugins may rely on other plugins
    */
   plugins: [
-    '~/plugins/axios',
+    { src: '~/plugins/arweave.ts' },
+    { src: '~/plugins/ardb.ts' },
+    { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',
-    '~/plugins/services.ts',
     '~/plugins/filters.ts',
-    { src: '~/plugins/web3.ts', mode: 'client' },
+    { src: '~/plugins/localforage.ts', ssr: false },
   ],
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxt/typescript-build', '@nuxtjs/vuetify'],
+  buildModules: [
+    '@nuxt/typescript-build',
+    '@nuxtjs/vuetify',
+    'nuxt-typed-vuex'
+  ],
   /*
    ** Nuxt.js modules
    */
@@ -55,48 +65,33 @@ export default {
   ],
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
-    imgBaseUrl: (
-      process.env.NODE_ENV === 'production'
-      || process.env.NODE_ENV === 'staging'
-    )
-      ? `https://storage.googleapis.com/${process.env.USER_UPLOAD_BUCKET_NAME}`
-      : 'http://localhost:3000'
-  },
-  serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
-  auth: {
-    localStorage: false,
-    cookie: {
-      options: {
-        secure: process.env.NODE_ENV === 'production'
-          || process.env.NODE_ENV === 'staging'
-      }
+    arweave: {
+      appConfig: {
+        name: process.env.APP_NAME || 'ArtByCity-Development',
+        version: process.env.APP_VERSION || 'development'
+      },
+      apiConfig: {
+        protocol: process.env.ARWEAVE_PROTOCOL || 'http',
+        host: process.env.ARWEAVE_HOST || 'localhost',
+        port: process.env.ARWEAVE_PORT || 1984
+      },
+      waitForConfirmations: process.env.ARWEAVE_TX_CONFIRMATIONS || 12
     },
+    artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081'
+  },
+  auth: {
     redirect: {
-      login: '/login',
-      logout: '/',
-      home: '/',
-      // callback: '/callback',
-      rewriteRedirects: true,
-      // resetOnError: true
+      logout: '/'
     },
     strategies: {
-      local: {
-        scheme: 'refresh',
-        token: {
-          property: 'token',
-          maxAge: 1800
-        },
-        refreshToken: {
-          property: 'refresh_token',
-          data: 'refresh_token',
-          maxAge: 60 * 60 * 24 * 30
-        },
-        user: { property: 'user' },
-        login: { url: '/auth/login', method: 'post' },
-        logout: false,
-        user: { url: '/auth/user', method: 'get' }
+      local: false,
+      'arweave-wallet': {
+        scheme: '~/schemes/arweave-wallet.ts'
       }
-    }
+    },
+    plugins: [
+      { src: '~/plugins/persist-store.ts', ssr: false }
+    ]
   },
   router: {},
   /*
@@ -125,7 +120,13 @@ export default {
      ** You can extend webpack config here
      */
     // @ts-ignore
-    extend(config, ctx) {},
+    extend(config, _context) {
+      config.node = {
+        fs: 'empty'
+      }
+      // Exclude /contracts directory from webpack build
+      config.module.rules.push({ exclude: [`${__dirname}/contracts`] })
+    },
     plugins: [
       new IgnoreNotFoundExportPlugin()
     ]

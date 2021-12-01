@@ -1,4 +1,4 @@
-export default (value: string) => {
+export default (value: string | number) => {
   if (!value) {
     return ''
   }

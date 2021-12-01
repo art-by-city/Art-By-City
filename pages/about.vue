@@ -7,10 +7,6 @@
     </v-row>
     <v-row justify="center">
       <v-col cols="auto">
-        <p>
-          <strong>art x by city</strong> is currently undergoing an invite-only
-          alpha phase.
-        </p>
         <p>check back later for more details.</p>
       </v-col>
     </v-row>

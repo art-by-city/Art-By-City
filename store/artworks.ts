@@ -1,6 +1,6 @@
 import { ActionTree, MutationTree } from 'vuex'
 
-import ArtworkOptions from '../models/artwork/artworkOptions'
+import { ArtworkOptions } from '~/types'
 import ProgressService from '~/services/progress/service'
 
 const maxArtworkHistory = 5
@@ -44,7 +44,7 @@ export const mutations: MutationTree<ArtworkStoreState> = {
     state.currentArtworkIndex = state.currentArtworkIndex - (1 + skip)
   },
 
-  options(state: ArtworkStoreState, options: any) {
+  setOptions(state: ArtworkStoreState, options: any) {
     state.options = options
   }
 }

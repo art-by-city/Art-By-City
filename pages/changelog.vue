@@ -48,9 +48,9 @@
 <script lang="ts">
 import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
-import PageComponent from '../components/pages/page.component'
+
+import PageComponent from '~/components/pages/page.component'
 import { Changelog } from '~/models/changelog'
-import User, { getUser } from '../models/user/user'
 
 const emptyChangelog = { entries: [] }
 
@@ -71,10 +71,6 @@ export default class ChangelogPage extends PageComponent {
 
   mounted() {
     this.$changelogService.markLatestChangelogSeen()
-  }
-
-  get user(): User | null {
-    return getUser(this.$auth.user)
   }
 }
 </script>

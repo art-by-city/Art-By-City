@@ -23,9 +23,9 @@
         </div>
         <img
           class="artwork-zoom-image"
-          ref="zoomImage"
+          ref="image"
           :class="{ 'dragging': isDragging }"
-          :src="src"
+          :src="image.src"
           :style="zoomImageStyle"
         />
       </div>
@@ -54,20 +54,16 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, PropSync } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, PropSync, Watch } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
 
-const ZOOM_UPPER_LIMIT: number = 1
+const ZOOM_UPPER_LIMIT: number = 4.1
 const ZOOM_LOWER_LIMIT: number = -0.9
 
 @Component
 export default class ArtworkZoomDialog extends Vue {
   isDragging: boolean = false
-  _width: number | 'auto' = 'auto'
-  width: number | 'auto' = 'auto'
-  height: number | 'auto' = 'auto'
-  _height: number | 'auto' = 'auto'
   left: number = 0
   top: number = 0
   offsetX: number = 0
@@ -76,26 +72,52 @@ export default class ArtworkZoomDialog extends Vue {
   mouseDownY: number = 0
   zoomFactor: number = 0
 
+  image: {
+    width: number
+    height: number
+    src: string
+  } = {
+    width: 0,
+    height: 0,
+    src: ''
+  }
+
   @PropSync('show', {
     type: Boolean,
     required: true,
     default: false
   }) zoom!: boolean
 
+  @Watch('zoom')
+  onDialogOpenedOrClosed() {
+    this.reset()
+  }
+
   @Prop({
     type: String,
     required: true
   }) readonly src!: string
 
+  mounted() {
+    const image = new Image()
+
+    image.onload = () => {
+      this.image.src = image.src
+      this.image.width = image.width
+      this.image.height = image.height
+    }
+
+    image.src = this.src
+  }
+
   private reset() {
+    this.isDragging = false
     this.left = 0
     this.top = 0
     this.offsetX = 0
     this.offsetY = 0
     this.mouseDownX = 0
     this.mouseDownY = 0
-    this.width = this._width
-    this.height = this._height
     this.zoomFactor = 0
   }
 
@@ -121,8 +143,6 @@ export default class ArtworkZoomDialog extends Vue {
   @debounce
   onCloseZoomDialog() {
     this.zoom = false
-    this.isDragging = false
-    this.reset()
   }
 
   onImgTouchStart(evt: TouchEvent) {
@@ -178,35 +198,13 @@ export default class ArtworkZoomDialog extends Vue {
     this.magnify(evt.deltaY / 1000)
   }
 
-  private setImageDimensions() {
-    if (this.$refs.zoomImage) {
-      this._width = (<Element>this.$refs.zoomImage).clientWidth
-      this.width = this._width
-      this._height = (<Element>this.$refs.zoomImage).clientHeight
-      this.height = this._height
-    }
-  }
-
   get zoomImageStyle() {
-    if (
-      this.width === 'auto'
-      || this.height === 'auto') {
-      this.setImageDimensions()
-    }
-
-    const left = `${this.left}px`
-    const top = `${this.top}px`
-
     const scale = 1 + this.zoomFactor
 
-    const width = this.width === 'auto'
-      ? this.width
-      : `${this.width * scale}px`
-    const height = this.height === 'auto'
-      ? this.height
-      : `${this.height * scale}px`
+    let left = this.left - Math.floor(this.image.width / 2)
+    let top = this.top - Math.floor(this.image.height / 2)
 
-    return { left, top, width, height }
+    return { transform: `scale(${scale}) translate(${left}px, ${top}px)` }
   }
 }
 </script>
@@ -226,7 +224,9 @@ export default class ArtworkZoomDialog extends Vue {
 .artwork-zoom-image {
   z-index: 9991;
   display: inline-block;
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: unset;
   display: block;
   margin-left: auto;

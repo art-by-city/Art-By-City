@@ -1,243 +1,308 @@
 <template>
   <v-container class="artwork-edit-form">
-    <v-row v-if="cropMode && cropImage" dense>
-      <img
-        id="cropImage"
-        class="crop-image"
-        :src="getImageSource(cropImage, baseUrl)"
-      />
-    </v-row>
-    <v-row v-if="cropMode && cropImage" dense>
-      <v-col>
-        <v-btn small icon @click="onSaveCropSelection">
-          <v-icon>mdi-content-save</v-icon>
-        </v-btn>
-        <v-btn small icon @click="onCancelCropSelection">
-          <v-icon>mdi-cancel</v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row v-if="!cropMode" dense justify="center">
-      <div class="artwork-image-selector-container">
-        <draggable
-          style="height:100%; width:100%; display: flex; flex-wrap: wrap;"
-          :list="artwork.images"
-          handle=".drag-handle"
-          @sort="onPreviewImageChanged()"
-        >
-          <div
-            class="artwork-image-selector"
-            v-for="(image, i) in artwork.images"
-            :key="i"
+    <template v-if="cropMode && cropImage">
+      <v-row dense>
+        <img
+          id="cropImage"
+          class="crop-image"
+          :src="cropImage.dataUrl"
+        />
+      </v-row>
+      <v-row dense>
+        <v-col>
+          <v-btn small icon @click="onSaveCropSelection">
+            <v-icon>mdi-content-save</v-icon>
+          </v-btn>
+          <v-btn small icon @click="onCancelCropSelection">
+            <v-icon>mdi-cancel</v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </template>
+    <v-form v-else
+      ref="form"
+      v-model="valid"
+      autocomplete="off"
+    >
+      <v-row dense justify="center">
+        <div class="artwork-image-selector-container">
+          <draggable
+            style="height:100%; width:100%; display: flex; flex-wrap: wrap;"
+            :list="artwork.images"
+            handle=".drag-handle"
+            @sort="onPreviewImageChanged()"
           >
-            <v-hover v-slot:default="hoverProps">
-              <v-img
-                aspect-ratio="1.7"
-                :src="getImageSource(image, baseUrl)"
-                class="clickable"
-              >
-                <v-overlay absolute :value="hoverProps.hover">
-                  <v-file-input
-                    class="artwork-upload-button"
-                    accept="image/png, image/jpeg"
-                    hide-input
-                    prepend-icon="mdi-camera"
-                    @change="onArtworkImageChanged(i, $event)"
-                  ></v-file-input>
-                  <div style="display: inline-flex;">
-                    <v-btn
-                      icon
-                      small
-                      @click="onCropArtworkImageClicked(i)"
-                    >
-                      <v-icon>mdi-crop</v-icon>
-                    </v-btn>
-                    <v-btn
-                      icon
-                      small
-                      @click="onDeleteArtworkImageClicked(i)"
-                    >
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
-                    <v-btn
-                      icon
-                      small
-                      class="drag-handle"
-                    >
-                      <v-icon>mdi-drag-variant</v-icon>
-                    </v-btn>
-                  </div>
-                </v-overlay>
-              </v-img>
-            </v-hover>
-          </div>
-          <div class="artwork-image-selector" v-if="!isAtMaxImages">
-            <v-responsive
-              aspect-ratio="1.7"
-              style="border: 1px dashed black;"
+            <div
+              class="artwork-image-selector"
+              v-for="(image, i) in artwork.images"
+              :key="image.guid"
             >
-              <v-file-input
-                class="artwork-upload-button add-artwork-image-button"
-                accept="image/png, image/jpeg"
-                hide-input
-                prepend-icon="mdi-camera-plus"
-                @change="onAddArtworkImageClicked"
-              ></v-file-input>
-            </v-responsive>
-          </div>
-        </draggable>
-      </div>
-    </v-row>
-    <v-row v-if="!cropMode" dense justify="center">
-      <v-col cols="12">
-        <v-text-field
-          v-model="artwork.title"
-          type="text"
-          name="artworkTitle"
-          label="Title"
-          class="text-lowercase"
-          :rules="titleRules"
-        ></v-text-field>
-        <v-text-field
-          v-model="artwork.slug"
-          type="text"
-          name="artworkSlug"
-          :label="slugBase"
-          class="text-lowercase"
-          :rules="slugRules"
-        ></v-text-field>
-        <ArtworkTypeSelector
-          v-model="artwork.type"
-          :artworkTypes="$store.state.config.artworkTypes"
-          required
+              <v-hover v-slot:default="hoverProps">
+                <v-img
+                  aspect-ratio="1.7"
+                  max-height="300px"
+                  contain
+                  :src="image.dataUrl"
+                  class="clickable"
+                >
+                  <v-overlay absolute :value="hoverProps.hover">
+                    <v-file-input
+                      class="artwork-upload-button"
+                      accept="image/png, image/jpeg"
+                      hide-input
+                      prepend-icon="mdi-camera"
+                      @change="onArtworkImageChanged(i, $event)"
+                    ></v-file-input>
+                    <div style="display: inline-flex;">
+                      <v-btn
+                        icon
+                        small
+                        @click="onCropArtworkImageClicked(i)"
+                      >
+                        <v-icon>mdi-crop</v-icon>
+                      </v-btn>
+                      <v-btn
+                        icon
+                        small
+                        @click="onDeleteArtworkImageClicked(i)"
+                      >
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                      <v-btn
+                        icon
+                        small
+                        class="drag-handle"
+                      >
+                        <v-icon>mdi-drag-variant</v-icon>
+                      </v-btn>
+                    </div>
+                  </v-overlay>
+                </v-img>
+              </v-hover>
+            </div>
+            <div
+              v-if="!isAtMaxImages"
+              class="artwork-image-selector"
+              :class="{ 'has-error': this.hasImageValidationErrors }"
+            >
+              <v-responsive
+                style="border: 1px dashed black; height: 100%;"
+              >
+                <v-file-input
+                  class="artwork-upload-button add-artwork-image-button"
+                  accept="image/*"
+                  hide-input
+                  prepend-icon="mdi-camera-plus"
+                  @change="onAddArtworkImageClicked"
+                ></v-file-input>
+              </v-responsive>
+              <span
+                v-if="this.hasImageValidationErrors"
+                class="red--text caption"
+              >
+                At least 1 image is required
+              </span>
+            </div>
+          </draggable>
+        </div>
+      </v-row>
+      <v-row dense justify="center">
+        <v-col cols="12">
+          <v-text-field
+            v-model="artwork.title"
+            type="text"
+            name="artworkTitle"
+            label="Title"
+            counter="128"
+            :rules="[rules.required, rules.maxLength(128)]"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="artwork.slug"
+            type="text"
+            name="artworkSlug"
+            counter="128"
+            :label="slugBase"
+            :rules="[rules.required, rules.maxLength(128), rules.slug]"
+          ></v-text-field>
+
+          <!-- <ArtworkTypeSelector
+            v-model="artwork.type"
+            :artworkTypes="$store.state.config.artworkTypes"
+            required
+          /> -->
+          <!-- <CitySelector
+            v-model="artwork.city"
+            :cities="$store.state.config.cities"
+            disabled
+          /> -->
+          <!-- <HashtagSelector
+            v-model="artwork.hashtags"
+            :hashtags="$store.state.config.hashtags"
+          /> -->
+
+          <v-text-field
+            v-model="artwork.created"
+            name="artworkCreated"
+            label="Created (Year)"
+            placeholder="2021"
+            :rules="[rules.year]"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="artwork.city"
+            name="artworkCity"
+            label="City Code"
+            placeholder="NYC"
+            :rules="[rules.city]"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="artwork.medium"
+            type="text"
+            name="artworkMedium"
+            label="Medium"
+            counter="240"
+            placeholder="e.g. Oil on Canvas, Digital"
+            :rules="[rules.maxLength(240)]"
+          ></v-text-field>
+
+          <v-textarea
+            v-model="artwork.description"
+            name="artworkDescription"
+            label="Description"
+            hint="Enter a description for this Artwork"
+            auto-grow
+            rows="2"
+            counter="1024"
+            :rules="[rules.maxLength(1024)]"
+          ></v-textarea>
+
+          <LicenseSelector v-model="artwork.license" />
+        </v-col>
+      </v-row>
+      <v-row dense justify="center" v-if="transaction">
+        <TransactionFormControls
+          :transaction="transaction"
+          :loading="isUploading"
+          @cancel="onCancel"
+          @submit="onSubmit"
         />
-        <CitySelector
-          v-model="artwork.city"
-          :cities="$store.state.config.cities"
-          disabled
-        />
-        <HashtagSelector
-          v-model="artwork.hashtags"
-          :hashtags="$store.state.config.hashtags"
-        />
-        <v-textarea
-          v-model="artwork.description"
-          name="artworkDescription"
-          label="Description"
-          hint="Enter a description for this Artwork"
-          auto-grow
-          rows="2"
-          class="text-lowercase"
-          :rules="descriptionRules"
-        ></v-textarea>
-      </v-col>
-    </v-row>
-    <v-row justify="center">
-      <v-col cols="auto">
-        <v-btn text color="error" class="text-lowercase" @click="cancel">
-          Cancel
-        </v-btn>
-        <v-btn text color="success" class="text-lowercase" @click="save">
-          Save
-        </v-btn>
-      </v-col>
-    </v-row>
+      </v-row>
+    </v-form>
   </v-container>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, Emit, Watch } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
+import Transaction from 'arweave/node/lib/transaction'
 
-import Artwork, {
-  getImageSource,
-  ImageUploadPreview,
-  ArtworkImageFile,
-  isImageFileRef
-} from '~/models/artwork/artwork'
+import { Artwork, ArtworkImage, UserTransaction } from '~/types'
+import { debounce, uuidv4 } from '~/helpers'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
+import LicenseSelector from '~/components/forms/licenseSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
-import { readFileAsDataUrlAsync, debounce } from '~/helpers/helpers'
+import TransactionFormControls from '~/components/forms/transactionFormControls.component.vue'
 
 @Component({
   components: {
     CitySelector,
     ArtworkTypeSelector,
     HashtagSelector,
-    draggable
+    draggable,
+    LicenseSelector,
+    TransactionFormControls
   }
 })
 export default class ArtworkEditForm extends Vue {
   @Prop({ type: Object, required: true }) artwork!: Artwork
-
-  getImageSource = getImageSource
-
+  @Watch('artwork', {
+    deep: true,
+    immediate: true
+  }) async onArtworkChanged(artwork: Artwork) {
+    this.transaction = await this.$artworkService.createArtworkTransaction(
+      artwork
+    )
+  }
+  transaction: Transaction | null = null
   $refs!: {
-    cropImage: HTMLImageElement
+    cropImage: HTMLImageElement,
+    form: Vue & {
+      validate: () => boolean
+      resetValidation: () => void
+    }
   }
   cropMode: boolean = false
-  cropImage?: ArtworkImageFile
+  cropImage?: ArtworkImage
   cropImageIndex?: number
   cropper?: Cropper
+  valid = false
+  dirty = false
+  isUploading: boolean = false
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
-  @Emit('save') save() {}
-  @Emit('cancel') cancel() {}
+  @Emit('save') _save(txId: string) {
+    return txId
+  }
+  @Emit('cancel') onCancel() {}
 
-  @Prop({
-    type: String,
-    required: true
-  }) readonly baseUrl!: string
-
-  @Prop({
-    type: String,
-    required: false
-  }) readonly owner!: string
-
-  get titleRules() {
-    return [(value: string = '') => {
-      if (value.length < 1) {
-        return 'title is required'
+  rules = {
+    required: (value: string = '') => value.length < 1 ? 'Required' : true,
+    minLength: (minLength: number) => (value: string = '') => {
+      if (!value) {
+        return true
+      }
+      return value.length < minLength
+        ? `Minimum 3 characters`
+        : true
+    },
+    maxLength: (maxLength: number) => (value: string = '') => {
+      return value.length > maxLength
+        ? `Maximum ${maxLength} characters`
+        : true
+    },
+    city: (value: string = '') => {
+      if (!value) {
+        return true
       }
 
-      if (value.length > 128) {
-        return 'title must be no more than 128 characters'
+      const validCityCodeRegex = /^[a-zA-Z]{3}$/
+
+      if (!validCityCodeRegex.test(value)) {
+        return 'Must be a valid city code'
       }
 
       return true
-    }]
-  }
-
-  get slugRules() {
-    return [(value: string = '') => {
-      if (value.length < 1) {
-        return 'URL slug is required'
+    },
+    year: (value: string = '') => {
+      if (!value) {
+        return true
       }
 
-      if (value.length > 128) {
-        return 'URL slug must be no more than 128 characters'
+      const year = Number.parseInt(value)
+
+      if (
+        Number.isNaN(year)
+        || year > (new Date()).getFullYear()
+        || year < 1000
+      ) {
+        return 'Must be a valid year'
       }
 
+      return true
+    },
+    slug: (value: string = '') => {
       const validSlugRegex = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
 
       if (!validSlugRegex.test(value)) {
-        return 'URL slug must be a valid slug (lowerchase alphanumerics, hyphen, underscore)'
+        return 'Must be a valid URL slug (lowerchase alphanumerics, hyphen, underscore)'
       }
 
       return true
-    }]
-  }
-
-  get descriptionRules() {
-    return [(value: string = '') => {
-      if (value.length > 1024) {
-        return 'description must be no more than 1024 characters'
-      }
-
-      return true
-    }]
+    }
   }
 
   get isAtMaxImages(): Boolean {
@@ -249,27 +314,19 @@ export default class ArtworkEditForm extends Vue {
   }
 
   get slugBase(): string {
-    return `artby.city/${this.artwork.owner.username}/`
+    const username = this.artwork.creator.address
+
+    return `artby.city/${username}/`
   }
 
-  private async createImagePreview(image: File): Promise<ImageUploadPreview> {
-    const imgData = await readFileAsDataUrlAsync(image)
-    return {
-      ascii: imgData.split(',')[1],
-      type: image.type
-    } as ImageUploadPreview
+  get hasImageValidationErrors(): boolean {
+    return this.dirty && this.artwork.images.length < 1
   }
 
   @debounce
-  async onArtworkImageChanged(index: number, image: File) {
-    this.artwork.images.splice(
-      index,
-      1,
-      await this.createImagePreview(image)
-    )
-
-    if (index === 0) {
-      this.onPreviewImageChanged()
+  async onArtworkImageChanged(index: number, image: File | undefined) {
+    if (image) {
+      await this.processAndSetArtworkImage(image, index)
     }
   }
 
@@ -283,15 +340,9 @@ export default class ArtworkEditForm extends Vue {
   }
 
   @debounce
-  async onAddArtworkImageClicked(image: File) {
-    this.artwork.images.splice(
-      this.artwork.images.length,
-      0,
-      await this.createImagePreview(image)
-    )
-
-    if (this.artwork.images.length === 1) {
-      this.onPreviewImageChanged()
+  async onAddArtworkImageClicked(image: File | undefined) {
+    if (image) {
+      await this.processAndSetArtworkImage(image)
     }
   }
 
@@ -313,17 +364,13 @@ export default class ArtworkEditForm extends Vue {
   @debounce
   onSaveCropSelection() {
     if (this.cropper && typeof this.cropImageIndex !== 'undefined') {
-      let type = 'image/png'
-      const originalImage = this.artwork.images[this.cropImageIndex]
-      if (!isImageFileRef(originalImage)) {
-        type = originalImage.type
-      }
+      const type = 'image/png'
       this.artwork.images.splice(this.cropImageIndex, 1, {
-        type,
-        ascii: this.cropper
+        guid: uuidv4(),
+        imageType: type,
+        dataUrl: this.cropper
           .getCroppedCanvas()
           .toDataURL(type)
-          .replace(/^data:image\/(png|jpg);base64,/, '')
       })
 
       this.cropMode = false
@@ -335,6 +382,87 @@ export default class ArtworkEditForm extends Vue {
   onCancelCropSelection() {
     this.cropMode = false
     this.cropper?.destroy()
+  }
+
+  async onSubmit(transaction: Transaction) {
+    this.dirty = true
+    this.valid = this.$refs.form.validate()
+
+    if (this.hasImageValidationErrors) {
+      this.valid = false
+    }
+
+    if (this.valid) {
+      this.isUploading = true
+
+      const signed = await this.$arweaveService.sign(transaction)
+
+      if (signed) {
+        const tx: UserTransaction = {
+          transaction,
+          type: 'artwork',
+          status: 'PENDING_CONFIRMATION',
+          created: new Date().getTime()
+        }
+
+        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
+          this.isUploading = false
+          if (err) {
+            this.$toastService.error(err.message)
+          } else {
+            return this._save(transaction.id)
+          }
+        })
+      } else {
+        this.isUploading = false
+      }
+    }
+  }
+
+  private async processArtworkImage(image: File): Promise<ArtworkImage> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onerror = async (error) => {
+        reject(error)
+      }
+      reader.onload = async (evt) => {
+        if (!evt.target) {
+          reject('Error reading file')
+          return
+        }
+
+        resolve({
+          guid: uuidv4(),
+          dataUrl: reader.result?.toString() || '',
+          imageType: image.type
+        })
+      }
+      reader.readAsDataURL(image)
+    })
+  }
+
+  private async processAndSetArtworkImage(image: File, index?: number) {
+    const processedImage = await this.processArtworkImage(image)
+
+    if (typeof index === 'undefined') {
+      index = this.artwork.images.length
+      this.artwork.images.push(processedImage)
+    } else {
+      this.artwork.images[index] = processedImage
+    }
+
+    if (index === 0) {
+      await this.suggestMetadataFromFile(image)
+      this.onPreviewImageChanged()
+    }
+  }
+
+  private async suggestMetadataFromFile(image: File) {
+    // Suggested title is filename without extension
+    this.artwork.title = image.name.slice(0, image.name.lastIndexOf('.'))
+    this.artwork.slug = this.artwork.title
+      .toLowerCase()
+      .replace(/[^a-z0-9_\-]/g, '')
   }
 }
 </script>
@@ -367,10 +495,26 @@ export default class ArtworkEditForm extends Vue {
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+.artwork-image-selector-container {
+  width: 100%;
+}
 .artwork-image-selector {
   height: 56px;
   width: 96px;
   margin: 5px;
+}
+.artwork-image-selector.has-error {
+  border: 1px solid red;
+}
+.artwork-image-selector:nth-child(1) {
+  height: 300px;
+  width: 100%;
+  margin-bottom: 25px;
+  flex-basis: fill;
+}
+.break {
+  flex-basis: 100%;
+  height: 0;
 }
 .crop-image {
   display: block;

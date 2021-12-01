@@ -17,7 +17,6 @@
         >
           <ArtworkCard
             :artwork="artwork"
-            :baseUrl="baseUrl"
             :disabled="!isCurrentArtworkCard(i)"
             @click="onArtworkCardClicked(artwork, i)"
           />
@@ -39,8 +38,8 @@ import _ from 'lodash'
 
 import ArtworkExplorerToolbar from './ArtworkExplorerToolbar.component.vue'
 import ArtworkCard from '../ArtworkCard.component.vue'
-import ArtworkOptions from '~/models/artwork/artworkOptions'
-import { debounce, isTouchDevice } from '~/helpers/helpers'
+import { debounce } from '~/helpers'
+import { ArtworkOptions } from '~/types'
 
 @Component({
   components: {
@@ -51,11 +50,6 @@ import { debounce, isTouchDevice } from '~/helpers/helpers'
 export default class ArtworkExplorer extends Vue {
   @PropSync('initial', { type: Array }) artworks!: any[]
   @PropSync('options', { type: Object }) opts!: any
-
-  @Prop({
-    type: String,
-    required: true
-  }) readonly baseUrl!: string
 
   @Prop({
     type: String,

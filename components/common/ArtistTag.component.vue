@@ -13,7 +13,6 @@
         <v-list-item-avatar>
           <UserAvatar
             :user="user"
-            :baseUrl="baseUrl"
             abbr
           />
         </v-list-item-avatar>
@@ -38,11 +37,6 @@ export default class ArtistTag extends Vue {
     type: Object,
     required: true
   }) readonly user!: User
-
-  @Prop({
-    type: String,
-    required: true
-  }) readonly baseUrl!: string
 
   @Prop({
     type: Boolean,

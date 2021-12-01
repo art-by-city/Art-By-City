@@ -13,7 +13,7 @@
           >
             <v-fade-transition>
               <v-overlay v-if="!disabled && props.hover" absolute class="artwork-overlay">
-                <v-row align="end" class="fill-height pa-1">
+                <v-row align="end" class="fill-height pa-1 pl-4">
                   <v-col
                     cols="auto"
                     class="
@@ -25,9 +25,13 @@
                       v-if="disabled"
                       class="artwork-card-disable-overlay"
                     ></div>
-                    <LikeButton :dark="true" :artwork="artwork" />
-                    <a class="artwork-card-title white--text text-lowercase">
+                    <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
+                    <a class="artwork-card-title white--text">
                       {{ artwork.title }}
+                    </a>
+                    <br />
+                    <a class="artwork-card-title white--text font-italic font-weight-thin">
+                      {{ artwork.creator.address }}
                     </a>
                   </v-col>
                 </v-row>
@@ -44,10 +48,8 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
-import Artwork, {
-  isImageFileRef,
-  isImageUploadPreview
-} from '~/models/artwork/artwork'
+import { Artwork } from '~/types'
+import { debounce } from '~/helpers'
 
 @Component({
   components: {
@@ -63,25 +65,24 @@ export default class ArtworkCard extends Vue {
   @Prop()
   disabled?: boolean
 
-  @Prop({
-    type: String,
-    required: true
-  }) readonly baseUrl!: string
-
+  @debounce
   @Emit('click') onArtworkCardClicked() {
-    return this.artwork
+    if (this.artwork) {
+      if (this.artwork.slug) {
+        this.$router.push(
+          `/${this.artwork.creator.address}/${this.artwork.slug}`
+        )
+      } else {
+        this.$router.push(`/${this.artwork.creator.address}/${this.artwork.id}`)
+      }
+    }
   }
 
   get src() {
-    if (this.artwork) {
+    if (this.artwork && this.artwork.images.length > 0) {
       const image = this.artwork.images[0]
-      if (isImageFileRef(image)) {
-        return `${this.baseUrl}/artwork-images/${image.source}`
-      }
 
-      if (isImageUploadPreview(image)) {
-        return `data:${image.type};base64, ${image.ascii}`
-      }
+      return image.dataUrl
     }
 
     return ''

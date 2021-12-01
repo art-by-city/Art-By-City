@@ -1,77 +1,66 @@
 <template>
   <div class="user-profile-page">
-    <v-container v-if="profile" fluid>
+    <v-container fluid>
       <v-row align="end">
         <v-col
           cols="1" offset="3"
             sm="2" offset-sm="3"
         >
-          <UserAvatar
-            class="user-profile-avatar"
-            :user="profile.user"
-            :baseUrl="$config.imgBaseUrl"
-            :editable="$auth.user.id === profile.user.id"
-            :size="$vuetify.breakpoint.name"
-            @onChange="onUserAvatarChanged"
-          />
+          <UserAvatar class="user-profile-avatar" :user="artist" />
         </v-col>
         <v-col
           cols="6" offset="2"
             sm="4" offset-sm="1"
         >
-          <v-hover>
-            <template v-slot:default="props">
-              <div class="user-profile-info">
-                <div class="
-                  user-profile-username
-                  text-lowercase
-                  font-weight-black
-                  text-body-1
-                  text-sm-h2
-                ">
-                  {{ profile.user.username }}
-                </div>
-                <div class="text-caption text-lowercase">
-                  <span v-if="!editMode">{{ profile.user.name }}</span>
-                  <v-text-field
-                    v-if="editMode"
-                    v-model="profile.user.name"
-                    type="text"
-                    name="name"
-                    label="Name"
-                    class="text-lowercase"
-                    autocomplete="off"
-                    aria-autocomplete="off"
-                  ></v-text-field>
-                </div>
-                <div class="text-caption text-lowercase">
-                  {{ profile.user.city }}
-                </div>
-                <div class="profile-edit-controls">
-                  <v-btn
-                    v-if="editMode || (props.hover && $auth.user.id === profile.user.id)"
-                    icon
-                    @click="toggleEditMode"
-                  >
-                    <v-icon>
-                      {{
-                        editMode
-                          ? 'mdi-content-save'
-                          : 'mdi-square-edit-outline'
-                      }}
-                    </v-icon>
-                  </v-btn>
-                  <v-btn
-                    v-if="editMode"
-                    icon
-                    @click="toggleEditMode(false)"
-                  >
-                    <v-icon>mdi-cancel</v-icon>
-                  </v-btn>
-                </div>
-              </div>
-            </template>
-          </v-hover>
+          <v-card elevation="0">
+            <v-card-title>
+              <!-- TODO: Username -->
+              {{ artist.address }}
+            </v-card-title>
+            <v-card-subtitle>
+              <!-- TODO: address here if username -->
+            </v-card-subtitle>
+            <v-card-text>
+              <v-btn
+                v-if="likesCount > 0"
+                text
+                :to="`${this.artist.address}/likes`"
+              >
+                Liked Art: {{ likesCount }}
+              </v-btn>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+                <v-btn
+                  v-if="isOwner"
+                  text
+                  outlined
+                  @click="onEditProfileClicked"
+                >
+                  Edit
+                </v-btn>
+                <template v-else>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span
+                        v-on="on"
+                        v-bind="attrs"
+                        class="cursor--not-allowed"
+                      >
+                        <v-btn
+                          text
+                          outlined
+                          disabled
+                        >
+                          Follow
+                        </v-btn>
+                      </span>
+                    </template>
+                    Coming soon!
+                  </v-tooltip>
+                </template>
+            </v-card-actions>
+          </v-card>
         </v-col>
       </v-row>
       <v-row>
@@ -84,91 +73,90 @@
           cols="12"
             sm="6"  offset-sm="3"
         >
-          <v-row>
-            <v-col
-              v-for="(artwork, i) in profile.artworks"
-              :key="i"
-              cols="4"
-            >
-              <v-lazy transition="fade-transition">
-                <ArtworkCard
-                  :artwork="artwork"
-                  :baseUrl="$config.imgBaseUrl"
-                  @click="onArtworkCardClicked(artwork)"
-                />
-              </v-lazy>
-            </v-col>
-          </v-row>
+          <ArtistFeed :address="artist.address" />
         </v-col>
       </v-row>
     </v-container>
+
+    <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
   </div>
 </template>
 
 <script lang="ts">
-import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
+import { User } from '~/models'
+import { Avatar, SetUserTransactionStatusPayload } from '~/types'
+import { debounce } from '~/helpers'
+import ProgressService from '~/services/progress/service'
 import PageComponent from '~/components/pages/page.component'
-import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import { debounce } from '~/helpers/helpers'
+import AvatarUploadDialog from
+  '~/components/avatar/AvatarUploadDialog.component.vue'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 
 @Component({
   components: {
-    ArtworkCard
+    AvatarUploadDialog,
+    ArtistFeed
   }
 })
 export default class UserProfilePage extends PageComponent {
-  profile: any | null
-  modalArtwork: any | null = null
-  editMode = false
+  artist: User = { address: this.$route.params.username }
+  showAvatarUploadDialog: boolean = false
+  likesCount: number = 0
 
-  async asyncData({ $axios, params, app, error }: Context) {
-    let profile
+  get isOwner(): boolean {
+    return this.$auth.user && this.artist.address === this.$auth.user.address
+  }
+
+  async fetch() {
+    ProgressService.start()
     try {
-      const { payload } = await $axios.$get(`/api/user/${params.username}/profile`)
-
-      profile = payload
-    } catch (err) {
-      if (err.response?.status === 404) {
-        return error({ statusCode: 404, message: 'user profile not found' })
-      } else {
-        app.$toastService.error('error fetching user profile')
-      }
-    } finally {
-      return { profile }
-    }
-  }
-
-  @debounce
-  async toggleEditMode(save: boolean = true) {
-    let success = true
-
-    if (this.editMode && save) {
-      success = await this.$profileService.updateProfile(this.profile.user)
-    }
-
-    if (success) {
-      this.editMode = !this.editMode
-    }
-  }
-
-  @debounce
-  onArtworkCardClicked(artwork: any) {
-    const idOrSlug = artwork.slug || artwork.id
-    this.$router.push(`/${this.profile.user.username}/${idOrSlug}`)
-  }
-
-  @debounce
-  async onUserAvatarChanged(image: File) {
-    const avatar = await this.$profileService.uploadUserAvatar(image)
-    if (avatar) {
-      this.profile = Object.assign(
-        {},
-        this.profile,
-        { user: { ...this.profile.user, avatar } }
+      const avatar = await this.$avatarService.fetchAvatar(
+        this.artist.address
       )
+
+      if (avatar) {
+        this.setAvatar(avatar)
+      }
+
+      this.likesCount = await this.$likesService.fetchTotalLikedByUser(
+        this.artist.address
+      )
+    } catch (error) {
+      console.error(error)
+      this.$toastService.error(error)
+    } finally {
+      ProgressService.stop()
     }
+  }
+
+  created() {
+    if (this.$auth.loggedIn && this.artist.address === this.$auth.user.address) {
+      this.$store.subscribe(async (mutation) => {
+        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+          const payload = mutation.payload as SetUserTransactionStatusPayload
+          if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {
+            const avatar = await this.$avatarService.fetchAvatar(
+              this.$auth.user.address
+            )
+            if (avatar) {
+              this.setAvatar(avatar)
+            }
+          }
+        }
+      })
+    }
+  }
+
+  @debounce
+  onEditProfileClicked() {
+    this.showAvatarUploadDialog = true
+  }
+
+  setAvatar(avatar: Avatar) {
+    this.artist = Object.assign({}, this.artist, { avatar })
   }
 }
 </script>
