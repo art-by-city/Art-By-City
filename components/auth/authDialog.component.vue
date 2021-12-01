@@ -46,6 +46,35 @@
         </v-row>
       </v-container>
     </template>
+    <template v-if="content === 'alpha-agreement'">
+      <v-container fluid class="pa-1">
+        <v-row dense>
+          <v-card tile width="100%">
+            <v-card-title class="text-h2">
+              <strong>Art By City - Alpha</strong>
+            </v-card-title>
+            <v-card-text>
+              <strong>Art By City</strong>
+              is currently in <strong>Alpha Testing</strong>.<br />
+
+              By using <strong>Art By City</strong> you acknowledge that you may
+              experience bugs, so please bear with us as we work to build
+              <strong>The Artist's Permaweb</strong>.  Please feel free to help
+              us test the app, and provide us with feedback!
+              <br />
+              <br />
+              <v-btn
+                color="green"
+                @click="close"
+                elevation="2"
+                outlined
+                class="mx-auto"
+              >I understand</v-btn>
+            </v-card-text>
+          </v-card>
+        </v-row>
+      </v-container>
+    </template>
   </v-dialog>
 </template>
 

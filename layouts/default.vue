@@ -99,6 +99,7 @@ export default class DefaultLayout extends Vue {
     try {
       await this.$auth.loginWith('arweave-wallet')
       this.$nuxt.$emit('auth-completed')
+      this.showAuthDialog = 'alpha-agreement'
     } catch (error) {
       if (error instanceof ArweaveWalletNotInstalledError) {
         this.showAuthDialog = 'get-wallet'
