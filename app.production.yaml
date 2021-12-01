@@ -1,6 +1,6 @@
 runtime: nodejs14
 
-instance_class: F2
+instance_class: F4_1G
 
 handlers:
   - url: /_nuxt
@@ -21,6 +21,12 @@ env_variables:
   BASE_URL: https://artby.city
   GCP_PROJECT_ID: clean-linker-273919
   USER_UPLOAD_BUCKET_NAME: art-by-city-user-uploads
+  APP_NAME: ArtByCity
+  APP_VERSION: 0.0.1-alpha
+  ARWEAVE_PROTOCOL: https
+  ARWEAVE_HOST: arweave.net
+  ARWEAVE_PORT: 443
+  ARTIST_PREREGISTRATION_URL: https://us-central1-clean-linker-273919.cloudfunctions.net/artist-preregistration
 
 includes:
   - secrets.yaml
