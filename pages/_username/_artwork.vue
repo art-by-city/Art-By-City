@@ -39,14 +39,14 @@
         </v-col>
       </v-row>
       <v-row dense>
-        <v-col offset="1" offset-sm="2" cols="6" sm="5">
+        <v-col offset-sm="2" cols="12" sm="5">
           <v-row dense>
             <span class="text-h4 text-sm-h2">{{ artwork.title }}</span>
           </v-row>
           <v-row dense>
             <strong>Created by</strong>
             &nbsp;
-            <nuxt-link :to="`/${artwork.creator.address}`">
+            <nuxt-link :to="`/${artwork.creator.address}`" class="text-truncate">
               {{ artwork.creator.address }}
             </nuxt-link>
           </v-row>
@@ -75,7 +75,7 @@
           <v-row dense>
             <strong>Transaction ID</strong>
             &nbsp;
-            <span>{{ artwork.id }}</span>
+            <span class="text-truncate">{{ artwork.id }}</span>
             &nbsp;
             <a
               :href="`https://viewblock.io/arweave/tx/${artwork.id}`"
@@ -112,7 +112,7 @@
           </v-row>
         </v-col>
         <v-col cols="5">
-          <div style="align-self: flex-end">
+          <div v-if="$auth.loggedIn" style="align-self: flex-end">
             <LikeButton
               :entityOwner="artwork.creator.address"
               :entityTxId="artwork.id"
