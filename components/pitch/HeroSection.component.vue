@@ -94,14 +94,14 @@ export default class HeroSection extends Vue {
     },
     {
       artist: 'Christian M',
-      title: 'Pablo',
-      year: 2020,
+      title: 'White Night',
+      year: 2014,
       src: 'gallery-images/christian_m-1.jpg'
     },
     {
       artist: 'Christian M',
-      title: 'Trippy Rainbow House',
-      year: 2020,
+      title: 'Candy Flip',
+      year: 2014,
       src: 'gallery-images/christian_m-2.jpg'
     },
     {
@@ -124,7 +124,7 @@ export default class HeroSection extends Vue {
     },
     {
       artist: 'JP Hackett',
-      title: 'Teeth',
+      title: 'Lips with Teeth',
       year: 2020,
       src: 'gallery-images/jp-4.jpg'
     },
@@ -185,9 +185,9 @@ export default class HeroSection extends Vue {
 .hero-splash >>> .hero-splash-content {
   background-color: rgba(0, 0, 0, 0.333);
 }
-/* .hero-splash >>> .v-image__image.v-image__image--cover {
+.hero-splash >>> .v-image__image.v-image__image--cover {
   animation: slowlyzoom 60s linear infinite;
-} */
+}
 @-moz-keyframes slowlyzoom {
   50%  { -moz-transform: scale(1.1) }
   100% { -moz-transform: scale(1)   }
