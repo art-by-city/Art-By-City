@@ -140,18 +140,18 @@ export default class HeroSection extends Vue {
       year: 2020,
       src: 'gallery-images/jp-6.jpg'
     },
-    {
-      artist: 'Higgs Boson',
-      title: 'Decoherence',
-      year: 2018,
-      src: 'gallery-images/Decoherence_1.JPG'
-    },
-    {
-      artist: 'Higgs Boson',
-      title: 'Rhizome',
-      year: 2013,
-      src: 'gallery-images/Rhizome_1.JPG'
-    }
+    // {
+    //   artist: 'Higgs Boson',
+    //   title: 'Decoherence',
+    //   year: 2018,
+    //   src: 'gallery-images/Decoherence_1.JPG'
+    // },
+    // {
+    //   artist: 'Higgs Boson',
+    //   title: 'Rhizome',
+    //   year: 2013,
+    //   src: 'gallery-images/Rhizome_1.JPG'
+    // }
   ]
 
   currentImageIndex: number = 0
