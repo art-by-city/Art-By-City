@@ -15,7 +15,7 @@ build_staging:
   variables:
     NODE_ENV: staging
   before_script:
-    - apk add --update --no-cache --virtual .gyp python2 make g++ coreutils curl
+    - apk add --no-cache --virtual .gyp python2 make g++ coreutils curl
   script:
   - npm install --production --progress=false
   - npm run build
