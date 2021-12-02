@@ -140,18 +140,18 @@ export default class HeroSection extends Vue {
       year: 2020,
       src: 'gallery-images/jp-6.jpg'
     },
-    {
-      artist: 'Higgs Boson',
-      title: 'Decoherence',
-      year: 2018,
-      src: 'gallery-images/Decoherence_1.JPG'
-    },
-    {
-      artist: 'Higgs Boson',
-      title: 'Rhizome',
-      year: 2013,
-      src: 'gallery-images/Rhizome_1.JPG'
-    }
+    // {
+    //   artist: 'Higgs Boson',
+    //   title: 'Decoherence',
+    //   year: 2018,
+    //   src: 'gallery-images/Decoherence_1.JPG'
+    // },
+    // {
+    //   artist: 'Higgs Boson',
+    //   title: 'Rhizome',
+    //   year: 2013,
+    //   src: 'gallery-images/Rhizome_1.JPG'
+    // }
   ]
 
   currentImageIndex: number = 0
@@ -185,9 +185,9 @@ export default class HeroSection extends Vue {
 .hero-splash >>> .hero-splash-content {
   background-color: rgba(0, 0, 0, 0.333);
 }
-.hero-splash >>> .v-image__image.v-image__image--cover {
+/* .hero-splash >>> .v-image__image.v-image__image--cover {
   animation: slowlyzoom 60s linear infinite;
-}
+} */
 @-moz-keyframes slowlyzoom {
   50%  { -moz-transform: scale(1.1) }
   100% { -moz-transform: scale(1)   }

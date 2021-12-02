@@ -1,11 +1,11 @@
 <template>
   <v-app-bar
-    :clipped-left="true"
     fixed
     app
     dense
     flat
     dark
+    max-width="100%"
     class="app-bar"
   >
     <v-btn class="app-logo" text color="white" plain to="/">

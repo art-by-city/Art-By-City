@@ -8,10 +8,10 @@
     <section id="yourArtForever">
       <v-container fluid>
         <v-row dense justify="center">
-          <v-col cols="auto">
+          <v-col cols="12" sm="auto">
             <p class="text-h2">
               your art
-              <span class="font-weight-black text-uppercase text-h1">
+              <span class="font-weight-black text-uppercase text-h2 text-sm-h1">
                 forever
               </span>
             </p>
@@ -23,12 +23,12 @@
     <section id="permanentStorage" class="mx-auto my-16">
       <v-container fluid>
         <v-row>
-          <v-col cols="4" offset="2">
+          <v-col cols="12" sm="4" offset-sm="2">
             <span class="text-h2 font-weight-bold">
               Welcome to the Artist's Permaweb
             </span>
           </v-col>
-          <v-col cols="4" align-self="center">
+          <v-col cols="12" sm="4" align-self="center">
             <!-- <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
               fermentum neque et sodales rutrum. Mauris lobortis aliquet
@@ -51,12 +51,12 @@
     <section id="monetization" class="mx-auto my-16">
       <v-container fluid>
         <v-row>
-          <v-col cols="4" offset="2">
-            <span class="text-h2 font-weight-bold">
+          <v-col cols="12" sm="4" offset-sm="2">
+            <span class="text-h3 text-sm-h2 font-weight-bold">
               Turn-key Monetization
             </span>
           </v-col>
-          <v-col cols="4" align-self="center">
+          <v-col cols="12" sm="4" align-self="center">
             <!-- <p>
               Quisque gravida, tortor nec ullamcorper fringilla, urna enim
               suscipit magna, sed fringilla magna ipsum nec erat. Phasellus
@@ -80,12 +80,12 @@
     <section id="verification" class="mx-auto my-16">
       <v-container fluid>
         <v-row>
-          <v-col cols="4" offset="2">
+          <v-col cols="12" sm="4" offset-sm="2">
             <span class="text-h2 font-weight-bold">
               Verified Art &amp; Artists
             </span>
           </v-col>
-          <v-col cols="4" align-self="center">
+          <v-col cols="12" sm="4" align-self="center">
             <!-- <p>
               Integer eget urna odio. Proin blandit elit ante, a aliquam lorem
               porta et. Vivamus posuere cursus mi ac semper. Vestibulum eu
