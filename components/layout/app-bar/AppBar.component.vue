@@ -14,9 +14,10 @@
 
     <v-spacer></v-spacer>
 
-    <v-btn text to="/discover">discover</v-btn>
-
-    <v-divider vertical class="white-divider" />
+    <template v-if="!$auth.loggedIn">
+      <v-btn text to="/discover">discover</v-btn>
+      <v-divider vertical class="white-divider" />
+    </template>
 
     <template v-if="$auth.loggedIn">
       <v-btn text to="/publish">publish</v-btn>
