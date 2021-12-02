@@ -185,9 +185,9 @@ export default class HeroSection extends Vue {
 .hero-splash >>> .hero-splash-content {
   background-color: rgba(0, 0, 0, 0.333);
 }
-.hero-splash >>> .v-image__image.v-image__image--cover {
+/* .hero-splash >>> .v-image__image.v-image__image--cover {
   animation: slowlyzoom 60s linear infinite;
-}
+} */
 @-moz-keyframes slowlyzoom {
   50%  { -moz-transform: scale(1.1) }
   100% { -moz-transform: scale(1)   }
