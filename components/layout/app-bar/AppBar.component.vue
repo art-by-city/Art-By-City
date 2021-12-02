@@ -14,6 +14,10 @@
 
     <v-spacer></v-spacer>
 
+    <v-btn text to="/discover">discover</v-btn>
+
+    <v-divider vertical class="white-divider" />
+
     <template v-if="$auth.loggedIn">
       <v-btn text to="/publish">publish</v-btn>
       <v-divider vertical class="mx-4 white-divider" />
@@ -22,9 +26,9 @@
       <TransactionsMenu />
     </template>
     <template v-else>
-      <v-btn text @click="onLoginClicked">log in</v-btn>
+      <v-btn v-if="!isMobile" text @click="onLoginClicked">log in</v-btn>
       <v-divider vertical class="white-divider" />
-      <v-btn text @click="onSignUpClicked">sign up</v-btn>
+      <v-btn class="pr-0" text @click="onSignUpClicked">sign up</v-btn>
     </template>
   </v-app-bar>
 </template>
@@ -50,6 +54,17 @@ export default class AppBar extends Vue {
     type: Object,
     required: true
   }) readonly config!: ConfigStoreState
+
+  get isMobile() {
+    switch (this.$vuetify.breakpoint.name) {
+      case 'xs':
+      case 'sm':
+      case 'md': return true
+      case 'lg':
+      case 'xl':
+        default: return false
+    }
+  }
 
   @debounce
   @Emit('login') onLoginClicked() {}
