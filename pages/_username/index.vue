@@ -3,7 +3,7 @@
     <v-container fluid>
       <v-row align="end">
         <v-col
-          cols="1" offset="3"
+          cols="2" offset="2"
             sm="2" offset-sm="3"
         >
           <UserAvatar class="user-profile-avatar" :user="artist" />
