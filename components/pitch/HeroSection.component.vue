@@ -155,20 +155,27 @@ export default class HeroSection extends Vue {
       src: 'gallery-images/jp-6.jpg',
       link: '/zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc/ink-2'
     },
-    // {
-    //   artist: 'Higgs Boson',
-    //   title: 'Decoherence',
-    //   year: 2018,
-    //   src: 'gallery-images/Decoherence_1.JPG',
-    //   link: '/1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE/decoherence'
-    // },
-    // {
-    //   artist: 'Higgs Boson',
-    //   title: 'Rhizome',
-    //   year: 2013,
-    //   src: 'gallery-images/Rhizome_1.JPG',
-    //   link: '/1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE/rhizome'
-    // }
+    {
+      artist: 'Higgs Boson',
+      title: 'Decoherence #1',
+      year: 2018,
+      src: 'gallery-images/Decoherence_1_scaled.JPG',
+      link: '/1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE/decoherence'
+    },
+    {
+      artist: 'Higgs Boson',
+      title: 'Rhizome #1',
+      year: 2013,
+      src: 'gallery-images/Rhizome_1_scaled.JPG',
+      link: '/1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE/rhizome'
+    },
+    {
+      artist: 'Higgs Boson',
+      title: 'Rhizome #4',
+      year: 2013,
+      src: 'gallery-images/Rhizome_4_scaled.JPG',
+      link: '/1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE/rhizome'
+    }
   ]
 
   currentImageIndex: number = 0
