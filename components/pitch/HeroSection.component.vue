@@ -159,21 +159,21 @@ export default class HeroSection extends Vue {
       artist: 'Higgs Boson',
       title: 'Decoherence #1',
       year: 2018,
-      src: 'gallery-images/Decoherence_1_scaled.JPG',
+      src: 'gallery-images/Decoherence_1_scaled.jpg',
       link: '/1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE/decoherence'
     },
     {
       artist: 'Higgs Boson',
       title: 'Rhizome #1',
       year: 2013,
-      src: 'gallery-images/Rhizome_1_scaled.JPG',
+      src: 'gallery-images/Rhizome_1_scaled.jpg',
       link: '/1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE/rhizome'
     },
     {
       artist: 'Higgs Boson',
       title: 'Rhizome #4',
       year: 2013,
-      src: 'gallery-images/Rhizome_4_scaled.JPG',
+      src: 'gallery-images/Rhizome_4_scaled.jpg',
       link: '/1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE/rhizome'
     }
   ]
