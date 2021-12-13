@@ -191,7 +191,7 @@ export default class ImageFileInput extends Vue {
       index = this.value.length
       this.value.push(processedImage)
     } else {
-      this.value[index] = processedImage
+      Vue.set(this.value, index, processedImage)
     }
 
     if (index === 0) {
