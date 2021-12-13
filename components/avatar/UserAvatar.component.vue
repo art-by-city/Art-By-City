@@ -1,20 +1,11 @@
 <template>
   <div class="user-avatar">
-    <v-avatar :color="bgColor" :size="_size">
-      <template v-if="user.avatar">
-        <nuxt-link :to="`/${fullUsername}`">
-          <v-img :src="user.avatar.src"></v-img>
-        </nuxt-link>
-      </template>
-      <template v-else>
-        <nuxt-link
-          class="white--text avatar-username"
-          :to="`/${fullUsername}`"
-        >
-          {{ username }}
-        </nuxt-link>
-      </template>
+    <v-avatar color="transparent" :size="size">
+      <nuxt-link :to="`/${username}`">
+        <v-img :src="src"></v-img>
+      </nuxt-link>
     </v-avatar>
+
     <v-tooltip bottom v-if="dense">
       <template v-slot:activator="{ on, attrs }">
         <span
@@ -24,21 +15,22 @@
           style="display: inline-flex;"
         >
           <nuxt-link
-            :class="`${textColor}--text text-truncate`"
+            :class="`${dark ? 'white' : 'black'}--text text-truncate`"
             :style="`max-width: ${usernameWidth}`"
-            :to="`/${fullUsername}`"
+            :to="`/${username}`"
           >
-            {{ fullUsername }}
+            {{ username }}
           </nuxt-link>
         </span>
       </template>
-      {{ fullUsername }}
+      {{ username }}
     </v-tooltip>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
+import MD5 from 'crypto-js/md5'
 
 import User from '~/models/user/user'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
@@ -52,28 +44,10 @@ export default class UserAvatar extends Vue {
   }) readonly user!: User
 
   @Prop({
-    type: String,
-    required: false,
-    default: 'indigo'
-  }) readonly color!: string
-
-  @Prop({
     type: Boolean,
     required: false,
     default: false
   }) readonly dense: boolean | undefined
-
-  @Prop({
-    type: Boolean,
-    required: false,
-    default: false
-  }) readonly abbr: boolean | undefined
-
-  @Prop({
-    type: Boolean,
-    required: false,
-    default: false
-  }) readonly showUsername: boolean | undefined
 
   @Prop({
     type: Boolean,
@@ -87,33 +61,22 @@ export default class UserAvatar extends Vue {
     default: '100%'
   }) readonly usernameWidth!: string
 
-  get textColor() {
-    if (this.dark) {
-      return 'white'
+  get src() {
+    if (this.user.avatar) {
+      return this.user.avatar.src
     }
 
-    return 'black'
-  }
+    const gravatarBase = 'https://www.gravatar.com/avatar'
+    const userAddrHash = MD5(this.user.address.toLowerCase())
 
-  get bgColor() {
-    if (this.user?.avatar?.src) {
-      return 'transparent'
-    }
-
-    return this.color
+    return `${gravatarBase}/${userAddrHash}?f=y&d=identicon&s=${this.size}`
   }
 
   get username() {
-    return this.abbr
-      ? this.user.address[0]
-      : this.user.address
-  }
-
-  get fullUsername() {
     return this.user.address
   }
 
-  get _size() {
+  get size() {
     if (this.dense) {
       return 32
     }
@@ -161,9 +124,5 @@ export default class UserAvatar extends Vue {
   margin-left: 0px;
   margin-top: 0px;
   margin-bottom: 0px;
-}
-.avatar-username {
-  word-break: break-word;
-  text-decoration: none;
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="liked-by-list">
     <template v-for="(user, i) in users">
       <v-divider v-if="i > 0"></v-divider>
-      <UserAvatar :key="i" abbr dense :user="user" usernameWidth="298px" />
+      <UserAvatar :key="i" dense :user="user" usernameWidth="298px" />
     </template>
   </div>
 </template>
