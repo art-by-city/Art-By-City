@@ -1,8 +1,12 @@
 <template>
   <v-container class="feed">
-    <v-row v-for="(post, i) in feed" :key="post.guid" justify="center">
+    <v-row
+      v-for="(item, i) in feed"
+      :key="item.guid"
+      justify="center"
+    >
       <v-col cols="6">
-        <ArtworkCard :artwork="post.artwork" />
+        <ArtworkCard :txId="item.txId" />
       </v-col>
     </v-row>
   </v-container>

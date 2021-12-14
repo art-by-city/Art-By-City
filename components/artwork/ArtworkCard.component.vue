@@ -1,46 +1,80 @@
 <template>
   <div class="artwork-card">
-    <div v-if="artwork">
-      <v-hover :disabled="disabled">
-        <template v-slot:default="props">
-          <v-img
-            v-if="artwork"
-            :src="src"
-            style="cursor: pointer"
-            aspect-ratio="1"
-            class="elevation-2"
-            @click="onArtworkCardClicked"
-          >
-            <v-fade-transition>
-              <v-overlay v-if="!disabled && props.hover" absolute class="artwork-overlay">
-                <v-row align="end" class="fill-height pa-1 pl-4">
-                  <v-col
-                    cols="auto"
+    <v-hover :disabled="disabled">
+      <template v-slot:default="props">
+        <v-img
+          :src="src"
+          style="cursor: pointer"
+          aspect-ratio="1"
+          class="elevation-2"
+          @click="onArtworkCardClicked"
+        >
+          <template v-slot:placeholder>
+            <v-row
+              class="fill-height ma-0"
+              align="center"
+              align-content="center"
+              justify="center"
+            >
+              <v-col
+                cols="12"
+                class="font-weight-md-thin scale-text text-center"
+              >
+                {{ txId }}
+              </v-col>
+
+              <v-col cols="12">
+                <v-progress-linear
+                  indeterminate
+                  color="black"
+                  background-color="transparent"
+                  height="1"
+                  bottom
+                ></v-progress-linear>
+              </v-col>
+            </v-row>
+          </template>
+
+          <v-fade-transition>
+            <v-overlay
+              v-if="!disabled && props.hover"
+              absolute
+              class="artwork-overlay"
+            >
+              <v-row align="end" class="fill-height pa-1 pl-4">
+                <v-col
+                  cols="auto"
+                  class="
+                    artwork-overlay-title-container
+                    disable-text-highlighting
+                  "
+                >
+                  <div
+                    v-if="disabled"
+                    class="artwork-card-disable-overlay"
+                  ></div>
+                  <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
+                  <a class="artwork-card-title white--text">
+                    {{ artwork ? artwork.title : '' }}
+                  </a>
+                  <br />
+                  <a
                     class="
-                      artwork-overlay-title-container
-                      disable-text-highlighting
+                      artwork-card-title
+                      white--text
+                      font-italic
+                      font-weight-thin
                     "
                   >
-                    <div
-                      v-if="disabled"
-                      class="artwork-card-disable-overlay"
-                    ></div>
-                    <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
-                    <a class="artwork-card-title white--text">
-                      {{ artwork.title }}
-                    </a>
-                    <br />
-                    <a class="artwork-card-title white--text font-italic font-weight-thin">
-                      {{ artwork.creator.address }}
-                    </a>
-                  </v-col>
-                </v-row>
-              </v-overlay>
-            </v-fade-transition>
-          </v-img>
-        </template>
-      </v-hover>
-    </div>
+                    {{ artwork ? artwork.creator.address : '' }}
+                  </a>
+                </v-col>
+              </v-row>
+            </v-overlay>
+          </v-fade-transition>
+        </v-img>
+      </template>
+    </v-hover>
   </div>
 </template>
 
@@ -58,9 +92,9 @@ import { debounce } from '~/helpers'
 })
 export default class ArtworkCard extends Vue {
   @Prop({
-    default: null
+    required: true
   })
-  artwork!: Artwork | null
+  txId!: string
 
   @Prop()
   disabled?: boolean
@@ -78,14 +112,19 @@ export default class ArtworkCard extends Vue {
     }
   }
 
+  artwork: Artwork | null = null
+
   get src() {
     if (this.artwork && this.artwork.images.length > 0) {
-      const image = this.artwork.images[0]
-
-      return image.dataUrl
+      return this.artwork.images[0].dataUrl
     }
 
     return ''
+  }
+
+  fetchOnServer = false
+  async fetch() {
+    this.artwork = await this.$artworkService.fetch(this.txId)
   }
 }
 </script>
@@ -108,5 +147,10 @@ export default class ArtworkCard extends Vue {
   top: 0;
   left: 0;
   z-index: 8990;
+}
+
+.scale-text {
+  font-size: 2.75vmin;
+  word-break: break-all;
 }
 </style>
