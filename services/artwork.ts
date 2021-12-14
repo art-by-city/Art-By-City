@@ -91,8 +91,6 @@ export default class ArtworkService extends TransactionService {
   }
 
   async fetchFeed(creator?: string | string[]): Promise<FeedItem[]> {
-    const items: FeedItem[] = []
-
     if (!creator) {
       switch (this.config.name) {
         case 'ArtByCity':
@@ -133,62 +131,39 @@ export default class ArtworkService extends TransactionService {
       }
     }
 
-    const txs = await this.transactionFactory
-      .searchTransactions('artwork', creator)
+    const txs = await this.transactionFactory.searchTransactions(
+      'artwork',
+      creator
+    )
 
-    for (const ardbTx of txs) {
-      const txId = ardbTx.id
-      try {
-        const txDataString = await this.$arweave.transactions.getData(txId, {
-          decode: true,
-          string: true
-        }) as string
-
-        const txData = JSON.parse(txDataString)
-        txData.id = txId
-
-        const artwork = new ArtworkFactory().create(txData)
-
-        items.push({ guid: uuidv4(), artwork })
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    return items
+    return this.buildFeed(txs.map(tx => tx.id))
   }
 
   async fetchLikedArtworkFeed(address: string): Promise<FeedItem[]> {
     const items: FeedItem[] = []
     const likeTxs = await this.$likesService.fetchUserLikes(address)
 
-    for (const likeTx of likeTxs) {
+    const likedEntityTxIds = likeTxs.map(tx => {
       try {
-        const tags: { name: string, value: string }[] = (likeTx as any)._tags
+        const tags: { name: string, value: string }[] = (tx as any)._tags
         const likedEntityTag = tags.find((tag) => tag.name === LIKED_ENTITY_TAG)
 
         if (likedEntityTag) {
-          const entityTxId = likedEntityTag.value
-          const txDataString = await this.$arweave.transactions.getData(
-            likedEntityTag.value,
-            {
-              decode: true,
-              string: true
-            }
-          ) as string
-
-          const txData = JSON.parse(txDataString)
-          txData.id = entityTxId
-
-          const artwork = new ArtworkFactory().create(txData)
-
-          items.push({ guid: uuidv4(), artwork })
+          return likedEntityTag.value
         }
-      } catch (error) {
-        console.error(error)
-      }
-    }
 
-    return items
+        return ''
+      } catch (err) {
+        return ''
+      }
+    }).filter(txId => !!txId)
+
+    return this.buildFeed(likedEntityTxIds)
+  }
+
+  private buildFeed(txIds: string[]): FeedItem[] {
+    return txIds.map(txId => {
+      return { guid: uuidv4(), txId, category: 'artwork' }
+    })
   }
 }

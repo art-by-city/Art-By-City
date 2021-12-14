@@ -2,12 +2,12 @@
   <div class="likes-feed">
     <v-row>
       <v-col
-        v-for="(post, i) in feed"
-        :key="post.guid"
+        v-for="(item, i) in feed"
+        :key="item.guid"
         cols="4"
       >
         <v-lazy transition="fade-transition">
-          <ArtworkCard :artwork="post.artwork" />
+          <ArtworkCard :txId="item.txId" />
         </v-lazy>
       </v-col>
     </v-row>

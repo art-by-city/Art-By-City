@@ -64,15 +64,13 @@ export default class LikesService extends TransactionService {
   }
 
   async fetchUserLikes(likedBy: string): Promise<ArdbTransaction[]> {
-    const txs = await this.transactionFactory.searchTransactions(
+    return await this.transactionFactory.searchTransactions(
       'like',
       likedBy,
       {
         sort: 'HEIGHT_DESC'
       }
     )
-
-    return txs
   }
 
   async fetchTotalLikedByUser(likedBy: string): Promise<number> {

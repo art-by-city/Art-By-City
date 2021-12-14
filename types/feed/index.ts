@@ -1,5 +1,6 @@
-import { Artwork, TrackableEntity } from '..'
+import { DomainEntityCategory, TrackableEntity } from '../'
 
 export interface FeedItem extends TrackableEntity {
-  artwork: Artwork
+  txId: string
+  category: DomainEntityCategory
 }
