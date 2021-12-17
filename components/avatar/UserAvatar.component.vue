@@ -2,7 +2,11 @@
   <div class="user-avatar">
     <v-avatar color="transparent" :size="size">
       <nuxt-link :to="`/${username}`">
-        <v-img :src="src"></v-img>
+        <v-img :src="src">
+          <template v-slot:placeholder>
+            <TransactionPlaceholder :txId="user.address" />
+          </template>
+        </v-img>
       </nuxt-link>
     </v-avatar>
 
@@ -43,6 +47,8 @@ export default class UserAvatar extends Vue {
     required: true
   }) readonly user!: User
 
+  src: string = ''
+
   @Prop({
     type: Boolean,
     required: false,
@@ -60,17 +66,6 @@ export default class UserAvatar extends Vue {
     required: false,
     default: '100%'
   }) readonly usernameWidth!: string
-
-  get src() {
-    if (this.user.avatar) {
-      return this.user.avatar.src
-    }
-
-    const gravatarBase = 'https://www.gravatar.com/avatar'
-    const userAddrHash = MD5(this.user.address.toLowerCase())
-
-    return `${gravatarBase}/${userAddrHash}?f=y&d=identicon&s=${this.size}`
-  }
 
   get username() {
     return this.user.address
@@ -97,13 +92,24 @@ export default class UserAvatar extends Vue {
         if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
           const payload = mutation.payload as SetUserTransactionStatusPayload
           if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {
-            const avatar = await this.$avatarService.fetchAvatar(
-              this.$auth.user.address
-            )
-            this.$auth.setUser(Object.assign({}, this.$auth.user, { avatar }))
+            this.$fetch()
           }
         }
       })
+    }
+  }
+
+  fetchOnServer = false
+  async fetch() {
+    const avatar = await this.$avatarService.fetchAvatar(this.user.address)
+
+    if (avatar) {
+      this.src = avatar.src
+    } else {
+      const gravatarBase = 'https://www.gravatar.com/avatar'
+      const userAddrHash = MD5(this.user.address.toLowerCase())
+
+      this.src = `${gravatarBase}/${userAddrHash}?f=y&d=identicon&s=${this.size}`
     }
   }
 }

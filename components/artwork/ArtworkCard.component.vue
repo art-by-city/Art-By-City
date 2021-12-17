@@ -10,29 +10,7 @@
           @click="onArtworkCardClicked"
         >
           <template v-slot:placeholder>
-            <v-row
-              class="fill-height ma-0"
-              align="center"
-              align-content="center"
-              justify="center"
-            >
-              <v-col
-                cols="12"
-                class="font-weight-md-thin scale-text text-center"
-              >
-                {{ txId }}
-              </v-col>
-
-              <v-col cols="12">
-                <v-progress-linear
-                  indeterminate
-                  color="black"
-                  background-color="transparent"
-                  height="1"
-                  bottom
-                ></v-progress-linear>
-              </v-col>
-            </v-row>
+            <TransactionPlaceholder :txId="txId" />
           </template>
 
           <v-fade-transition>
@@ -147,10 +125,5 @@ export default class ArtworkCard extends Vue {
   top: 0;
   left: 0;
   z-index: 8990;
-}
-
-.scale-text {
-  font-size: 2.75vmin;
-  word-break: break-all;
 }
 </style>

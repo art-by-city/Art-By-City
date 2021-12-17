@@ -119,14 +119,6 @@ export default class UserProfilePage extends PageComponent {
   async fetch() {
     ProgressService.start()
     try {
-      const avatar = await this.$avatarService.fetchAvatar(
-        this.artist.address
-      )
-
-      if (avatar) {
-        this.setAvatar(avatar)
-      }
-
       this.likesCount = await this.$likesService.fetchTotalLikedByUser(
         this.artist.address
       )
@@ -138,31 +130,9 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
-  created() {
-    if (this.$auth.loggedIn && this.artist.address === this.$auth.user.address) {
-      this.$store.subscribe(async (mutation) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {
-            const avatar = await this.$avatarService.fetchAvatar(
-              this.$auth.user.address
-            )
-            if (avatar) {
-              this.setAvatar(avatar)
-            }
-          }
-        }
-      })
-    }
-  }
-
   @debounce
   onEditProfileClicked() {
     this.showAvatarUploadDialog = true
-  }
-
-  setAvatar(avatar: Avatar) {
-    this.artist = Object.assign({}, this.artist, { avatar })
   }
 }
 </script>
