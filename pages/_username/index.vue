@@ -102,6 +102,12 @@ import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
   }
 })
 export default class UserProfilePage extends PageComponent {
+  head() {
+    return {
+      title: `${this.$route.params.username}'s profile`
+    }
+  }
+
   artist: User = { address: this.$route.params.username }
   showAvatarUploadDialog: boolean = false
   likesCount: number = 0

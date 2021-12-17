@@ -5,18 +5,22 @@ export default {
    ** Headers of the page
    */
   head: {
-    titleTemplate: '%s - ' + process.env.npm_package_name,
-    title: process.env.npm_package_name || '',
+    titleTemplate: 'Art By City - %s',
+    title: 'The Artist\'s Permaweb',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
         hid: 'description',
         name: 'description',
-        content: process.env.npm_package_description || ''
+        content: 'The Artist\'s Permaweb'
       }
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    link: [{
+      rel: 'icon',
+      type: 'image/png',
+      href: 'logo/logo_by_daliah_ammar_square_stacked_64.png'
+    }]
   },
   /*
    ** Customize the progress-bar color

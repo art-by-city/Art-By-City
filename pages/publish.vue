@@ -26,6 +26,10 @@ import { Artwork } from '~/types'
   }
 })
 export default class UploadPage extends FormPageComponent {
+  get head() {
+    return { title: 'Publish' }
+  }
+
   artwork: Artwork = {
     id: '',
     creator: {
