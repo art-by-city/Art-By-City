@@ -179,6 +179,16 @@ import ProgressService from '~/services/progress/service'
   }
 })
 export default class ArtworkPage extends FormPageComponent {
+  head() {
+    if (this.artwork) {
+      return {
+        title: `${this.artwork.title} by ${this.$route.params.username}`
+      }
+    }
+
+    return {}
+  }
+
   artwork: Artwork | null = null
   previewImage: ArtworkImage | null = null
   cachedArtwork!: Artwork

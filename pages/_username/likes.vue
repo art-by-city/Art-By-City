@@ -53,6 +53,12 @@ import LikesFeed from '~/components/profile/LikesFeed.component.vue'
   }
 })
 export default class ProfileLikesPage extends Vue {
+  head() {
+    return {
+      title: `${this.$route.params.username}'s Likes`
+    }
+  }
+
   artist: User = { address: this.$route.params.username }
 
   async fetch() {
