@@ -5,3 +5,5 @@ export { default as UserAvatar } from '../avatar/UserAvatar.component.vue'
 export { default as ImageFileInput } from './ImageFileInput.component.vue'
 export { default as TransactionConfirmationProgress } from
   './TransactionConfirmationProgress.component.vue'
+export { default as TransactionPlaceholder } from
+  './TransactionPlaceholder.component.vue'

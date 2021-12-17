@@ -15,7 +15,7 @@ export default class AvatarService extends TransactionService {
     return tx
   }
 
-  async fetchAvatar(address: string): Promise<Avatar | undefined> {
+  async fetchAvatar(address: string): Promise<Avatar | null> {
     const txs = await this.transactionFactory.searchTransactions(
       'avatar',
       address
@@ -27,6 +27,6 @@ export default class AvatarService extends TransactionService {
       return res.data as Avatar
     }
 
-    return
+    return null
   }
 }

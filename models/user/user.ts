@@ -5,7 +5,7 @@ export default interface User {
   // id: string
   // username: string
   // name: string
-  avatar?: Avatar
+  avatar?: Avatar | null
   // roles: string[]
   // city: string
   // email: string
