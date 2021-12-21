@@ -86,13 +86,11 @@
 import { Component } from 'nuxt-property-decorator'
 
 import { User } from '~/models'
-import { Avatar, SetUserTransactionStatusPayload } from '~/types'
 import { debounce } from '~/helpers'
 import ProgressService from '~/services/progress/service'
 import PageComponent from '~/components/pages/page.component'
 import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 
 @Component({
