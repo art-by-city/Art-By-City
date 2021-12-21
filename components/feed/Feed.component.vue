@@ -6,8 +6,17 @@
       justify="center"
     >
       <v-col cols="6">
-        <ArtworkCard :txId="item.txId" />
+        <v-lazy transition="fade-transition">
+          <ArtworkCard :txId="item.txId" />
+        </v-lazy>
       </v-col>
+    </v-row>
+
+    <v-row>
+      <FeedLoadMore
+        @intersect="onLoadMoreIntersected"
+        :pending="$fetchState.pending"
+      />
     </v-row>
   </v-container>
 </template>
@@ -18,24 +27,47 @@ import { Component, Vue } from 'nuxt-property-decorator'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 import ProgressService from '~/services/progress/service'
 import { FeedItem } from '~/types'
+import FeedLoadMore from './FeedLoadMore.component.vue'
 
 @Component({
   components: {
-    ArtworkCard
+    ArtworkCard,
+    FeedLoadMore
   }
 })
 export default class FeedComponent extends Vue {
   feed: FeedItem[] = []
+  cursor?: string
 
   async fetch() {
     ProgressService.start()
     try {
-      this.feed = await this.$artworkService.fetchFeed()
+      this.feed.push(
+        ...(await this.$artworkService.fetchFeed(null, this.cursor, 5))
+      )
     } catch (error) {
       console.error(error)
       this.$toastService.error(error)
     } finally {
       ProgressService.stop()
+    }
+  }
+
+  intersectionCount: number = 0
+  private onLoadMoreIntersected(visible: boolean) {
+    if (
+      !this.$fetchState.pending
+      && visible
+      && this.feed.length > 0
+    ) {
+      const prevCursor = this.cursor
+      const nextCursor = this.feed[this.feed.length - 1].cursor
+      if (prevCursor !== nextCursor && this.intersectionCount > 0) {
+        this.cursor = nextCursor
+        this.$fetch()
+      }
+
+      this.intersectionCount = this.intersectionCount + 1
     }
   }
 }

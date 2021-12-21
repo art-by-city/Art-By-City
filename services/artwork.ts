@@ -52,7 +52,7 @@ export default class ArtworkService extends TransactionService {
 
   async fetchByTxIdOrSlug(txIdOrSlug: string, owner: string):
     Promise<Artwork | null> {
-    const txsBySlug = await this.transactionFactory.searchTransactions(
+    const result = await this.transactionFactory.searchTransactions(
       'artwork',
       owner,
       {
@@ -62,8 +62,8 @@ export default class ArtworkService extends TransactionService {
       }
     )
 
-    if (txsBySlug[0]) {
-      return await this.fetch(txsBySlug[0].id)
+    if (result.transactions[0]) {
+      return await this.fetch(result.transactions[0].id)
     }
 
     // If no slug matches, try treating it as a txid
@@ -90,7 +90,11 @@ export default class ArtworkService extends TransactionService {
     }
   }
 
-  async fetchFeed(creator?: string | string[]): Promise<FeedItem[]> {
+  async fetchFeed(
+    creator?: string | string[] | null,
+    cursor?: string,
+    limit?: number
+  ): Promise<FeedItem[]> {
     if (!creator) {
       switch (this.config.name) {
         case 'ArtByCity':
@@ -131,19 +135,26 @@ export default class ArtworkService extends TransactionService {
       }
     }
 
-    const txs = await this.transactionFactory.searchTransactions(
+    const result = await this.transactionFactory.searchTransactions(
       'artwork',
-      creator
+      creator,
+      {
+        type: 'application/json',
+        sort: 'HEIGHT_DESC',
+        tags: [],
+        limit: limit || 9,
+        cursor
+      }
     )
 
-    return this.buildFeed(txs.map(tx => tx.id))
+    return this.buildFeed(result.transactions.map(tx => tx.id), result.cursor)
   }
 
-  async fetchLikedArtworkFeed(address: string): Promise<FeedItem[]> {
-    const items: FeedItem[] = []
-    const likeTxs = await this.$likesService.fetchUserLikes(address)
+  async fetchLikedArtworkFeed(address: string, cursor?: string):
+    Promise<FeedItem[]> {
+    const result = await this.$likesService.fetchUserLikes(address, cursor, 9)
 
-    const likedEntityTxIds = likeTxs.map(tx => {
+    const likedEntityTxIds = result.transactions.map(tx => {
       try {
         const tags: { name: string, value: string }[] = (tx as any)._tags
         const likedEntityTag = tags.find((tag) => tag.name === LIKED_ENTITY_TAG)
@@ -158,12 +169,13 @@ export default class ArtworkService extends TransactionService {
       }
     }).filter(txId => !!txId)
 
-    return this.buildFeed(likedEntityTxIds)
+    return this.buildFeed(likedEntityTxIds, result.cursor)
   }
 
-  private buildFeed(txIds: string[]): FeedItem[] {
-    return txIds.map(txId => {
-      return { guid: uuidv4(), txId, category: 'artwork' }
+  private buildFeed(txs: string[], cursor: string): FeedItem[] {
+    return txs.map((txId) => {
+      const item = { guid: uuidv4(), category: 'artwork', txId, cursor }
+      return item as FeedItem
     })
   }
 }
