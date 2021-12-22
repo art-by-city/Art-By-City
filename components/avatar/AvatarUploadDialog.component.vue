@@ -16,7 +16,6 @@
             </v-card-text>
             <v-card-actions>
               <TransactionFormControls
-                :transaction="transaction"
                 :loading="isUploading"
                 @cancel="onCancel"
                 @submit="onSubmit"
@@ -30,8 +29,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, PropSync, Watch } from 'nuxt-property-decorator'
-import Transaction from 'arweave/node/lib/transaction'
+import { Vue, Component, Emit, PropSync } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers'
 import { ArtworkImage, UserTransaction } from '~/types'
@@ -45,17 +43,6 @@ import TransactionFormControls from
 })
 export default class AvatarUploadDialog extends Vue {
   images: ArtworkImage[] = []
-  @Watch('images', {
-    deep: true,
-    immediate: true
-  }) async onImagesChanged(images: ArtworkImage[]) {
-    if (images.length > 0) {
-      this.transaction = await this.$avatarService.createAvatarTransaction(
-        { src: images[0].dataUrl }
-      )
-    }
-  }
-  transaction: Transaction | null = null
   isUploading: boolean = false
 
   @PropSync('show', {
@@ -67,11 +54,15 @@ export default class AvatarUploadDialog extends Vue {
     return txId
   }
 
-  async onSubmit(transaction: Transaction) {
+  async onSubmit() {
     const valid = this.images.length > 0
 
     if (valid) {
       this.isUploading = true
+
+      const transaction = await this.$avatarService.createAvatarTransaction(
+        { src: this.images[0].dataUrl }
+      )
 
       const signed = await this.$arweaveService.sign(transaction)
 

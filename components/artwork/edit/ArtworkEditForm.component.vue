@@ -48,7 +48,7 @@
                   <v-overlay absolute :value="hoverProps.hover">
                     <v-file-input
                       class="artwork-upload-button"
-                      accept="image/png, image/jpeg"
+                      accept="image/*"
                       hide-input
                       prepend-icon="mdi-camera"
                       @change="onArtworkImageChanged(i, $event)"
@@ -126,21 +126,6 @@
             :rules="[rules.required, rules.maxLength(128), rules.slug]"
           ></v-text-field>
 
-          <!-- <ArtworkTypeSelector
-            v-model="artwork.type"
-            :artworkTypes="$store.state.config.artworkTypes"
-            required
-          /> -->
-          <!-- <CitySelector
-            v-model="artwork.city"
-            :cities="$store.state.config.cities"
-            disabled
-          /> -->
-          <!-- <HashtagSelector
-            v-model="artwork.hashtags"
-            :hashtags="$store.state.config.hashtags"
-          /> -->
-
           <v-text-field
             v-model="artwork.created"
             name="artworkCreated"
@@ -181,9 +166,8 @@
           <LicenseSelector v-model="artwork.license" />
         </v-col>
       </v-row>
-      <v-row dense justify="center" v-if="transaction">
+      <v-row dense justify="center">
         <TransactionFormControls
-          :transaction="transaction"
           :loading="isUploading"
           @cancel="onCancel"
           @submit="onSubmit"
@@ -194,18 +178,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'nuxt-property-decorator'
+import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
-import Transaction from 'arweave/node/lib/transaction'
 
 import { Artwork, ArtworkImage, UserTransaction } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
 import CitySelector from '~/components/forms/citySelector.component.vue'
-import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
+import ArtworkTypeSelector from
+  '~/components/forms/artworkTypeSelector.component.vue'
 import LicenseSelector from '~/components/forms/licenseSelector.component.vue'
 import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
-import TransactionFormControls from '~/components/forms/transactionFormControls.component.vue'
+import TransactionFormControls from
+  '~/components/forms/transactionFormControls.component.vue'
 
 @Component({
   components: {
@@ -219,15 +204,6 @@ import TransactionFormControls from '~/components/forms/transactionFormControls.
 })
 export default class ArtworkEditForm extends Vue {
   @Prop({ type: Object, required: true }) artwork!: Artwork
-  @Watch('artwork', {
-    deep: true,
-    immediate: true
-  }) async onArtworkChanged(artwork: Artwork) {
-    this.transaction = await this.$artworkService.createArtworkTransaction(
-      artwork
-    )
-  }
-  transaction: Transaction | null = null
   $refs!: {
     cropImage: HTMLImageElement,
     form: Vue & {
@@ -384,7 +360,7 @@ export default class ArtworkEditForm extends Vue {
     this.cropper?.destroy()
   }
 
-  async onSubmit(transaction: Transaction) {
+  async onSubmit() {
     this.dirty = true
     this.valid = this.$refs.form.validate()
 
@@ -394,6 +370,10 @@ export default class ArtworkEditForm extends Vue {
 
     if (this.valid) {
       this.isUploading = true
+
+      const transaction = await this.$artworkService.createArtworkTransaction(
+        this.artwork
+      )
 
       const signed = await this.$arweaveService.sign(transaction)
 
@@ -408,7 +388,8 @@ export default class ArtworkEditForm extends Vue {
         this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
           this.isUploading = false
           if (err) {
-            this.$toastService.error(err.message)
+            console.error('Error submitting user tx', err)
+            this.$toastService.error('Error submitting user tx: ' + err.message)
           } else {
             return this._save(transaction.id)
           }
