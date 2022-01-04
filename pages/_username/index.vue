@@ -6,7 +6,7 @@
           cols="2" offset="2"
             sm="2" offset-sm="3"
         >
-          <UserAvatar class="user-profile-avatar" :user="artist" />
+          <UserAvatar :user="artist" />
         </v-col>
         <v-col
           cols="6" offset="2"
@@ -144,10 +144,6 @@ export default class UserProfilePage extends PageComponent {
   font-weight: 400;
   font-size: 1rem;
   letter-spacing: 0.009375rem;
-}
-.user-profile-avatar {
-  left: 50%;
-  transform: translateX(-50%)
 }
 .user-profile-info {
   position: relative;

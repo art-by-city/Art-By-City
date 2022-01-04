@@ -12,7 +12,7 @@
             <v-card-title>Upload Avatar</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <ImageFileInput v-model="images" />
+              <AvatarUploadInput v-model="image" />
             </v-card-text>
             <v-card-actions>
               <TransactionFormControls
@@ -35,14 +35,16 @@ import { debounce } from '~/helpers'
 import { ArtworkImage, UserTransaction } from '~/types'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
+import AvatarUploadInput from './AvatarUploadInput.component.vue'
 
 @Component({
   components: {
-    TransactionFormControls
+    TransactionFormControls,
+    AvatarUploadInput
   }
 })
 export default class AvatarUploadDialog extends Vue {
-  images: ArtworkImage[] = []
+  image: ArtworkImage | null = null
   isUploading: boolean = false
 
   @PropSync('show', {
@@ -55,13 +57,11 @@ export default class AvatarUploadDialog extends Vue {
   }
 
   async onSubmit() {
-    const valid = this.images.length > 0
-
-    if (valid) {
+    if (this.image) {
       this.isUploading = true
 
       const transaction = await this.$avatarService.createAvatarTransaction(
-        { src: this.images[0].dataUrl }
+        { src: this.image.dataUrl }
       )
 
       const signed = await this.$arweaveService.sign(transaction)
@@ -90,7 +90,7 @@ export default class AvatarUploadDialog extends Vue {
 
   private close() {
     this.open = false
-    this.images = []
+    this.image = null
     this.isUploading = false
   }
 
