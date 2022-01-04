@@ -1,8 +1,8 @@
 <template>
   <div class="user-avatar">
     <v-avatar color="transparent" :size="size">
-      <nuxt-link :to="`/${username}`">
-        <v-img :src="src">
+      <nuxt-link :to="`/${username}`" class="mb-n1">
+        <v-img :src="src" aspect-ratio="1" :width="size">
           <template v-slot:placeholder>
             <TransactionPlaceholder :txId="user.address" />
           </template>
