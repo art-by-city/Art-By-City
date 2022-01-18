@@ -10,14 +10,17 @@
     <v-container fluid>
       <v-row justify="center" class="my-16">
         <v-col cols="12">
-          <SplashLogo />
+          <SplashLogo dark />
         </v-col>
       </v-row>
       <v-row class="my-16">
         <v-spacer></v-spacer>
         <v-col cols="auto">
           <div class="ml-16 pa-12">
-            <nuxt-link :to="heroImage.link || '/discover'" class="text-decoration-none white--text">
+            <nuxt-link
+              :to="heroImage.link || '/discover'"
+              class="text-decoration-none white--text"
+            >
               <div class="text-h5 font-weight-bold">{{ heroImage.title }}</div>
               <div class="font-weight-thin font-italic">
                 {{ heroImage.artist }}
@@ -49,13 +52,8 @@ import { Component, Vue, Emit } from 'nuxt-property-decorator'
 import _ from 'lodash'
 
 import { debounce } from '~/helpers'
-import SplashLogo from '~/components/common/SplashLogo.component.vue'
 
-@Component({
-  components: {
-    SplashLogo
-  }
-})
+@Component
 export default class HeroSection extends Vue {
   @debounce
   @Emit('click') onCallToActionClicked() {}

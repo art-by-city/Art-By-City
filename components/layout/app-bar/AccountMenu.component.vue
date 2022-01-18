@@ -4,7 +4,7 @@
       <v-btn icon v-on="props.on" style="margin-right: 0px;">
         <v-icon>mdi-chevron-down</v-icon>
       </v-btn>
-      <UserAvatar abbr dark dense :user="$auth.user" usernameWidth="120px" />
+      <UserAvatar dark dense :user="$auth.user" usernameWidth="120px" />
     </template>
     <v-list dense>
       <v-list-item dense exact :to="`/${$auth.user.address}`">

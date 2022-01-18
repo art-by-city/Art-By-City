@@ -43,7 +43,6 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 
 import { User } from '~/models'
-import { Avatar } from '~/types'
 import ProgressService from '~/services/progress/service'
 import LikesFeed from '~/components/profile/LikesFeed.component.vue'
 
@@ -53,25 +52,22 @@ import LikesFeed from '~/components/profile/LikesFeed.component.vue'
   }
 })
 export default class ProfileLikesPage extends Vue {
+  head() {
+    return {
+      title: `${this.$route.params.username}'s Likes`
+    }
+  }
+
   artist: User = { address: this.$route.params.username }
 
   async fetch() {
     ProgressService.start()
     try {
-      const avatar = await this.$avatarService.fetchAvatar(this.artist.address)
-
-      if (avatar) {
-        this.setAvatar(avatar)
-      }
     } catch (error) {
       console.error(error)
     } finally {
       ProgressService.stop()
     }
-  }
-
-  setAvatar(avatar: Avatar) {
-    this.artist = Object.assign({}, this.artist, { avatar })
   }
 }
 </script>

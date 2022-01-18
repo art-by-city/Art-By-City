@@ -11,10 +11,7 @@
     <v-card-actions>
       <v-list-item>
         <v-list-item-avatar>
-          <UserAvatar
-            :user="user"
-            abbr
-          />
+          <UserAvatar :user="user" />
         </v-list-item-avatar>
         <v-list-item-content>
           <v-list-item-title>

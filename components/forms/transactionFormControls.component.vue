@@ -12,9 +12,6 @@
           Cancel
         </v-btn>
       </v-col>
-      <v-col cols="12" sm="auto" order="1" order-sm="2" class="center-text">
-        <v-chip outlined>{{ estimate }}</v-chip>
-      </v-col>
       <v-col cols="12" sm="auto" order="3" order-sm="3" class="center-text">
         <v-btn
           outlined
@@ -32,41 +29,22 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'nuxt-property-decorator'
-import Transaction from 'arweave/node/lib/transaction'
+import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers'
 
 @Component
 export default class TransactionFormControls extends Vue {
   @Prop({
-    type: Object,
-    required: false
-  }) transaction?: Transaction
-
-  @Prop({
     type: Boolean,
     required: false
   }) loading?: boolean
-
-  get estimate(): string {
-    if (this.transaction) {
-      const price = this.$arweave.ar.winstonToAr(this.transaction.reward, {
-        decimals: 6
-      })
-      return `≈ ${price} AR`
-    }
-
-    return '...'
-  }
 
   @debounce
   @Emit('cancel') onCancelClicked() {}
 
   @debounce
-  @Emit('submit') onSubmitClicked() {
-    return this.transaction
-  }
+  @Emit('submit') onSubmitClicked() {}
 }
 </script>
 

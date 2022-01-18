@@ -2,14 +2,21 @@
   <div class="likes-feed">
     <v-row>
       <v-col
-        v-for="(post, i) in feed"
-        :key="post.guid"
+        v-for="(item, i) in feed"
+        :key="item.guid"
         cols="4"
       >
         <v-lazy transition="fade-transition">
-          <ArtworkCard :artwork="post.artwork" />
+          <ArtworkCard :txId="item.txId" />
         </v-lazy>
       </v-col>
+    </v-row>
+
+    <v-row>
+      <FeedLoadMore
+        @intersect="onLoadMoreIntersected"
+        :pending="$fetchState.pending"
+      />
     </v-row>
   </div>
 </template>
@@ -19,14 +26,17 @@ import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 import { FeedItem } from '~/types'
+import FeedLoadMore from '~/components/feed/FeedLoadMore.component.vue'
 
 @Component({
   components: {
-    ArtworkCard
+    ArtworkCard,
+    FeedLoadMore
   }
 })
 export default class LikesFeed extends Vue {
   feed: FeedItem[] = []
+  cursor?: string
 
   @Prop({
     type: String,
@@ -34,7 +44,21 @@ export default class LikesFeed extends Vue {
   }) readonly address!: string
 
   async fetch() {
-    this.feed = await this.$artworkService.fetchLikedArtworkFeed(this.address)
+    this.feed.push(
+      ...(
+        await this.$artworkService.fetchLikedArtworkFeed(
+          this.address,
+          this.cursor
+        )
+      )
+    )
+  }
+
+  private onLoadMoreIntersected(visible: boolean) {
+    if (visible && this.feed.length > 0) {
+      this.cursor = this.feed[this.feed.length - 1].cursor
+      this.$fetch()
+    }
   }
 }
 </script>

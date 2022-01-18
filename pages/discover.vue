@@ -14,5 +14,9 @@ import FeedComponent from '~/components/feed/Feed.component.vue'
     FeedComponent
   }
 })
-export default class DiscoverPage extends Vue {}
+export default class DiscoverPage extends Vue {
+  get head() {
+    return { title: 'Discover' }
+  }
+}
 </script>

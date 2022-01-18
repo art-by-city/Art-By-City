@@ -460,6 +460,10 @@ type VForm = Vue & {
 
 @Component
 export default class RegisterPage extends Vue {
+  get head() {
+    return { title: 'Artist Pre-Registration Program' }
+  }
+
   signUpStep: number = 1
   submitting: boolean = false
   hasSubmitted: boolean = false

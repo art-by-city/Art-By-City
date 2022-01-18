@@ -6,7 +6,7 @@
           cols="2" offset="2"
             sm="2" offset-sm="3"
         >
-          <UserAvatar class="user-profile-avatar" :user="artist" />
+          <UserAvatar :user="artist" />
         </v-col>
         <v-col
           cols="6" offset="2"
@@ -14,13 +14,13 @@
         >
           <v-card elevation="0">
             <v-card-title>
-              <!-- TODO: Username -->
-              {{ artist.address }}
+              {{ primaryName }}
             </v-card-title>
             <v-card-subtitle>
-              <!-- TODO: address here if username -->
+              {{ secondaryName }}
             </v-card-subtitle>
             <v-card-text>
+              <div v-if="artist.profile">{{ artist.profile.bio }}</div>
               <v-btn
                 v-if="likesCount > 0"
                 text
@@ -31,14 +31,36 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-                <v-btn
-                  v-if="isOwner"
-                  text
-                  outlined
-                  @click="onEditProfileClicked"
-                >
-                  Edit
-                </v-btn>
+                <template v-if="isOwner">
+                  <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
+                    <template v-slot:activator>
+                      <v-btn
+                        v-model="showEditSpeedDial"
+                        text
+                        outlined
+                      >
+                        Edit
+                      </v-btn>
+                    </template>
+
+                    <v-btn
+                      text
+                      outlined
+                      @click="onEditAvatarClicked"
+                    >
+                      Avatar
+                    </v-btn>
+
+                    <v-btn
+                      text
+                      outlined
+                      @click="onEditProfileClicked"
+                    >
+                      Profile
+                    </v-btn>
+
+                  </v-speed-dial>
+                </template>
                 <template v-else>
                   <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
@@ -78,47 +100,86 @@
       </v-row>
     </v-container>
 
-    <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
+    <!-- <template v-if="isOwner"> -->
+      <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
+      <EditProfileDialog :show.sync="showEditProfileDialog" />
+    <!-- </template> -->
   </div>
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 
 import { User } from '~/models'
-import { Avatar, SetUserTransactionStatusPayload } from '~/types'
 import { debounce } from '~/helpers'
 import ProgressService from '~/services/progress/service'
 import PageComponent from '~/components/pages/page.component'
 import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import EditProfileDialog from
+  '~/components/profile/EditProfileDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import { SetUserTransactionStatusPayload } from '~/types'
 
 @Component({
   components: {
     AvatarUploadDialog,
-    ArtistFeed
+    ArtistFeed,
+    EditProfileDialog
   }
 })
 export default class UserProfilePage extends PageComponent {
+  head() {
+    return {
+      title: `${this.$route.params.username}'s profile`
+    }
+  }
+
   artist: User = { address: this.$route.params.username }
+  showEditSpeedDial: boolean = false
   showAvatarUploadDialog: boolean = false
+  showEditProfileDialog: Boolean = false
   likesCount: number = 0
 
   get isOwner(): boolean {
     return this.$auth.user && this.artist.address === this.$auth.user.address
   }
 
+  get primaryName(): string {
+    return this.artist.profile?.displayName || this.artist.address
+  }
+
+  get secondaryName(): string {
+    if (this.artist.profile?.displayName) {
+      return this.artist.address
+    }
+
+    return ''
+  }
+
+  created() {
+    if (this.$auth.loggedIn) {
+      this.$store.subscribe(async (mutation, _state) => {
+        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+          const payload = mutation.payload as SetUserTransactionStatusPayload
+          if (payload.status === 'CONFIRMED' && payload.type === 'profile') {
+            this.$fetch()
+          }
+        }
+      })
+    }
+  }
+
   async fetch() {
     ProgressService.start()
     try {
-      const avatar = await this.$avatarService.fetchAvatar(
+      const profile = await this.$profileService.fetchProfile(
         this.artist.address
       )
 
-      if (avatar) {
-        this.setAvatar(avatar)
+      if (profile) {
+        Vue.set(this.artist, 'profile', profile)
       }
 
       this.likesCount = await this.$likesService.fetchTotalLikedByUser(
@@ -132,31 +193,14 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
-  created() {
-    if (this.$auth.loggedIn && this.artist.address === this.$auth.user.address) {
-      this.$store.subscribe(async (mutation) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {
-            const avatar = await this.$avatarService.fetchAvatar(
-              this.$auth.user.address
-            )
-            if (avatar) {
-              this.setAvatar(avatar)
-            }
-          }
-        }
-      })
-    }
+  @debounce
+  onEditProfileClicked() {
+    this.showEditProfileDialog = true
   }
 
   @debounce
-  onEditProfileClicked() {
+  onEditAvatarClicked() {
     this.showAvatarUploadDialog = true
-  }
-
-  setAvatar(avatar: Avatar) {
-    this.artist = Object.assign({}, this.artist, { avatar })
   }
 }
 </script>
@@ -170,10 +214,6 @@ export default class UserProfilePage extends PageComponent {
   font-weight: 400;
   font-size: 1rem;
   letter-spacing: 0.009375rem;
-}
-.user-profile-avatar {
-  left: 50%;
-  transform: translateX(-50%)
 }
 .user-profile-info {
   position: relative;
