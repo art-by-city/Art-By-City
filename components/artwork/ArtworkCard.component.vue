@@ -44,7 +44,7 @@
                       font-weight-thin
                     "
                   >
-                    {{ artwork ? artwork.creator.address : '' }}
+                    {{ username }}
                   </a>
                 </v-col>
               </v-row>
@@ -60,7 +60,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
-import { Artwork } from '~/types'
+import { Artwork, Profile } from '~/types'
 import { debounce } from '~/helpers'
 
 @Component({
@@ -91,6 +91,7 @@ export default class ArtworkCard extends Vue {
   }
 
   artwork: Artwork | null = null
+  profile: Profile | null = null
 
   get src() {
     if (this.artwork && this.artwork.images.length > 0) {
@@ -100,9 +101,19 @@ export default class ArtworkCard extends Vue {
     return ''
   }
 
+  get username() {
+    return this.profile?.displayName || this.artwork?.creator.address || ''
+  }
+
   fetchOnServer = false
   async fetch() {
     this.artwork = await this.$artworkService.fetch(this.txId)
+
+    if (this.artwork) {
+      this.profile = await this.$profileService.fetchProfile(
+        this.artwork.creator.address
+      )
+    }
   }
 }
 </script>

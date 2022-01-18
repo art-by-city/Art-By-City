@@ -12,7 +12,7 @@
             <v-card-title>Upload Avatar</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <AvatarUploadInput v-model="image" />
+              <AvatarUploadInput v-model="asset" />
             </v-card-text>
             <v-card-actions>
               <TransactionFormControls
@@ -29,10 +29,11 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, PropSync } from 'nuxt-property-decorator'
+import { Component } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
 import { ArtworkImage, UserTransaction } from '~/types'
+import TransactionDialog from
+  '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import AvatarUploadInput from './AvatarUploadInput.component.vue'
@@ -43,25 +44,15 @@ import AvatarUploadInput from './AvatarUploadInput.component.vue'
     AvatarUploadInput
   }
 })
-export default class AvatarUploadDialog extends Vue {
-  image: ArtworkImage | null = null
-  isUploading: boolean = false
-
-  @PropSync('show', {
-    type: Boolean,
-    required: false
-  }) open?: boolean
-
-  @Emit('upload') onUpload(txId: string): string {
-    return txId
-  }
+export default class AvatarUploadDialog extends TransactionDialog {
+  asset: ArtworkImage | null = null
 
   async onSubmit() {
-    if (this.image) {
+    if (this.asset) {
       this.isUploading = true
 
       const transaction = await this.$avatarService.createAvatarTransaction(
-        { src: this.image.dataUrl }
+        { src: this.asset.dataUrl }
       )
 
       const signed = await this.$arweaveService.sign(transaction)
@@ -86,23 +77,6 @@ export default class AvatarUploadDialog extends Vue {
         this.isUploading = false
       }
     }
-  }
-
-  private close() {
-    this.open = false
-    this.image = null
-    this.isUploading = false
-  }
-
-  @debounce
-  onCloseDialog() {
-    if (!this.isUploading) {
-      this.close()
-    }
-  }
-
-  onCancel() {
-    this.close()
   }
 }
 </script>
