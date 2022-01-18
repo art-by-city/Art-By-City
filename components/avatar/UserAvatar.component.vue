@@ -21,7 +21,7 @@
           <nuxt-link
             :class="`${dark ? 'white' : 'black'}--text text-truncate`"
             :style="`max-width: ${usernameWidth}`"
-            :to="`/${username}`"
+            :to="`/${user.address}`"
           >
             {{ username }}
           </nuxt-link>
