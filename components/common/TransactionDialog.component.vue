@@ -23,7 +23,7 @@ export default class TransactionDialog extends Vue {
 
   close() {
     this.open = false
-    this.asset = null
+    // this.asset = null
     this.isUploading = false
   }
 
