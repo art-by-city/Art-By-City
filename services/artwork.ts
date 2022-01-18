@@ -103,7 +103,8 @@ export default class ArtworkService extends TransactionService {
             'zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc',
             'hyL5aEp4K7fd7hYEjKxi6caxjyL2UANONOnnnFe7jwc',
             'aJIPwBoPqt1FGaa4pRoMotuDZr68PHRAoXe3lUerFTs',
-            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE'
+            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE',
+            'dYRuag6nzcdFXJ02_Ljf8ks-WDUrpAMeSI0agFd_ZBQ'
           ]
           break
         case 'ArtByCity-Staging':
@@ -119,7 +120,8 @@ export default class ArtworkService extends TransactionService {
             'zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc',
             'hyL5aEp4K7fd7hYEjKxi6caxjyL2UANONOnnnFe7jwc',
             'aJIPwBoPqt1FGaa4pRoMotuDZr68PHRAoXe3lUerFTs',
-            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE'
+            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE',
+            'dYRuag6nzcdFXJ02_Ljf8ks-WDUrpAMeSI0agFd_ZBQ'
           ]
           break
         default:
