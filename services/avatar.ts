@@ -15,18 +15,18 @@ export default class AvatarService extends TransactionService {
     return tx
   }
 
-  async fetchAvatar(address: string): Promise<Avatar | undefined> {
-    const txs = await this.transactionFactory.searchTransactions(
+  async fetchAvatar(address: string): Promise<Avatar | null> {
+    const result = await this.transactionFactory.searchTransactions(
       'avatar',
       address
     )
 
-    if (txs[0]) {
-      const res = await this.$arweave.api.get(txs[0].id)
+    if (result.transactions[0]) {
+      const res = await this.$arweave.api.get(result.transactions[0].id)
 
       return res.data as Avatar
     }
 
-    return
+    return null
   }
 }

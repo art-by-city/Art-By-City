@@ -1,46 +1,58 @@
 <template>
   <div class="artwork-card">
-    <div v-if="artwork">
-      <v-hover :disabled="disabled">
-        <template v-slot:default="props">
-          <v-img
-            v-if="artwork"
-            :src="src"
-            style="cursor: pointer"
-            aspect-ratio="1"
-            class="elevation-2"
-            @click="onArtworkCardClicked"
-          >
-            <v-fade-transition>
-              <v-overlay v-if="!disabled && props.hover" absolute class="artwork-overlay">
-                <v-row align="end" class="fill-height pa-1 pl-4">
-                  <v-col
-                    cols="auto"
+    <v-hover :disabled="disabled">
+      <template v-slot:default="props">
+        <v-img
+          :src="src"
+          style="cursor: pointer"
+          aspect-ratio="1"
+          class="elevation-2"
+          @click="onArtworkCardClicked"
+        >
+          <template v-slot:placeholder>
+            <TransactionPlaceholder :txId="txId" />
+          </template>
+
+          <v-fade-transition>
+            <v-overlay
+              v-if="!disabled && props.hover"
+              absolute
+              class="artwork-overlay"
+            >
+              <v-row align="end" class="fill-height pa-1 pl-4">
+                <v-col
+                  cols="auto"
+                  class="
+                    artwork-overlay-title-container
+                    disable-text-highlighting
+                  "
+                >
+                  <div
+                    v-if="disabled"
+                    class="artwork-card-disable-overlay"
+                  ></div>
+                  <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
+                  <a class="artwork-card-title white--text">
+                    {{ artwork ? artwork.title : '' }}
+                  </a>
+                  <br />
+                  <a
                     class="
-                      artwork-overlay-title-container
-                      disable-text-highlighting
+                      artwork-card-title
+                      white--text
+                      font-italic
+                      font-weight-thin
                     "
                   >
-                    <div
-                      v-if="disabled"
-                      class="artwork-card-disable-overlay"
-                    ></div>
-                    <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
-                    <a class="artwork-card-title white--text">
-                      {{ artwork.title }}
-                    </a>
-                    <br />
-                    <a class="artwork-card-title white--text font-italic font-weight-thin">
-                      {{ artwork.creator.address }}
-                    </a>
-                  </v-col>
-                </v-row>
-              </v-overlay>
-            </v-fade-transition>
-          </v-img>
-        </template>
-      </v-hover>
-    </div>
+                    {{ username }}
+                  </a>
+                </v-col>
+              </v-row>
+            </v-overlay>
+          </v-fade-transition>
+        </v-img>
+      </template>
+    </v-hover>
   </div>
 </template>
 
@@ -48,7 +60,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import LikeButton from '../likeButton.component.vue'
-import { Artwork } from '~/types'
+import { Artwork, Profile } from '~/types'
 import { debounce } from '~/helpers'
 
 @Component({
@@ -58,9 +70,9 @@ import { debounce } from '~/helpers'
 })
 export default class ArtworkCard extends Vue {
   @Prop({
-    default: null
+    required: true
   })
-  artwork!: Artwork | null
+  txId!: string
 
   @Prop()
   disabled?: boolean
@@ -78,14 +90,30 @@ export default class ArtworkCard extends Vue {
     }
   }
 
+  artwork: Artwork | null = null
+  profile: Profile | null = null
+
   get src() {
     if (this.artwork && this.artwork.images.length > 0) {
-      const image = this.artwork.images[0]
-
-      return image.dataUrl
+      return this.artwork.images[0].dataUrl
     }
 
     return ''
+  }
+
+  get username() {
+    return this.profile?.displayName || this.artwork?.creator.address || ''
+  }
+
+  fetchOnServer = false
+  async fetch() {
+    this.artwork = await this.$artworkService.fetch(this.txId)
+
+    if (this.artwork) {
+      this.profile = await this.$profileService.fetchProfile(
+        this.artwork.creator.address
+      )
+    }
   }
 }
 </script>

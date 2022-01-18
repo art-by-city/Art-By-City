@@ -98,7 +98,8 @@ export default class ArtworkZoomDialog extends Vue {
     required: true
   }) readonly src!: string
 
-  mounted() {
+  @Watch('src')
+  onLoadImage() {
     const image = new Image()
 
     image.onload = () => {
@@ -108,6 +109,10 @@ export default class ArtworkZoomDialog extends Vue {
     }
 
     image.src = this.src
+  }
+
+  mounted() {
+    this.onLoadImage()
   }
 
   private reset() {

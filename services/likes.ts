@@ -3,6 +3,7 @@ import Transaction from 'arweave/node/lib/transaction'
 
 import { TransactionService } from './'
 import { User } from '~/models'
+import { TransactionSearchResults } from '../factories/transaction'
 
 export const LIKED_ENTITY_TAG = 'liked-entity'
 const LIKING_ARTIST_FEE = '0.0002' // $0.01 USD @ 1AR/$50
@@ -24,7 +25,7 @@ export default class LikesService extends TransactionService {
   }
 
   async isEntityLikedBy(entityTxId: string, likedBy: string): Promise<boolean> {
-    const txs = await this.transactionFactory.searchTransactions(
+    const result = await this.transactionFactory.searchTransactions(
       'like',
       likedBy,
       {
@@ -32,7 +33,7 @@ export default class LikesService extends TransactionService {
       }
     )
 
-    if (txs[0]) {
+    if (result.transactions[0]) {
       return true
     }
 
@@ -42,7 +43,7 @@ export default class LikesService extends TransactionService {
   private async fetchEntityLikeTxs(
     entityTxId: string
   ): Promise<ArdbTransaction[]> {
-    const txs = await this.transactionFactory.searchTransactions(
+    const result = await this.transactionFactory.searchTransactions(
       'like',
       undefined,
       {
@@ -50,7 +51,7 @@ export default class LikesService extends TransactionService {
       }
     )
 
-    return txs
+    return result.transactions
   }
 
   async fetchLikedBy(entityTxId: string): Promise<User[]> {
@@ -63,19 +64,25 @@ export default class LikesService extends TransactionService {
     return (await this.fetchEntityLikeTxs(entityTxId)).length || 0
   }
 
-  async fetchUserLikes(likedBy: string): Promise<ArdbTransaction[]> {
-    const txs = await this.transactionFactory.searchTransactions(
+  async fetchUserLikes(likedBy: string, cursor?: string, limit?: number):
+    Promise<TransactionSearchResults> {
+    const result = await this.transactionFactory.searchTransactions(
       'like',
       likedBy,
       {
-        sort: 'HEIGHT_DESC'
+        sort: 'HEIGHT_DESC',
+        tags: [],
+        cursor,
+        limit
       }
     )
 
-    return txs
+    return result
   }
 
   async fetchTotalLikedByUser(likedBy: string): Promise<number> {
-    return (await this.fetchUserLikes(likedBy)).length || 0
+    return (
+      await this.fetchUserLikes(likedBy, undefined, 100)
+    ).transactions.length || 0
   }
 }

@@ -6,11 +6,17 @@ import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 
 import { ArweaveAppConfig, DomainEntityCategory } from '../types'
 
-
 export interface TransactionSearchOptions {
   type?: 'application/json',
   sort?: 'HEIGHT_ASC' | 'HEIGHT_DESC',
   tags?: { tag: string, value: string }[]
+  limit?: number
+  cursor?: string
+}
+
+export interface TransactionSearchResults {
+  cursor: string
+  transactions: ArdbTransaction[]
 }
 
 export default class TransactionFactory {
@@ -68,7 +74,7 @@ export default class TransactionFactory {
       sort: 'HEIGHT_DESC',
       tags: []
     }
-  ): Promise<ArdbTransaction[]> {
+  ): Promise<TransactionSearchResults> {
     let query = this.ardb
       .search('transactions')
       .appName(this.config.name)
@@ -88,10 +94,19 @@ export default class TransactionFactory {
       }
     }
 
+    if (opts.cursor) {
+      query = query.cursor(opts.cursor)
+    }
+
+    if (opts.limit) {
+      query = query.limit(opts.limit)
+    }
+
     const sort = opts?.sort || 'HEIGHT_DESC'
 
-    const results = await query.find({ sort })
+    const transactions = await query.find({ sort }) as ArdbTransaction[]
+    const cursor = query.getCursor()
 
-    return results as ArdbTransaction[]
+    return { cursor, transactions }
   }
 }

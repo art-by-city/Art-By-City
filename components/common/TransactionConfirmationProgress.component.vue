@@ -38,7 +38,7 @@
           <span v-if="tx.status === 'CONFIRMED'">Ready!</span>
         </v-row>
         <v-row dense v-if="tx.status === 'CONFIRMING'">
-          <v-progress-linear v-model="confirmationsPct" height="25">
+          <v-progress-linear :value="confirmationsPct" height="25">
             {{ confirmations }} / {{ $config.arweave.waitForConfirmations }}
           </v-progress-linear>
         </v-row>

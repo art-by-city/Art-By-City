@@ -7,4 +7,9 @@ export interface Avatar {
   src: string
 }
 
-export type DomainEntityCategory = 'artwork' | 'avatar' | 'like'
+export interface Profile {
+  displayName?: string
+  bio?: string
+}
+
+export type DomainEntityCategory = 'artwork' | 'avatar' | 'like' | 'profile'

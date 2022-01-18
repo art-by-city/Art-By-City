@@ -1,20 +1,15 @@
 <template>
   <div class="user-avatar">
-    <v-avatar :color="bgColor" :size="_size">
-      <template v-if="user.avatar">
-        <nuxt-link :to="`/${fullUsername}`">
-          <v-img :src="user.avatar.src"></v-img>
-        </nuxt-link>
-      </template>
-      <template v-else>
-        <nuxt-link
-          class="white--text avatar-username"
-          :to="`/${fullUsername}`"
-        >
-          {{ username }}
-        </nuxt-link>
-      </template>
+    <v-avatar color="transparent" :size="size">
+      <nuxt-link :to="`/${username}`" class="mb-n1">
+        <v-img :src="src" aspect-ratio="1" :width="size">
+          <template v-slot:placeholder>
+            <TransactionPlaceholder :txId="user.address" />
+          </template>
+        </v-img>
+      </nuxt-link>
     </v-avatar>
+
     <v-tooltip bottom v-if="dense">
       <template v-slot:activator="{ on, attrs }">
         <span
@@ -24,25 +19,26 @@
           style="display: inline-flex;"
         >
           <nuxt-link
-            :class="`${textColor}--text text-truncate`"
+            :class="`${dark ? 'white' : 'black'}--text text-truncate`"
             :style="`max-width: ${usernameWidth}`"
-            :to="`/${fullUsername}`"
+            :to="`/${user.address}`"
           >
-            {{ fullUsername }}
+            {{ username }}
           </nuxt-link>
         </span>
       </template>
-      {{ fullUsername }}
+      {{ username }}
     </v-tooltip>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
+import MD5 from 'crypto-js/md5'
 
 import User from '~/models/user/user'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload } from '~/types'
+import { Profile, SetUserTransactionStatusPayload } from '~/types'
 
 @Component
 export default class UserAvatar extends Vue {
@@ -51,29 +47,14 @@ export default class UserAvatar extends Vue {
     required: true
   }) readonly user!: User
 
-  @Prop({
-    type: String,
-    required: false,
-    default: 'indigo'
-  }) readonly color!: string
+  src: string = ''
+  profile: Profile | null = null
 
   @Prop({
     type: Boolean,
     required: false,
     default: false
   }) readonly dense: boolean | undefined
-
-  @Prop({
-    type: Boolean,
-    required: false,
-    default: false
-  }) readonly abbr: boolean | undefined
-
-  @Prop({
-    type: Boolean,
-    required: false,
-    default: false
-  }) readonly showUsername: boolean | undefined
 
   @Prop({
     type: Boolean,
@@ -87,33 +68,11 @@ export default class UserAvatar extends Vue {
     default: '100%'
   }) readonly usernameWidth!: string
 
-  get textColor() {
-    if (this.dark) {
-      return 'white'
-    }
-
-    return 'black'
-  }
-
-  get bgColor() {
-    if (this.user?.avatar?.src) {
-      return 'transparent'
-    }
-
-    return this.color
-  }
-
   get username() {
-    return this.abbr
-      ? this.user.address[0]
-      : this.user.address
+    return this.profile?.displayName || this.user.address
   }
 
-  get fullUsername() {
-    return this.user.address
-  }
-
-  get _size() {
+  get size() {
     if (this.dense) {
       return 32
     }
@@ -134,14 +93,27 @@ export default class UserAvatar extends Vue {
         if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
           const payload = mutation.payload as SetUserTransactionStatusPayload
           if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {
-            const avatar = await this.$avatarService.fetchAvatar(
-              this.$auth.user.address
-            )
-            this.$auth.setUser(Object.assign({}, this.$auth.user, { avatar }))
+            this.$fetch()
           }
         }
       })
     }
+  }
+
+  fetchOnServer = false
+  async fetch() {
+    const avatar = await this.$avatarService.fetchAvatar(this.user.address)
+
+    if (avatar) {
+      this.src = avatar.src
+    } else {
+      const gravatarBase = 'https://www.gravatar.com/avatar'
+      const userAddrHash = MD5(this.user.address.toLowerCase())
+
+      this.src = `${gravatarBase}/${userAddrHash}?f=y&d=identicon&s=${this.size}`
+    }
+
+    this.profile = await this.$profileService.fetchProfile(this.user.address)
   }
 }
 </script>
@@ -161,9 +133,5 @@ export default class UserAvatar extends Vue {
   margin-left: 0px;
   margin-top: 0px;
   margin-bottom: 0px;
-}
-.avatar-username {
-  word-break: break-word;
-  text-decoration: none;
 }
 </style>

@@ -12,11 +12,10 @@
             <v-card-title>Upload Avatar</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <ImageFileInput v-model="images" />
+              <AvatarUploadInput v-model="asset" />
             </v-card-text>
             <v-card-actions>
               <TransactionFormControls
-                :transaction="transaction"
                 :loading="isUploading"
                 @cancel="onCancel"
                 @submit="onSubmit"
@@ -30,48 +29,57 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, PropSync, Watch } from 'nuxt-property-decorator'
-import Transaction from 'arweave/node/lib/transaction'
+import { Component } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
 import { ArtworkImage, UserTransaction } from '~/types'
+import TransactionDialog from
+  '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
+import AvatarUploadInput from './AvatarUploadInput.component.vue'
+import { uuidv4 } from '~/helpers'
 
 @Component({
   components: {
-    TransactionFormControls
+    TransactionFormControls,
+    AvatarUploadInput
   }
 })
-export default class AvatarUploadDialog extends Vue {
-  images: ArtworkImage[] = []
-  @Watch('images', {
-    deep: true,
-    immediate: true
-  }) async onImagesChanged(images: ArtworkImage[]) {
-    if (images.length > 0) {
-      this.transaction = await this.$avatarService.createAvatarTransaction(
-        { src: images[0].dataUrl }
+export default class AvatarUploadDialog extends TransactionDialog {
+  asset: ArtworkImage | null = null
+
+  fetchOnServer = false
+  async fetch() {
+    if (this.$auth.user && this.$auth.user.address) {
+      const avatar = await this.$avatarService.fetchAvatar(
+        this.$auth.user.address
       )
+
+      if (avatar) {
+        // NB: resolve mime type from data url src quickly
+        // maybe this is faster than .split() ?
+        let imageType = avatar.src.substring(5, 14)
+        // data:image/jpe
+        if (imageType[6] === 'j') {
+          imageType += 'g'
+        }
+
+        this.asset = {
+          guid: uuidv4(),
+          imageType,
+          dataUrl: avatar.src
+        }
+      }
     }
   }
-  transaction: Transaction | null = null
-  isUploading: boolean = false
 
-  @PropSync('show', {
-    type: Boolean,
-    required: false
-  }) open?: boolean
-
-  @Emit('upload') onUpload(txId: string): string {
-    return txId
-  }
-
-  async onSubmit(transaction: Transaction) {
-    const valid = this.images.length > 0
-
-    if (valid) {
+  async onSubmit() {
+    if (this.asset) {
       this.isUploading = true
+
+      const transaction = await this.$avatarService.createAvatarTransaction(
+        { src: this.asset.dataUrl }
+      )
 
       const signed = await this.$arweaveService.sign(transaction)
 
@@ -95,23 +103,6 @@ export default class AvatarUploadDialog extends Vue {
         this.isUploading = false
       }
     }
-  }
-
-  private close() {
-    this.open = false
-    this.images = []
-    this.isUploading = false
-  }
-
-  @debounce
-  onCloseDialog() {
-    if (!this.isUploading) {
-      this.close()
-    }
-  }
-
-  onCancel() {
-    this.close()
   }
 }
 </script>

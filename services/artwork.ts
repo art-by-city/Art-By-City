@@ -52,7 +52,7 @@ export default class ArtworkService extends TransactionService {
 
   async fetchByTxIdOrSlug(txIdOrSlug: string, owner: string):
     Promise<Artwork | null> {
-    const txsBySlug = await this.transactionFactory.searchTransactions(
+    const result = await this.transactionFactory.searchTransactions(
       'artwork',
       owner,
       {
@@ -62,8 +62,8 @@ export default class ArtworkService extends TransactionService {
       }
     )
 
-    if (txsBySlug[0]) {
-      return await this.fetch(txsBySlug[0].id)
+    if (result.transactions[0]) {
+      return await this.fetch(result.transactions[0].id)
     }
 
     // If no slug matches, try treating it as a txid
@@ -90,9 +90,11 @@ export default class ArtworkService extends TransactionService {
     }
   }
 
-  async fetchFeed(creator?: string | string[]): Promise<FeedItem[]> {
-    const items: FeedItem[] = []
-
+  async fetchFeed(
+    creator?: string | string[] | null,
+    cursor?: string,
+    limit?: number
+  ): Promise<FeedItem[]> {
     if (!creator) {
       switch (this.config.name) {
         case 'ArtByCity':
@@ -101,7 +103,8 @@ export default class ArtworkService extends TransactionService {
             'zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc',
             'hyL5aEp4K7fd7hYEjKxi6caxjyL2UANONOnnnFe7jwc',
             'aJIPwBoPqt1FGaa4pRoMotuDZr68PHRAoXe3lUerFTs',
-            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE'
+            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE',
+            'dYRuag6nzcdFXJ02_Ljf8ks-WDUrpAMeSI0agFd_ZBQ'
           ]
           break
         case 'ArtByCity-Staging':
@@ -117,7 +120,8 @@ export default class ArtworkService extends TransactionService {
             'zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc',
             'hyL5aEp4K7fd7hYEjKxi6caxjyL2UANONOnnnFe7jwc',
             'aJIPwBoPqt1FGaa4pRoMotuDZr68PHRAoXe3lUerFTs',
-            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE'
+            '1KZdIq1mkiTjb1gf6f5c__MUkheFyU6UK8-MMciSKnE',
+            'dYRuag6nzcdFXJ02_Ljf8ks-WDUrpAMeSI0agFd_ZBQ'
           ]
           break
         default:
@@ -133,62 +137,47 @@ export default class ArtworkService extends TransactionService {
       }
     }
 
-    const txs = await this.transactionFactory
-      .searchTransactions('artwork', creator)
-
-    for (const ardbTx of txs) {
-      const txId = ardbTx.id
-      try {
-        const txDataString = await this.$arweave.transactions.getData(txId, {
-          decode: true,
-          string: true
-        }) as string
-
-        const txData = JSON.parse(txDataString)
-        txData.id = txId
-
-        const artwork = new ArtworkFactory().create(txData)
-
-        items.push({ guid: uuidv4(), artwork })
-      } catch (error) {
-        console.error(error)
+    const result = await this.transactionFactory.searchTransactions(
+      'artwork',
+      creator,
+      {
+        type: 'application/json',
+        sort: 'HEIGHT_DESC',
+        tags: [],
+        limit: limit || 9,
+        cursor
       }
-    }
+    )
 
-    return items
+    return this.buildFeed(result.transactions.map(tx => tx.id), result.cursor)
   }
 
-  async fetchLikedArtworkFeed(address: string): Promise<FeedItem[]> {
-    const items: FeedItem[] = []
-    const likeTxs = await this.$likesService.fetchUserLikes(address)
+  async fetchLikedArtworkFeed(address: string, cursor?: string):
+    Promise<FeedItem[]> {
+    const result = await this.$likesService.fetchUserLikes(address, cursor, 9)
 
-    for (const likeTx of likeTxs) {
+    const likedEntityTxIds = result.transactions.map(tx => {
       try {
-        const tags: { name: string, value: string }[] = (likeTx as any)._tags
+        const tags: { name: string, value: string }[] = (tx as any)._tags
         const likedEntityTag = tags.find((tag) => tag.name === LIKED_ENTITY_TAG)
 
         if (likedEntityTag) {
-          const entityTxId = likedEntityTag.value
-          const txDataString = await this.$arweave.transactions.getData(
-            likedEntityTag.value,
-            {
-              decode: true,
-              string: true
-            }
-          ) as string
-
-          const txData = JSON.parse(txDataString)
-          txData.id = entityTxId
-
-          const artwork = new ArtworkFactory().create(txData)
-
-          items.push({ guid: uuidv4(), artwork })
+          return likedEntityTag.value
         }
-      } catch (error) {
-        console.error(error)
-      }
-    }
 
-    return items
+        return ''
+      } catch (err) {
+        return ''
+      }
+    }).filter(txId => !!txId)
+
+    return this.buildFeed(likedEntityTxIds, result.cursor)
+  }
+
+  private buildFeed(txs: string[], cursor: string): FeedItem[] {
+    return txs.map((txId) => {
+      const item = { guid: uuidv4(), category: 'artwork', txId, cursor }
+      return item as FeedItem
+    })
   }
 }
