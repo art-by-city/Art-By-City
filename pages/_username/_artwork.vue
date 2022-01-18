@@ -47,7 +47,7 @@
             <strong>Created by</strong>
             &nbsp;
             <nuxt-link :to="`/${artwork.creator.address}`" class="text-truncate">
-              {{ artwork.creator.address }}
+              {{ username }}
             </nuxt-link>
           </v-row>
           <v-row dense v-if="artwork.created">
@@ -163,7 +163,8 @@ import {
   Artwork,
   ArtworkImage,
   UserTransaction,
-  SetUserTransactionStatusPayload
+  SetUserTransactionStatusPayload,
+  Profile
   } from '~/types'
 import { debounce } from '~/helpers'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
@@ -190,12 +191,17 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   artwork: Artwork | null = null
+  profile: Profile | null = null
   previewImage: ArtworkImage | null = null
   cachedArtwork!: Artwork
   zoom = false
   txIdOrSlug: string = this.$route.params.artwork
   txId?: string
   tx: UserTransaction | null = null
+
+  get username() {
+    return this.profile?.displayName || this.artwork?.creator.address || ''
+  }
 
   async fetch() {
     ProgressService.start()
@@ -207,6 +213,9 @@ export default class ArtworkPage extends FormPageComponent {
 
       if (artwork) {
         this.artwork = artwork
+        this.profile = await this.$profileService.fetchProfile(
+          this.artwork.creator.address
+        )
         this.setPreviewImage()
       } else {
         this.txId = this.txIdOrSlug

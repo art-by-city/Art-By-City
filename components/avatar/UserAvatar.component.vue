@@ -38,7 +38,7 @@ import MD5 from 'crypto-js/md5'
 
 import User from '~/models/user/user'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload } from '~/types'
+import { Profile, SetUserTransactionStatusPayload } from '~/types'
 
 @Component
 export default class UserAvatar extends Vue {
@@ -48,6 +48,7 @@ export default class UserAvatar extends Vue {
   }) readonly user!: User
 
   src: string = ''
+  profile: Profile | null = null
 
   @Prop({
     type: Boolean,
@@ -68,7 +69,7 @@ export default class UserAvatar extends Vue {
   }) readonly usernameWidth!: string
 
   get username() {
-    return this.user.address
+    return this.profile?.displayName || this.user.address
   }
 
   get size() {
@@ -111,6 +112,8 @@ export default class UserAvatar extends Vue {
 
       this.src = `${gravatarBase}/${userAddrHash}?f=y&d=identicon&s=${this.size}`
     }
+
+    this.profile = await this.$profileService.fetchProfile(this.user.address)
   }
 }
 </script>
