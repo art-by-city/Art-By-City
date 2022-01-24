@@ -131,9 +131,35 @@ import { SetUserTransactionStatusPayload } from '~/types'
 })
 export default class UserProfilePage extends PageComponent {
   head() {
-    return {
-      title: `${this.$route.params.username}'s profile`
+    const head: any = { meta: [] }
+    const username = this.$route.params.username
+    const title = username
+
+    head.title = title
+
+    if (this.artist.profile) {
+      head.meta.push(
+        { property: 'og:title', content: title },
+        { property: 'og:type', content: 'profile' },
+        { property: 'profile:username', content: username },
+        {
+          property: 'og:url',
+          content: `${this.$config.baseUrl}/${username}`
+        }
+      )
+
+      // TODO -> need directly linkable image, e.g. bundles
+      // head.meta.push({ property: 'og:image', content: '' })
+
+      if (this.artist.profile.bio) {
+        head.meta.push({
+          property: 'og:description',
+          content: this.artist.profile.bio
+        })
+      }
     }
+
+    return head
   }
 
   artist: User = { address: this.$route.params.username }

@@ -181,13 +181,35 @@ import ProgressService from '~/services/progress/service'
 })
 export default class ArtworkPage extends FormPageComponent {
   head() {
+    const head: any = { meta: [] }
+    const username = this.$route.params.username
+
     if (this.artwork) {
-      return {
-        title: `${this.artwork.title} by ${this.$route.params.username}`
+      const displayName = this.profile?.displayName || username
+      const slugOrTxId = this.artwork.slug || this.artwork.id
+
+      head.title = `${this.artwork.title} by ${displayName}`
+      head.meta.push(
+        { property: 'og:title', content: this.artwork.title },
+        { property: 'og:type', content: 'artbycity:artwork' },
+        {
+          property: 'og:url',
+          content: `${this.$config.baseUrl}/${username}/${slugOrTxId}`
+        }
+      )
+
+      // TODO -> need directly linkable image, e.g. bundles
+      // head.meta.push({ property: 'og:image', content: '' })
+
+      if (this.artwork.description) {
+        head.meta.push({
+          property: 'og:description',
+          content: this.artwork.description
+        })
       }
     }
 
-    return {}
+    return head
   }
 
   artwork: Artwork | null = null
