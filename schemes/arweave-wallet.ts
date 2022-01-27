@@ -18,7 +18,10 @@ const APP_INFO = {
 
 // TODO -> Extend TokenableSchemeOptions and add these
 const APP_PERMISSIONS = [
-  'ACCESS_ADDRESS'
+  'ACCESS_ADDRESS',
+  'ACCESS_PUBLIC_KEY',
+  'SIGNATURE',
+  'SIGN_TRANSACTION'
 ]
 
 const DEFAULTS: TokenableSchemeOptions = {
@@ -112,6 +115,7 @@ export default class ArweaveWalletScheme<
     }
 
     return this.fetchUser()
+    // return this.login()
   }
 
   async login(): Promise<void> {

@@ -57,6 +57,7 @@ import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 import { SetUserTransactionStatusPayload } from '~/types'
+import { PermissionType } from 'arconnect'
 
 @Component({
   components: {
@@ -115,6 +116,26 @@ export default class EditProfileDialog extends TransactionDialog {
       const transaction = await this.$profileService.createProfileTransaction(
         this.asset
       )
+
+        // TODO -> Extend TokenableSchemeOptions and add these
+        const APP_INFO = {
+          name: 'Art x By x City',
+          logo: 'logo/logo_by_daliah_ammar_square.png'
+        }
+
+        // TODO -> Extend TokenableSchemeOptions and add these
+        const APP_PERMISSIONS = [
+          'ACCESS_ADDRESS',
+          'ACCESS_PUBLIC_KEY',
+          'SIGNATURE',
+          'SIGN_TRANSACTION'
+        ]
+        console.log('CONNECTING')
+        await window.arweaveWallet.connect(
+          APP_PERMISSIONS as PermissionType[],
+          APP_INFO
+        )
+        console.log('CONNECTED')
 
       const signed = await this.$arweaveService.sign(transaction)
 

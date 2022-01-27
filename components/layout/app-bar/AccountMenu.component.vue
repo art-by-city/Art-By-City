@@ -23,6 +23,13 @@
         <v-list-item-content>Likes</v-list-item-content>
       </v-list-item>
 
+      <v-list-item dense exact :to="`/debug`">
+        <v-list-item-action>
+          <v-icon>mdi-heart</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>Debug</v-list-item-content>
+      </v-list-item>
+
       <v-list-item dense @click="onLogoutClicked">
         <v-list-item-action>
           <v-icon>mdi-logout-variant</v-icon>
