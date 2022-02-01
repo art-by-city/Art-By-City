@@ -27,7 +27,7 @@ const DEFAULTS: TokenableSchemeOptions = {
     property: 'token',
     type: false,
     name: 'Arweave',
-    maxAge: 1800,
+    maxAge: false,
     global: false,
     required: true,
     prefix: '_token.',
@@ -104,10 +104,20 @@ export default class ArweaveWalletScheme<
     return response
   }
 
-  mounted(): Promise<void> {
+  async mounted(): Promise<void> {
     const { tokenExpired } = this.check(true)
 
-    if (tokenExpired) {
+    // Check wallet extension for active address
+    let isWalletExtensionConnected = false
+    try {
+      const activeAddress = await window.arweaveWallet.getActiveAddress()
+
+      if (activeAddress) {
+        isWalletExtensionConnected = true
+      }
+    } catch (e) {}
+
+    if (!isWalletExtensionConnected || tokenExpired) {
       this.$auth.reset()
     }
 
