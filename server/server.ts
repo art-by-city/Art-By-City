@@ -14,7 +14,7 @@ export default async function (req: any, res: any, next: any) {
         const arweave = new Arweave({
           protocol: process.env.ARWEAVE_PROTOCOL || 'http',
           host: process.env.ARWEAVE_HOST || 'localhost',
-          port: 1984
+          port: process.env.ARWEAVE_PORT || 1984
         })
 
         const ardb = new ArDB(arweave, 2)
