@@ -189,10 +189,11 @@ export default class ArtworkPage extends FormPageComponent {
     if (this.artwork) {
       const displayName = this.profile?.displayName || username
       const slugOrTxId = this.artwork.slug || this.artwork.id
+      const title = `${this.artwork.title} by ${displayName}`
 
-      head.title = `${this.artwork.title} by ${displayName}`
+      head.title = title
       head.meta.push(
-        { property: 'og:title', content: this.artwork.title },
+        { property: 'og:title', content: title },
         { property: 'og:type', content: 'artbycity:artwork' },
         {
           property: 'og:url',
