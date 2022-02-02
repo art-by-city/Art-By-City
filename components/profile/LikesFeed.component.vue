@@ -43,6 +43,7 @@ export default class LikesFeed extends Vue {
     required: true
   }) readonly address!: string
 
+  fetchOnServer = false
   async fetch() {
     this.feed.push(
       ...(

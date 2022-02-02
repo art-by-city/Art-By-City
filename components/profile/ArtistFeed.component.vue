@@ -43,13 +43,14 @@ export default class ArtistFeed extends Vue {
     required: true
   }) readonly address!: string
 
+  fetchOnServer = false
   async fetch() {
     this.feed.push(
       ...(await this.$artworkService.fetchFeed(this.address, this.cursor))
     )
   }
 
-  private onLoadMoreIntersected(visible: boolean) {
+  onLoadMoreIntersected(visible: boolean) {
     if (visible && this.feed.length > 0) {
       this.cursor = this.feed[this.feed.length - 1].cursor
       this.$fetch()
