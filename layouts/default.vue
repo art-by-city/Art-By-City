@@ -102,7 +102,7 @@ export default class DefaultLayout extends Vue {
       this.showAuthDialog = 'alpha-agreement'
     } catch (error) {
       if (error instanceof ArweaveWalletNotInstalledError) {
-        this.showAuthDialog = 'get-wallet'
+        this.showAuthDialog = 'sign-up'
       } else {
         this.$toastService.error(error)
       }

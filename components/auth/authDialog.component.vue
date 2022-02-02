@@ -2,25 +2,28 @@
   <v-dialog
     :value="content"
     @click:outside="onCloseDialog"
-    :max-width="maxWidth"
+    :max-width="600"
   >
-    <template v-if="content === 'get-wallet'">
-      <GetArweaveWallet @login="login" />
-    </template>
     <template v-if="content === 'sign-up'">
       <v-container fluid class="pa-1">
         <v-row dense>
           <v-card tile width="100%">
-            <v-card-title class="text-h2">
+            <!-- <v-card-title class="text-h2">
               <strong>Art By City</strong>
-            </v-card-title>
+            </v-card-title> -->
             <v-card-text>
-              is a decentralized application and community.
-              This means that an <strong>Arweave Wallet</strong> is required to
-              log in.  If you're unfamiliar with Arweave, Web 3.0, decentralized
-              applications (dApps), or blockchain technology you can sign up for
-              our <strong>Artist Pre-Registration</strong> program and we'll get
-              in touch to help you get started on your Web 3.0 journey.
+              <p>
+                <strong class="text-h6">Art By City</strong> is a decentralized application and community.
+                This means that an <strong>Arweave Wallet</strong> is required
+                to log in.
+              </p>
+              <p>
+                If you're unfamiliar with Arweave, Web 3.0, decentralized
+                applications (dApps), or blockchain technology you can sign up
+                for our <strong>Artist Pre-Registration</strong> program and
+                we'll get in touch to help you get started on your Web 3.0
+                journey.
+              </p>
             </v-card-text>
           </v-card>
         </v-row>
@@ -31,7 +34,7 @@
             cols="12"
             md="6"
           >
-            <GetArweaveWallet @login="login" />
+            <GetArweaveWallet @login="onLogin" @create="onCreate" />
           </v-col>
           <v-col
             class="pa-0"
@@ -110,16 +113,13 @@ export default class AuthDialog extends Vue {
     default: ''
   }) content?: string
 
-  @Emit('login') login() {
+  @Emit('login') onLogin() {
     this.close()
   }
 
-  get maxWidth() {
-    if (this.content === 'get-wallet') {
-      return 300
-    }
-
-    return 600
+  onCreate() {
+    this.close()
+    this.$router.push('/create')
   }
 
   private close() {
