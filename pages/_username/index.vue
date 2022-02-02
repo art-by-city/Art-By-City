@@ -134,23 +134,29 @@ export default class UserProfilePage extends PageComponent {
     const head: any = { meta: [] }
     const username = this.$route.params.username
     const title = username
+    const avatarUrl = 'TODO'
 
     head.title = title
+    head.meta.push(
+      { property: 'og:title', content: title },
+      { property: 'og:type', content: 'profile' },
+      { property: 'profile:username', content: username },
+      {
+        property: 'og:url',
+        content: `${this.$config.baseUrl}/${username}`
+      }
+    )
+
+    head.meta.push({ property: 'og:image', content: avatarUrl })
+    // head.meta.push({ property: 'og:image:type', content: '' })
+    // head.meta.push({ property: 'og:image:width', content: '' })
+    // head.meta.push({ property: 'og:image:height', content: '' })
+    head.meta.push({
+      property: 'og:image:alt',
+      content: `${username}'s avatar`
+    })
 
     if (this.artist.profile) {
-      head.meta.push(
-        { property: 'og:title', content: title },
-        { property: 'og:type', content: 'profile' },
-        { property: 'profile:username', content: username },
-        {
-          property: 'og:url',
-          content: `${this.$config.baseUrl}/${username}`
-        }
-      )
-
-      // TODO -> need directly linkable image, e.g. bundles
-      // head.meta.push({ property: 'og:image', content: '' })
-
       if (this.artist.profile.bio) {
         head.meta.push({
           property: 'og:description',
