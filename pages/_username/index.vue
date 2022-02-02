@@ -171,6 +171,7 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
+  fetchOnServer = false
   async fetch() {
     ProgressService.start()
     try {
