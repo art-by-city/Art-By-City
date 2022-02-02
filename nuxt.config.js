@@ -5,16 +5,17 @@ export default {
    ** Headers of the page
    */
   head: {
-    titleTemplate: 'Art By City - %s',
+    titleTemplate: '%s | Art By City',
     title: 'The Artist\'s Permaweb',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
         hid: 'description',
-        name: 'description',
-        content: 'The Artist\'s Permaweb'
-      }
+        name: 'Description',
+        content: 'The Artist\'s Permaweb - Publish your art permanently on the blockchain'
+      },
+      { property: 'og:site_name', content: 'Art By City' }
     ],
     link: [{
       rel: 'icon',
@@ -83,6 +84,7 @@ export default {
     },
     artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081'
   },
+  serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     redirect: {
       logout: '/'
