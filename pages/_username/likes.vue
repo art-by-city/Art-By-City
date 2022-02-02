@@ -14,8 +14,7 @@
         >
           <v-card elevation="0">
             <v-card-title>
-              <!-- TODO: Username -->
-              Liked by {{ artist.address }}
+              Liked by {{ primaryName }}
             </v-card-title>
           </v-card>
         </v-col>
@@ -60,9 +59,20 @@ export default class ProfileLikesPage extends Vue {
 
   artist: User = { address: this.$route.params.username }
 
+  get primaryName(): string {
+    return this.artist.profile?.displayName || this.artist.address
+  }
+
   async fetch() {
     ProgressService.start()
     try {
+      const profile = await this.$profileService.fetchProfile(
+        this.artist.address
+      )
+
+      if (profile) {
+        Vue.set(this.artist, 'profile', profile)
+      }
     } catch (error) {
       console.error(error)
     } finally {

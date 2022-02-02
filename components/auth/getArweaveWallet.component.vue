@@ -1,9 +1,9 @@
 <template>
   <v-card tile outlined>
-    <v-card-title>Log In with Arweave Wallet</v-card-title>
+    <v-card-title>{{ title }}</v-card-title>
     <v-container fluid>
       <template v-if="isArweaveWalletInstalled">
-        <v-row justify="center">
+        <v-row justify="center" class="mb-2">
           <v-btn
             elevation="2"
             outlined
@@ -21,27 +21,14 @@
         </v-row>
       </template>
       <template v-else>
-        <v-row
-          v-for="(provider, i) in walletProviders"
-          :key="i"
-          justify="center"
-          class="my-1"
-        >
+        <v-row justify="center" class="mb-2">
           <v-btn
-            :href="provider.url"
-            target="_blank"
             elevation="2"
             outlined
             class="mx-auto"
+            @click="onCreateWalletClicked"
           >
-            <v-img
-              :src="provider.logo"
-              max-height="20px"
-              max-width="20px"
-              contain
-            ></v-img>
-            <span class="mx-2">Get {{ provider.name }}</span>
-            <v-icon dense>mdi-open-in-new</v-icon>
+            <span class="mx-2">Create Wallet</span>
           </v-btn>
         </v-row>
       </template>
@@ -53,29 +40,28 @@
 import { Vue, Component, Emit } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers'
+import WalletProvidersList from './walletProvidersList.component.vue'
 
-@Component
+@Component({
+  components: {
+    WalletProvidersList
+  }
+})
 export default class GetArweaveWallet extends Vue {
-  walletProviders = [
-    {
-      org: 'Koii',
-      name: 'Finnie',
-      url: 'https://koii.network/getFinnie',
-      logo: 'logo/koii/Koii_Logo_blue.png'
-    },
-    {
-      org: 'th8ta',
-      name: 'ArConnect',
-      url: 'https://arconnect.io',
-      logo: 'logo/arconnect/logo64.png'
-    }
-  ]
-
   get isArweaveWalletInstalled() {
     return window && window.arweaveWallet ? true : false
   }
 
+  get title() {
+    return this.isArweaveWalletInstalled
+      ? 'Log In with Arweave Wallet'
+      : 'Create an Arweave Wallet'
+  }
+
   @debounce
   @Emit('login') onLoginClicked() {}
+
+  @debounce
+  @Emit('create') onCreateWalletClicked() {}
 }
 </script>
