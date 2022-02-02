@@ -181,6 +181,7 @@ import ProgressService from '~/services/progress/service'
 })
 export default class ArtworkPage extends FormPageComponent {
   head() {
+<<<<<<< HEAD
     if (this.artwork) {
       return {
         title: `${this.artwork.title} by ${this.$route.params.username}`
@@ -188,6 +189,45 @@ export default class ArtworkPage extends FormPageComponent {
     }
 
     return {}
+=======
+    const head: any = { meta: [] }
+    const username = this.$route.params.username
+    const artworkUrl =
+      `${this.$config.baseUrl}/api/artwork/${username}/${this.txIdOrSlug}`
+
+    if (this.artwork) {
+      const displayName = this.profile?.displayName || username
+      const slugOrTxId = this.artwork.slug || this.artwork.id
+
+      head.title = `${this.artwork.title} by ${displayName}`
+      head.meta.push(
+        { property: 'og:title', content: this.artwork.title },
+        { property: 'og:type', content: 'artbycity:artwork' },
+        {
+          property: 'og:url',
+          content: `${this.$config.baseUrl}/${username}/${slugOrTxId}`
+        }
+      )
+
+      head.meta.push({ property: 'og:image', content: artworkUrl })
+      // head.meta.push({ property: 'og:image:type', content: '' })
+      // head.meta.push({ property: 'og:image:width', content: '' })
+      // head.meta.push({ property: 'og:image:height', content: '' })
+      head.meta.push({
+        property: 'og:image:alt',
+        content: this.artwork.description
+      })
+
+      if (this.artwork.description) {
+        head.meta.push({
+          property: 'og:description',
+          content: this.artwork.description
+        })
+      }
+    }
+
+    return head
+>>>>>>> master
   }
 
   artwork: Artwork | null = null
