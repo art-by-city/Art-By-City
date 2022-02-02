@@ -100,10 +100,10 @@
       </v-row>
     </v-container>
 
-    <!-- <template v-if="isOwner"> -->
+    <template v-if="isOwner">
       <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
       <EditProfileDialog :show.sync="showEditProfileDialog" />
-    <!-- </template> -->
+    </template>
   </div>
 </template>
 
@@ -171,7 +171,6 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
-  fetchOnServer = false
   async fetch() {
     ProgressService.start()
     try {

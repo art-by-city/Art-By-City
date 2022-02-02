@@ -39,6 +39,7 @@ export default class FeedComponent extends Vue {
   feed: FeedItem[] = []
   cursor?: string
 
+  fetchOnServer = false
   async fetch() {
     ProgressService.start()
     try {
