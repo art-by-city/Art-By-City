@@ -203,7 +203,6 @@ export default class ArtworkPage extends FormPageComponent {
     return this.profile?.displayName || this.artwork?.creator.address || ''
   }
 
-  fetchOnServer = false
   async fetch() {
     ProgressService.start()
     try {
