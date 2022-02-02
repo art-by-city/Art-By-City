@@ -183,6 +183,8 @@ export default class ArtworkPage extends FormPageComponent {
   head() {
     const head: any = { meta: [] }
     const username = this.$route.params.username
+    const artworkUrl =
+      `${this.$config.baseUrl}/api/artwork/${username}/${this.txIdOrSlug}`
 
     if (this.artwork) {
       const displayName = this.profile?.displayName || username
@@ -198,8 +200,14 @@ export default class ArtworkPage extends FormPageComponent {
         }
       )
 
-      // TODO -> need directly linkable image, e.g. bundles
-      // head.meta.push({ property: 'og:image', content: '' })
+      head.meta.push({ property: 'og:image', content: artworkUrl })
+      // head.meta.push({ property: 'og:image:type', content: '' })
+      // head.meta.push({ property: 'og:image:width', content: '' })
+      // head.meta.push({ property: 'og:image:height', content: '' })
+      head.meta.push({
+        property: 'og:image:alt',
+        content: this.artwork.description
+      })
 
       if (this.artwork.description) {
         head.meta.push({

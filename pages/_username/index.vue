@@ -134,7 +134,7 @@ export default class UserProfilePage extends PageComponent {
     const head: any = { meta: [] }
     const username = this.$route.params.username
     const title = username
-    const avatarUrl = 'TODO'
+    const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
 
     head.title = title
     head.meta.push(
