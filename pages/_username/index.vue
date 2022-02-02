@@ -131,9 +131,41 @@ import { SetUserTransactionStatusPayload } from '~/types'
 })
 export default class UserProfilePage extends PageComponent {
   head() {
-    return {
-      title: `${this.$route.params.username}'s profile`
+    const head: any = { meta: [] }
+    const username = this.$route.params.username
+    const title = username
+    const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
+
+    head.title = title
+    head.meta.push(
+      { property: 'og:title', content: title },
+      { property: 'og:type', content: 'profile' },
+      { property: 'profile:username', content: username },
+      {
+        property: 'og:url',
+        content: `${this.$config.baseUrl}/${username}`
+      }
+    )
+
+    head.meta.push({ property: 'og:image', content: avatarUrl })
+    // head.meta.push({ property: 'og:image:type', content: '' })
+    // head.meta.push({ property: 'og:image:width', content: '' })
+    // head.meta.push({ property: 'og:image:height', content: '' })
+    head.meta.push({
+      property: 'og:image:alt',
+      content: `${username}'s avatar`
+    })
+
+    if (this.artist.profile) {
+      if (this.artist.profile.bio) {
+        head.meta.push({
+          property: 'og:description',
+          content: this.artist.profile.bio
+        })
+      }
     }
+
+    return head
   }
 
   artist: User = { address: this.$route.params.username }
