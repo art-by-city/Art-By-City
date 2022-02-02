@@ -2,7 +2,7 @@
   <v-card tile outlined height="100%">
     <v-card-title>Artist Pre-Registration</v-card-title>
     <v-container fluid>
-      <v-row justify="center">
+      <v-row justify="center" class="mb-2">
         <v-btn
           elevation="2"
           outlined
