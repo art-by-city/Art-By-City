@@ -181,15 +181,6 @@ import ProgressService from '~/services/progress/service'
 })
 export default class ArtworkPage extends FormPageComponent {
   head() {
-<<<<<<< HEAD
-    if (this.artwork) {
-      return {
-        title: `${this.artwork.title} by ${this.$route.params.username}`
-      }
-    }
-
-    return {}
-=======
     const head: any = { meta: [] }
     const username = this.$route.params.username
     const artworkUrl =
@@ -198,10 +189,11 @@ export default class ArtworkPage extends FormPageComponent {
     if (this.artwork) {
       const displayName = this.profile?.displayName || username
       const slugOrTxId = this.artwork.slug || this.artwork.id
+      const title = `${this.artwork.title} by ${displayName}`
 
-      head.title = `${this.artwork.title} by ${displayName}`
+      head.title = title
       head.meta.push(
-        { property: 'og:title', content: this.artwork.title },
+        { property: 'og:title', content: title },
         { property: 'og:type', content: 'artbycity:artwork' },
         {
           property: 'og:url',
@@ -227,7 +219,6 @@ export default class ArtworkPage extends FormPageComponent {
     }
 
     return head
->>>>>>> master
   }
 
   artwork: Artwork | null = null

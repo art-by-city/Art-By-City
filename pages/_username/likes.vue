@@ -66,8 +66,6 @@ export default class ProfileLikesPage extends Vue {
   async fetch() {
     ProgressService.start()
     try {
-<<<<<<< HEAD
-=======
       const profile = await this.$profileService.fetchProfile(
         this.artist.address
       )
@@ -75,7 +73,6 @@ export default class ProfileLikesPage extends Vue {
       if (profile) {
         Vue.set(this.artist, 'profile', profile)
       }
->>>>>>> master
     } catch (error) {
       console.error(error)
     } finally {

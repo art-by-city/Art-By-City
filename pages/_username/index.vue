@@ -100,17 +100,10 @@
       </v-row>
     </v-container>
 
-<<<<<<< HEAD
-    <!-- <template v-if="isOwner"> -->
-      <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
-      <EditProfileDialog :show.sync="showEditProfileDialog" />
-    <!-- </template> -->
-=======
     <template v-if="isOwner">
       <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
       <EditProfileDialog :show.sync="showEditProfileDialog" />
     </template>
->>>>>>> master
   </div>
 </template>
 
@@ -138,11 +131,6 @@ import { SetUserTransactionStatusPayload } from '~/types'
 })
 export default class UserProfilePage extends PageComponent {
   head() {
-<<<<<<< HEAD
-    return {
-      title: `${this.$route.params.username}'s profile`
-    }
-=======
     const head: any = { meta: [] }
     const username = this.$route.params.username
     const title = username
@@ -178,7 +166,6 @@ export default class UserProfilePage extends PageComponent {
     }
 
     return head
->>>>>>> master
   }
 
   artist: User = { address: this.$route.params.username }
