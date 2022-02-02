@@ -65,8 +65,6 @@ export default async function (req: any, res: any, next: any) {
             next()
           }
         } else {
-
-
           next()
         }
       } else {
