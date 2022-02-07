@@ -54,8 +54,7 @@ export default class FeedComponent extends Vue {
     }
   }
 
-  intersectionCount: number = 0
-  private onLoadMoreIntersected(visible: boolean) {
+  onLoadMoreIntersected(visible: boolean) {
     if (
       !this.$fetchState.pending
       && visible
@@ -63,12 +62,11 @@ export default class FeedComponent extends Vue {
     ) {
       const prevCursor = this.cursor
       const nextCursor = this.feed[this.feed.length - 1].cursor
-      if (prevCursor !== nextCursor && this.intersectionCount > 0) {
+
+      if (prevCursor !== nextCursor) {
         this.cursor = nextCursor
         this.$fetch()
       }
-
-      this.intersectionCount = this.intersectionCount + 1
     }
   }
 }
