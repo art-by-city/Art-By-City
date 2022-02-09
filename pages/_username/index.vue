@@ -133,8 +133,21 @@ export default class UserProfilePage extends PageComponent {
   head() {
     const head: any = { meta: [] }
     const username = this.$route.params.username
-    const title = username
+    let title = `${username}'s Profile`
     const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
+
+    if (this.artist.profile) {
+      if (this.artist.profile.displayName) {
+        title = `${this.artist.profile.displayName}'s Profile`
+      }
+
+      if (this.artist.profile.bio) {
+        head.meta.push({
+          property: 'og:description',
+          content: this.artist.profile.bio
+        })
+      }
+    }
 
     head.title = title
     head.meta.push(
@@ -155,15 +168,6 @@ export default class UserProfilePage extends PageComponent {
       property: 'og:image:alt',
       content: `${username}'s avatar`
     })
-
-    if (this.artist.profile) {
-      if (this.artist.profile.bio) {
-        head.meta.push({
-          property: 'og:description',
-          content: this.artist.profile.bio
-        })
-      }
-    }
 
     return head
   }
