@@ -30,6 +30,14 @@
                   counter="1024"
                   :rules="[bioRules]"
                 ></v-textarea>
+
+                <v-text-field
+                  v-model="asset.twitter"
+                  name="twitter"
+                  label="Twitter Username"
+                  hint="(Optional) Link your Twitter username for credit when your artwork is shared on social media"
+                  :rules="[twitterRules]"
+                ></v-text-field>
               </v-form>
             </v-card-text>
             <v-card-actions>
@@ -50,7 +58,7 @@
 import { Component } from 'nuxt-property-decorator'
 
 import { Profile, UserTransaction } from '~/types'
-import { maxLength } from '~/helpers/rules'
+import { maxLength, twitter as twitterRule } from '~/helpers/rules'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
@@ -78,6 +86,9 @@ export default class EditProfileDialog extends TransactionDialog {
   }
   get bioRules() {
     return maxLength(1024)
+  }
+  get twitterRules() {
+    return twitterRule
   }
 
   fetchOnServer = false
@@ -111,6 +122,10 @@ export default class EditProfileDialog extends TransactionDialog {
 
     if (this.asset && this.valid) {
       this.isUploading = true
+
+      if (this.asset.twitter && this.asset.twitter[0] === '@') {
+        this.asset.twitter = this.asset.twitter.substring(1)
+      }
 
       const transaction = await this.$profileService.createProfileTransaction(
         this.asset
