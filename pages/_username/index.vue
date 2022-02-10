@@ -131,45 +131,34 @@ import { SetUserTransactionStatusPayload } from '~/types'
 })
 export default class UserProfilePage extends PageComponent {
   head() {
-    const head: any = { meta: [] }
     const username = this.$route.params.username
-    let title = `${username}'s Profile`
+    const displayName = this.artist.profile?.displayName || username
+    const title = `${displayName}'s Profile`
+    const description = this.artist.profile?.bio || title
+    const url = `${this.$config.baseUrl}/${username}`
     const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
+    const avatarAlt = `${username}'s avatar`
 
-    if (this.artist.profile) {
-      if (this.artist.profile.displayName) {
-        title = `${this.artist.profile.displayName}'s Profile`
-      }
+    return {
+      title,
+      meta: [
+        // Open Graph
+        { property: 'og:title',            content: title       },
+        { property: 'og:description',      content: description },
+        { property: 'og:type',             content: 'profile'   },
+        { property: 'og:profile:username', content: username    },
+        { property: 'og:url',              content: url         },
+        { property: 'og:image',            content: avatarUrl   },
+        { property: 'og:image:alt',        content: avatarAlt   },
+        // { property: 'og:image:type',       content: ''          },
+        // { property: 'og:image:width',      content: ''          },
+        // { property: 'og:image:height',     content: ''          },
 
-      if (this.artist.profile.bio) {
-        head.meta.push({
-          property: 'og:description',
-          content: this.artist.profile.bio
-        })
-      }
+        // Twitter
+        { name: 'twitter:card',    content: 'summary' },
+        // { name: 'twitter:creator', content: '' },
+      ]
     }
-
-    head.title = title
-    head.meta.push(
-      { property: 'og:title', content: title },
-      { property: 'og:type', content: 'profile' },
-      { property: 'profile:username', content: username },
-      {
-        property: 'og:url',
-        content: `${this.$config.baseUrl}/${username}`
-      }
-    )
-
-    head.meta.push({ property: 'og:image', content: avatarUrl })
-    // head.meta.push({ property: 'og:image:type', content: '' })
-    // head.meta.push({ property: 'og:image:width', content: '' })
-    // head.meta.push({ property: 'og:image:height', content: '' })
-    head.meta.push({
-      property: 'og:image:alt',
-      content: `${username}'s avatar`
-    })
-
-    return head
   }
 
   artist: User = { address: this.$route.params.username }
