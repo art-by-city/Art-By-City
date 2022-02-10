@@ -189,6 +189,7 @@ export default class ArtworkPage extends FormPageComponent {
     const url = `${this.$config.baseUrl}/${username}/${this.txIdOrSlug}`
     const thumbnailUrl =
       `${this.$config.baseUrl}/api/artwork/${username}/${this.txIdOrSlug}`
+    const twitter = this.profile?.twitter || ''
 
     return {
       title,
@@ -205,8 +206,8 @@ export default class ArtworkPage extends FormPageComponent {
         // { property: 'og:image:height', content: ''                       },
 
         // Twitter
-        { name: 'twitter:card', content: 'summary_large_image' },
-        // { name: 'twitter:creator', content: '' },
+        { name: 'twitter:card',    content: 'summary_large_image' },
+        { name: 'twitter:creator', content: `@${twitter}`         },
       ]
     }
   }

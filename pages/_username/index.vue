@@ -17,7 +17,17 @@
               {{ primaryName }}
             </v-card-title>
             <v-card-subtitle>
-              {{ secondaryName }}
+              <p class="mb-0">{{ secondaryName }}</p>
+              <p v-if="artist.profile && artist.profile.twitter">
+                <v-icon small>mdi-twitter</v-icon>
+                <a
+                  class="text-decoration-none"
+                  :href="`https://twitter.com/${artist.profile.twitter}`"
+                  target="_blank"
+                >
+                  @{{ artist.profile.twitter }}
+                </a>
+              </p>
             </v-card-subtitle>
             <v-card-text>
               <div v-if="artist.profile">{{ artist.profile.bio }}</div>
@@ -138,6 +148,7 @@ export default class UserProfilePage extends PageComponent {
     const url = `${this.$config.baseUrl}/${username}`
     const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
     const avatarAlt = `${username}'s avatar`
+    const twitter = this.artist.profile?.twitter || ''
 
     return {
       title,
@@ -155,8 +166,8 @@ export default class UserProfilePage extends PageComponent {
         // { property: 'og:image:height',     content: ''          },
 
         // Twitter
-        { name: 'twitter:card',    content: 'summary' },
-        // { name: 'twitter:creator', content: '' },
+        { name: 'twitter:card',    content: 'summary'     },
+        { name: 'twitter:creator', content: `@${twitter}` },
       ]
     }
   }
