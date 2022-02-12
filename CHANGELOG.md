@@ -1,5 +1,44 @@
 # Changelog
 
+## [2022-02-11](#2022-02-11)
+
+### Features
+- Add Twitter Username to your Profile
+- Added more `<meta>` tags specific to Twitter to help sharing of artwork
+  - Artwork shared on Twitter will credit the tweet with the artist's Twitter
+    Username
+- Generating more efficient thumbnails of artwork when shared via social media
+
+### Bug Fixes
+- Discover feed fix when loading more artwork
+
+## [2022-02-02](#2022-02-02)
+
+### Features
+- Generate an Arweave wallet directly on https://artby.city/create
+- Open Graph Protocol `<meta>` tags enable linking of artwork and artist
+  profiles on social media
+- Moved some queries to client-side for quicker page loads
+
+### Bug Fixes
+- Auth and wallet browser extension sync fix
+- Avatar bug fixes
+
+
+## [2022-01-18](#2022-01-18)
+
+### Features
+- Artist Profile info can now be published
+  - Add a Display Name that replaces Arweave address
+  - Add an Artist Bio
+- Avatars
+  - Default avatars generated uniquely from wallet address
+- Implemented lazy loading of feed for quicker page loads
+
+### Bug Fixes
+- Various bug fixes for Avatars, feeds, and profiles
+
+
 ## [2021-07-12](#2021-07-12)
 
 ### Features

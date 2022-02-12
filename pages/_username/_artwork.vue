@@ -181,44 +181,35 @@ import ProgressService from '~/services/progress/service'
 })
 export default class ArtworkPage extends FormPageComponent {
   head() {
-    const head: any = { meta: [] }
+    if (!this.artwork) { return {} }
+
     const username = this.$route.params.username
-    const artworkUrl =
+    const displayName = this.profile?.displayName || username
+    const title = `${this.artwork.title} by ${displayName}`
+    const url = `${this.$config.baseUrl}/${username}/${this.txIdOrSlug}`
+    const thumbnailUrl =
       `${this.$config.baseUrl}/api/artwork/${username}/${this.txIdOrSlug}`
+    const twitter = this.profile?.twitter || ''
 
-    if (this.artwork) {
-      const displayName = this.profile?.displayName || username
-      const slugOrTxId = this.artwork.slug || this.artwork.id
-      const title = `${this.artwork.title} by ${displayName}`
+    return {
+      title,
+      meta: [
+        // Open Graph
+        { property: 'og:title',        content: title                    },
+        { property: 'og:description',  content: this.artwork.description },
+        { property: 'og:type',         content: 'artbycity:artwork'      },
+        { property: 'og:url',          content: url                      },
+        { property: 'og:image',        content: thumbnailUrl             },
+        { property: 'og:image:alt',    content: this.artwork.description },
+        // { property: 'og:image:type',   content: ''                       },
+        // { property: 'og:image:width',  content: ''                       },
+        // { property: 'og:image:height', content: ''                       },
 
-      head.title = title
-      head.meta.push(
-        { property: 'og:title', content: title },
-        { property: 'og:type', content: 'artbycity:artwork' },
-        {
-          property: 'og:url',
-          content: `${this.$config.baseUrl}/${username}/${slugOrTxId}`
-        }
-      )
-
-      head.meta.push({ property: 'og:image', content: artworkUrl })
-      // head.meta.push({ property: 'og:image:type', content: '' })
-      // head.meta.push({ property: 'og:image:width', content: '' })
-      // head.meta.push({ property: 'og:image:height', content: '' })
-      head.meta.push({
-        property: 'og:image:alt',
-        content: this.artwork.description
-      })
-
-      if (this.artwork.description) {
-        head.meta.push({
-          property: 'og:description',
-          content: this.artwork.description
-        })
-      }
+        // Twitter
+        { name: 'twitter:card',    content: 'summary_large_image' },
+        { name: 'twitter:creator', content: `@${twitter}`         },
+      ]
     }
-
-    return head
   }
 
   artwork: Artwork | null = null

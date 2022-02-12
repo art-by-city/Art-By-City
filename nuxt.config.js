@@ -15,7 +15,8 @@ export default {
         name: 'Description',
         content: 'The Artist\'s Permaweb - Publish your art permanently on the blockchain'
       },
-      { property: 'og:site_name', content: 'Art By City' }
+      { property: 'og:site_name', content: 'Art By City' },
+      { name: 'twitter:site', content: '@artbycity' }
     ],
     link: [{
       rel: 'icon',
