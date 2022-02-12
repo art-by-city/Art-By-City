@@ -17,7 +17,17 @@
               {{ primaryName }}
             </v-card-title>
             <v-card-subtitle>
-              {{ secondaryName }}
+              <p class="mb-0">{{ secondaryName }}</p>
+              <p v-if="artist.profile && artist.profile.twitter">
+                <v-icon small>mdi-twitter</v-icon>
+                <a
+                  class="text-decoration-none"
+                  :href="`https://twitter.com/${artist.profile.twitter}`"
+                  target="_blank"
+                >
+                  @{{ artist.profile.twitter }}
+                </a>
+              </p>
             </v-card-subtitle>
             <v-card-text>
               <div v-if="artist.profile">{{ artist.profile.bio }}</div>
@@ -131,41 +141,35 @@ import { SetUserTransactionStatusPayload } from '~/types'
 })
 export default class UserProfilePage extends PageComponent {
   head() {
-    const head: any = { meta: [] }
     const username = this.$route.params.username
-    const title = username
+    const displayName = this.artist.profile?.displayName || username
+    const title = `${displayName}'s Profile`
+    const description = this.artist.profile?.bio || title
+    const url = `${this.$config.baseUrl}/${username}`
     const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
+    const avatarAlt = `${username}'s avatar`
+    const twitter = this.artist.profile?.twitter || ''
 
-    head.title = title
-    head.meta.push(
-      { property: 'og:title', content: title },
-      { property: 'og:type', content: 'profile' },
-      { property: 'profile:username', content: username },
-      {
-        property: 'og:url',
-        content: `${this.$config.baseUrl}/${username}`
-      }
-    )
+    return {
+      title,
+      meta: [
+        // Open Graph
+        { property: 'og:title',            content: title       },
+        { property: 'og:description',      content: description },
+        { property: 'og:type',             content: 'profile'   },
+        { property: 'og:profile:username', content: username    },
+        { property: 'og:url',              content: url         },
+        { property: 'og:image',            content: avatarUrl   },
+        { property: 'og:image:alt',        content: avatarAlt   },
+        // { property: 'og:image:type',       content: ''          },
+        // { property: 'og:image:width',      content: ''          },
+        // { property: 'og:image:height',     content: ''          },
 
-    head.meta.push({ property: 'og:image', content: avatarUrl })
-    // head.meta.push({ property: 'og:image:type', content: '' })
-    // head.meta.push({ property: 'og:image:width', content: '' })
-    // head.meta.push({ property: 'og:image:height', content: '' })
-    head.meta.push({
-      property: 'og:image:alt',
-      content: `${username}'s avatar`
-    })
-
-    if (this.artist.profile) {
-      if (this.artist.profile.bio) {
-        head.meta.push({
-          property: 'og:description',
-          content: this.artist.profile.bio
-        })
-      }
+        // Twitter
+        { name: 'twitter:card',    content: 'summary'     },
+        { name: 'twitter:creator', content: `@${twitter}` },
+      ]
     }
-
-    return head
   }
 
   artist: User = { address: this.$route.params.username }

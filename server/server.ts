@@ -1,6 +1,7 @@
 import Arweave from 'arweave'
 import ArDB from '@textury/ardb'
 import ArdbTransaction from '@textury/ardb/lib/models/transaction'
+import sharp from 'sharp'
 
 import { Artwork, ArtworkImage, Avatar } from '~/types'
 
@@ -56,11 +57,13 @@ export default async function (req: any, res: any, next: any) {
           }
 
           if (matches) {
-            const imageType = matches[1]
+            // const imageType = matches[1]
             const imageDataBase64 = matches[2]
 
-            res.setHeader('Content-Type', imageType)
-            res.end(Buffer.from(imageDataBase64, 'base64'))
+            const thumbnail = await generateThumbnail(Buffer.from(imageDataBase64, 'base64'))
+
+            res.setHeader('Content-Type', 'image/webp')
+            res.end(thumbnail)
           } else {
             next()
           }
@@ -77,4 +80,11 @@ export default async function (req: any, res: any, next: any) {
     console.error('Error in server.ts', err)
     next()
   }
+}
+
+async function generateThumbnail(image: Buffer): Promise<Buffer> {
+  return sharp(image).resize(4096, 4096, {
+    fit: sharp.fit.inside,
+    withoutEnlargement: true
+  }).webp().toBuffer()
 }
