@@ -88,7 +88,9 @@ export default {
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     redirect: {
-      logout: '/'
+      logout: '/',
+      login: '/',
+      home: false
     },
     strategies: {
       local: false,

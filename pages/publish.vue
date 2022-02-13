@@ -33,7 +33,7 @@ export default class UploadPage extends FormPageComponent {
   artwork: Artwork = {
     id: '',
     creator: {
-      address: this.$auth.user.address
+      address: this.$auth.user?.address || ''
     },
     title: '',
     slug: '',
@@ -43,7 +43,7 @@ export default class UploadPage extends FormPageComponent {
   }
 
   onSave(txId: string) {
-    this.$router.push(`/${this.$auth.user.address}/${txId}`)
+    this.$router.push(`/${this.$auth.user?.address || ''}/${txId}`)
   }
 
   onCancel() {
