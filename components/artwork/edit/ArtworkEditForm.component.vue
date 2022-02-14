@@ -114,6 +114,7 @@
             name="artworkTitle"
             label="Title"
             counter="128"
+            @input="generateSlugFromTitle"
             :rules="[rules.required, rules.maxLength(128)]"
           ></v-text-field>
 
@@ -441,6 +442,10 @@ export default class ArtworkEditForm extends Vue {
   private async suggestMetadataFromFile(image: File) {
     // Suggested title is filename without extension
     this.artwork.title = image.name.slice(0, image.name.lastIndexOf('.'))
+    this.generateSlugFromTitle()
+  }
+
+  private generateSlugFromTitle() {
     this.artwork.slug = this.artwork.title
       .toLowerCase()
       .replace(/[^a-z0-9_\-]/g, '')
