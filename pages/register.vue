@@ -279,7 +279,7 @@
                 && fields.artistMedium.valid
                 && fields.artistLinks.valid
                 && signUpStep++
-                && focusFormField('preferredUsernameField')
+                && focusFormField('howDidYouHearAboutUsField')
               "
             >
               Continue
@@ -293,61 +293,6 @@
           <v-stepper-step
             step="4"
             editable
-            :rules="[() => fields.preferredUsername.valid]"
-            @click="focusFormField('preferredUsernameField')"
-          >
-            Preferred Username
-          </v-stepper-step>
-          <v-stepper-content step="4">
-            <v-sheet flat tile class="pt-1">
-              <p>
-                As <strong>Art By City</strong> is a decentralized application,
-                we will be deploying a Smart Contract to facilitate username
-                registration and profile routing.  Use the field below to let us
-                know what your preferred username is and we can pre-register it
-                before the contract is deployed on Arweave Mainnet.
-              </p>
-
-              <!-- Preferred Username -->
-              <v-form
-                ref="preferredUsernameForm"
-                @submit.prevent="
-                  validateForm('preferredUsernameForm')
-                  && focusFormField('step4Continue')
-                "
-              >
-                <v-text-field
-                  ref="preferredUsernameField"
-                  v-model="fields.preferredUsername.value"
-                  outlined
-                  label="Preferred Username"
-                  counter="32"
-                  :rules="[rules.count(32)]"
-                ></v-text-field>
-              </v-form>
-            </v-sheet>
-            <v-btn
-              ref="step4Continue"
-              elevation="2"
-              outlined
-              class="mx-auto mb-2"
-              @click="
-                fields.preferredUsername.valid
-                && signUpStep++
-                && focusFormField('howDidYouHearAboutUsField')
-              "
-            >
-              Continue
-            </v-btn>
-            <small>
-              press <strong>Enter</strong><v-icon>mdi-keyboard-return</v-icon>
-            </small>
-          </v-stepper-content>
-
-          <!-- Form Step 5 -->
-          <v-stepper-step
-            step="5"
-            editable
             :rules="[
               () => fields.howDidYouHearAboutUs.valid
                 && fields.referral.valid
@@ -356,7 +301,7 @@
           >
             Referral
           </v-stepper-step>
-          <v-stepper-content step="5">
+          <v-stepper-content step="4">
             <v-sheet flat tile class="pt-1">
 
               <!-- How Did You Hear About Us? -->
@@ -415,9 +360,9 @@
             </small>
           </v-stepper-content>
 
-          <!-- Form Step 6 -->
-          <v-stepper-step step="6" editable>Review &amp; Submit</v-stepper-step>
-          <v-stepper-content step="6">
+          <!-- Form Step 5 -->
+          <v-stepper-step step="5" editable>Review &amp; Submit</v-stepper-step>
+          <v-stepper-content step="5">
             <v-sheet flat tile class="pt-1">
               <v-simple-table>
                 <template v-slot:default>
@@ -478,7 +423,6 @@ export default class RegisterPage extends Vue {
     artistType: { label: 'Artist Type', value: '', valid: true },
     artistMedium: { label: 'Artist Medium', value: '', valid: true },
     artistLinks: { label: 'Artist Links', value: '', valid: true },
-    preferredUsername: { label: 'Preferred Username', value: '', valid: true },
     howDidYouHearAboutUs: { label: 'How did you hear about us?', value: '', valid: true },
     referral: { label: 'Referred By', value: '', valid: true },
   }
@@ -539,7 +483,6 @@ export default class RegisterPage extends Vue {
       && this.validateForm('artistTypeForm')
       && this.validateForm('artistMediumForm')
       && this.validateForm('artistLinksForm')
-      && this.validateForm('preferredUsernameForm')
       && this.validateForm('howDidYouHearAboutUsForm')
       && this.validateForm('referralForm')
 
