@@ -76,7 +76,7 @@ export default async function (
               format
             )
 
-            res.setHeader('Content-Type', 'image/webp')
+            res.setHeader('Content-Type', `image/${format}`)
             res.end(thumbnail)
           } else {
             next()
