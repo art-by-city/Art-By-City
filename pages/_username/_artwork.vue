@@ -232,8 +232,6 @@ export default class ArtworkPage extends FormPageComponent {
       if (userAgent?.toLowerCase().startsWith('twitterbot')) {
         this.isUserAgentBot = true
       }
-
-      this.isUserAgentBot = true
     }
 
     ProgressService.start()
