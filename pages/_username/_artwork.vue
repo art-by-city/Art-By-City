@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-container v-if="artwork">
+    <v-container v-if="artwork && !isUserAgentBot">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
         <v-img
           class="preview-artwork"
@@ -220,12 +220,22 @@ export default class ArtworkPage extends FormPageComponent {
   txIdOrSlug: string = this.$route.params.artwork
   txId?: string
   tx: UserTransaction | null = null
+  isUserAgentBot: boolean = false
 
   get username() {
     return this.profile?.displayName || this.artwork?.creator.address || ''
   }
 
   async fetch() {
+    if (process.server) {
+      const userAgent = this.$nuxt.context.req.headers['user-agent']
+      if (userAgent?.toLowerCase().startsWith('twitterbot')) {
+        this.isUserAgentBot = true
+      }
+
+      this.isUserAgentBot = true
+    }
+
     ProgressService.start()
     try {
       const artwork = await this.$artworkService.fetchByTxIdOrSlug(
@@ -235,6 +245,11 @@ export default class ArtworkPage extends FormPageComponent {
 
       if (artwork) {
         this.artwork = artwork
+
+        if (this.isUserAgentBot) {
+          this.artwork.images = []
+        }
+
         this.profile = await this.$profileService.fetchProfile(
           this.artwork.creator.address
         )
