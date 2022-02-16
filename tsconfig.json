@@ -18,11 +18,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
-<<<<<<< HEAD
-    "resolveJsonModule": true,
-=======
     "useUnknownInCatchVariables": false,
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
     "baseUrl": ".",
     "paths": {
       "~/*": [
