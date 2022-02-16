@@ -12,26 +12,6 @@
           cols="6" offset="2"
             sm="4" offset-sm="1"
         >
-<<<<<<< HEAD
-          <div class="user-profile-info">
-            <div class="
-              user-profile-username
-              text-lowercase
-              font-weight-black
-              text-body-2
-            ">
-              {{ artist.username }}
-            </div>
-            <div class="
-              user-profile-username
-              text-lowercase
-              font-weight-black
-              text-body-2
-            ">
-              {{ artist.address }}
-            </div>
-          </div>
-=======
           <v-card elevation="0">
             <v-card-title>
               {{ primaryName }}
@@ -113,7 +93,6 @@
                 </template>
             </v-card-actions>
           </v-card>
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
         </v-col>
         <v-btn v-if="isProfileOwner"
           fab
@@ -142,46 +121,19 @@
       </v-row>
     </v-container>
 
-<<<<<<< HEAD
-    <ProfileEditForm
-      :show.sync="showEditForm"
-      :username.sync="artist.username"
-    />
-=======
     <template v-if="isOwner">
       <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
       <EditProfileDialog :show.sync="showEditProfileDialog" />
     </template>
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-<<<<<<< HEAD
-import PageComponent from '~/components/pages/page.component'
-import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import ProfileEditForm from '~/components/profile/profileEditForm.component.vue'
-=======
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
 import { User } from '~/models'
 import { debounce } from '~/helpers'
 import ProgressService from '~/services/progress/service'
-<<<<<<< HEAD
-import { debounce } from '~/helpers'
-
-@Component({
-  components: {
-    ArtworkCard,
-    ProfileEditForm
-  }
-})
-export default class UserProfilePage extends PageComponent {
-  feed: FeedItem[] = []
-  artist: User = { address: '' }
-  showEditForm: boolean = false
-=======
 import PageComponent from '~/components/pages/page.component'
 import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
@@ -265,34 +217,10 @@ export default class UserProfilePage extends PageComponent {
       })
     }
   }
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
 
   async fetch() {
     ProgressService.start()
     try {
-<<<<<<< HEAD
-      const username = await this.$usernameService.resolveUsername(
-        this.$route.params.username
-      )
-
-      if (username) {
-        this.artist.username = username
-        this.artist.address = this.$route.params.username
-      } else {
-        const address = await this.$usernameService.resolveAddress(
-          this.$route.params.username
-        )
-
-        if (address) {
-          this.artist.address = address
-          this.artist.username = this.$route.params.username
-        } else {
-          this.artist.address = this.$route.params.username
-        }
-      }
-
-      this.feed = await this.$artworkService.fetchArtworkFeed(
-=======
       const profile = await this.$profileService.fetchProfile(
         this.artist.address
       )
@@ -302,7 +230,6 @@ export default class UserProfilePage extends PageComponent {
       }
 
       this.likesCount = await this.$likesService.fetchTotalLikedByUser(
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
         this.artist.address
       )
     } catch (error) {
@@ -313,24 +240,6 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
-<<<<<<< HEAD
-  get isProfileOwner(): boolean {
-    if (
-      this.$auth.loggedIn &&
-      this.$auth.user.address === this.artist.address
-    ) {
-      return true
-    }
-
-    return false
-  }
-
-  @debounce
-  onEditProfileClicked() {
-    if (this.isProfileOwner) {
-      this.showEditForm = true
-    }
-=======
   @debounce
   onEditProfileClicked() {
     this.showEditProfileDialog = true
@@ -339,7 +248,6 @@ export default class UserProfilePage extends PageComponent {
   @debounce
   onEditAvatarClicked() {
     this.showAvatarUploadDialog = true
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
   }
 }
 </script>

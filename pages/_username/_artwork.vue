@@ -44,13 +44,9 @@
             <span class="text-h4 text-sm-h2">{{ artwork.title }}</span>
           </v-row>
           <v-row dense>
-<<<<<<< HEAD
-            Created by: <nuxt-link :to="`/${username}`">
-=======
             <strong>Created by</strong>
             &nbsp;
             <nuxt-link :to="`/${artwork.creator.address}`" class="text-truncate">
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
               {{ username }}
             </nuxt-link>
           </v-row>
@@ -184,48 +180,6 @@ import ProgressService from '~/services/progress/service'
   }
 })
 export default class ArtworkPage extends FormPageComponent {
-<<<<<<< HEAD
-  artwork!: Artwork
-  previewImage?: ArtworkImage
-  cachedArtwork!: Artwork
-  editMode = false
-  zoom = false
-  username?: string
-
-  async asyncData({ params, app, error, redirect }: Context) {
-    let artwork, previewImage, username
-    let editMode = false
-
-    try {
-      const res = await app.$arweave.api.get(params.artwork)
-
-      // Try to lookup username
-      const _username = await app.$usernameService.resolveUsername(
-        params.username
-      )
-
-      if (_username) {
-        username = _username
-      } else {
-        username = params.username
-      }
-
-      if (!res.data.error) {
-        artwork = res.data
-        previewImage = res.data.images[0]
-      } else {
-        redirect('/')
-      }
-    } catch (err) {
-      if (err.response?.status === 404) {
-        return error({ statusCode: 404, message: 'artwork not found' })
-      } else {
-        console.error(err)
-        app.$toastService.error(err)
-      }
-    } finally {
-      return { artwork, previewImage, editMode, username }
-=======
   head() {
     if (!this.artwork) { return {} }
 
@@ -255,7 +209,6 @@ export default class ArtworkPage extends FormPageComponent {
         { name: 'twitter:card',    content: 'summary_large_image' },
         { name: 'twitter:creator', content: `@${twitter}`         },
       ]
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
     }
   }
 
@@ -289,14 +242,14 @@ export default class ArtworkPage extends FormPageComponent {
       )
 
       if (artwork) {
-        this.artwork = artwork
-
         if (this.isUserAgentBot) {
-          this.artwork.images = []
+          artwork.images = []
         }
 
+        this.artwork = artwork
+
         this.profile = await this.$profileService.fetchProfile(
-          this.artwork.creator.address
+          artwork.creator.address
         )
         this.setPreviewImage()
       } else {

@@ -121,7 +121,7 @@ export default class NotificationsMenu extends Vue {
     this.$store.subscribe((mutation, _state) => {
       if (mutation.type === `notifications/${ADD_NOTIFICATION}`) {
         this.popupNotifs.push(mutation.payload)
-        this.popupTimeouts.push(setTimeout(() => {
+        this.popupTimeouts.push(window.setTimeout(() => {
           const idx = this.popupNotifs.findIndex(
             (pn) => pn.guid === mutation.payload.guid
           )
@@ -144,7 +144,7 @@ export default class NotificationsMenu extends Vue {
       readtime: new Date().getTime()
     })
 
-    this.lastUnreadTimeout = setTimeout(() => {
+    this.lastUnreadTimeout = window.setTimeout(() => {
       this.lastUnreadCount = 0
     }, 10000, this)
   }

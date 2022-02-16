@@ -4,44 +4,29 @@ import ArDB from '@textury/ardb'
 import { readContract, interactWriteDryRun, interactWrite } from 'smartweave'
 import { ContractInteractionResult } from 'smartweave/lib/contract-step'
 
-import {
-  handle,
-  UsernamesContractState
-} from '~/contracts'
-import { TransactionBuilder } from '~/builders'
-import { Tag } from 'arweave/node/lib/transaction'
+import { TransactionService } from './'
 
-export default class UsernameService {
-  $arweave!: Arweave
-  $ardb!: ArDB
-  transactionBuilder!: TransactionBuilder
+// import {
+//   handle,
+//   UsernamesContractState
+// } from '~/contracts'
 
+export default class UsernameService extends TransactionService {
   private deployer!: string
   private contract?: string
 
-  constructor(context: Context) {
-    this.$arweave = context.$arweave
-    this.$ardb = context.$ardb
-    this.deployer = context.$config.arweave.appConfig.deployer
-    this.transactionBuilder = new TransactionBuilder(
-      this.$arweave,
-      this.$ardb,
-      context.$config.arweave.appConfig
-    )
-  }
-
   private async fetchContract(): Promise<string> {
-    const txs = await this.$ardb.search('transactions').find()
+    // const txs = await this.$ardb.search('transactions').find()
 
-    const contractTxs = await this.transactionBuilder.searchTransactions(
-      'contract',
-      { owner: this.deployer, contractName: 'usernames' },
-      'HEIGHT_DESC'
-    )
+    // const contractTxs = await this.transactionFactory.searchTransactions(
+    //   'contract',
+    //   { owner: this.deployer, contractName: 'usernames' },
+    //   'HEIGHT_DESC'
+    // )
 
-    if (contractTxs.length > 0) {
-      return contractTxs[0].id
-    }
+    // if (contractTxs.length > 0) {
+    //   return contractTxs[0].id
+    // }
 
     throw new Error('Error reading usernames contract')
   }
@@ -56,16 +41,16 @@ export default class UsernameService {
       }
     }
 
-    const state = await readContract(
-      this.$arweave,
-      this.contract
-    ) as UsernamesContractState
+    // const state = await readContract(
+    //   this.$arweave,
+    //   this.contract
+    // ) as UsernamesContractState
 
-    for (const username in state.usernames) {
-      if (state.usernames[username].owner === address) {
-        return username
-      }
-    }
+    // for (const username in state.usernames) {
+    //   if (state.usernames[username].owner === address) {
+    //     return username
+    //   }
+    // }
 
     return
   }
@@ -80,16 +65,16 @@ export default class UsernameService {
       }
     }
 
-    const state = await readContract(
-      this.$arweave,
-      this.contract
-    ) as UsernamesContractState
+    // const state = await readContract(
+    //   this.$arweave,
+    //   this.contract
+    // ) as UsernamesContractState
 
-    const entry = state.usernames[username]
+    // const entry = state.usernames[username]
 
-    if (entry?.owner) {
-      return entry.owner
-    }
+    // if (entry?.owner) {
+    //   return entry.owner
+    // }
 
     return
   }
@@ -99,24 +84,26 @@ export default class UsernameService {
       this.contract = await this.fetchContract()
     }
 
-    const state = await readContract(
-      this.$arweave,
-      this.contract
-    ) as UsernamesContractState
+    // const state = await readContract(
+    //   this.$arweave,
+    //   this.contract
+    // ) as UsernamesContractState
 
-    try {
-      const res = handle(state, {
-        caller: '',
-        input: {
-          function: 'register',
-          username
-        }
-      })
+    // try {
+    //   const res = handle(state, {
+    //     caller: '',
+    //     input: {
+    //       function: 'register',
+    //       username
+    //     }
+    //   })
 
-      return { type: 'ok', state: res.state, result: res.result }
-    } catch (error) {
-      return { type: 'exception', state, result: error.message }
-    }
+    //   return { type: 'ok', state: res.state, result: res.result }
+    // } catch (error) {
+    //   return { type: 'exception', state, result: error.message }
+    // }
+
+    return { type: 'error', result: null, state: null }
 
     // NB: Ideally we'd just be able to use this, but doesn't work with ArLocal
     // return await interactWriteDryRun(

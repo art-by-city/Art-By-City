@@ -38,11 +38,14 @@ export default ({ $config }: Context, inject: Inject) => {
     //     Can take this out if reverse proxy project is deprecated
     if (process.server) {
       const _request = arweave.api.request.bind(arweave.api)
-      arweave.api.request = (): AxiosInstance => {
+
+      arweave.api.request = () => {
         const instance = _request()
 
         instance.interceptors.request.use((config) => {
-          config.headers.origin = $config.baseUrl
+          if (config.headers) {
+            config.headers.origin = $config.baseUrl
+          }
 
           return config
         })

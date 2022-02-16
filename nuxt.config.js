@@ -73,14 +73,9 @@ export default {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
     arweave: {
       appConfig: {
-<<<<<<< HEAD
-        name: process.env.APP_NAME || 'ArtByCity',
+        name: process.env.APP_NAME || 'ArtByCity-Development',
         version: process.env.APP_VERSION || 'development',
         deployer: process.env.CONTRACT_DEPLOYER_ADDRESS || ''
-=======
-        name: process.env.APP_NAME || 'ArtByCity-Development',
-        version: process.env.APP_VERSION || 'development'
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
       },
       apiConfig: {
         protocol: process.env.ARWEAVE_PROTOCOL || 'http',

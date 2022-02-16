@@ -13,10 +13,6 @@
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
     "deploy:staging": "gcloud app deploy app.staging.yaml --project art-by-city-staging-299519",
     "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919",
-<<<<<<< HEAD
-    "arlocal": "ts-node --project node.tsconfig.json arlocal.js",
-=======
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
     "build:contracts": "ts-node --project node.tsconfig.json contracts/scripts/build.ts",
     "deploy:contracts": "ts-node --project node.tsconfig.json contracts/scripts/deploy.ts",
     "test:contracts": "ts-node --project node.tsconfig.json contracts/scripts/getLatestState.ts",
@@ -52,33 +48,13 @@
     "nuxt-typed-vuex": "^0.2.0",
     "reflect-metadata": "^0.1.13",
     "sass-loader": "^10.1.1",
-<<<<<<< HEAD
     "smartweave": "^0.4.41",
-=======
     "sharp": "^0.30.1",
     "typescript": "^4.4.3",
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
     "vee-validate": "^3.3.0",
     "vuedraggable": "^2.24.1"
   },
   "devDependencies": {
-<<<<<<< HEAD
-    "@babel/cli": "^7.14.8",
-    "@babel/core": "^7.15.0",
-    "@babel/preset-typescript": "^7.15.0",
-    "@textury/arlocal": "^1.0.27",
-    "babel-eslint": "^10.0.1",
-    "babel-plugin-transform-remove-imports": "^1.5.5",
-    "eslint": "^6.1.0",
-    "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-nuxt": ">=0.4.2",
-    "eslint-plugin-prettier": "^3.1.2",
-    "nodemon": "^2.0.4",
-    "prettier": "^1.19.1",
-    "swagger-jsdoc": "^4.2.0",
-    "swagger-ui-express": "^4.1.4",
-    "ts-node": "^9.0.0"
-=======
     "@nuxtjs/eslint-config-typescript": "^7.0.2",
     "@nuxtjs/eslint-module": "^3.0.2",
     "eslint": "^8.1.0",
@@ -86,6 +62,5 @@
     "eslint-plugin-nuxt": "^3.0.0",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.4.1"
->>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
   }
 }
