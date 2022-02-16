@@ -94,17 +94,6 @@
             </v-card-actions>
           </v-card>
         </v-col>
-        <v-btn v-if="isProfileOwner"
-          fab
-          icon
-          small
-          right
-          color="primary"
-          elevation="2"
-          @click="onEditProfileClicked"
-        >
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
       </v-row>
       <v-row>
         <v-col cols="10" offset="1" sm="6" offset-sm="3">
