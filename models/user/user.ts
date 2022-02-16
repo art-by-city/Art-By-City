@@ -1,6 +1,4 @@
-export interface UserAvatar {
-  source: string
-}
+import { Avatar, Profile } from '~/types'
 
 export default interface User {
   address: string
@@ -8,7 +6,8 @@ export default interface User {
   // id: string
   // username: string
   // name: string
-  // avatar: UserAvatar
+  avatar?: Avatar | null
+  profile?: Profile | null
   // roles: string[]
   // city: string
   // email: string

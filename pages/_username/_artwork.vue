@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-container v-if="artwork">
+    <v-container v-if="artwork && !isUserAgentBot">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
         <v-img
           class="preview-artwork"
@@ -11,7 +11,11 @@
           @click="onPreviewArtworkClicked"
         ></v-img>
       </v-row>
-      <v-row dense justify="center" v-if="artwork.images && artwork.images.length > 1">
+      <v-row
+        v-if="artwork.images && artwork.images.length > 1"
+        justify="center"
+        dense
+      >
         <div class="artwork-image-selector-container">
           <div
             class="artwork-image-selector"
@@ -35,28 +39,93 @@
         </v-col>
       </v-row>
       <v-row dense>
-        <v-col offset="1" offset-sm="2" cols="6" sm="5">
+        <v-col offset-sm="2" cols="12" sm="5">
           <v-row dense>
-            <span class="text-lowercase text-h4 text-sm-h2">{{ artwork.title }}</span>
+            <span class="text-h4 text-sm-h2">{{ artwork.title }}</span>
           </v-row>
           <v-row dense>
+<<<<<<< HEAD
             Created by: <nuxt-link :to="`/${username}`">
+=======
+            <strong>Created by</strong>
+            &nbsp;
+            <nuxt-link :to="`/${artwork.creator.address}`" class="text-truncate">
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
               {{ username }}
             </nuxt-link>
           </v-row>
+          <v-row dense v-if="artwork.created">
+            <strong>Created</strong>
+            &nbsp;
+            <span>{{ artwork.created }}</span>
+          </v-row>
+          <v-row dense v-if="artwork.city">
+            <strong>City</strong>
+            &nbsp;
+            <span class="text-uppercase">{{ artwork.city }}</span>
+          </v-row>
+          <v-row dense v-if="artwork.medium">
+            <strong>Medium</strong>
+            &nbsp;
+            <span>{{ artwork.medium }}</span>
+          </v-row>
+          <v-row dense v-if="artwork.published">
+            <strong>Published</strong>
+            &nbsp;
+            <span>
+              {{ (new Date(artwork.published)).toLocaleDateString() }}
+            </span>
+          </v-row>
           <v-row dense>
-            <div class="text-lowercase" style="width: 100%">
+            <strong>Transaction ID</strong>
+            &nbsp;
+            <span class="text-truncate">{{ artwork.id }}</span>
+            &nbsp;
+            <a
+              :href="`https://viewblock.io/arweave/tx/${artwork.id}`"
+              target="_blank"
+              class="license-anchor"
+            >
+              ViewBlock
+              <v-icon small dense class="adjust-icon">
+                mdi-open-in-new
+              </v-icon>
+            </a>
+          </v-row>
+          <v-row dense v-if="artwork.license">
+            <strong>License</strong>
+            &nbsp;
+            <span>{{ artwork.license.name }}</span>
+            &nbsp;
+            <a
+              :href="artwork.license.reference"
+              target="_blank"
+              class="license-anchor"
+            >
+              Learn More
+              <v-icon small dense class="adjust-icon">
+                mdi-open-in-new
+              </v-icon>
+            </a>
+          </v-row>
+          <v-row dense v-if="artwork.description">
+            <strong>Description</strong>
+            <div style="width: 100%">
               {{ artwork.description }}
             </div>
           </v-row>
         </v-col>
         <v-col cols="5">
-          <div style="align-self: flex-end">
-            <!-- <LikeButton :artwork="artwork"/> -->
+          <div v-if="$auth.loggedIn" style="align-self: flex-end">
+            <LikeButton
+              :entityOwner="artwork.creator.address"
+              :entityTxId="artwork.id"
+            />
           </div>
-          <div class="text-lowercase">{{ artwork.type }}</div>
-          <div class="text-lowercase">{{ cityName }}</div>
-          <div class="text-lowercase">{{ hashtagsString }}</div>
+          <!--
+            <div class="text-lowercase">{{ artwork.type }}</div>
+            <div class="text-lowercase">{{ hashtagsString }}</div>
+          -->
         </v-col>
       </v-row>
 
@@ -65,45 +134,57 @@
         :show.sync="zoom"
         :src="previewImage.dataUrl"
       />
-
-      <v-dialog
-        :value="editMode"
-        persistent
-        :max-width="editDialogMaxWidth"
-      >
-        <ArtworkEditForm
-          :artwork="artwork"
-          @previewImageChanged="setPreviewImage()"
-          @cancel="onCancelClicked"
-        />
-      </v-dialog>
+    </v-container>
+    <v-container v-else>
+      <v-row justify="center">
+        <v-col cols="auto">
+          <template v-if="tx">
+            <TransactionConfirmationProgress :tx="tx" />
+          </template>
+          <template v-else>
+            <!-- <h1>404 Artwork not found :(</h1> -->
+          </template>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
 
 <script lang="ts">
-import { Context } from '@nuxt/types'
 import { Component } from 'nuxt-property-decorator'
 
 import LikeButton from '~/components/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
-import ArtworkZoomDialog from '~/components/artwork/ArtworkZoomDialog.component.vue'
+import ArtworkZoomDialog from
+  '~/components/artwork/ArtworkZoomDialog.component.vue'
 import {
   ArtworkEditControls,
   ArtworkEditForm
 } from '~/components/artwork/edit'
-import { Artwork, ArtworkImage } from '~/types'
+import TransactionConfirmationProgress from
+  '~/components/common/TransactionConfirmationProgress.component.vue'
+import {
+  Artwork,
+  ArtworkImage,
+  UserTransaction,
+  SetUserTransactionStatusPayload,
+  Profile
+  } from '~/types'
 import { debounce } from '~/helpers'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import ProgressService from '~/services/progress/service'
 
 @Component({
   components: {
     LikeButton,
     ArtworkZoomDialog,
     ArtworkEditControls,
-    ArtworkEditForm
+    ArtworkEditForm,
+    TransactionConfirmationProgress
   }
 })
 export default class ArtworkPage extends FormPageComponent {
+<<<<<<< HEAD
   artwork!: Artwork
   previewImage?: ArtworkImage
   cachedArtwork!: Artwork
@@ -144,140 +225,125 @@ export default class ArtworkPage extends FormPageComponent {
       }
     } finally {
       return { artwork, previewImage, editMode, username }
+=======
+  head() {
+    if (!this.artwork) { return {} }
+
+    const username = this.$route.params.username
+    const displayName = this.profile?.displayName || username
+    const title = `${this.artwork.title} by ${displayName}`
+    const url = `${this.$config.baseUrl}/${username}/${this.txIdOrSlug}`
+    const thumbnailUrl =
+      `${this.$config.baseUrl}/api/artwork/${username}/${this.txIdOrSlug}`
+    const twitter = this.profile?.twitter || ''
+
+    return {
+      title,
+      meta: [
+        // Open Graph
+        { property: 'og:title',        content: title                    },
+        { property: 'og:description',  content: this.artwork.description },
+        { property: 'og:type',         content: 'artbycity:artwork'      },
+        { property: 'og:url',          content: url                      },
+        { property: 'og:image',        content: thumbnailUrl             },
+        { property: 'og:image:alt',    content: this.artwork.description },
+        // { property: 'og:image:type',   content: ''                       },
+        // { property: 'og:image:width',  content: ''                       },
+        // { property: 'og:image:height', content: ''                       },
+
+        // Twitter
+        { name: 'twitter:card',    content: 'summary_large_image' },
+        { name: 'twitter:creator', content: `@${twitter}`         },
+      ]
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
     }
   }
 
-  get isMobile() {
-    switch (this.$vuetify.breakpoint.name) {
-      case 'xs':
-      case 'sm':
-      case 'md': return true
-      case 'lg':
-      case 'xl':
-        default: return false
-    }
+  artwork: Artwork | null = null
+  profile: Profile | null = null
+  previewImage: ArtworkImage | null = null
+  cachedArtwork!: Artwork
+  zoom = false
+  txIdOrSlug: string = this.$route.params.artwork
+  txId?: string
+  tx: UserTransaction | null = null
+  isUserAgentBot: boolean = false
+
+  get username() {
+    return this.profile?.displayName || this.artwork?.creator.address || ''
   }
 
-  get editDialogMaxWidth() {
-    if (this.isMobile) {
-      return '1785px'
+  async fetch() {
+    if (process.server) {
+      const userAgent = this.$nuxt.context.req.headers['user-agent']
+      if (userAgent?.toLowerCase().startsWith('twitterbot')) {
+        this.isUserAgentBot = true
+      }
     }
 
-    return '500px'
-  }
+    ProgressService.start()
+    try {
+      const artwork = await this.$artworkService.fetchByTxIdOrSlug(
+        this.txIdOrSlug,
+        this.$route.params.username
+      )
 
-  get cityName() {
-    // for (let i = 0; i < this.$store.state.config.cities.length; i++) {
-    //   if (this.$store.state.config.cities[i].id === this.artwork.city) {
-    //     return this.$store.state.config.cities[i].name
-    //   }
-    // }
-    return ''
+      if (artwork) {
+        this.artwork = artwork
+
+        if (this.isUserAgentBot) {
+          this.artwork.images = []
+        }
+
+        this.profile = await this.$profileService.fetchProfile(
+          this.artwork.creator.address
+        )
+        this.setPreviewImage()
+      } else {
+        this.txId = this.txIdOrSlug
+        this.tx = this.$accessor.transactions.getById(this.txId)
+        this.$store.subscribe(async (mutation) => {
+          if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+            const payload = mutation.payload as SetUserTransactionStatusPayload
+            if (payload.type === 'artwork' && payload.id === this.txId) {
+              if (payload.status === 'CONFIRMED') {
+                this.$fetch()
+              } else {
+                this.tx = this.$accessor.transactions.getById(this.txId)
+              }
+            }
+          }
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      this.$toastService.error(error)
+    } finally {
+      ProgressService.stop()
+    }
   }
 
   get hashtagsString() {
-    return this.artwork.hashtags.map((h) => { return `#${h}` }).join(', ')
+    return this.artwork?.hashtags.map(h => `#${h}`).join(', ') || ''
   }
 
   setPreviewImage(image?: ArtworkImage) {
-    this.previewImage = image
-      ? image
-      : this.artwork.images[0]
+    if (image) {
+      this.previewImage = image
+    } else if (
+      this.artwork
+      && this.artwork.images
+      && this.artwork.images.length > 0
+    ) {
+      this.previewImage = this.artwork.images[0]
+    } else {
+      this.previewImage = null
+    }
   }
 
   @debounce
   onPreviewArtworkClicked() {
     this.zoom = true
-  }
-
-  @debounce
-  toggleEditMode(forceState?: boolean) {
-    // if (!this.editMode) {
-    //   this.cachedArtwork = { ...this.artwork }
-    //   this.cachedArtwork.images = [ ...this.artwork.images ]
-    // }
-    // if (typeof forceState !== 'undefined') {
-    //   this.editMode = !!forceState
-    // } else {
-    //   this.editMode = !this.editMode
-    // }
-  }
-
-  @debounce
-  onCancelClicked() {
-    // if (this.isNew) {
-    //   this.$router.push('/portfolio')
-    // } else {
-    //   this.artwork = Object.assign({}, this.artwork, this.cachedArtwork)
-    //   this.toggleEditMode(false)
-    // }
-  }
-
-  @debounce
-  async saveArtwork() {
-    // const artwork = this.isNew
-    //   ? await this.$artworkService.createArtwork(this.artwork)
-    //   : await this.$artworkService.updateArtwork(this.artwork)
-
-    // if (artwork) {
-    //   this.previewImage = artwork.images[0]
-    //   window.history.replaceState(
-    //     window.history.state,
-    //     document.title,
-    //     `/${artwork.owner.username}/${artwork.slug}`
-    //   )
-    //   this.artwork = Object.assign({}, this.artwork, artwork)
-    //   this.toggleEditMode(false)
-    // }
-  }
-
-  @debounce
-  async publishOrApproveArtwork(intent: 'publish' | 'approve') {
-    // ProgressService.start()
-    // try {
-    //   const action = intent === 'publish'
-    //     ? this.artwork.published
-    //       ? 'unpublish'
-    //       : 'publish'
-    //     : this.artwork.approved
-    //       ? 'unapprove'
-    //       : 'approve'
-    //   const { success } = await this.$axios.$post(`/api/artwork/${this.artwork.id}/${action}`)
-
-    //   if (success) {
-    //     const published = intent === 'publish' ? !this.artwork.published : this.artwork.published
-    //     const approved = intent === 'approve' ? !this.artwork.approved : this.artwork.approved
-    //     this.artwork = {
-    //       ...this.artwork,
-    //       published,
-    //       approved
-    //     }
-    //     this.$toastService.success(`artwork updated`)
-    //   }
-    // } catch (error) {
-    //   this.$toastService.error(`error updating artwork`)
-    // }
-    // ProgressService.stop()
-  }
-
-  @debounce
-  async deleteArtwork() {
-    // if (confirm('Are you sure you want to delete this artwork?')) {
-    //   ProgressService.start()
-    //   try {
-    //     const { success } = await this.$axios.$delete(
-    //       `/api/artwork/${this.artwork.id}`
-    //     )
-
-    //     if (success) {
-    //       this.$toastService.success('artwork deleted')
-    //       this.$router.push('/portfolio')
-    //     }
-    //   } catch (error) {
-    //     this.$toastService.error('error deleting artwork')
-    //   }
-    //   ProgressService.stop()
-    // }
   }
 }
 </script>
@@ -297,5 +363,8 @@ export default class ArtworkPage extends FormPageComponent {
   width: 96px;
   margin: 5px;
   display: inline-block;
+}
+.adjust-icon {
+  margin-top: -3px;
 }
 </style>

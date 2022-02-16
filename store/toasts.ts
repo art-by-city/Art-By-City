@@ -25,8 +25,10 @@ export const mutations: MutationTree<ToastStoreState> ={
 
 export const actions: ActionTree<ToastStoreState, any> = {
   async destroyOnExpiration({ commit }, toast: ToastMessage): Promise<void> {
-    setTimeout(() => {
-      commit('remove', toast)
-    }, toast.timeout)
+    if (toast.timeout) {
+      setTimeout(() => {
+        commit('remove', toast)
+      }, toast.timeout)
+    }
   }
 }

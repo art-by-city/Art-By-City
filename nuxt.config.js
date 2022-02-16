@@ -5,18 +5,24 @@ export default {
    ** Headers of the page
    */
   head: {
-    titleTemplate: '%s - ' + process.env.npm_package_name,
-    title: process.env.npm_package_name || '',
+    titleTemplate: '%s | Art By City',
+    title: 'The Artist\'s Permaweb',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
         hid: 'description',
-        name: 'description',
-        content: process.env.npm_package_description || ''
-      }
+        name: 'Description',
+        content: 'The Artist\'s Permaweb - Publish your art permanently on the blockchain'
+      },
+      { property: 'og:site_name', content: 'Art By City' },
+      { name: 'twitter:site', content: '@artbycity' }
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    link: [{
+      rel: 'icon',
+      type: 'image/png',
+      href: 'logo/logo_by_daliah_ammar_square_stacked_64.png'
+    }]
   },
   /*
    ** Customize the progress-bar color
@@ -25,6 +31,7 @@ export default {
     color: 'blue',
     height: '5px',
     duration: 10000,
+    continuous: true,
     throttle: 0
   },
   /*
@@ -44,12 +51,17 @@ export default {
     { src: '~/plugins/ardb.ts' },
     { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',
-    '~/plugins/filters.ts'
+    '~/plugins/filters.ts',
+    { src: '~/plugins/localforage.ts', ssr: false },
   ],
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxt/typescript-build', '@nuxtjs/vuetify'],
+  buildModules: [
+    '@nuxt/typescript-build',
+    '@nuxtjs/vuetify',
+    'nuxt-typed-vuex'
+  ],
   /*
    ** Nuxt.js modules
    */
@@ -61,29 +73,40 @@ export default {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
     arweave: {
       appConfig: {
+<<<<<<< HEAD
         name: process.env.APP_NAME || 'ArtByCity',
         version: process.env.APP_VERSION || 'development',
         deployer: process.env.CONTRACT_DEPLOYER_ADDRESS || ''
+=======
+        name: process.env.APP_NAME || 'ArtByCity-Development',
+        version: process.env.APP_VERSION || 'development'
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
       },
       apiConfig: {
         protocol: process.env.ARWEAVE_PROTOCOL || 'http',
         host: process.env.ARWEAVE_HOST || 'localhost',
         port: process.env.ARWEAVE_PORT || 1984
-      }
+      },
+      waitForConfirmations: process.env.ARWEAVE_TX_CONFIRMATIONS || 12
     },
-
+    artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081'
   },
+  serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     redirect: {
+      logout: '/',
       login: '/',
-      logout: '/'
+      home: false
     },
     strategies: {
       local: false,
-      arconnect: {
-        scheme: '~/schemes/arconnect'
+      'arweave-wallet': {
+        scheme: '~/schemes/arweave-wallet.ts'
       }
-    }
+    },
+    plugins: [
+      { src: '~/plugins/persist-store.ts', ssr: false }
+    ]
   },
   router: {},
   /*

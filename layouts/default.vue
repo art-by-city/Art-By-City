@@ -2,19 +2,21 @@
   <v-app dark class="app">
     <AppBar
       :config="$config"
-      :user="$auth.user"
       @login="login"
       @logout="logout"
+      @signup="showSignupModal"
     />
 
     <v-main class="main">
-      <v-container fluid class="pl-4 pr-4 pt-7 main-container content-container">
-        <nuxt v-if="!$slots.default" />
-        <slot />
-      </v-container>
+      <!-- <v-container fluid class="pl-4 pr-4 pt-7 main-container"> -->
+      <nuxt v-if="!$slots.default" />
+      <slot />
+      <!-- </v-container> -->
     </v-main>
 
-    <Footer :shouldChangelogIconBlink="shouldChangelogIconBlink()" />
+    <Footer />
+
+    <AuthDialog @login="login" :show.sync="showAuthDialog" />
 
     <div class="toast-alerts-container">
       <v-alert
@@ -47,21 +49,20 @@
 import { Vue, Component } from 'nuxt-property-decorator'
 
 import ToastMessage from '~/models/toasts/toastMessage'
-import { AppBar, Footer } from '~/components/layout'
+import { AppBar, Footer, AuthDialog } from '~/components'
+import { ArweaveWalletNotInstalledError } from '~/schemes/arweave-wallet'
 
 @Component({
   components: {
     AppBar,
-    Footer
+    Footer,
+    AuthDialog
   }
 })
 export default class DefaultLayout extends Vue {
-  shouldChangelogIconBlink(): boolean {
-    // return !this.$changelogService.hasSeenLatestChangelog()
-    return false
-  }
-
   toasts: ToastMessage[] = []
+  showAuthDialog: string = ''
+
   removeToast(toast: ToastMessage) {
     this.$store.commit('toasts/remove', toast)
   }
@@ -81,25 +82,46 @@ export default class DefaultLayout extends Vue {
     //     }
     //   )
     // }
+
+    this.$nuxt.$on('needs-auth', (cb: Function) => {
+      if (this.$auth.loggedIn) {
+        cb()
+      } else {
+        this.$nuxt.$once('auth-completed', () => {
+          cb()
+        })
+        this.showSignupModal()
+      }
+    })
   }
 
   async login() {
     try {
-      await this.$auth.loginWith('arconnect')
+      await this.$auth.loginWith('arweave-wallet')
+      this.$nuxt.$emit('auth-completed')
+      this.showAuthDialog = 'alpha-agreement'
     } catch (error) {
-      this.$toastService.error(error)
+      if (error instanceof ArweaveWalletNotInstalledError) {
+        this.showAuthDialog = 'sign-up'
+      } else {
+        this.$toastService.error(error)
+      }
     }
   }
 
   async logout() {
     await this.$auth.logout()
   }
+
+  async showSignupModal() {
+    this.showAuthDialog = 'sign-up'
+  }
 }
 </script>
 
 <style scoped>
 .app {
-  background-color: #FAFAFA;
+  background-color: white;
 }
 
 .main-container {
@@ -111,13 +133,13 @@ export default class DefaultLayout extends Vue {
   position: fixed;
   bottom: 32px;
   right: 32px;
-  z-index: 5;
+  z-index: 9999;
 }
 
 .progress-bar {
   top: 48px;
   position: fixed;
-  z-index: 5;
+  z-index: 9999;
 }
 
 .notification-icon >>> .v-badge__badge {

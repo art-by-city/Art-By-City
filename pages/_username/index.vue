@@ -3,20 +3,16 @@
     <v-container fluid>
       <v-row align="end">
         <v-col
-          cols="1" offset="3"
+          cols="2" offset="2"
             sm="2" offset-sm="3"
         >
-          <UserAvatar
-            class="user-profile-avatar"
-            abbr
-            :user="artist"
-            :size="$vuetify.breakpoint.name"
-          />
+          <UserAvatar :user="artist" />
         </v-col>
         <v-col
           cols="6" offset="2"
             sm="4" offset-sm="1"
         >
+<<<<<<< HEAD
           <div class="user-profile-info">
             <div class="
               user-profile-username
@@ -35,6 +31,89 @@
               {{ artist.address }}
             </div>
           </div>
+=======
+          <v-card elevation="0">
+            <v-card-title>
+              {{ primaryName }}
+            </v-card-title>
+            <v-card-subtitle>
+              <p class="mb-0">{{ secondaryName }}</p>
+              <p v-if="artist.profile && artist.profile.twitter">
+                <v-icon small>mdi-twitter</v-icon>
+                <a
+                  class="text-decoration-none"
+                  :href="`https://twitter.com/${artist.profile.twitter}`"
+                  target="_blank"
+                >
+                  @{{ artist.profile.twitter }}
+                </a>
+              </p>
+            </v-card-subtitle>
+            <v-card-text>
+              <div v-if="artist.profile">{{ artist.profile.bio }}</div>
+              <v-btn
+                v-if="likesCount > 0"
+                text
+                :to="`${this.artist.address}/likes`"
+              >
+                Liked Art: {{ likesCount }}
+              </v-btn>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+                <template v-if="isOwner">
+                  <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
+                    <template v-slot:activator>
+                      <v-btn
+                        v-model="showEditSpeedDial"
+                        text
+                        outlined
+                      >
+                        Edit
+                      </v-btn>
+                    </template>
+
+                    <v-btn
+                      text
+                      outlined
+                      @click="onEditAvatarClicked"
+                    >
+                      Avatar
+                    </v-btn>
+
+                    <v-btn
+                      text
+                      outlined
+                      @click="onEditProfileClicked"
+                    >
+                      Profile
+                    </v-btn>
+
+                  </v-speed-dial>
+                </template>
+                <template v-else>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on, attrs }">
+                      <span
+                        v-on="on"
+                        v-bind="attrs"
+                        class="cursor--not-allowed"
+                      >
+                        <v-btn
+                          text
+                          outlined
+                          disabled
+                        >
+                          Follow
+                        </v-btn>
+                      </span>
+                    </template>
+                    Coming soon!
+                  </v-tooltip>
+                </template>
+            </v-card-actions>
+          </v-card>
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
         </v-col>
         <v-btn v-if="isProfileOwner"
           fab
@@ -58,37 +137,38 @@
           cols="12"
             sm="6"  offset-sm="3"
         >
-          <v-row>
-            <v-col
-              v-for="(post, i) in feed"
-              :key="post.guid"
-              cols="4"
-            >
-              <v-lazy transition="fade-transition">
-                <ArtworkCard :artwork="post.artwork" />
-              </v-lazy>
-            </v-col>
-          </v-row>
+          <ArtistFeed :address="artist.address" />
         </v-col>
       </v-row>
     </v-container>
 
+<<<<<<< HEAD
     <ProfileEditForm
       :show.sync="showEditForm"
       :username.sync="artist.username"
     />
+=======
+    <template v-if="isOwner">
+      <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
+      <EditProfileDialog :show.sync="showEditProfileDialog" />
+    </template>
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
   </div>
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 
+<<<<<<< HEAD
 import PageComponent from '~/components/pages/page.component'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 import ProfileEditForm from '~/components/profile/profileEditForm.component.vue'
+=======
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
 import { User } from '~/models'
-import { FeedItem } from '~/types'
+import { debounce } from '~/helpers'
 import ProgressService from '~/services/progress/service'
+<<<<<<< HEAD
 import { debounce } from '~/helpers'
 
 @Component({
@@ -101,10 +181,96 @@ export default class UserProfilePage extends PageComponent {
   feed: FeedItem[] = []
   artist: User = { address: '' }
   showEditForm: boolean = false
+=======
+import PageComponent from '~/components/pages/page.component'
+import AvatarUploadDialog from
+  '~/components/avatar/AvatarUploadDialog.component.vue'
+import EditProfileDialog from
+  '~/components/profile/EditProfileDialog.component.vue'
+import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import { SetUserTransactionStatusPayload } from '~/types'
+
+@Component({
+  components: {
+    AvatarUploadDialog,
+    ArtistFeed,
+    EditProfileDialog
+  }
+})
+export default class UserProfilePage extends PageComponent {
+  head() {
+    const username = this.$route.params.username
+    const displayName = this.artist.profile?.displayName || username
+    const title = `${displayName}'s Profile`
+    const description = this.artist.profile?.bio || title
+    const url = `${this.$config.baseUrl}/${username}`
+    const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
+    const avatarAlt = `${username}'s avatar`
+    const twitter = this.artist.profile?.twitter || ''
+
+    return {
+      title,
+      meta: [
+        // Open Graph
+        { property: 'og:title',            content: title       },
+        { property: 'og:description',      content: description },
+        { property: 'og:type',             content: 'profile'   },
+        { property: 'og:profile:username', content: username    },
+        { property: 'og:url',              content: url         },
+        { property: 'og:image',            content: avatarUrl   },
+        { property: 'og:image:alt',        content: avatarAlt   },
+        // { property: 'og:image:type',       content: ''          },
+        // { property: 'og:image:width',      content: ''          },
+        // { property: 'og:image:height',     content: ''          },
+
+        // Twitter
+        { name: 'twitter:card',    content: 'summary'     },
+        { name: 'twitter:creator', content: `@${twitter}` },
+      ]
+    }
+  }
+
+  artist: User = { address: this.$route.params.username }
+  showEditSpeedDial: boolean = false
+  showAvatarUploadDialog: boolean = false
+  showEditProfileDialog: Boolean = false
+  likesCount: number = 0
+
+  get isOwner(): boolean {
+    return this.$auth.user && this.artist.address === this.$auth.user.address
+  }
+
+  get primaryName(): string {
+    return this.artist.profile?.displayName || this.artist.address
+  }
+
+  get secondaryName(): string {
+    if (this.artist.profile?.displayName) {
+      return this.artist.address
+    }
+
+    return ''
+  }
+
+  created() {
+    if (this.$auth.loggedIn) {
+      this.$store.subscribe(async (mutation, _state) => {
+        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+          const payload = mutation.payload as SetUserTransactionStatusPayload
+          if (payload.status === 'CONFIRMED' && payload.type === 'profile') {
+            this.$fetch()
+          }
+        }
+      })
+    }
+  }
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
 
   async fetch() {
     ProgressService.start()
     try {
+<<<<<<< HEAD
       const username = await this.$usernameService.resolveUsername(
         this.$route.params.username
       )
@@ -126,6 +292,17 @@ export default class UserProfilePage extends PageComponent {
       }
 
       this.feed = await this.$artworkService.fetchArtworkFeed(
+=======
+      const profile = await this.$profileService.fetchProfile(
+        this.artist.address
+      )
+
+      if (profile) {
+        Vue.set(this.artist, 'profile', profile)
+      }
+
+      this.likesCount = await this.$likesService.fetchTotalLikedByUser(
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
         this.artist.address
       )
     } catch (error) {
@@ -136,6 +313,7 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
+<<<<<<< HEAD
   get isProfileOwner(): boolean {
     if (
       this.$auth.loggedIn &&
@@ -152,6 +330,16 @@ export default class UserProfilePage extends PageComponent {
     if (this.isProfileOwner) {
       this.showEditForm = true
     }
+=======
+  @debounce
+  onEditProfileClicked() {
+    this.showEditProfileDialog = true
+  }
+
+  @debounce
+  onEditAvatarClicked() {
+    this.showAvatarUploadDialog = true
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
   }
 }
 </script>
@@ -165,10 +353,6 @@ export default class UserProfilePage extends PageComponent {
   font-weight: 400;
   font-size: 1rem;
   letter-spacing: 0.009375rem;
-}
-.user-profile-avatar {
-  left: 50%;
-  transform: translateX(-50%)
 }
 .user-profile-info {
   position: relative;

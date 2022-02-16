@@ -5,15 +5,18 @@
   "author": "Jim Toth <jim@meme.coach>",
   "private": true,
   "scripts": {
-    "dev": "nuxt-ts",
-    "dev-debug": "node --inspect node_modules/.bin/nuxt-ts",
-    "build": "nuxt-ts build",
-    "start": "nuxt-ts start",
-    "generate": "nuxt-ts generate",
+    "dev": "nuxt",
+    "dev-debug": "node --inspect node_modules/.bin/nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
     "deploy:staging": "gcloud app deploy app.staging.yaml --project art-by-city-staging-299519",
     "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919",
+<<<<<<< HEAD
     "arlocal": "ts-node --project node.tsconfig.json arlocal.js",
+=======
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
     "build:contracts": "ts-node --project node.tsconfig.json contracts/scripts/build.ts",
     "deploy:contracts": "ts-node --project node.tsconfig.json contracts/scripts/deploy.ts",
     "test:contracts": "ts-node --project node.tsconfig.json contracts/scripts/getLatestState.ts",
@@ -21,37 +24,45 @@
   },
   "dependencies": {
     "@nuxt/types": "^2.15.7",
-    "@nuxt/typescript-build": "^0.6.7",
-    "@nuxt/typescript-runtime": "^0.4.10",
+    "@nuxt/typescript-build": "^2.1.0",
     "@nuxtjs/auth-next": "5.0.0-1624817847.21691f1",
     "@nuxtjs/axios": "^5.13.6",
-    "@nuxtjs/eslint-config-typescript": "^1.0.0",
-    "@nuxtjs/eslint-module": "^1.0.0",
     "@nuxtjs/vuetify": "^1.11.2",
     "@textury/ardb": "^1.1.1",
+    "@types/async": "^3.2.7",
+    "@types/crypto-js": "^4.0.2",
     "@types/lodash": "^4.14.155",
     "@types/prettier": "^2.3.2",
     "@types/prop-types": "^15.7.3",
     "@types/react": "^17.0.3",
-    "@types/swagger-jsdoc": "^3.0.2",
-    "@types/swagger-ui-express": "^4.1.2",
+    "@types/sharp": "^0.29.5",
     "arconnect": "^0.2.9",
     "arweave": "^1.10.16",
+    "async": "^3.2.1",
     "cropperjs": "^1.5.9",
+    "crypto-js": "^4.1.1",
     "dotenv": "^8.2.0",
     "fuse.js": "^6.4.0",
     "ignore-not-found-export-webpack-plugin": "^1.0.1",
+    "localforage": "^1.10.0",
     "lodash": "^4.17.15",
     "moment": "^2.27.0",
     "nuxt": "^2.15.7",
     "nuxt-property-decorator": "^2.7.2",
+    "nuxt-typed-vuex": "^0.2.0",
     "reflect-metadata": "^0.1.13",
     "sass-loader": "^10.1.1",
+<<<<<<< HEAD
     "smartweave": "^0.4.41",
+=======
+    "sharp": "^0.30.1",
+    "typescript": "^4.4.3",
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
     "vee-validate": "^3.3.0",
     "vuedraggable": "^2.24.1"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@babel/cli": "^7.14.8",
     "@babel/core": "^7.15.0",
     "@babel/preset-typescript": "^7.15.0",
@@ -67,5 +78,14 @@
     "swagger-jsdoc": "^4.2.0",
     "swagger-ui-express": "^4.1.4",
     "ts-node": "^9.0.0"
+=======
+    "@nuxtjs/eslint-config-typescript": "^7.0.2",
+    "@nuxtjs/eslint-module": "^3.0.2",
+    "eslint": "^8.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-nuxt": "^3.0.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.4.1"
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
   }
 }

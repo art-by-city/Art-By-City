@@ -1,71 +1,74 @@
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
+# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 image: node:14-alpine
-
 variables:
-  GCP_PROJECT_ID: $PROJECT_ID
-
-before_script:
-  - apk add --no-cache --virtual .gyp python make g++ coreutils curl
-
+  GCP_PROJECT_ID: "$PROJECT_ID"
 build_staging:
   stage: build
   environment: Staging
   only:
-    - master
+  - master
   variables:
     NODE_ENV: staging
+  before_script:
+    - apk add --no-cache --virtual .gyp python2 make g++ coreutils curl
   script:
-    - npm install --production --progress=false
-    - npm run build
+  - npm install --production --progress=false
+  - npm run build
   artifacts:
     paths:
-      - .nuxt
-
+    - ".nuxt"
 build_production:
   stage: build
   environment: Production
   only:
-    - production
+  - production
   variables:
     NODE_ENV: production
   script:
-    - npm install --production --progress=false
-    - npm run build
+  - apk add --no-cache --virtual .gyp python2 make g++ coreutils curl
+  - npm install --production --progress=false
+  - npm run build
   artifacts:
     paths:
-      - .nuxt
-
+    - ".nuxt"
 deploy_staging:
   stage: deploy
   environment: Staging
   only:
-    - master
+  - master
   before_script:
-    - apk add --no-cache --virtual .gyp python make g++ coreutils curl
-    - curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
-    - mkdir -p /usr/local/gcloud
-    - tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz
-    - /usr/local/gcloud/google-cloud-sdk/install.sh
-    - export PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin
+  - apk add --no-cache --virtual .gyp python2 make g++ coreutils curl
+  - curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
+  - mkdir -p /usr/local/gcloud
+  - tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz
+  - "/usr/local/gcloud/google-cloud-sdk/install.sh"
+  - export PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin
   script:
-    - node generateSecrets.js > secrets.yaml
-    - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
-    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
-    - gcloud --quiet --project $PROJECT_ID app deploy app.staging.yaml
-
+  - node generateSecrets.js > secrets.yaml
+  - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
+  - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+  - gcloud --quiet --project $PROJECT_ID app deploy app.staging.yaml
 deploy_production:
   stage: deploy
   environment: Production
   only:
-    - production
+  - production
   before_script:
-    - apk add --no-cache --virtual .gyp python make g++ coreutils curl
-    - curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
-    - mkdir -p /usr/local/gcloud
-    - tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz
-    - /usr/local/gcloud/google-cloud-sdk/install.sh
-    - export PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin
+  - apk add --no-cache --virtual .gyp python2 make g++ coreutils curl
+  - curl https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz > /tmp/google-cloud-sdk.tar.gz
+  - mkdir -p /usr/local/gcloud
+  - tar -C /usr/local/gcloud -xvf /tmp/google-cloud-sdk.tar.gz
+  - "/usr/local/gcloud/google-cloud-sdk/install.sh"
+  - export PATH=$PATH:/usr/local/gcloud/google-cloud-sdk/bin
   script:
-    - node generateSecrets.js > secrets.yaml
-    - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
-    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
-    - gcloud --quiet --project $PROJECT_ID app deploy app.production.yaml
+  - node generateSecrets.js > secrets.yaml
+  - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
+  - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+  - gcloud --quiet --project $PROJECT_ID app deploy app.production.yaml
+include:
+- template: Security/Dependency-Scanning.gitlab-ci.yml

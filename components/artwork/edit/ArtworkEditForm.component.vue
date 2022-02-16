@@ -48,7 +48,7 @@
                   <v-overlay absolute :value="hoverProps.hover">
                     <v-file-input
                       class="artwork-upload-button"
-                      accept="image/png, image/jpeg"
+                      accept="image/*"
                       hide-input
                       prepend-icon="mdi-camera"
                       @change="onArtworkImageChanged(i, $event)"
@@ -98,7 +98,7 @@
               </v-responsive>
               <span
                 v-if="this.hasImageValidationErrors"
-                class="red--text caption"s
+                class="red--text caption"
               >
                 At least 1 image is required
               </span>
@@ -113,31 +113,46 @@
             type="text"
             name="artworkTitle"
             label="Title"
-            class="text-lowercase"
-            :rules="titleRules"
+            counter="128"
+            @input="generateSlugFromTitle"
+            :rules="[rules.required, rules.maxLength(128)]"
           ></v-text-field>
+
           <v-text-field
             v-model="artwork.slug"
             type="text"
             name="artworkSlug"
+            counter="128"
             :label="slugBase"
-            class="text-lowercase"
-            :rules="slugRules"
+            :rules="[rules.required, rules.maxLength(128), rules.slug]"
           ></v-text-field>
-          <!-- <ArtworkTypeSelector
-            v-model="artwork.type"
-            :artworkTypes="$store.state.config.artworkTypes"
-            required
-          /> -->
-          <!-- <CitySelector
+
+          <v-text-field
+            v-model="artwork.created"
+            name="artworkCreated"
+            label="Created (Year)"
+            placeholder="2021"
+            :rules="[rules.year]"
+          ></v-text-field>
+
+          <v-text-field
             v-model="artwork.city"
-            :cities="$store.state.config.cities"
-            disabled
-          /> -->
-          <HashtagSelector
-            v-model="artwork.hashtags"
-            :hashtags="$store.state.config.hashtags"
-          />
+            name="artworkCity"
+            label="City Code"
+            placeholder="NYC"
+            :rules="[rules.city]"
+          ></v-text-field>
+
+          <v-text-field
+            v-model="artwork.medium"
+            type="text"
+            name="artworkMedium"
+            label="Medium"
+            counter="240"
+            placeholder="e.g. Oil on Canvas, Digital"
+            :rules="[rules.maxLength(240)]"
+          ></v-text-field>
+
           <v-textarea
             v-model="artwork.description"
             name="artworkDescription"
@@ -145,27 +160,19 @@
             hint="Enter a description for this Artwork"
             auto-grow
             rows="2"
-            class="text-lowercase"
-            :rules="descriptionRules"
+            counter="1024"
+            :rules="[rules.maxLength(1024)]"
           ></v-textarea>
+
+          <LicenseSelector v-model="artwork.license" />
         </v-col>
       </v-row>
       <v-row dense justify="center">
-        <template v-if="loading">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular></template>
-        <template v-else>
-          <v-col cols="auto">
-            <v-btn text color="error" class="text-lowercase" @click="cancel">
-              Cancel
-            </v-btn>
-            <v-btn text color="primary" class="text-lowercase" @click="onSaveClicked">
-              Publish
-            </v-btn>
-          </v-col>
-        </template>
+        <TransactionFormControls
+          :loading="isUploading"
+          @cancel="onCancel"
+          @submit="onSubmit"
+        />
       </v-row>
     </v-form>
   </v-container>
@@ -176,24 +183,28 @@ import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
 
-import { Artwork, ArtworkImage } from '~/types'
-import CitySelector from '~/components/forms/citySelector.component.vue'
-import ArtworkTypeSelector from '~/components/forms/artworkTypeSelector.component.vue'
-import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
+import { Artwork, ArtworkImage, UserTransaction } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
+import CitySelector from '~/components/forms/citySelector.component.vue'
+import ArtworkTypeSelector from
+  '~/components/forms/artworkTypeSelector.component.vue'
+import LicenseSelector from '~/components/forms/licenseSelector.component.vue'
+import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
+import TransactionFormControls from
+  '~/components/forms/transactionFormControls.component.vue'
 
 @Component({
   components: {
     CitySelector,
     ArtworkTypeSelector,
     HashtagSelector,
-    draggable
+    draggable,
+    LicenseSelector,
+    TransactionFormControls
   }
 })
 export default class ArtworkEditForm extends Vue {
   @Prop({ type: Object, required: true }) artwork!: Artwork
-  @Prop({ type: Boolean, required: false, default: false }) loading!: boolean
-
   $refs!: {
     cropImage: HTMLImageElement,
     form: Vue & {
@@ -207,55 +218,68 @@ export default class ArtworkEditForm extends Vue {
   cropper?: Cropper
   valid = false
   dirty = false
+  isUploading: boolean = false
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
-  @Emit('save') _save() {
-    return this.valid
+  @Emit('save') _save(txId: string) {
+    return txId
   }
-  @Emit('cancel') cancel() {}
+  @Emit('cancel') onCancel() {}
 
-  get titleRules() {
-    return [(value: string = '') => {
-      if (value.length < 1) {
-        return 'title is required'
+  rules = {
+    required: (value: string = '') => value.length < 1 ? 'Required' : true,
+    minLength: (minLength: number) => (value: string = '') => {
+      if (!value) {
+        return true
+      }
+      return value.length < minLength
+        ? `Minimum 3 characters`
+        : true
+    },
+    maxLength: (maxLength: number) => (value: string = '') => {
+      return value.length > maxLength
+        ? `Maximum ${maxLength} characters`
+        : true
+    },
+    city: (value: string = '') => {
+      if (!value) {
+        return true
       }
 
-      if (value.length > 128) {
-        return 'title must be no more than 128 characters'
+      const validCityCodeRegex = /^[a-zA-Z]{3}$/
+
+      if (!validCityCodeRegex.test(value)) {
+        return 'Must be a valid city code'
       }
 
       return true
-    }]
-  }
-
-  get slugRules() {
-    return [(value: string = '') => {
-      if (value.length < 1) {
-        return 'URL slug is required'
+    },
+    year: (value: string = '') => {
+      if (!value) {
+        return true
       }
 
-      if (value.length > 128) {
-        return 'URL slug must be no more than 128 characters'
+      const year = Number.parseInt(value)
+
+      if (
+        Number.isNaN(year)
+        || year > (new Date()).getFullYear()
+        || year < 1000
+      ) {
+        return 'Must be a valid year'
       }
 
+      return true
+    },
+    slug: (value: string = '') => {
       const validSlugRegex = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
 
       if (!validSlugRegex.test(value)) {
-        return 'URL slug must be a valid slug (lowerchase alphanumerics, hyphen, underscore)'
+        return 'Must be a valid URL slug (lowerchase alphanumerics, hyphen, underscore)'
       }
 
       return true
-    }]
-  }
-
-  get descriptionRules() {
-    return [(value: string = '') => {
-      if (value.length > 1024) {
-        return 'description must be no more than 1024 characters'
-      }
-
-      return true
-    }]
+    }
   }
 
   get isAtMaxImages(): Boolean {
@@ -337,8 +361,7 @@ export default class ArtworkEditForm extends Vue {
     this.cropper?.destroy()
   }
 
-  @debounce
-  onSaveClicked() {
+  async onSubmit() {
     this.dirty = true
     this.valid = this.$refs.form.validate()
 
@@ -346,7 +369,36 @@ export default class ArtworkEditForm extends Vue {
       this.valid = false
     }
 
-    this._save()
+    if (this.valid) {
+      this.isUploading = true
+
+      const transaction = await this.$artworkService.createArtworkTransaction(
+        this.artwork
+      )
+
+      const signed = await this.$arweaveService.sign(transaction)
+
+      if (signed) {
+        const tx: UserTransaction = {
+          transaction,
+          type: 'artwork',
+          status: 'PENDING_CONFIRMATION',
+          created: new Date().getTime()
+        }
+
+        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
+          this.isUploading = false
+          if (err) {
+            console.error('Error submitting user tx', err)
+            this.$toastService.error('Error submitting user tx: ' + err.message)
+          } else {
+            return this._save(transaction.id)
+          }
+        })
+      } else {
+        this.isUploading = false
+      }
+    }
   }
 
   private async processArtworkImage(image: File): Promise<ArtworkImage> {
@@ -390,6 +442,10 @@ export default class ArtworkEditForm extends Vue {
   private async suggestMetadataFromFile(image: File) {
     // Suggested title is filename without extension
     this.artwork.title = image.name.slice(0, image.name.lastIndexOf('.'))
+    this.generateSlugFromTitle()
+  }
+
+  private generateSlugFromTitle() {
     this.artwork.slug = this.artwork.title
       .toLowerCase()
       .replace(/[^a-z0-9_\-]/g, '')

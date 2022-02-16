@@ -1,8 +1,10 @@
+$max-width-important: 1600px !important;
+
 .content-container {
-  width: 1240px !important;
+  max-width: $max-width-important;
 }
 header.app-bar div.v-toolbar__content {
-  width: 1240px !important;
+  max-width: $max-width-important;
 }
 .app-logo {
   padding-left: 0 !important;
@@ -16,12 +18,12 @@ $breakpoints: (
 );
 @each $screenWidth, $containerWidth in $breakpoints {
   @media screen and (max-width: $screenWidth) {
-    .content-container {
-      width: $containerWidth !important;
-    }
-    header.app-bar div.v-toolbar__content {
-      width: $containerWidth !important;
-    }
+    // .content-container {
+    //   width: $containerWidth !important;
+    // }
+    // header.app-bar div.v-toolbar__content {
+    //   width: $containerWidth !important;
+    // }
   }
 }
 @media screen and (max-width: 840px) {
@@ -126,4 +128,8 @@ $condensed-input-height: 24px;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.cursor--not-allowed {
+  cursor: not-allowed !important;
 }

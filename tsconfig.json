@@ -9,6 +9,7 @@
       "dom"
     ],
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": false,
     "sourceMap": true,
@@ -17,7 +18,11 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
+<<<<<<< HEAD
     "resolveJsonModule": true,
+=======
+    "useUnknownInCatchVariables": false,
+>>>>>>> 62f3fe0b9542379b9049d5b84dcde11b971065d4
     "baseUrl": ".",
     "paths": {
       "~/*": [
@@ -32,6 +37,8 @@
       "@nuxt/types",
       "@nuxtjs/axios",
       "@nuxtjs/auth-next",
+      "@types/async",
+      "@types/crypto-js",
       "reflect-metadata",
       "vuetify",
       "arconnect",

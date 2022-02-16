@@ -1,8 +1,9 @@
 import { TrackableEntity } from '../common'
 
 export interface Artwork {
-  id?: string
+  id: string
   published?: Date
+  created?: number
   creator: ArtworkCreator
   title: string
   slug?: string
@@ -10,6 +11,9 @@ export interface Artwork {
   type?: string
   hashtags: string[]
   images: ArtworkImage[]
+  license?: License
+  medium?: string
+  city?: string
 }
 
 export interface ArtworkCreator {
@@ -25,6 +29,14 @@ export interface BaseArtworkImage extends TrackableEntity {
 
 export interface DataURLArtworkImage extends BaseArtworkImage {
   dataUrl: string
+}
+
+export interface License {
+  reference: string
+  detailsUrl: string
+  name: string
+  licenseId: string
+  seeAlso: string[]
 }
 
 /**
