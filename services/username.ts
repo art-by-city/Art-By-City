@@ -8,11 +8,6 @@ import {
 } from 'contracts/src/usernames/contract'
 import { SmartWeaveService } from './'
 
-// import {
-//   handle,
-//   UsernamesContractState
-// } from '~/contracts'
-
 export default class UsernameService extends SmartWeaveService {
   private contract!: Contract<UsernamesContractState>
   private txId = 'fAIofxVwPZqj-lK2gN6Z-eVmmw3jjcuURzb1wEJmsBQ'
@@ -28,13 +23,13 @@ export default class UsernameService extends SmartWeaveService {
       })
   }
 
-  async resolveUsername(address: string): Promise<string | undefined> {
+  async resolveUsername(address: string): Promise<string | null> {
     const { state } = await this.contract.readState()
 
-    return state.usernames[address]
+    return state.usernames[address] || null
   }
 
-  async resolveAddress(username: string): Promise<string | undefined> {
+  async resolveAddress(username: string): Promise<string | null> {
     const { state } = await this.contract.readState()
 
     for (const address in state.usernames) {
@@ -43,39 +38,27 @@ export default class UsernameService extends SmartWeaveService {
       }
     }
 
-    return
+    this.contract.evaluationOptions()
+
+    return null
   }
 
   async checkUsername(username: string):
-    Promise<InteractionResult<
-      UsernamesContractState,
-      UsernamesContractResult
-    >> {
-    return await this.contract.dryWrite<UsernamesContractInput>({
+    Promise<InteractionResult<UsernamesContractState, UsernamesContractResult>>
+  {
+     return await this.contract.dryWrite<UsernamesContractInput>({
       function: 'register',
       username
     })
   }
 
-  // async registerUsername(username: string): Promise<ContractInteractionResult> {
-  //   if (!this.contract) {
-  //     this.contract = await this.fetchContract()
-  //   }
-
-  //   const txId = await interactWrite(
-  //     this.$arweave,
-  //     'use_wallet',
-  //     this.contract,
-  //     {
-  //       function: 'register',
-  //       username
-  //     }
-  //   )
-
-  //   // TODO -> This should be getStatus() and check for num_of_confirmations!
-  //   //         However, ArLocal has not implemented this endpoint
-  //   const tx = await this.$arweave.transactions.get(txId)
-
-  //   return { type: 'ok', result: '', state: {} }
-  // }
+  async registerUsername(username: string): Promise<string | null> {
+    return await this.writeInteraction(
+      this.contract,
+      {
+        function: 'register',
+        username
+      }
+    )
+  }
 }

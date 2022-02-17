@@ -1,16 +1,79 @@
 <template>
   <div class="user-profile-page">
     <v-container fluid>
-      <v-row align="end">
+      <v-row>
         <v-col
           cols="2" offset="2"
             sm="2" offset-sm="3"
+          style="position: relative;"
         >
-          <UserAvatar :user="artist" />
+          <v-row class="mt-4">
+            <UserAvatar :user="artist" />
+          </v-row>
+          <v-row class="mb-4 mx-auto" style="position: absolute; bottom: 0;">
+            <template v-if="isOwner">
+              <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
+                <template v-slot:activator>
+                  <v-btn
+                    v-model="showEditSpeedDial"
+                    text
+                    outlined
+                  >
+                    Edit
+                  </v-btn>
+                </template>
+
+                <v-btn
+                  text
+                  outlined
+                  @click="onEditAvatarClicked"
+                >
+                  Avatar
+                </v-btn>
+
+                <v-btn
+                  text
+                  outlined
+                  @click="onEditProfileClicked"
+                >
+                  Profile
+                </v-btn>
+
+                <v-btn
+                  text
+                  outlined
+                  @click="onEditUsernameClicked"
+                >
+                  Username
+                </v-btn>
+
+              </v-speed-dial>
+            </template>
+            <template v-else>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <span
+                    v-on="on"
+                    v-bind="attrs"
+                    class="cursor--not-allowed"
+                  >
+                    <v-btn
+                      text
+                      outlined
+                      disabled
+                    >
+                      Follow
+                    </v-btn>
+                  </span>
+                </template>
+                Coming soon!
+              </v-tooltip>
+            </template>
+          </v-row>
         </v-col>
         <v-col
           cols="6" offset="2"
-            sm="4" offset-sm="1"
+            sm="4" offset-sm="0"
         >
           <v-card elevation="0">
             <v-card-title>
@@ -18,7 +81,10 @@
             </v-card-title>
             <v-card-subtitle>
               <p class="mb-0">{{ secondaryName }}</p>
-              <p v-if="artist.profile && artist.profile.twitter">
+              <p class="mb-0" v-if="artist.username">
+                @{{ artist.username }}
+              </p>
+              <p class="mb-0" v-if="artist.profile && artist.profile.twitter">
                 <v-icon small>mdi-twitter</v-icon>
                 <a
                   class="text-decoration-none"
@@ -39,71 +105,10 @@
                 Liked Art: {{ likesCount }}
               </v-btn>
             </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-                <template v-if="isOwner">
-                  <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
-                    <template v-slot:activator>
-                      <v-btn
-                        v-model="showEditSpeedDial"
-                        text
-                        outlined
-                      >
-                        Edit
-                      </v-btn>
-                    </template>
-
-                    <v-btn
-                      text
-                      outlined
-                      @click="onEditAvatarClicked"
-                    >
-                      Avatar
-                    </v-btn>
-
-                    <v-btn
-                      text
-                      outlined
-                      @click="onEditProfileClicked"
-                    >
-                      Profile
-                    </v-btn>
-
-                    <v-btn
-                      text
-                      outlined
-                      @click="onEditUsernameClicked"
-                    >
-                      Username
-                    </v-btn>
-
-                  </v-speed-dial>
-                </template>
-                <template v-else>
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span
-                        v-on="on"
-                        v-bind="attrs"
-                        class="cursor--not-allowed"
-                      >
-                        <v-btn
-                          text
-                          outlined
-                          disabled
-                        >
-                          Follow
-                        </v-btn>
-                      </span>
-                    </template>
-                    Coming soon!
-                  </v-tooltip>
-                </template>
-            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row class="mt-0">
         <v-col cols="10" offset="1" sm="6" offset-sm="3">
           <v-divider></v-divider>
         </v-col>
@@ -141,7 +146,7 @@ import UsernameDialog from
   '~/components/username/UsernameDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload } from '~/types'
+import { DomainEntity, DomainEntityCategory, SetUserTransactionStatusPayload } from '~/types'
 
 @Component({
   components: {
@@ -212,8 +217,15 @@ export default class UserProfilePage extends PageComponent {
       this.$store.subscribe(async (mutation, _state) => {
         if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
           const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED' && payload.type === 'profile') {
-            this.$fetch()
+          if (payload.status === 'CONFIRMED') {
+            switch (payload.type) {
+              case 'profile':
+                this.fetchAndSet('profile')
+                break
+              case 'username':
+                this.fetchAndSet('username')
+                break
+            }
           }
         }
       })
@@ -223,13 +235,8 @@ export default class UserProfilePage extends PageComponent {
   async fetch() {
     ProgressService.start()
     try {
-      const profile = await this.$profileService.fetchProfile(
-        this.artist.address
-      )
-
-      if (profile) {
-        Vue.set(this.artist, 'profile', profile)
-      }
+      await this.fetchAndSet('profile')
+      await this.fetchAndSet('username')
 
       this.likesCount = await this.$likesService.fetchTotalLikedByUser(
         this.artist.address
@@ -239,6 +246,25 @@ export default class UserProfilePage extends PageComponent {
       this.$toastService.error(error)
     } finally {
       ProgressService.stop()
+    }
+  }
+
+  private async fetchAndSet(category: DomainEntityCategory) {
+    let entity: DomainEntity | null = null
+
+    switch (category) {
+      case 'profile':
+        entity = await this.$profileService.fetchProfile(this.artist.address)
+        break
+      case 'username':
+        entity = await this.$usernameService.resolveUsername(
+          this.artist.address
+        )
+        break
+    }
+
+    if (entity) {
+      Vue.set(this.artist, category, entity)
     }
   }
 

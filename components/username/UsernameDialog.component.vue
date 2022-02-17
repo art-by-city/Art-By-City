@@ -14,18 +14,23 @@
             <v-card-text>
               <v-form ref="form" v-model="valid" autocomplete="off">
                 <v-text-field
-                  v-model="asset.displayName"
+                  v-model="asset"
                   type="text"
-                  name="displayName"
-                  label="Display Name"
+                  name="username"
+                  label="Username"
                   counter="64"
-                  :rules="[displayNameRules]"
+                  :rules="[() => !!asset || 'Required' ]"
+                  :loading="isValidating"
+                  :error-messages="usernameErrors"
+                  @input="dirty = true"
+                  :messages="messages"
+                  :color="color"
                 ></v-text-field>
               </v-form>
             </v-card-text>
             <v-card-actions>
               <TransactionFormControls
-                :loading="isUploading"
+                :loading="isUploading || isValidating"
                 @cancel="onCancel"
                 @submit="onSubmit"
               />
@@ -38,15 +43,106 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Watch } from 'nuxt-property-decorator'
+import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
+import { SetUserTransactionStatusPayload } from '~/types'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 
 @Component
-export default class UsernameDialog extends TransactionDialog {
-  /*
-    Contract TX ID Xl7OC01HuzhQ2BMkBqKJ3AQ4sSlEDsuyOU2NEFch5Dc
-    Initial State TX ID dHzWEn1sr-jGX6P5aY1VRT6BOva0p0FTMGNKyGQnsJQ
-  */
- onSubmit() {}
+export default class UsernameDialog extends TransactionDialog<string> {
+  valid = false
+  dirty = false
+  $refs!: {
+    form: Vue & {
+      validate: () => boolean
+      resetValidation: () => void
+    }
+  }
+  usernameErrors: string[] = []
+  messages: string[] = []
+  color: string = 'primary'
+  isValidating: boolean | string = false
+
+  // Async validation of username
+  @Watch('asset') async onUsernameChanged(username: string) {
+    if (!this.dirty) {
+      return
+    }
+
+    this.isValidating = true
+    this.messages = []
+    this.color = 'primary'
+
+    const result = await this.$usernameService.checkUsername(username)
+
+    if (username !== this.asset) {
+      this.isValidating = false
+      return
+    }
+
+    switch (result.type) {
+      case 'error':
+      case 'exception':
+        this.usernameErrors = [ result.errorMessage || '' ]
+        break
+      case 'ok':
+      default:
+        this.usernameErrors = []
+        break
+    }
+
+    if (this.usernameErrors.length === 0) {
+      this.messages = ['Available!']
+      this.color = 'success'
+    }
+
+    this.isValidating = false
+  }
+
+  fetchOnServer = false
+  async fetch() {
+    if (this.$auth.user && this.$auth.user.address) {
+      this.asset = await this.$usernameService.resolveUsername(
+        this.$auth.user.address
+      )
+    }
+  }
+
+  created() {
+    if (this.$auth.loggedIn) {
+      this.$store.subscribe(async (mutation, _state) => {
+        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+          const payload = mutation.payload as SetUserTransactionStatusPayload
+          if (payload.status === 'CONFIRMED' && payload.type === 'username') {
+            this.$fetch()
+          }
+        }
+      })
+    }
+  }
+
+  async onSubmit() {
+    this.valid = this.$refs.form.validate()
+
+    if (this.asset && this.valid) {
+      this.isUploading = true
+
+      const txId = await this.$usernameService.registerUsername(this.asset)
+
+      if (txId) {
+        const transaction = await this.$arweave.transactions.get(txId)
+
+        this.$accessor.transactions.queueTransaction({
+          transaction,
+          type: 'username',
+          status: 'PENDING_CONFIRMATION',
+          created: new Date().getTime()
+        })
+      }
+
+      this.isUploading = false
+      this.close()
+    }
+  }
 }
 </script>

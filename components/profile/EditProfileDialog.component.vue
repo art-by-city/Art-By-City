@@ -71,7 +71,7 @@ import { SetUserTransactionStatusPayload } from '~/types'
     TransactionFormControls
   }
 })
-export default class EditProfileDialog extends TransactionDialog {
+export default class EditProfileDialog extends TransactionDialog<Profile> {
   asset: Profile = {}
   valid = false
   $refs!: {

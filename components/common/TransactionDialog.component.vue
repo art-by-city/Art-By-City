@@ -12,9 +12,9 @@ import TransactionFormControls from
     TransactionFormControls
   }
 })
-export default class TransactionDialog extends Vue {
+export default class TransactionDialog<T> extends Vue {
   isUploading: boolean = false
-  asset: any | null = null
+  asset: T | null = null
 
   @PropSync('show', {
     type: Boolean,
