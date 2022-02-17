@@ -69,6 +69,14 @@
                       Profile
                     </v-btn>
 
+                    <v-btn
+                      text
+                      outlined
+                      @click="onEditUsernameClicked"
+                    >
+                      Username
+                    </v-btn>
+
                   </v-speed-dial>
                 </template>
                 <template v-else>
@@ -113,6 +121,7 @@
     <template v-if="isOwner">
       <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
       <EditProfileDialog :show.sync="showEditProfileDialog" />
+      <UsernameDialog :show.sync="showUsernameDialog" />
     </template>
   </div>
 </template>
@@ -128,6 +137,8 @@ import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
 import EditProfileDialog from
   '~/components/profile/EditProfileDialog.component.vue'
+import UsernameDialog from
+  '~/components/username/UsernameDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 import { SetUserTransactionStatusPayload } from '~/types'
@@ -136,7 +147,8 @@ import { SetUserTransactionStatusPayload } from '~/types'
   components: {
     AvatarUploadDialog,
     ArtistFeed,
-    EditProfileDialog
+    EditProfileDialog,
+    UsernameDialog
   }
 })
 export default class UserProfilePage extends PageComponent {
@@ -176,6 +188,7 @@ export default class UserProfilePage extends PageComponent {
   showEditSpeedDial: boolean = false
   showAvatarUploadDialog: boolean = false
   showEditProfileDialog: Boolean = false
+  showUsernameDialog: Boolean = false
   likesCount: number = 0
 
   get isOwner(): boolean {
@@ -237,6 +250,11 @@ export default class UserProfilePage extends PageComponent {
   @debounce
   onEditAvatarClicked() {
     this.showAvatarUploadDialog = true
+  }
+
+  @debounce
+  onEditUsernameClicked() {
+    this.showUsernameDialog = true
   }
 }
 </script>

@@ -49,6 +49,7 @@ export default {
   plugins: [
     { src: '~/plugins/arweave.ts' },
     { src: '~/plugins/ardb.ts' },
+    { src: '~/plugins/smartweave.ts' },
     { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',
     '~/plugins/filters.ts',
