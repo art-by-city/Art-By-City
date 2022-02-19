@@ -10,7 +10,8 @@ import { SmartWeaveService } from './'
 
 export default class UsernameService extends SmartWeaveService {
   private contract!: Contract<UsernamesContractState>
-  private txId = 'fAIofxVwPZqj-lK2gN6Z-eVmmw3jjcuURzb1wEJmsBQ'
+  private txId = '6R5_uFtkdXzr6GSl5SR8Q_JlaLMF4utIY8s8YnQ3OLc'
+  // private txId = 'pp'
 
   constructor(context: Context) {
     super(context)
@@ -24,23 +25,52 @@ export default class UsernameService extends SmartWeaveService {
   }
 
   async resolveUsername(address: string): Promise<string | null> {
-    const { state } = await this.contract.readState()
+    try {
+      const { state } = await this.contract.readState()
 
-    return state.usernames[address] || null
+      return state.usernames[address] || null
+    } catch (err) {
+      console.error(err)
+    }
+
+    return null
   }
 
   async resolveAddress(username: string): Promise<string | null> {
-    const { state } = await this.contract.readState()
+    try {
+      const { state } = await this.contract.readState()
 
-    for (const address in state.usernames) {
-      if (state.usernames[address] === username) {
-        return address
+      for (const address in state.usernames) {
+        if (state.usernames[address] === username) {
+          return address
+        }
       }
+    } catch (err) {
+      console.error(err)
     }
 
-    this.contract.evaluationOptions()
-
     return null
+  }
+
+  async resolve(usernameOrAddress: string): Promise<{
+    username: string | null,
+    address: string | null
+  }> {
+    let username = null, address = null
+    const resolvedUsername = await this.resolveUsername(usernameOrAddress)
+    const resolvedAddress = await this.resolveAddress(usernameOrAddress)
+
+    if (!resolvedUsername && !resolvedAddress) {
+      address = usernameOrAddress
+    } else if (!resolvedUsername && resolvedAddress) {
+      username = usernameOrAddress
+      address = resolvedAddress
+    } else if (resolvedUsername && !resolvedAddress) {
+      address = usernameOrAddress
+      username = resolvedUsername
+    }
+
+    return { username, address }
   }
 
   async checkUsername(username: string):
@@ -58,6 +88,15 @@ export default class UsernameService extends SmartWeaveService {
       {
         function: 'register',
         username
+      }
+    )
+  }
+
+  async releaseUsername(): Promise<string | null> {
+    return await this.writeInteraction(
+      this.contract,
+      {
+        function: 'release'
       }
     )
   }

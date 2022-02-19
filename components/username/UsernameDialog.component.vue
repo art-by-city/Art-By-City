@@ -29,11 +29,27 @@
               </v-form>
             </v-card-text>
             <v-card-actions>
-              <TransactionFormControls
-                :loading="isUploading || isValidating"
-                @cancel="onCancel"
-                @submit="onSubmit"
-              />
+              <v-container>
+                <v-row justify="center">
+                  <TransactionFormControls
+                    :loading="isUploading || isValidating"
+                    @cancel="onCancel"
+                    @submit="onSubmit"
+                  />
+                </v-row>
+                <!-- <v-row justify="center">
+                  <v-btn
+                    outlined
+                    elevation="2"
+                    color="secondary"
+                    :disabled="isUploading || isValidating"
+                    :loading="isUploading || isValidating"
+                    @click="onReleaseClicked"
+                  >
+                    Release
+                  </v-btn>
+                </v-row> -->
+              </v-container>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -44,9 +60,11 @@
 
 <script lang="ts">
 import { Component, Watch } from 'nuxt-property-decorator'
+
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 import { SetUserTransactionStatusPayload } from '~/types'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
+import { debounce } from '~/helpers'
 
 @Component
 export default class UsernameDialog extends TransactionDialog<string> {
@@ -65,7 +83,7 @@ export default class UsernameDialog extends TransactionDialog<string> {
 
   // Async validation of username
   @Watch('asset') async onUsernameChanged(username: string) {
-    if (!this.dirty) {
+    if (!this.dirty || !username) {
       return
     }
 
@@ -144,5 +162,26 @@ export default class UsernameDialog extends TransactionDialog<string> {
       this.close()
     }
   }
+
+  // @debounce
+  // async onReleaseClicked() {
+  //   this.isUploading = true
+
+  //   const txId = await this.$usernameService.releaseUsername()
+
+  //   if (txId) {
+  //     const transaction = await this.$arweave.transactions.get(txId)
+
+  //     this.$accessor.transactions.queueTransaction({
+  //       transaction,
+  //       type: 'username',
+  //       status: 'PENDING_CONFIRMATION',
+  //       created: new Date().getTime()
+  //     })
+  //   }
+
+  //   this.isUploading = false
+  //   this.close()
+  // }
 }
 </script>

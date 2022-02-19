@@ -1,17 +1,20 @@
 import Arweave from 'arweave'
 import { Context } from '@nuxt/types'
 
-import { ArweaveAppConfig } from '~/types'
+import { ArweaveConfig } from '~/types'
 import Transaction from 'arweave/web/lib/transaction'
 
 export default class ArweaveService {
   $arweave!: Arweave
-  config!: ArweaveAppConfig
+  config!: ArweaveConfig
   context: Context
 
   constructor(context: Context) {
     this.$arweave = context.$arweave
-    this.config = context.$config.arweave.appConfig
+    this.config = {
+      app: context.$config.arweave.appConfig,
+      api: context.$config.arweave.apiConfig
+    }
     this.context = context
   }
 

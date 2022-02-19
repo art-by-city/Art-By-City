@@ -72,10 +72,14 @@ export default class ArtworkService extends TransactionService {
 
   async fetch(id: string): Promise<Artwork | null> {
     try {
-      const txDataString = await this.$arweave.transactions.getData(id, {
-        decode: true,
-        string: true
-      }) as string
+      // const txDataString = await this.$arweave.transactions.getData(id, {
+      //   decode: true,
+      //   string: true
+      // }) as string
+      const res = await this.context.$axios.get(
+        `http://${this.config.api.host}:${this.config.api.port}/tx/${id}/data`
+      )
+      const txDataString = Buffer.from(res.data, 'base64').toString()
 
       const txData = JSON.parse(txDataString)
       txData.id = id
@@ -96,7 +100,7 @@ export default class ArtworkService extends TransactionService {
     limit?: number
   ): Promise<FeedItem[]> {
     if (!creator) {
-      switch (this.config.name) {
+      switch (this.config.app.name) {
         case 'ArtByCity':
           creator = [
             'mKRPxOSIe08BddCnrL9en8C3hUGqwA5l1sUZilGsjDg',

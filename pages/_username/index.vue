@@ -1,6 +1,6 @@
 <template>
   <div class="user-profile-page">
-    <v-container fluid>
+    <v-container fluid v-if="artist">
       <v-row>
         <v-col
           cols="2" offset="2"
@@ -96,7 +96,9 @@
               </p>
             </v-card-subtitle>
             <v-card-text>
-              <div v-if="artist.profile">{{ artist.profile.bio }}</div>
+              <div v-if="artist.profile">
+                {{ artist.profile.bio }}
+              </div>
               <v-btn
                 v-if="likesCount > 0"
                 text
@@ -146,7 +148,11 @@ import UsernameDialog from
   '~/components/username/UsernameDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { DomainEntity, DomainEntityCategory, SetUserTransactionStatusPayload } from '~/types'
+import {
+  DomainEntity,
+  DomainEntityCategory,
+  SetUserTransactionStatusPayload
+} from '~/types'
 
 @Component({
   components: {
@@ -159,13 +165,13 @@ import { DomainEntity, DomainEntityCategory, SetUserTransactionStatusPayload } f
 export default class UserProfilePage extends PageComponent {
   head() {
     const username = this.$route.params.username
-    const displayName = this.artist.profile?.displayName || username
+    const displayName = this.artist?.profile?.displayName || username
     const title = `${displayName}'s Profile`
-    const description = this.artist.profile?.bio || title
+    const description = this.artist?.profile?.bio || title
     const url = `${this.$config.baseUrl}/${username}`
     const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
     const avatarAlt = `${username}'s avatar`
-    const twitter = this.artist.profile?.twitter || ''
+    const twitter = this.artist?.profile?.twitter || ''
 
     return {
       title,
@@ -189,7 +195,7 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
-  artist: User = { address: this.$route.params.username }
+  artist: User | null = null
   showEditSpeedDial: boolean = false
   showAvatarUploadDialog: boolean = false
   showEditProfileDialog: Boolean = false
@@ -197,15 +203,16 @@ export default class UserProfilePage extends PageComponent {
   likesCount: number = 0
 
   get isOwner(): boolean {
-    return this.$auth.user && this.artist.address === this.$auth.user.address
+    return this.$auth.user
+      && (this.artist?.address || '') === this.$auth.user.address
   }
 
   get primaryName(): string {
-    return this.artist.profile?.displayName || this.artist.address
+    return this.artist?.profile?.displayName || this.artist?.address || ''
   }
 
   get secondaryName(): string {
-    if (this.artist.profile?.displayName) {
+    if (this.artist?.profile?.displayName) {
       return this.artist.address
     }
 
@@ -235,12 +242,22 @@ export default class UserProfilePage extends PageComponent {
   async fetch() {
     ProgressService.start()
     try {
-      await this.fetchAndSet('profile')
-      await this.fetchAndSet('username')
-
-      this.likesCount = await this.$likesService.fetchTotalLikedByUser(
-        this.artist.address
+      const { username, address } = await this.$usernameService.resolve(
+        this.$route.params.username
       )
+
+      if (!address) {
+        this.$router.replace('/')
+      } else {
+        this.artist = { username, address }
+        await this.fetchAndSet('profile')
+
+        if (this.artist?.address) {
+          this.likesCount = await this.$likesService.fetchTotalLikedByUser(
+            this.artist.address
+          )
+        }
+      }
     } catch (error) {
       console.error(error)
       this.$toastService.error(error)
@@ -252,18 +269,23 @@ export default class UserProfilePage extends PageComponent {
   private async fetchAndSet(category: DomainEntityCategory) {
     let entity: DomainEntity | null = null
 
-    switch (category) {
-      case 'profile':
-        entity = await this.$profileService.fetchProfile(this.artist.address)
-        break
-      case 'username':
-        entity = await this.$usernameService.resolveUsername(
-          this.artist.address
-        )
-        break
+    if (this.artist?.address) {
+      switch (category) {
+        case 'profile':
+          entity = await this.$profileService.fetchProfile(this.artist.address)
+          break
+        case 'username':
+          entity = await this.$usernameService.resolveUsername(
+            this.artist.address
+          )
+          if (entity) {
+            this.$router.replace(`/${entity}`)
+          }
+          break
+      }
     }
 
-    if (entity) {
+    if (entity && this.artist) {
       Vue.set(this.artist, category, entity)
     }
   }

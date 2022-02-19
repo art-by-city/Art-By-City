@@ -2,7 +2,7 @@ import { Avatar, Profile } from '~/types'
 
 export default interface User {
   address: string
-  username?: string
+  username?: string | null
   // id: string
   // username: string
   // name: string

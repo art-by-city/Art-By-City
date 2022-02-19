@@ -236,10 +236,13 @@ export default class ArtworkPage extends FormPageComponent {
 
     ProgressService.start()
     try {
+      console.log('artwork page username, artwork', this.$route.params.username, this.$route.params.artwork)
       const artwork = await this.$artworkService.fetchByTxIdOrSlug(
-        this.txIdOrSlug,
+        this.$route.params.artwork,
         this.$route.params.username
       )
+
+      console.log('artwork page got artwork', artwork?.id || null)
 
       if (artwork) {
         if (this.isUserAgentBot) {
