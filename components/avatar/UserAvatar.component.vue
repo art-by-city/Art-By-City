@@ -70,7 +70,15 @@ export default class UserAvatar extends Vue {
   }) readonly usernameWidth!: string
 
   get displayName() {
-    return this.profile?.displayName || this.username || this.user.address
+    if (this.profile?.displayName) {
+      return this.profile?.displayName
+    }
+
+    if (this.username) {
+      return `@${this.username}`
+    }
+
+    return this.user.address || ''
   }
 
   get size() {
@@ -100,6 +108,11 @@ export default class UserAvatar extends Vue {
                 break
               case 'username':
                 this.username = await this.$usernameService.resolveUsername(
+                  this.user.address
+                )
+                break
+              case 'profile':
+                this.profile = await this.$profileService.fetchProfile(
                   this.user.address
                 )
                 break

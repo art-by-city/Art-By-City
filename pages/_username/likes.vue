@@ -1,6 +1,6 @@
 <template>
   <div class="user-profile-likes">
-    <v-container fluid>
+    <v-container fluid v-if="artist">
       <v-row align="end">
         <v-col
           cols="1" offset="3"
@@ -53,25 +53,41 @@ import LikesFeed from '~/components/profile/LikesFeed.component.vue'
 export default class ProfileLikesPage extends Vue {
   head() {
     return {
-      title: `${this.$route.params.username}'s Likes`
+      title: `${this.primaryName}'s Likes`
     }
   }
 
-  artist: User = { address: this.$route.params.username }
+  artist: User | null = null
+  username: string | null = null
 
   get primaryName(): string {
-    return this.artist.profile?.displayName || this.artist.address
+    if (this.artist?.profile?.displayName) {
+      return this.artist?.profile?.displayName
+    }
+
+    if (this.artist?.username) {
+      return `@${this.artist.username}`
+    }
+
+    return this.artist?.address || ''
   }
 
   async fetch() {
     ProgressService.start()
     try {
-      const profile = await this.$profileService.fetchProfile(
-        this.artist.address
+      const { username, address } = await this.$usernameService.resolve(
+        this.$route.params.username
       )
 
-      if (profile) {
-        Vue.set(this.artist, 'profile', profile)
+      if (!address) {
+        this.$router.push('/')
+      } else {
+        this.artist = { username, address }
+        const profile = await this.$profileService.fetchProfile(address)
+
+        if (profile) {
+          Vue.set(this.artist, 'profile', profile)
+        }
       }
     } catch (error) {
       console.error(error)

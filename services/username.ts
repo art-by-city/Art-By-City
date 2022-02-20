@@ -10,8 +10,7 @@ import { SmartWeaveService } from './'
 
 export default class UsernameService extends SmartWeaveService {
   private contract!: Contract<UsernamesContractState>
-  private txId = '6R5_uFtkdXzr6GSl5SR8Q_JlaLMF4utIY8s8YnQ3OLc'
-  // private txId = 'pp'
+  private txId = 'mcJaw78tFMl2wB8s-qiSv7TsQFLRMPwB4gTPJJovClI'
 
   constructor(context: Context) {
     super(context)

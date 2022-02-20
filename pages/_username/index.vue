@@ -5,70 +5,53 @@
         <v-col
           cols="2" offset="2"
             sm="2" offset-sm="3"
-          style="position: relative;"
         >
           <v-row class="mt-4">
             <UserAvatar :user="artist" />
           </v-row>
-          <v-row class="mb-4 mx-auto" style="position: absolute; bottom: 0;">
-            <template v-if="isOwner">
-              <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
-                <template v-slot:activator>
-                  <v-btn
-                    v-model="showEditSpeedDial"
-                    text
-                    outlined
-                  >
-                    Edit
-                  </v-btn>
-                </template>
-
-                <v-btn
-                  text
-                  outlined
-                  @click="onEditAvatarClicked"
-                >
-                  Avatar
-                </v-btn>
-
-                <v-btn
-                  text
-                  outlined
-                  @click="onEditProfileClicked"
-                >
-                  Profile
-                </v-btn>
-
-                <v-btn
-                  text
-                  outlined
-                  @click="onEditUsernameClicked"
-                >
-                  Username
-                </v-btn>
-
-              </v-speed-dial>
-            </template>
-            <template v-else>
-              <v-tooltip top>
-                <template v-slot:activator="{ on, attrs }">
-                  <span
-                    v-on="on"
-                    v-bind="attrs"
-                    class="cursor--not-allowed"
-                  >
+          <v-row class="mt-4 mx-auto">
+            <v-sheet color="white">
+              <template v-if="isOwner">
+                <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
+                  <template v-slot:activator>
                     <v-btn
+                      v-model="showEditSpeedDial"
                       text
                       outlined
-                      disabled
                     >
-                      Follow
+                      Edit
                     </v-btn>
-                  </span>
-                </template>
-                Coming soon!
-              </v-tooltip>
-            </template>
+                  </template>
+
+                  <v-btn @click="onEditAvatarClicked">Avatar</v-btn>
+
+                  <v-btn @click="onEditProfileClicked">Profile</v-btn>
+
+                  <v-btn @click="onEditUsernameClicked">Username</v-btn>
+
+                </v-speed-dial>
+              </template>
+              <template v-else>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span
+                      v-on="on"
+                      v-bind="attrs"
+                      class="cursor--not-allowed"
+                    >
+                      <v-btn
+                        text
+                        outlined
+                        disabled
+                      >
+                        Follow
+                      </v-btn>
+                    </span>
+                  </template>
+                  Coming soon!
+                </v-tooltip>
+              </template>
+            </v-sheet>
           </v-row>
         </v-col>
         <v-col
@@ -81,8 +64,16 @@
             </v-card-title>
             <v-card-subtitle>
               <p class="mb-0">{{ secondaryName }}</p>
-              <p class="mb-0" v-if="artist.username">
-                @{{ artist.username }}
+              <p class="mb-0" v-if="tertiaryName">
+                <v-img
+                  src="logo/arweave/arweave_logo.svg"
+                  max-height="16px"
+                  max-width="16px"
+                  contain
+                  class="d-inline-block"
+                  style="vertical-align: middle;"
+                ></v-img>
+                {{ tertiaryName }}
               </p>
               <p class="mb-0" v-if="artist.profile && artist.profile.twitter">
                 <v-icon small>mdi-twitter</v-icon>
@@ -102,7 +93,7 @@
               <v-btn
                 v-if="likesCount > 0"
                 text
-                :to="`${this.artist.address}/likes`"
+                :to="`${this.artist.username || this.artist.address}/likes`"
               >
                 Liked Art: {{ likesCount }}
               </v-btn>
@@ -110,7 +101,7 @@
           </v-card>
         </v-col>
       </v-row>
-      <v-row class="mt-0">
+      <v-row>
         <v-col cols="10" offset="1" sm="6" offset-sm="3">
           <v-divider></v-divider>
         </v-col>
@@ -164,13 +155,15 @@ import {
 })
 export default class UserProfilePage extends PageComponent {
   head() {
-    const username = this.$route.params.username
-    const displayName = this.artist?.profile?.displayName || username
-    const title = `${displayName}'s Profile`
+    if (!this.artist) { return {} }
+
+    const title = `${this.primaryName}'s Profile`
     const description = this.artist?.profile?.bio || title
-    const url = `${this.$config.baseUrl}/${username}`
-    const avatarUrl = `${this.$config.baseUrl}/api/avatar/${username}`
-    const avatarAlt = `${username}'s avatar`
+    const url =
+      `${this.$config.baseUrl}/${this.artist.username || this.artist.address}`
+    const avatarUrl =
+      `${this.$config.baseUrl}/api/avatar/${this.artist.address}`
+    const avatarAlt = `${this.primaryName}'s avatar`
     const twitter = this.artist?.profile?.twitter || ''
 
     return {
@@ -180,7 +173,9 @@ export default class UserProfilePage extends PageComponent {
         { property: 'og:title',            content: title       },
         { property: 'og:description',      content: description },
         { property: 'og:type',             content: 'profile'   },
-        { property: 'og:profile:username', content: username    },
+        {
+          property: 'og:profile:username',
+          content: this.artist.username || this.artist.address  },
         { property: 'og:url',              content: url         },
         { property: 'og:image',            content: avatarUrl   },
         { property: 'og:image:alt',        content: avatarAlt   },
@@ -208,11 +203,31 @@ export default class UserProfilePage extends PageComponent {
   }
 
   get primaryName(): string {
-    return this.artist?.profile?.displayName || this.artist?.address || ''
+    if (this.artist?.profile?.displayName) {
+      return this.artist?.profile?.displayName
+    }
+
+    if (this.artist?.username) {
+      return `@${this.artist.username}`
+    }
+
+    return this.artist?.address || ''
   }
 
   get secondaryName(): string {
     if (this.artist?.profile?.displayName) {
+      if (this.artist?.username) {
+        return `@${this.artist?.username}`
+      } else {
+        return this.artist.address
+      }
+    }
+
+    return ''
+  }
+
+  get tertiaryName(): string {
+    if (this.artist?.profile?.displayName || this.artist?.username) {
       return this.artist.address
     }
 
@@ -247,7 +262,7 @@ export default class UserProfilePage extends PageComponent {
       )
 
       if (!address) {
-        this.$router.replace('/')
+        this.$router.push('/')
       } else {
         this.artist = { username, address }
         await this.fetchAndSet('profile')

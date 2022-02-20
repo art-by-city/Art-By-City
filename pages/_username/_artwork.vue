@@ -46,8 +46,11 @@
           <v-row dense>
             <strong>Created by</strong>
             &nbsp;
-            <nuxt-link :to="`/${artwork.creator.address}`" class="text-truncate">
-              {{ username }}
+            <nuxt-link
+              :to="`/${username || artwork.creator.address}`"
+              class="text-truncate"
+            >
+              {{ displayName }}
             </nuxt-link>
           </v-row>
           <v-row dense v-if="artwork.created">
@@ -183,12 +186,14 @@ export default class ArtworkPage extends FormPageComponent {
   head() {
     if (!this.artwork) { return {} }
 
-    const username = this.$route.params.username
-    const displayName = this.profile?.displayName || username
-    const title = `${this.artwork.title} by ${displayName}`
-    const url = `${this.$config.baseUrl}/${username}/${this.txIdOrSlug}`
+    const usernameOrAddress = this.username || this.artwork.creator.address
+    const txIdOrSlug = this.artwork.slug || this.artwork.id
+
+    const title = `${this.artwork.title} by ${this.displayName}`
+    const url =
+      `${this.$config.baseUrl}/${usernameOrAddress}/${txIdOrSlug}`
     const thumbnailUrl =
-      `${this.$config.baseUrl}/api/artwork/${username}/${this.txIdOrSlug}`
+      `${this.$config.baseUrl}/api/artwork/${usernameOrAddress}/${txIdOrSlug}`
     const twitter = this.profile?.twitter || ''
 
     return {
@@ -214,6 +219,7 @@ export default class ArtworkPage extends FormPageComponent {
 
   artwork: Artwork | null = null
   profile: Profile | null = null
+  username: string | null = null
   previewImage: ArtworkImage | null = null
   cachedArtwork!: Artwork
   zoom = false
@@ -222,8 +228,16 @@ export default class ArtworkPage extends FormPageComponent {
   tx: UserTransaction | null = null
   isUserAgentBot: boolean = false
 
-  get username() {
-    return this.profile?.displayName || this.artwork?.creator.address || ''
+  get displayName() {
+    if (this.profile?.displayName) {
+      return this.profile?.displayName
+    }
+
+    if (this.username) {
+      return `@${this.username}`
+    }
+
+    return this.artwork?.creator.address || ''
   }
 
   async fetch() {
@@ -236,40 +250,45 @@ export default class ArtworkPage extends FormPageComponent {
 
     ProgressService.start()
     try {
-      console.log('artwork page username, artwork', this.$route.params.username, this.$route.params.artwork)
-      const artwork = await this.$artworkService.fetchByTxIdOrSlug(
-        this.$route.params.artwork,
+      const { username, address } = await this.$usernameService.resolve(
         this.$route.params.username
       )
 
-      console.log('artwork page got artwork', artwork?.id || null)
-
-      if (artwork) {
-        if (this.isUserAgentBot) {
-          artwork.images = []
-        }
-
-        this.artwork = artwork
-
-        this.profile = await this.$profileService.fetchProfile(
-          artwork.creator.address
-        )
-        this.setPreviewImage()
+      if (!address) {
+        this.$router.push('/')
       } else {
-        this.txId = this.txIdOrSlug
-        this.tx = this.$accessor.transactions.getById(this.txId)
-        this.$store.subscribe(async (mutation) => {
-          if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-            const payload = mutation.payload as SetUserTransactionStatusPayload
-            if (payload.type === 'artwork' && payload.id === this.txId) {
-              if (payload.status === 'CONFIRMED') {
-                this.$fetch()
-              } else {
-                this.tx = this.$accessor.transactions.getById(this.txId)
+        const artwork = await this.$artworkService.fetchByTxIdOrSlug(
+          this.$route.params.artwork,
+          address
+        )
+
+        if (artwork) {
+          if (this.isUserAgentBot) {
+            artwork.images = []
+          }
+
+          this.artwork = artwork
+          this.username = username || null
+          this.profile = await this.$profileService.fetchProfile(
+            artwork.creator.address
+          )
+          this.setPreviewImage()
+        } else {
+          this.txId = this.txIdOrSlug
+          this.tx = this.$accessor.transactions.getById(this.txId)
+          this.$store.subscribe(async (mutation) => {
+            if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
+              const payload = mutation.payload as SetUserTransactionStatusPayload
+              if (payload.type === 'artwork' && payload.id === this.txId) {
+                if (payload.status === 'CONFIRMED') {
+                  this.$fetch()
+                } else {
+                  this.tx = this.$accessor.transactions.getById(this.txId)
+                }
               }
             }
-          }
-        })
+          })
+        }
       }
     } catch (error) {
       console.error(error)
