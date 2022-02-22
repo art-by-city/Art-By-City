@@ -96,7 +96,7 @@ export default class ArtworkService extends TransactionService {
     limit?: number
   ): Promise<FeedItem[]> {
     if (!creator) {
-      switch (this.config.name) {
+      switch (this.config.app.name) {
         case 'ArtByCity':
           creator = [
             'mKRPxOSIe08BddCnrL9en8C3hUGqwA5l1sUZilGsjDg',

@@ -11,7 +11,7 @@ export default class TransactionService extends ArDBService {
     this.transactionFactory = new TransactionFactory(
       this.$arweave,
       this.$ardb,
-      context.$config.arweave.appConfig
+      context.$config.arweave.app
     )
   }
 }

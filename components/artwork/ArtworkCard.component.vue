@@ -44,7 +44,7 @@
                       font-weight-thin
                     "
                   >
-                    {{ username }}
+                    {{ displayName }}
                   </a>
                 </v-col>
               </v-row>
@@ -80,18 +80,16 @@ export default class ArtworkCard extends Vue {
   @debounce
   @Emit('click') onArtworkCardClicked() {
     if (this.artwork) {
-      if (this.artwork.slug) {
-        this.$router.push(
-          `/${this.artwork.creator.address}/${this.artwork.slug}`
-        )
-      } else {
-        this.$router.push(`/${this.artwork.creator.address}/${this.artwork.id}`)
-      }
+      const creatorUrl = this.username || this.artwork.creator.address
+      const artworkUrl = this.artwork.slug || this.artwork.id
+
+      this.$router.push(`/${creatorUrl}/${artworkUrl}`)
     }
   }
 
   artwork: Artwork | null = null
   profile: Profile | null = null
+  username: string | null = null
 
   get src() {
     if (this.artwork && this.artwork.images.length > 0) {
@@ -101,8 +99,16 @@ export default class ArtworkCard extends Vue {
     return ''
   }
 
-  get username() {
-    return this.profile?.displayName || this.artwork?.creator.address || ''
+  get displayName() {
+    if (this.profile?.displayName) {
+      return this.profile?.displayName
+    }
+
+    if (this.username) {
+      return `@${this.username}`
+    }
+
+    return this.artwork?.creator.address || ''
   }
 
   fetchOnServer = false
@@ -111,6 +117,10 @@ export default class ArtworkCard extends Vue {
 
     if (this.artwork) {
       this.profile = await this.$profileService.fetchProfile(
+        this.artwork.creator.address
+      )
+
+      this.username = await this.$usernameService.resolveUsername(
         this.artwork.creator.address
       )
     }

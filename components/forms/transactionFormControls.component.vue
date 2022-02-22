@@ -17,7 +17,7 @@
           outlined
           elevation="2"
           color="primary"
-          :disabled="loading"
+          :disabled="loading || disabled"
           :loading="loading"
           @click="onSubmitClicked"
         >
@@ -39,6 +39,11 @@ export default class TransactionFormControls extends Vue {
     type: Boolean,
     required: false
   }) loading?: boolean
+
+  @Prop({
+    type: Boolean,
+    required: false
+  }) disabled?: boolean
 
   @debounce
   @Emit('cancel') onCancelClicked() {}
