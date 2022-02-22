@@ -72,14 +72,10 @@ export default class ArtworkService extends TransactionService {
 
   async fetch(id: string): Promise<Artwork | null> {
     try {
-      // const txDataString = await this.$arweave.transactions.getData(id, {
-      //   decode: true,
-      //   string: true
-      // }) as string
-      const res = await this.context.$axios.get(
-        `http://${this.config.api.host}:${this.config.api.port}/tx/${id}/data`
-      )
-      const txDataString = Buffer.from(res.data, 'base64').toString()
+      const txDataString = await this.$arweave.transactions.getData(id, {
+        decode: true,
+        string: true
+      }) as string
 
       const txData = JSON.parse(txDataString)
       txData.id = id
