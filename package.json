@@ -31,7 +31,6 @@
     "arconnect": "^0.2.9",
     "arweave": "^1.10.16",
     "async": "^3.2.1",
-    "contracts": "git+https://gitlab.com/art-by-city/contracts.git",
     "cropperjs": "^1.5.9",
     "crypto-js": "^4.1.1",
     "dotenv": "^8.2.0",

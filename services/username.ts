@@ -1,12 +1,21 @@
 import { Context } from '@nuxt/types'
 import { Contract, InteractionResult } from 'redstone-smartweave'
 
-import {
-  UsernamesContractInput,
-  UsernamesContractResult,
-  UsernamesContractState
-} from 'contracts/src/usernames/contract'
 import { SmartWeaveService } from './'
+
+export interface UsernamesContractState {
+  usernames: {
+    [owner: string]: string
+  }
+}
+
+export type UsernamesContractInput = {
+  function: 'register'
+  username: string
+} | {
+  function: 'release'
+}
+export type UsernamesContractResult = any
 
 export default class UsernameService extends SmartWeaveService {
   private contract!: Contract<UsernamesContractState>
