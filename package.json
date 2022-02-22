@@ -12,11 +12,7 @@
     "generate": "nuxt generate",
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
     "deploy:staging": "gcloud app deploy app.staging.yaml --project art-by-city-staging-299519",
-    "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919",
-    "build:contracts": "ts-node --project node.tsconfig.json contracts/scripts/build.ts",
-    "deploy:contracts": "ts-node --project node.tsconfig.json contracts/scripts/deploy.ts",
-    "test:contracts": "ts-node --project node.tsconfig.json contracts/scripts/getLatestState.ts",
-    "test:contracts2": "ts-node --project node.tsconfig.json contracts/scripts/updateState.ts"
+    "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919"
   },
   "dependencies": {
     "@nuxt/types": "^2.15.7",
@@ -35,6 +31,7 @@
     "arconnect": "^0.2.9",
     "arweave": "^1.10.16",
     "async": "^3.2.1",
+    "contracts": "git+https://gitlab.com/art-by-city/contracts.git",
     "cropperjs": "^1.5.9",
     "crypto-js": "^4.1.1",
     "dotenv": "^8.2.0",
@@ -46,6 +43,7 @@
     "nuxt": "^2.15.7",
     "nuxt-property-decorator": "^2.7.2",
     "nuxt-typed-vuex": "^0.2.0",
+    "redstone-smartweave": "^0.4.30",
     "reflect-metadata": "^0.1.13",
     "sass-loader": "^10.1.1",
     "sharp": "^0.30.1",

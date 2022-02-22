@@ -78,7 +78,7 @@ export default class DebugPage extends FormPageComponent {
     try {
       ProgressService.start()
       // rq5F6F8dJt9HdpqjT9rb4okcGCfcErLfWeLNii5qwFw
-      const arweave = new Arweave(this.$config.arweave.apiConfig)
+      const arweave = new Arweave(this.$config.arweave.api)
 
       const tx = await arweave.createTransaction({ data: this.request.data })
       tx.addTag('App-Name', APP_NAME)

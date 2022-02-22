@@ -45,9 +45,7 @@ import { uuidv4 } from '~/helpers'
     AvatarUploadInput
   }
 })
-export default class AvatarUploadDialog extends TransactionDialog {
-  asset: ArtworkImage | null = null
-
+export default class AvatarUploadDialog extends TransactionDialog<ArtworkImage> {
   fetchOnServer = false
   async fetch() {
     if (this.$auth.user && this.$auth.user.address) {

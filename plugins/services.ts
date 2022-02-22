@@ -12,7 +12,8 @@ import {
   TransactionQueueService,
   UserService,
   LikesService,
-  ArweaveService
+  ArweaveService,
+  UsernameService
 } from '~/services'
 
 declare module 'vue/types/vue' {
@@ -25,6 +26,7 @@ declare module 'vue/types/vue' {
     $cityService: CityService
     $toastService: ToastService
     $changelogService: ChangelogService
+    $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
     $txQueueService: TransactionQueueService
@@ -44,6 +46,7 @@ declare module '@nuxt/types' {
     $cityService: CityService
     $toastService: ToastService
     $changelogService: ChangelogService
+    $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
     $txQueueService: TransactionQueueService
@@ -59,6 +62,7 @@ declare module '@nuxt/types' {
     $cityService: CityService
     $toastService: ToastService
     $changelogService: ChangelogService
+    $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
     $txQueueService: TransactionQueueService
@@ -77,6 +81,7 @@ declare module 'vuex/types/index' {
     $cityService: CityService
     $toastService: ToastService
     $changelogService: ChangelogService
+    $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
     $txQueueService: TransactionQueueService
@@ -92,6 +97,7 @@ const servicesPlugin: Plugin = (context, inject) => {
   inject('cityService', new CityService(context))
   inject('toastService', new ToastService(context))
   inject('changelogService', new ChangelogService(context))
+  inject('usernameService', new UsernameService(context))
   inject('avatarService', new AvatarService(context))
   inject('userService', new UserService(context))
   inject('txQueueService', new TransactionQueueService(context))

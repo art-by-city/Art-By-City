@@ -49,6 +49,7 @@ export default {
   plugins: [
     { src: '~/plugins/arweave.ts' },
     { src: '~/plugins/ardb.ts' },
+    { src: '~/plugins/smartweave.ts' },
     { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',
     '~/plugins/filters.ts',
@@ -72,18 +73,21 @@ export default {
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
     arweave: {
-      appConfig: {
+      app: {
         name: process.env.APP_NAME || 'ArtByCity-Development',
         version: process.env.APP_VERSION || 'development'
       },
-      apiConfig: {
+      api: {
         protocol: process.env.ARWEAVE_PROTOCOL || 'http',
         host: process.env.ARWEAVE_HOST || 'localhost',
         port: process.env.ARWEAVE_PORT || 1984
       },
-      waitForConfirmations: process.env.ARWEAVE_TX_CONFIRMATIONS || 12
+      waitForConfirmations: process.env.ARWEAVE_TX_CONFIRMATIONS || 12,
+      contracts: {
+        usernames: process.env.USERNAMES_CONTRACT_ID || ''
+      }
     },
-    artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081'
+    artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081',
   },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
