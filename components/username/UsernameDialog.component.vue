@@ -38,18 +38,6 @@
                     @submit="onSubmit"
                   />
                 </v-row>
-                <!-- <v-row justify="center">
-                  <v-btn
-                    outlined
-                    elevation="2"
-                    color="secondary"
-                    :disabled="isUploading || isValidating"
-                    :loading="isUploading || isValidating"
-                    @click="onReleaseClicked"
-                  >
-                    Release
-                  </v-btn>
-                </v-row> -->
               </v-container>
             </v-card-actions>
           </v-card>
