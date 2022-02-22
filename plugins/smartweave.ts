@@ -1,4 +1,4 @@
-import { LoggerFactory, SmartWeave, SmartWeaveNodeFactory, SmartWeaveWebFactory } from 'redstone-smartweave'
+import { LoggerFactory, RedstoneGatewayInteractionsLoader, SmartWeave, SmartWeaveNodeFactory, SmartWeaveWebFactory } from 'redstone-smartweave'
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 
@@ -28,14 +28,27 @@ declare module 'vuex/types/index' {
   }
 }
 
+const CONTRACT_GATEWAY = 'https://gateway.redstone.finance'
+
 export default ({ app }: Context, inject: Inject) => {
   try {
-    LoggerFactory.INST.logLevel('error')
     if (process.server) {
-      inject('smartweave', SmartWeaveNodeFactory.memCached(app.$arweave))
-    } else {
-      inject('smartweave', SmartWeaveWebFactory.memCached(app.$arweave))
+      LoggerFactory.INST.logLevel('error')
+    } else if (process.env.NODE_ENV === 'development') {
+      LoggerFactory.INST.logLevel('error')
     }
+
+    let smartweave = process.server
+      ? SmartWeaveNodeFactory.memCachedBased(app.$arweave)
+      : SmartWeaveWebFactory.memCachedBased(app.$arweave)
+
+    if (process.env.NODE_ENV !== 'development') {
+      smartweave.setInteractionsLoader(
+        new RedstoneGatewayInteractionsLoader(CONTRACT_GATEWAY)
+      )
+    }
+
+    inject('smartweave', smartweave.build())
   } catch (error) {
     console.error('Error during SmartWeave plugin bootstrap', error)
   }

@@ -2,7 +2,6 @@ import { Contract, SmartWeave } from 'redstone-smartweave'
 import { Context } from '@nuxt/types'
 
 import { ArweaveService } from './'
-import { ArweaveAppConfig } from '~/types'
 
 export default class SmartWeaveService extends ArweaveService {
   $smartweave!: SmartWeave
@@ -22,6 +21,6 @@ export default class SmartWeaveService extends ArweaveService {
       .writeInteraction<ContractInput>(input, [
         { name: 'App-Name', value: this.config.app.name },
         { name: 'App-Version', value: this.config.app.version }
-      ])
+      ], undefined, true)
   }
 }

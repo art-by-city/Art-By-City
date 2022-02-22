@@ -35,10 +35,10 @@
       "@nuxtjs/auth-next",
       "@types/async",
       "@types/crypto-js",
+      "@types/prettier",
       "reflect-metadata",
       "vuetify",
-      "arconnect",
-      "@types/prettier"
+      "arconnect"
     ]
   },
   "exclude": [

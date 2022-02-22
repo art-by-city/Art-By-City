@@ -36,7 +36,7 @@ export default ({ $config }: Context, inject: Inject) => {
   try {
     const baseOpts = {
       driver: localforage.INDEXEDDB,
-      name: $config.arweave.appConfig.name
+      name: $config.arweave.app.name
     }
     const publicOpts = { ...baseOpts, storeName: 'public' }
     const userOpts = { ...baseOpts, storeName: 'user' }

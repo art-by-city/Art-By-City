@@ -33,6 +33,7 @@
                 <v-row justify="center">
                   <TransactionFormControls
                     :loading="isUploading || isValidating"
+                    :disabled="isValidating || !valid || !dirty"
                     @cancel="onCancel"
                     @submit="onSubmit"
                   />
@@ -63,8 +64,8 @@ import { Component, Watch } from 'nuxt-property-decorator'
 
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 import { SetUserTransactionStatusPayload } from '~/types'
+import { APP_INFO } from '~/schemes/arweave-wallet'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
-import { debounce } from '~/helpers'
 
 @Component
 export default class UsernameDialog extends TransactionDialog<string> {
@@ -81,6 +82,13 @@ export default class UsernameDialog extends TransactionDialog<string> {
   color: string = 'primary'
   isValidating: boolean | string = false
 
+  @Watch('open') async onOpen() {
+    await window.arweaveWallet.connect([
+      'SIGN_TRANSACTION'
+    ], APP_INFO)
+    this.dirty = false
+  }
+
   // Async validation of username
   @Watch('asset') async onUsernameChanged(username: string) {
     if (!this.dirty || !username) {
@@ -91,7 +99,7 @@ export default class UsernameDialog extends TransactionDialog<string> {
     this.messages = []
     this.color = 'primary'
 
-    const result = await this.$usernameService.checkUsername(username)
+    const result = await this.$usernameService.checkUsername(username, this.$auth.user.address)
 
     if (username !== this.asset) {
       this.isValidating = false
@@ -107,6 +115,10 @@ export default class UsernameDialog extends TransactionDialog<string> {
       default:
         this.usernameErrors = []
         break
+    }
+
+    if (result.errorMessage === 'username already registered') {
+      this.usernameErrors = [ 'you already registered this username!' ]
     }
 
     if (this.usernameErrors.length === 0) {
@@ -156,32 +168,15 @@ export default class UsernameDialog extends TransactionDialog<string> {
           status: 'PENDING_CONFIRMATION',
           created: new Date().getTime()
         })
+      } else {
+        this.$toastService.error(
+          'Could not register username: either you have an insufficient balance or the Gateway is unavailable'
+        )
       }
 
       this.isUploading = false
       this.close()
     }
   }
-
-  // @debounce
-  // async onReleaseClicked() {
-  //   this.isUploading = true
-
-  //   const txId = await this.$usernameService.releaseUsername()
-
-  //   if (txId) {
-  //     const transaction = await this.$arweave.transactions.get(txId)
-
-  //     this.$accessor.transactions.queueTransaction({
-  //       transaction,
-  //       type: 'username',
-  //       status: 'PENDING_CONFIRMATION',
-  //       created: new Date().getTime()
-  //     })
-  //   }
-
-  //   this.isUploading = false
-  //   this.close()
-  // }
 }
 </script>

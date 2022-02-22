@@ -12,11 +12,7 @@
     "generate": "nuxt generate",
     "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
     "deploy:staging": "gcloud app deploy app.staging.yaml --project art-by-city-staging-299519",
-    "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919",
-    "build:contracts": "ts-node --project node.tsconfig.json contracts/scripts/build.ts",
-    "deploy:contracts": "ts-node --project node.tsconfig.json contracts/scripts/deploy.ts",
-    "test:contracts": "ts-node --project node.tsconfig.json contracts/scripts/getLatestState.ts",
-    "test:contracts2": "ts-node --project node.tsconfig.json contracts/scripts/updateState.ts"
+    "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919"
   },
   "dependencies": {
     "@nuxt/types": "^2.15.7",

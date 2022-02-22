@@ -255,7 +255,7 @@ export default class ArtworkPage extends FormPageComponent {
       )
 
       if (!address) {
-        this.$router.push('/')
+        this.$router.replace('/')
       } else {
         const artwork = await this.$artworkService.fetchByTxIdOrSlug(
           this.$route.params.artwork,

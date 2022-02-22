@@ -11,10 +11,7 @@ export default class ArweaveService {
 
   constructor(context: Context) {
     this.$arweave = context.$arweave
-    this.config = {
-      app: context.$config.arweave.appConfig,
-      api: context.$config.arweave.apiConfig
-    }
+    this.config = context.$config.arweave
     this.context = context
   }
 

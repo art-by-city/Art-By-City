@@ -10,48 +10,50 @@
             <UserAvatar :user="artist" />
           </v-row>
           <v-row class="mt-4 mx-auto">
-            <v-sheet color="white">
-              <template v-if="isOwner">
-                <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
-                  <template v-slot:activator>
+            <template v-if="isOwner">
+              <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
+                <template v-slot:activator>
+                  <v-btn
+                    v-model="showEditSpeedDial"
+                    text
+                    outlined
+                  >
+                    Edit
+                  </v-btn>
+                </template>
+
+                <v-btn @click="onEditAvatarClicked">Avatar</v-btn>
+
+                <v-btn @click="onEditProfileClicked">Profile</v-btn>
+
+                <v-btn
+                  @click="onEditUsernameClicked"
+                >
+                  Username
+                </v-btn>
+
+              </v-speed-dial>
+            </template>
+            <template v-else>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <span
+                    v-on="on"
+                    v-bind="attrs"
+                    class="cursor--not-allowed"
+                  >
                     <v-btn
-                      v-model="showEditSpeedDial"
                       text
                       outlined
+                      disabled
                     >
-                      Edit
+                      Follow
                     </v-btn>
-                  </template>
-
-                  <v-btn @click="onEditAvatarClicked">Avatar</v-btn>
-
-                  <v-btn @click="onEditProfileClicked">Profile</v-btn>
-
-                  <v-btn @click="onEditUsernameClicked">Username</v-btn>
-
-                </v-speed-dial>
-              </template>
-              <template v-else>
-                <v-tooltip top>
-                  <template v-slot:activator="{ on, attrs }">
-                    <span
-                      v-on="on"
-                      v-bind="attrs"
-                      class="cursor--not-allowed"
-                    >
-                      <v-btn
-                        text
-                        outlined
-                        disabled
-                      >
-                        Follow
-                      </v-btn>
-                    </span>
-                  </template>
-                  Coming soon!
-                </v-tooltip>
-              </template>
-            </v-sheet>
+                  </span>
+                </template>
+                Coming soon!
+              </v-tooltip>
+            </template>
           </v-row>
         </v-col>
         <v-col
@@ -65,15 +67,14 @@
             <v-card-subtitle>
               <p class="mb-0">{{ secondaryName }}</p>
               <p class="mb-0" v-if="tertiaryName">
-                <v-img
+                <img
+                  width="16px"
+                  height="16px"
                   src="logo/arweave/arweave_logo.svg"
-                  max-height="16px"
-                  max-width="16px"
-                  contain
                   class="d-inline-block"
                   style="vertical-align: middle;"
-                ></v-img>
-                {{ tertiaryName }}
+                />
+                <span>{{ tertiaryName }}</span>
               </p>
               <p class="mb-0" v-if="artist.profile && artist.profile.twitter">
                 <v-icon small>mdi-twitter</v-icon>
@@ -218,8 +219,6 @@ export default class UserProfilePage extends PageComponent {
     if (this.artist?.profile?.displayName) {
       if (this.artist?.username) {
         return `@${this.artist?.username}`
-      } else {
-        return this.artist.address
       }
     }
 
@@ -228,7 +227,7 @@ export default class UserProfilePage extends PageComponent {
 
   get tertiaryName(): string {
     if (this.artist?.profile?.displayName || this.artist?.username) {
-      return this.artist.address
+      return this.artist?.address || ''
     }
 
     return ''
@@ -262,7 +261,7 @@ export default class UserProfilePage extends PageComponent {
       )
 
       if (!address) {
-        this.$router.push('/')
+        this.$router.replace('/')
       } else {
         this.artist = { username, address }
         await this.fetchAndSet('profile')

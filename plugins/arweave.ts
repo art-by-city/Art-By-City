@@ -31,7 +31,7 @@ declare module 'vuex/types/index' {
 
 export default ({ $config }: Context, inject: Inject) => {
   try {
-    const arweave = new Arweave($config.arweave?.apiConfig || {})
+    const arweave = new Arweave($config.arweave?.api || {})
 
     // NB: Add 'origin' header on SSR request to play nice with
     //     art-by-city/arlocal-reverse-proxy CORS feature

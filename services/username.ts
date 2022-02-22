@@ -10,10 +10,12 @@ import { SmartWeaveService } from './'
 
 export default class UsernameService extends SmartWeaveService {
   private contract!: Contract<UsernamesContractState>
-  private txId = 'mcJaw78tFMl2wB8s-qiSv7TsQFLRMPwB4gTPJJovClI'
+  private txId!: string
 
   constructor(context: Context) {
     super(context)
+
+    this.txId = this.config.contracts['usernames']
 
     this.contract = this.$smartweave
       .contract<UsernamesContractState>(this.txId)
@@ -60,7 +62,9 @@ export default class UsernameService extends SmartWeaveService {
     const resolvedAddress = await this.resolveAddress(usernameOrAddress)
 
     if (!resolvedUsername && !resolvedAddress) {
-      address = usernameOrAddress
+      if (usernameOrAddress.length === 43) {
+        address = usernameOrAddress
+      }
     } else if (!resolvedUsername && resolvedAddress) {
       username = usernameOrAddress
       address = resolvedAddress
@@ -72,7 +76,7 @@ export default class UsernameService extends SmartWeaveService {
     return { username, address }
   }
 
-  async checkUsername(username: string):
+  async checkUsername(username: string, caller: string):
     Promise<InteractionResult<UsernamesContractState, UsernamesContractResult>>
   {
      return await this.contract.dryWrite<UsernamesContractInput>({

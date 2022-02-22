@@ -80,7 +80,7 @@ export default class ProfileLikesPage extends Vue {
       )
 
       if (!address) {
-        this.$router.push('/')
+        this.$router.replace('/')
       } else {
         this.artist = { username, address }
         const profile = await this.$profileService.fetchProfile(address)
