@@ -2,7 +2,7 @@
   <v-container fluid class="transaction-confirmation-progress pa-0">
     <v-row dense>
       <v-col cols="12">
-        <span class="font-italic text-caption">{{ tx.transaction.id }}</span>
+        <span class="font-italic text-caption">{{ utx.id }}</span>
       </v-col>
     </v-row>
     <v-row dense align="center">
@@ -12,13 +12,13 @@
       <v-col cols="10">
         <v-row dense align="center">
           <strong>Status:&nbsp;</strong>
-          <span v-if="tx.status === 'PENDING_SUBMISSION'">
+          <span v-if="utx.status === 'PENDING_SUBMISSION'">
             Pending Submission
           </span>
-          <span v-if="tx.status === 'PENDING_CONFIRMATION'">
+          <span v-if="utx.status === 'PENDING_CONFIRMATION'">
             Pending Confirmation
           </span>
-          <template v-if="tx.status === 'DROPPED'">
+          <template v-if="utx.status === 'DROPPED'">
             <v-col cols="auto" class="pa-0">
               <span>Dropped</span>
             </v-col>
@@ -34,10 +34,10 @@
               </v-btn>
             </v-col> -->
           </template>
-          <span v-if="tx.status === 'CONFIRMING'">Confirming</span>
-          <span v-if="tx.status === 'CONFIRMED'">Ready!</span>
+          <span v-if="utx.status === 'CONFIRMING'">Confirming</span>
+          <span v-if="utx.status === 'CONFIRMED'">Ready!</span>
         </v-row>
-        <v-row dense v-if="tx.status === 'CONFIRMING'">
+        <v-row dense v-if="utx.status === 'CONFIRMING'">
           <v-progress-linear :value="confirmationsPct" height="25">
             {{ confirmations }} / {{ $config.arweave.waitForConfirmations }}
           </v-progress-linear>
@@ -58,10 +58,10 @@ export default class TransactionConfirmationProgress extends Vue {
   @Prop({
     type: Object,
     required: true
-  }) tx!: UserTransaction
+  }) utx!: UserTransaction
 
   get confirmations(): number {
-    return this.tx.confirmations || 0
+    return this.utx.confirmations || 0
   }
 
   get confirmationsPct(): number {
@@ -73,9 +73,9 @@ export default class TransactionConfirmationProgress extends Vue {
   @debounce
   onResubmitClicked() {
     this.$accessor.transactions.updateStatus({
-      id: this.tx.transaction.id,
+      id: this.utx.id,
       status: 'PENDING_SUBMISSION',
-      type: this.tx.type
+      type: this.utx.type
     })
   }
 }

@@ -150,8 +150,9 @@ export default class LikeButton extends Vue {
       const signed = await this.$arweaveService.sign(transaction)
 
       if (signed) {
-        const tx: UserTransaction = {
-          transaction,
+        const utx: UserTransaction = {
+          id: transaction.id,
+          last_tx: transaction.last_tx,
           type: 'like',
           status: 'PENDING_CONFIRMATION',
           created: new Date().getTime(),
@@ -159,15 +160,19 @@ export default class LikeButton extends Vue {
           entityId: this.entityTxId
         }
 
-        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
-          this.isUploading = false
-          if (err) {
-            this.$toastService.error(err.message)
-          } else {
-            this.isSubmittingLikeTx = true
-            this.subscribeToLikeTx()
+        this.$txQueueService.submitUserTransaction(
+          transaction,
+          utx,
+          (err?: Error) => {
+            this.isUploading = false
+            if (err) {
+              this.$toastService.error(err.message)
+            } else {
+              this.isSubmittingLikeTx = true
+              this.subscribeToLikeTx()
+            }
           }
-        })
+        )
       } else {
         this.isUploading = false
       }
