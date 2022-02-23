@@ -1,9 +1,7 @@
 import { Context } from '@nuxt/types'
 import { queue } from 'async'
 
-import { isDev } from '~/helpers'
-
-import { DEFAULT_STATE as DEFAULT_TRANSACTIONS_STATE }
+import { TransactionStoreState, DEFAULT_STATE as DEFAULT_TRANSACTIONS_STATE }
   from '~/store/transactions/state'
 import { DEFAULT_STATE as DEFAULT_NOTIFICATIONS_STATE }
   from '~/store/notifications/state'
@@ -27,6 +25,21 @@ persistedUserModules.forEach(({ name, defaultState }) => {
 export const RESTORE_MUTATION = (state: any, payload: any) => {
   persistedUserModules.forEach(({ name }) => {
     if (payload[name]) {
+      // NB: filter out "finished state" tx (confirmed, dropped)
+      if (name === 'transactions') {
+        const _state = payload[name] as TransactionStoreState
+        const txs = _state.transactions
+        const hasFinishedTx = txs.some((utx) => {
+          return utx.status === 'CONFIRMED' || utx.status === 'DROPPED'
+        })
+
+        if (hasFinishedTx) {
+          payload[name].transactions = _state.transactions.filter((utx) => {
+            return utx.status !== 'CONFIRMED' && utx.status !== 'DROPPED'
+          })
+        }
+      }
+
       state[name] = payload[name]
     }
   })

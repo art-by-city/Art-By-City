@@ -1,7 +1,6 @@
 import { actionTree } from 'typed-vuex'
 
 import {
-  CreateUserTransactionPayload,
   SetUserTransactionStatusPayload,
   TransactionNotificationType,
   UserTransaction
@@ -9,15 +8,10 @@ import {
 import { accessorType } from '~/store'
 import state from './state'
 import getters from './getters'
-import mutations, { ADD_TRANSACTION, SET_TRANSACTION_STATUS } from './mutations'
+import mutations, { ADD_TRANSACTION, REMOVE_TRANSACTION, SET_TRANSACTION_STATUS } from './mutations'
 
 const actions = actionTree({ state, getters, mutations }, {
   queueTransaction({}, tx: UserTransaction) {
-    // const tx: UserTransaction = {
-    //   ...payload,
-    //   status: 'PENDING_CONFIRMATION',
-    //   created: new Date().getTime()
-    // }
     const accessor = (<typeof accessorType>this.app.$accessor)
 
     accessor.transactions[ADD_TRANSACTION](tx)
@@ -33,7 +27,11 @@ const actions = actionTree({ state, getters, mutations }, {
     if (tx) {
       const prevStatus = '' + tx.status
 
-      commit(SET_TRANSACTION_STATUS, payload)
+      if (payload.status === 'CONFIRMED' || payload.status === 'DROPPED') {
+        commit(REMOVE_TRANSACTION, payload.id)
+      } else {
+        commit(SET_TRANSACTION_STATUS, payload)
+      }
 
       if (prevStatus !== payload.status) {
         const accessor = (<typeof accessorType>this.app.$accessor)
