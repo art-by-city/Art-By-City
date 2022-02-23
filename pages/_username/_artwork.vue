@@ -138,7 +138,7 @@
       <v-row justify="center">
         <v-col cols="auto">
           <template v-if="tx">
-            <TransactionConfirmationProgress :tx="tx" />
+            <TransactionConfirmationProgress :utx="tx" />
           </template>
           <template v-else>
             <!-- <h1>404 Artwork not found :(</h1> -->

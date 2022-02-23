@@ -11,7 +11,7 @@ const getters = getterTree(state, {
   ),
 
   getById: (state) => (id: string) => state.transactions.find(
-    (tx) => id === tx.transaction.id
+    (tx) => id === tx.id
   ) || null
 })
 

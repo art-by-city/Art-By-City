@@ -3,6 +3,7 @@ import { actionTree } from 'typed-vuex'
 import {
   CreateUserTransactionPayload,
   SetUserTransactionStatusPayload,
+  TransactionNotificationType,
   UserTransaction
 } from '~/types'
 import { accessorType } from '~/store'
@@ -26,7 +27,7 @@ const actions = actionTree({ state, getters, mutations }, {
     payload: SetUserTransactionStatusPayload
   ) {
     const tx = state.transactions.find(
-      (tx) => tx.transaction.id === payload.id
+      (tx) => tx.id === payload.id
     )
 
     if (tx) {
@@ -36,29 +37,28 @@ const actions = actionTree({ state, getters, mutations }, {
 
       if (prevStatus !== payload.status) {
         const accessor = (<typeof accessorType>this.app.$accessor)
+        let type!: TransactionNotificationType
         switch (payload.status) {
           case 'PENDING_CONFIRMATION':
-            accessor.notifications.addTransactionNotification({
-              txType: tx.type, type: 'Submitted', txId: tx.transaction.id
-            })
+            type = 'Submitted'
             break
           case 'CONFIRMING':
-            accessor.notifications.addTransactionNotification({
-              txType: tx.type, type: 'Accepted', txId: tx.transaction.id
-            })
+            type = 'Accepted'
             break
           case 'DROPPED':
-            accessor.notifications.addTransactionNotification({
-              txType: tx.type, type: 'Dropped', txId: tx.transaction.id
-            })
+            type = 'Dropped'
             break
           case 'CONFIRMED':
-            accessor.notifications.addTransactionNotification({
-              txType: tx.type, type: 'Confirmed', txId: tx.transaction.id
-            })
+            type = 'Confirmed'
             break
           default:
             break
+        }
+
+        if (type) {
+          accessor.notifications.addTransactionNotification({
+            txType: tx.type, type, txId: tx.id
+          })
         }
       }
     }

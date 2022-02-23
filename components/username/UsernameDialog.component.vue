@@ -148,10 +148,11 @@ export default class UsernameDialog extends TransactionDialog<string> {
       const txId = await this.$usernameService.registerUsername(this.asset)
 
       if (txId) {
-        const transaction = await this.$arweave.transactions.get(txId)
+        const anchor = await this.$arweave.transactions.getTransactionAnchor()
 
         this.$accessor.transactions.queueTransaction({
-          transaction,
+          id: txId,
+          last_tx: anchor,
           type: 'username',
           status: 'PENDING_CONFIRMATION',
           created: new Date().getTime()

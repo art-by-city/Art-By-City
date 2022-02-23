@@ -379,22 +379,27 @@ export default class ArtworkEditForm extends Vue {
       const signed = await this.$arweaveService.sign(transaction)
 
       if (signed) {
-        const tx: UserTransaction = {
-          transaction,
+        const utx: UserTransaction = {
+          id: transaction.id,
+          last_tx: transaction.last_tx,
           type: 'artwork',
           status: 'PENDING_CONFIRMATION',
           created: new Date().getTime()
         }
 
-        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
-          this.isUploading = false
-          if (err) {
-            console.error('Error submitting user tx', err)
-            this.$toastService.error('Error submitting user tx: ' + err.message)
-          } else {
-            return this._save(transaction.id)
+        this.$txQueueService.submitUserTransaction(
+          transaction,
+          utx,
+          (err?: Error) => {
+            this.isUploading = false
+            if (err) {
+              console.error('Error submitting user tx', err)
+              this.$toastService.error('Error submitting user tx: ' + err.message)
+            } else {
+              return this._save(transaction.id)
+            }
           }
-        })
+        )
       } else {
         this.isUploading = false
       }

@@ -14,7 +14,7 @@ const mutations = mutationTree(state, {
 
   [SET_TRANSACTION_STATUS](state, payload: SetUserTransactionStatusPayload) {
     const idx = state.transactions.findIndex(
-      (tx) => tx.transaction.id === payload.id
+      (tx) => tx.id === payload.id
     )
 
     if (idx >=0) {

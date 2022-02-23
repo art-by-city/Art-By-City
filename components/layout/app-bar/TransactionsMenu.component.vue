@@ -48,7 +48,7 @@
             dense
           >
             <v-list-item-content>
-              <TransactionConfirmationProgress :tx="tx" />
+              <TransactionConfirmationProgress :utx="tx" />
             </v-list-item-content>
           </v-list-item>
         </v-lazy>
