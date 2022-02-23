@@ -28,7 +28,7 @@ declare module 'vuex/types/index' {
   }
 }
 
-const CONTRACT_GATEWAY = 'https://gateway.redstone.finance'
+// const CONTRACT_GATEWAY = 'https://gateway.redstone.finance'
 
 export default ({ app }: Context, inject: Inject) => {
   try {
@@ -42,11 +42,11 @@ export default ({ app }: Context, inject: Inject) => {
       ? SmartWeaveNodeFactory.memCachedBased(app.$arweave)
       : SmartWeaveWebFactory.memCachedBased(app.$arweave)
 
-    if (process.env.NODE_ENV !== 'development') {
-      smartweave.setInteractionsLoader(
-        new RedstoneGatewayInteractionsLoader(CONTRACT_GATEWAY)
-      )
-    }
+    // if (process.env.NODE_ENV !== 'development') {
+    //   smartweave.setInteractionsLoader(
+    //     new RedstoneGatewayInteractionsLoader(CONTRACT_GATEWAY)
+    //   )
+    // }
 
     inject('smartweave', smartweave.build())
   } catch (error) {
