@@ -82,21 +82,26 @@ export default class AvatarUploadDialog extends TransactionDialog<ArtworkImage> 
       const signed = await this.$arweaveService.sign(transaction)
 
       if (signed) {
-        const tx: UserTransaction = {
-          transaction,
+        const utx: UserTransaction = {
+          id: transaction.id,
+          last_tx: transaction.last_tx,
           type: 'avatar',
           status: 'PENDING_CONFIRMATION',
           created: new Date().getTime()
         }
 
-        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
-          if (err) {
-            this.$toastService.error(err.message)
-            this.isUploading = false
-          } else {
-            this.close()
+        this.$txQueueService.submitUserTransaction(
+          transaction,
+          utx,
+          (err?: Error) => {
+            if (err) {
+              this.$toastService.error(err.message)
+              this.isUploading = false
+            } else {
+              this.close()
+            }
           }
-        })
+        )
       } else {
         this.isUploading = false
       }
