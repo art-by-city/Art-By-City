@@ -52,7 +52,6 @@ import { Component, Watch } from 'nuxt-property-decorator'
 
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 import { SetUserTransactionStatusPayload } from '~/types'
-import { APP_INFO } from '~/schemes/arweave-wallet'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 
 @Component
@@ -70,11 +69,13 @@ export default class UsernameDialog extends TransactionDialog<string> {
   color: string = 'primary'
   isValidating: boolean | string = false
 
-  @Watch('open') async onOpen() {
-    await window.arweaveWallet.connect([
-      'SIGN_TRANSACTION'
-    ], APP_INFO)
-    this.dirty = false
+  @Watch('open') async onOpen(open: boolean) {
+    if (open) {
+      this.dirty = false
+      this.messages = []
+      this.color = 'primary'
+      this.asset = this.$auth.user.username || null
+    }
   }
 
   // Async validation of username
@@ -87,26 +88,20 @@ export default class UsernameDialog extends TransactionDialog<string> {
     this.messages = []
     this.color = 'primary'
 
-    const result = await this.$usernameService.checkUsername(username, this.$auth.user.address)
-
-    if (username !== this.asset) {
+    if (username !== this.asset || username.length < 2) {
       this.isValidating = false
       return
     }
 
-    switch (result.type) {
-      case 'error':
-      case 'exception':
-        this.usernameErrors = [ result.errorMessage || '' ]
-        break
-      case 'ok':
-      default:
-        this.usernameErrors = []
-        break
-    }
+    const errorMessage = await this.$usernameService.validate(
+      username,
+      this.$auth.user.address
+    )
 
-    if (result.errorMessage === 'username already registered') {
+    if (errorMessage === 'username already registered') {
       this.usernameErrors = [ 'you already registered this username!' ]
+    } else if (errorMessage) {
+      this.usernameErrors = [ errorMessage ]
     }
 
     if (this.usernameErrors.length === 0) {
