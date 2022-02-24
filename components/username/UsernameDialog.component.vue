@@ -15,7 +15,7 @@
                 ref="form"
                 v-model="valid"
                 autocomplete="off"
-                :disabled="isValidating || isSigned"
+                :disabled="isSigned"
               >
                 <v-text-field
                   v-model="asset"
@@ -109,8 +109,6 @@ export default class UsernameDialog extends TransactionDialog<string> {
       username,
       this.$auth.user.address
     )
-
-    console.log('errorMessage', errorMessage)
 
     if (errorMessage === 'username already registered') {
       this.usernameErrors = [ 'you already registered this username!' ]
