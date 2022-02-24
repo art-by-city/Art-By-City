@@ -1,7 +1,7 @@
 import { Context } from '@nuxt/types'
 
 import { ArDBService, AvatarService } from './'
-import UsernameService from './username'
+import { UsernameService } from './username'
 
 export default class UserService extends ArDBService {
   $avatarService!: AvatarService

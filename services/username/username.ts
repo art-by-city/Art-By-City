@@ -1,21 +1,8 @@
 import { Context } from '@nuxt/types'
-import { Contract, InteractionResult } from 'redstone-smartweave'
+import { Contract, ContractInteraction, } from 'redstone-smartweave'
 
-import { SmartWeaveService } from './'
-
-export interface UsernamesContractState {
-  usernames: {
-    [owner: string]: string
-  }
-}
-
-export type UsernamesContractInput = {
-  function: 'register'
-  username: string
-} | {
-  function: 'release'
-}
-export type UsernamesContractResult = any
+import { SmartWeaveService } from '../'
+import { UsernamesContractState, handle, UsernamesContractInput } from './contract'
 
 export default class UsernameService extends SmartWeaveService {
   private contract!: Contract<UsernamesContractState>
@@ -85,13 +72,29 @@ export default class UsernameService extends SmartWeaveService {
     return { username, address }
   }
 
-  async checkUsername(username: string, caller: string):
-    Promise<InteractionResult<UsernamesContractState, UsernamesContractResult>>
-  {
-     return await this.contract.dryWrite<UsernamesContractInput>({
-      function: 'register',
-      username
-    })
+  async validate(username: string, caller: string): Promise<string | null> {
+    try {
+      const { state } = await this.contract.readState()
+
+      try {
+        handle(state, {
+          caller,
+          input: {
+            function: 'register',
+            username
+          }
+        })
+      } catch (err) {
+        return err.message
+      }
+
+
+    } catch (err) {
+      console.error(err)
+      return 'error validating username'
+    }
+
+    return null
   }
 
   async registerUsername(username: string): Promise<string | null> {
