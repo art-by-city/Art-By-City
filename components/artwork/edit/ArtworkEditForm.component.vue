@@ -282,10 +282,12 @@ export default class ArtworkEditForm extends Vue {
       return true
     },
     slug: (value: string = '') => {
-      const validSlugRegex = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
+      const validSlugRegex = /^[a-z0-9]+(?:[-_\.]*[a-z0-9]+)*$/
 
       if (!validSlugRegex.test(value)) {
-        return 'Must be a valid URL slug (lowerchase alphanumerics, hyphen, underscore)'
+        return 'Must be a valid URL slug'
+          + ' (lowerchase alphanumerics, hyphen, underscore, period),'
+          + ' must not end with a hyphen, underscore, or period'
       }
 
       return true
@@ -301,7 +303,7 @@ export default class ArtworkEditForm extends Vue {
   }
 
   get slugBase(): string {
-    const username = this.artwork.creator.address
+    const username = this.$auth.user.username || this.artwork.creator.address
 
     return `artby.city/${username}/`
   }
@@ -472,7 +474,9 @@ export default class ArtworkEditForm extends Vue {
   private generateSlugFromTitle() {
     this.artwork.slug = this.artwork.title
       .toLowerCase()
-      .replace(/[^a-z0-9_\-]/g, '')
+      .trim()
+      .replace(/[\s]/g, '-')
+      .replace(/[^a-z0-9_\-\.]/g, '')
   }
 }
 </script>

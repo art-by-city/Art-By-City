@@ -75,11 +75,16 @@ export default class UsernameService extends SmartWeaveService {
 
   async validate(username: string, caller: string): Promise<string | null> {
     try {
-      console.log('validate username', username)
       const { state } = await this.contract.readState()
 
+      const clonedState: UsernamesContractState = { usernames: {} }
+
+      for (const addr in state.usernames) {
+        clonedState.usernames[addr] = state.usernames[addr]
+      }
+
       try {
-        handle(state, {
+        handle(clonedState, {
           caller,
           input: {
             function: 'register',
