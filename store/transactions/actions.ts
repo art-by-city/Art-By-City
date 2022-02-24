@@ -28,7 +28,7 @@ const actions = actionTree({ state, getters, mutations }, {
       const prevStatus = '' + tx.status
 
       if (payload.status === 'CONFIRMED' || payload.status === 'DROPPED') {
-        commit(REMOVE_TRANSACTION, payload.id)
+        commit(REMOVE_TRANSACTION, { id: payload.id, result: payload.status })
       } else {
         commit(SET_TRANSACTION_STATUS, payload)
       }

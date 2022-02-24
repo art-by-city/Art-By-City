@@ -119,6 +119,8 @@
             <LikeButton
               :entityOwner="artwork.creator.address"
               :entityTxId="artwork.id"
+              :entityDescription="artwork.title"
+              :ownerDisplayName="displayName"
             />
           </div>
           <!--
@@ -152,7 +154,7 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import LikeButton from '~/components/likeButton.component.vue'
+import LikeButton from '~/components/likes/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkZoomDialog from
   '~/components/artwork/ArtworkZoomDialog.component.vue'

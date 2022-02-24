@@ -2,7 +2,6 @@
   <v-dialog
     :value="open"
     persistent
-    @click:outside="onCloseDialog"
     width="400"
   >
     <v-container dense class="pa-1">
@@ -12,7 +11,12 @@
             <v-card-title>Register Username</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <v-form ref="form" v-model="valid" autocomplete="off">
+              <v-form
+                ref="form"
+                v-model="valid"
+                autocomplete="off"
+                :disabled="isValidating || isSigned"
+              >
                 <v-text-field
                   v-model="asset"
                   type="text"
@@ -34,6 +38,10 @@
                   <TransactionFormControls
                     :loading="isUploading || isValidating"
                     :disabled="isValidating || !valid || !dirty"
+                    :signed="isSigned"
+                    :txTotal="txTotal"
+                    isContract
+                    @sign="onSign"
                     @cancel="onCancel"
                     @submit="onSubmit"
                   />
@@ -51,11 +59,12 @@
 import { Component, Watch } from 'nuxt-property-decorator'
 
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload } from '~/types'
+import { DomainEntityCategory, SetUserTransactionStatusPayload } from '~/types'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 
 @Component
 export default class UsernameDialog extends TransactionDialog<string> {
+  type: DomainEntityCategory = 'username'
   valid = false
   dirty = false
   $refs!: {
@@ -72,6 +81,8 @@ export default class UsernameDialog extends TransactionDialog<string> {
   @Watch('open') async onOpen(open: boolean) {
     if (open) {
       this.dirty = false
+      this.isSigned = false
+      this.isValidating = false
       this.messages = []
       this.color = 'primary'
       this.asset = this.$auth.user.username || null
@@ -85,6 +96,7 @@ export default class UsernameDialog extends TransactionDialog<string> {
     }
 
     this.isValidating = true
+    this.usernameErrors = []
     this.messages = []
     this.color = 'primary'
 
@@ -97,6 +109,8 @@ export default class UsernameDialog extends TransactionDialog<string> {
       username,
       this.$auth.user.address
     )
+
+    console.log('errorMessage', errorMessage)
 
     if (errorMessage === 'username already registered') {
       this.usernameErrors = [ 'you already registered this username!' ]
@@ -134,12 +148,24 @@ export default class UsernameDialog extends TransactionDialog<string> {
     }
   }
 
-  async onSubmit() {
+  async onSign() {
     this.valid = this.$refs.form.validate()
 
     if (this.asset && this.valid) {
       this.isUploading = true
 
+      this.transaction = await this.$arweave.createTransaction({
+        data: this.asset
+      })
+      this.isSigned = true
+
+      this.isUploading = false
+    }
+  }
+
+  async onSubmit() {
+    if (this.isSigned && this.asset) {
+      this.isUploading = true
       const txId = await this.$usernameService.registerUsername(this.asset)
 
       if (txId) {

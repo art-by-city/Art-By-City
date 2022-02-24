@@ -31,7 +31,6 @@
                     v-if="disabled"
                     class="artwork-card-disable-overlay"
                   ></div>
-                  <!-- <LikeButton :dark="true" :artwork="artwork" /> -->
                   <a class="artwork-card-title white--text">
                     {{ artwork ? artwork.title : '' }}
                   </a>
@@ -59,15 +58,10 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import LikeButton from '../likeButton.component.vue'
 import { Artwork, Profile } from '~/types'
 import { debounce } from '~/helpers'
 
-@Component({
-  components: {
-    LikeButton
-  }
-})
+@Component
 export default class ArtworkCard extends Vue {
   @Prop({
     required: true
