@@ -1,6 +1,13 @@
 <template>
-  <v-container dense>
-    <v-row dense justify="center" class="transaction-form-controls">
+  <v-container dense class="transaction-form-controls">
+    <v-divider class="mb-2"></v-divider>
+    <v-row dense justify="center" v-if="txTotal">
+      ~&nbsp;<span>{{ humanReadableTxTotal }}</span>&nbsp;AR
+    </v-row>
+    <v-row dense justify="center" v-if="txTotal">
+      <b>Submit transaction?</b>
+    </v-row>
+    <v-row dense justify="center">
       <v-col cols="12" sm="auto" order="2" order-sm="1" class="center-text">
         <v-btn
           outlined
@@ -19,9 +26,9 @@
           color="primary"
           :disabled="loading || disabled"
           :loading="loading"
-          @click="onSubmitClicked"
+          @click="onSubmitOrSignedClicked"
         >
-          Submit
+          {{ continueButtonText }}
         </v-btn>
       </v-col>
     </v-row>
@@ -45,11 +52,55 @@ export default class TransactionFormControls extends Vue {
     required: false
   }) disabled?: boolean
 
+  @Prop({
+    type: Boolean,
+    required: false
+  }) signed?: boolean
+
+  @Prop({
+    type: Boolean,
+    required: false
+  }) isContract?: boolean
+
+  @Prop({
+    type: String,
+    required: false
+  }) txTotal?: string
+
+  get humanReadableTxTotal() {
+    if (this.txTotal) {
+      return this.$arweave.ar.winstonToAr(this.txTotal, {
+        decimals: 8
+      })
+    }
+
+    return ''
+  }
+
+  get continueButtonText() {
+    if (this.isContract) {
+      return this.signed ? 'Sign & Submit' : 'Confirm'
+    }
+
+    return this.signed ? 'Submit' : 'Sign'
+  }
+
+  onSubmitOrSignedClicked() {
+    if (this.signed) {
+      this.onSubmitClicked()
+    } else {
+      this.onSignClicked()
+    }
+  }
+
   @debounce
   @Emit('cancel') onCancelClicked() {}
 
   @debounce
   @Emit('submit') onSubmitClicked() {}
+
+  @debounce
+  @Emit('sign') onSignClicked() {}
 }
 </script>
 

@@ -8,13 +8,18 @@ export const ADD_TRANSACTION = 'ADD_TRANSACTION'
 export const REMOVE_TRANSACTION = 'REMOVE_TRANSACTION'
 export const SET_TRANSACTION_STATUS = 'SET_TRANSACTION_STATUS'
 
+type RemoveTransactionPayload = {
+  id: string
+  result: 'CONFIRMED' | 'DROPPED'
+}
+
 const mutations = mutationTree(state, {
   [ADD_TRANSACTION](state, payload: UserTransaction) {
     state.transactions.unshift(payload)
   },
 
-  [REMOVE_TRANSACTION](state, id: string) {
-    const idx = state.transactions.findIndex(tx => tx.id === id)
+  [REMOVE_TRANSACTION](state, payload: RemoveTransactionPayload) {
+    const idx = state.transactions.findIndex(tx => tx.id === payload.id)
 
     if (idx >= 0) {
       state.transactions.splice(idx, 1)

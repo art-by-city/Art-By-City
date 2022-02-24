@@ -1,8 +1,9 @@
 import { Context } from '@nuxt/types'
-import { Contract, ContractInteraction, } from 'redstone-smartweave'
+import { Contract } from 'redstone-smartweave'
+import Transaction from 'arweave/web/lib/transaction'
 
 import { SmartWeaveService } from '../'
-import { UsernamesContractState, handle, UsernamesContractInput } from './contract'
+import { UsernamesContractState, handle } from './contract'
 
 export default class UsernameService extends SmartWeaveService {
   private contract!: Contract<UsernamesContractState>
@@ -74,6 +75,7 @@ export default class UsernameService extends SmartWeaveService {
 
   async validate(username: string, caller: string): Promise<string | null> {
     try {
+      console.log('validate username', username)
       const { state } = await this.contract.readState()
 
       try {

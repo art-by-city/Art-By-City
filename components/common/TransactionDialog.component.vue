@@ -2,8 +2,10 @@
 
 <script lang="ts">
 import { Vue, Component, PropSync } from 'nuxt-property-decorator'
+import Transaction from 'arweave/web/lib/transaction'
 
 import { debounce } from '~/helpers'
+import { DomainEntityCategory } from '~/types'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 
@@ -14,17 +16,36 @@ import TransactionFormControls from
 })
 export default class TransactionDialog<T> extends Vue {
   isUploading: boolean = false
+  isSigned: boolean = false
   asset: T | null = null
+  type!: DomainEntityCategory
+  transaction: Transaction | null = null
+
+  get txTotal() {
+    if (this.transaction) {
+      return this.$arweave.ar.add(
+        this.transaction.reward,
+        this.transaction.quantity
+      )
+    }
+
+    return undefined
+  }
 
   @PropSync('show', {
     type: Boolean,
     required: false
   }) open?: boolean
 
-  close() {
+  baseClose() {
     this.open = false
-    // this.asset = null
     this.isUploading = false
+    this.isSigned = false
+    this.transaction = null
+  }
+
+  close() {
+    this.baseClose()
   }
 
   @debounce
@@ -36,6 +57,29 @@ export default class TransactionDialog<T> extends Vue {
 
   onCancel() {
     this.close()
+  }
+
+  async onSubmit() {
+    if (this.isSigned && this.transaction) {
+      this.$txQueueService.submitUserTransaction(
+        this.transaction,
+        {
+          id: this.transaction.id,
+          last_tx: this.transaction.last_tx,
+          type: this.type,
+          status: 'PENDING_CONFIRMATION',
+          created: new Date().getTime()
+        },
+        (err?: Error) => {
+          if (err) {
+            this.$toastService.error(err.message)
+            this.isUploading = false
+          } else {
+            this.close()
+          }
+        }
+      )
+    }
   }
 }
 </script>

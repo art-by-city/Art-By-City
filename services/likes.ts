@@ -6,7 +6,7 @@ import { User } from '~/models'
 import { TransactionSearchResults } from '../factories/transaction'
 
 export const LIKED_ENTITY_TAG = 'liked-entity'
-const LIKING_ARTIST_FEE = '0.0002' // $0.01 USD @ 1AR/$50
+export const LIKING_ARTIST_FEE = '0.0002' // $0.01 USD @ 1AR/$50
 
 export default class LikesService extends TransactionService {
   async createLikeTransaction(

@@ -23,6 +23,7 @@
       ref="form"
       v-model="valid"
       autocomplete="off"
+      :disabled="isUploading || isSigned"
     >
       <v-row dense justify="center">
         <div class="artwork-image-selector-container">
@@ -57,6 +58,7 @@
                       <v-btn
                         icon
                         small
+                        :disabled="isUploading || isSigned"
                         @click="onCropArtworkImageClicked(i)"
                       >
                         <v-icon>mdi-crop</v-icon>
@@ -64,6 +66,7 @@
                       <v-btn
                         icon
                         small
+                        :disabled="isUploading || isSigned"
                         @click="onDeleteArtworkImageClicked(i)"
                       >
                         <v-icon>mdi-delete</v-icon>
@@ -71,6 +74,7 @@
                       <v-btn
                         icon
                         small
+                        :disabled="isUploading || isSigned"
                         class="drag-handle"
                       >
                         <v-icon>mdi-drag-variant</v-icon>
@@ -131,7 +135,7 @@
             v-model="artwork.created"
             name="artworkCreated"
             label="Created (Year)"
-            placeholder="2021"
+            placeholder="2022"
             :rules="[rules.year]"
           ></v-text-field>
 
@@ -170,6 +174,9 @@
       <v-row dense justify="center">
         <TransactionFormControls
           :loading="isUploading"
+          :signed="isSigned"
+          :txTotal="txTotal"
+          @sign="onSign"
           @cancel="onCancel"
           @submit="onSubmit"
         />
@@ -182,6 +189,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
+import Transaction from 'arweave/web/lib/transaction'
 
 import { Artwork, ArtworkImage, UserTransaction } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
@@ -219,6 +227,8 @@ export default class ArtworkEditForm extends Vue {
   valid = false
   dirty = false
   isUploading: boolean = false
+  isSigned: boolean = false
+  transaction: Transaction | null = null
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
   @Emit('save') _save(txId: string) {
@@ -300,6 +310,14 @@ export default class ArtworkEditForm extends Vue {
     return this.dirty && this.artwork.images.length < 1
   }
 
+  get txTotal() {
+    if (this.transaction) {
+      return this.transaction.reward
+    }
+
+    return undefined
+  }
+
   @debounce
   async onArtworkImageChanged(index: number, image: File | undefined) {
     if (image) {
@@ -361,7 +379,7 @@ export default class ArtworkEditForm extends Vue {
     this.cropper?.destroy()
   }
 
-  async onSubmit() {
+  async onSign() {
     this.dirty = true
     this.valid = this.$refs.form.validate()
 
@@ -372,37 +390,38 @@ export default class ArtworkEditForm extends Vue {
     if (this.valid) {
       this.isUploading = true
 
-      const transaction = await this.$artworkService.createArtworkTransaction(
+      this.transaction = await this.$artworkService.createArtworkTransaction(
         this.artwork
       )
 
-      const signed = await this.$arweaveService.sign(transaction)
+      this.isSigned = await this.$arweaveService.sign(this.transaction)
 
-      if (signed) {
-        const utx: UserTransaction = {
-          id: transaction.id,
-          last_tx: transaction.last_tx,
+      this.isUploading = false
+    }
+  }
+
+  async onSubmit() {
+    if (this.isSigned && this.transaction) {
+      const txId = this.transaction.id
+      this.$txQueueService.submitUserTransaction(
+        this.transaction,
+        {
+          id: this.transaction.id,
+          last_tx: this.transaction.last_tx,
           type: 'artwork',
           status: 'PENDING_CONFIRMATION',
           created: new Date().getTime()
-        }
-
-        this.$txQueueService.submitUserTransaction(
-          transaction,
-          utx,
-          (err?: Error) => {
-            this.isUploading = false
-            if (err) {
-              console.error('Error submitting user tx', err)
-              this.$toastService.error('Error submitting user tx: ' + err.message)
-            } else {
-              return this._save(transaction.id)
-            }
+        },
+        (err?: Error) => {
+          this.isUploading = false
+          if (err) {
+            console.error('Error submitting user tx', err)
+            this.$toastService.error('Error submitting user tx: ' + err.message)
+          } else {
+            return this._save(txId)
           }
-        )
-      } else {
-        this.isUploading = false
-      }
+        }
+      )
     }
   }
 

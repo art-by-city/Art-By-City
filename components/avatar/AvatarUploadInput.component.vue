@@ -40,11 +40,13 @@
                     hide-input
                     prepend-icon="mdi-camera"
                     @change="processAndSetImage"
+                    :disabled="disabled"
                   ></v-file-input>
                   <div style="display: inline-flex;">
                     <v-btn
                       icon
                       small
+                      :disabled="disabled"
                       @click="onCropArtworkImageClicked"
                     >
                       <v-icon>mdi-crop</v-icon>
@@ -52,6 +54,7 @@
                     <v-btn
                       icon
                       small
+                      :disabled="disabled"
                       @click="onDeleteArtworkImageClicked(i)"
                     >
                       <v-icon>mdi-delete</v-icon>
@@ -90,7 +93,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Emit, Model, Vue } from 'nuxt-property-decorator'
+import { Component, Emit, Model, Prop, Vue } from 'nuxt-property-decorator'
 import Cropper from 'cropperjs'
 import draggable from 'vuedraggable'
 
@@ -111,6 +114,12 @@ export default class AvatarUploadInput extends Vue {
   cropMode: boolean = false
   cropper?: Cropper
   hasImageValidationErrors: boolean = false
+
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly disabled!: boolean
 
   @debounce
   @Emit('change') onImageFileInputChanged(image: File): File {
