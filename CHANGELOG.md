@@ -1,5 +1,39 @@
 # Changelog
 
+## [2022-02-25](#2022-02-25)
+
+### Features
+- Usernames
+  - Users can now register a username for their profile
+  - Username will replace a user's Arweave address across the dApp and in
+    profile URLs
+  - e.g. `https://artby.city/jim`
+  - Artists that pre-registered a username and provided the team with their
+    Arweave address have had their usernames deployed in the contract's initial
+    state
+- User Confirmations
+  - All actions that lead to posting a transaction now have a cost estimate and
+    confirmation step before signing (profile, avatar, likes, username,
+    publishing)
+
+### Bug Fixes
+- Auth
+  - Fixed an issue that would cause a critical error if a user navigates to
+    `/publish` without being logged in
+  - Fixed an issue that would cause navigation to go to the home page after
+    logging in instead of staying on the current page
+- Social
+  - Now serving `image/png` thumbnails to `minds.com` user-agent to fix embeds on
+    that platform
+- Publishing
+  - Fixed issues related to artwork URL slug generation
+    - URL slug will now generate off of the title of the artwork as it is
+      updated
+- Performance
+  - Cleaned up some local storage cache scaling issues
+  - Temporarily not storing transaction data after tx submission until re-submit
+    feature is available
+
 ## [2022-02-11](#2022-02-11)
 
 ### Features
