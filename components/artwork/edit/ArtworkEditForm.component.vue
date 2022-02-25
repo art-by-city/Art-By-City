@@ -404,6 +404,7 @@ export default class ArtworkEditForm extends Vue {
 
   async onSubmit() {
     if (this.isSigned && this.transaction) {
+      this.isUploading = true
       const txId = this.transaction.id
       this.$txQueueService.submitUserTransaction(
         this.transaction,
@@ -415,7 +416,6 @@ export default class ArtworkEditForm extends Vue {
           created: new Date().getTime()
         },
         (err?: Error) => {
-          this.isUploading = false
           if (err) {
             console.error('Error submitting user tx', err)
             this.$toastService.error('Error submitting user tx: ' + err.message)

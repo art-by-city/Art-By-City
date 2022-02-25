@@ -61,6 +61,7 @@ export default class TransactionDialog<T> extends Vue {
 
   async onSubmit() {
     if (this.isSigned && this.transaction) {
+      this.isUploading = true
       this.$txQueueService.submitUserTransaction(
         this.transaction,
         {
