@@ -94,6 +94,7 @@ export default class LikeDialog extends TransactionDialog<Like> {
 
   async onSubmit() {
     if (this.isSigned && this.transaction) {
+      this.isUploading = true
       this.$txQueueService.submitUserTransaction(
         this.transaction,
         {
