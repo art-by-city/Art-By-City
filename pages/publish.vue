@@ -43,7 +43,11 @@ export default class UploadPage extends FormPageComponent {
   }
 
   onSave(txId: string) {
-    this.$router.push(`/${this.$auth.user?.address || ''}/${txId}`)
+    const profileUrl = this.$auth.user.username || this.$auth.user.address
+    const artworkUrl = this.artwork.slug || txId
+    if (profileUrl) {
+      this.$router.push(`/${profileUrl}/${artworkUrl}`)
+    }
   }
 
   onCancel() {

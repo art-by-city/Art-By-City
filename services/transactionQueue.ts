@@ -196,23 +196,27 @@ export default class TransactionQueueService extends ArweaveService {
       type: utx.type
     })
 
+    if (status === 'CONFIRMED' || status === 'DROPPED') {
+      if (utx.type === 'like') {
+        window.$nuxt.$emit(`${utx.type}-${status}`, utx.entityId)
+      } else {
+        window.$nuxt.$emit(`${utx.type}-${status}`)
+      }
+    }
+
     done()
   }
 
-  async submitUserTransaction(tx: Transaction, utx: UserTransaction, done: Function) {
+  async submitUserTransaction(
+    tx: Transaction,
+    utx: UserTransaction,
+    done: Function
+  ) {
     const res = await this.$arweave.transactions.post(tx)
 
     let error
     if ([200, 202].includes(res.status)) {
-      // call store queue transaction
-      // PENDING_CONFIRMATION
       this.$accessor.transactions.queueTransaction(utx)
-      // this.$accessor.transactions.updateStatus({
-      //   id: tx.transaction.id,
-      //   status: 'PENDING_CONFIRMATION',
-      //   type: tx.type,
-      //   lastSubmission: new Date().getTime()
-      // })
     } else if ([410].includes(res.status)) {
       error = new Error('Insufficient funds')
     } else {

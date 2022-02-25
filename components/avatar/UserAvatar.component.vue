@@ -37,8 +37,7 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 import MD5 from 'crypto-js/md5'
 
 import User from '~/models/user/user'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { Profile, SetUserTransactionStatusPayload } from '~/types'
+import { Profile } from '~/types'
 
 @Component
 export default class UserAvatar extends Vue {
@@ -96,42 +95,53 @@ export default class UserAvatar extends Vue {
     }
   }
 
+  get isOwner() {
+    return this.$auth.loggedIn && this.$auth.user.address === this.user.address
+  }
+
   created() {
-    if (this.$auth.loggedIn && this.user.address === this.$auth.user.address) {
-      this.$store.subscribe(async (mutation, _state) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED') {
-            switch (payload.type) {
-              case 'avatar':
-                this.$fetch()
-                break
-              case 'username':
-                this.username = await this.$usernameService.resolveUsername(
-                  this.user.address
-                )
-                break
-              case 'profile':
-                this.profile = await this.$profileService.fetchProfile(
-                  this.user.address
-                )
-                break
-            }
-          }
+    this.$nuxt.$on('avatar-CONFIRMED', async () => {
+      if (this.isOwner) {
+        const avatar = await this.$avatarService.fetchAvatar(this.user.address)
+
+        if (avatar) {
+          this.src = avatar.src
         }
-      })
-    }
+      }
+    })
+    this.$nuxt.$on('username-CONFIRMED', async () => {
+      if (this.isOwner) {
+        this.username = await this.$usernameService.resolveUsername(
+          this.user.address
+        )
+      }
+    })
+    this.$nuxt.$on('profile-CONFIRMED', async () => {
+      if (this.isOwner) {
+        await this.fetchAndSetProfile()
+      }
+    })
   }
 
   fetchOnServer = false
   async fetch() {
+    await this.fetchAndSetAvatar()
+    await this.fetchAndSetProfile()
+    this.username = this.user.username || null
+  }
+
+  async fetchAndSetProfile() {
+    this.profile = await this.$profileService.fetchProfile(this.user.address)
+  }
+
+  async fetchAndSetAvatar() {
     let avatar = this.user.avatar
 
     if (!avatar) {
       avatar = await this.$avatarService.fetchAvatar(this.user.address)
     }
 
-    if (avatar) {
+    if (avatar && avatar.src) {
       this.src = avatar.src
     } else {
       const gravatarBase = 'https://www.gravatar.com/avatar'
@@ -139,9 +149,6 @@ export default class UserAvatar extends Vue {
 
       this.src = `${gravatarBase}/${userAddrHash}?f=y&d=identicon&s=${this.size}`
     }
-
-    this.profile = await this.$profileService.fetchProfile(this.user.address)
-    this.username = this.user.username || null
   }
 }
 </script>

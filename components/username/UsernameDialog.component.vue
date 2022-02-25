@@ -58,8 +58,7 @@
 <script lang="ts">
 import { Component, Watch } from 'nuxt-property-decorator'
 
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { DomainEntityCategory, SetUserTransactionStatusPayload } from '~/types'
+import { DomainEntityCategory } from '~/types'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 
 @Component
@@ -134,16 +133,7 @@ export default class UsernameDialog extends TransactionDialog<string> {
   }
 
   created() {
-    if (this.$auth.loggedIn) {
-      this.$store.subscribe(async (mutation, _state) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED' && payload.type === 'username') {
-            this.$fetch()
-          }
-        }
-      })
-    }
+    this.$nuxt.$on('username-CONFIRMED', () => { this.$fetch() })
   }
 
   async onSign() {
