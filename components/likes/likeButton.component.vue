@@ -60,8 +60,6 @@
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload } from '~/types'
 import LikedByList from './LikedByList.component.vue'
 import LikeDialog from './LikeDialog.component.vue'
 
@@ -158,14 +156,17 @@ export default class LikeButton extends Vue {
   }
 
   created() {
-    this.$store.subscribe(async (mutation, _state) => {
-      if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-        const payload = mutation.payload as SetUserTransactionStatusPayload
-        if (payload.status === 'CONFIRMED' && payload.type === 'like') {
-          this.isLiked = true
-          this.isSubmittingLikeTx = false
-          await this.fetchLikeCount()
-        }
+    this.$nuxt.$on('like-CONFIRMED', (entityTxId: string) => {
+      if (this.entityTxId === entityTxId) {
+        this.isLiked = true
+        this.isSubmittingLikeTx = false
+        this.fetchLikeCount()
+      }
+    })
+
+    this.$nuxt.$on('like-DROPPED', (entityTxId: string) => {
+      if (this.entityTxId === entityTxId) {
+        this.isSubmittingLikeTx = false
       }
     })
   }
@@ -178,39 +179,6 @@ export default class LikeButton extends Vue {
   async toggleLike() {
     if (!this.isLiked && !this.isResolvingIsLiked && !this.isSubmittingLikeTx) {
       this.showLikeDialog = true
-      // const transaction = await this.$likesService.createLikeTransaction(
-      //   this.entityTxId,
-      //   this.entityOwner
-      // )
-
-      // const signed = await this.$arweaveService.sign(transaction)
-
-      // if (signed) {
-      //   const utx: UserTransaction = {
-      //     id: transaction.id,
-      //     last_tx: transaction.last_tx,
-      //     type: 'like',
-      //     status: 'PENDING_CONFIRMATION',
-      //     created: new Date().getTime(),
-      //     target: this.entityOwner,
-      //     entityId: this.entityTxId
-      //   }
-
-      //   this.$txQueueService.submitUserTransaction(
-      //     transaction,
-      //     utx,
-      //     (err?: Error) => {
-      //       this.isUploading = false
-      //       if (err) {
-      //         this.$toastService.error(err.message)
-      //       } else {
-      //         this.isSubmittingLikeTx = true
-      //       }
-      //     }
-      //   )
-      // } else {
-      //   this.isUploading = false
-      // }
     }
   }
 

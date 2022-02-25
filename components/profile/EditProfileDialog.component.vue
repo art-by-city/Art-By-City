@@ -70,8 +70,6 @@ import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload } from '~/types'
 
 @Component({
   components: {
@@ -113,16 +111,7 @@ export default class EditProfileDialog extends TransactionDialog<Profile> {
   }
 
   created() {
-    if (this.$auth.loggedIn) {
-      this.$store.subscribe(async (mutation, _state) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED' && payload.type === 'profile') {
-            this.$fetch()
-          }
-        }
-      })
-    }
+    this.$nuxt.$on('profile-CONFIRMED', () => { this.$fetch() })
   }
 
   async onSign() {

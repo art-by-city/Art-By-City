@@ -139,12 +139,7 @@ import EditProfileDialog from
 import UsernameDialog from
   '~/components/username/UsernameDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import {
-  DomainEntity,
-  DomainEntityCategory,
-  SetUserTransactionStatusPayload
-} from '~/types'
+import { DomainEntity, DomainEntityCategory } from '~/types'
 
 @Component({
   components: {
@@ -234,23 +229,17 @@ export default class UserProfilePage extends PageComponent {
   }
 
   created() {
-    if (this.$auth.loggedIn) {
-      this.$store.subscribe(async (mutation, _state) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED') {
-            switch (payload.type) {
-              case 'profile':
-                this.fetchAndSet('profile')
-                break
-              case 'username':
-                this.fetchAndSet('username')
-                break
-            }
-          }
-        }
-      })
-    }
+    this.$nuxt.$on('profile-CONFIRMED', () => {
+      if (this.isOwner) {
+        this.fetchAndSet('profile')
+      }
+    })
+
+    this.$nuxt.$on('username-CONFIRMED', () => {
+      if (this.isOwner) {
+        this.fetchAndSet('username')
+      }
+    })
   }
 
   async fetch() {

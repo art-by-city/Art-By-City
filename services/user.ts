@@ -15,13 +15,8 @@ export default class UserService extends ArDBService {
   }
 
   async fetchUser(address: string) {
-    const avatar = await this.$avatarService.fetchAvatar(address)
     const username = await this.$usernameService.resolveUsername(address)
 
-    return {
-      address,
-      avatar,
-      username
-    }
+    return { address, username }
   }
 }

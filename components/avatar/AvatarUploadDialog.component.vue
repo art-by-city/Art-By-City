@@ -36,7 +36,7 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import { ArtworkImage, DomainEntityCategory, UserTransaction } from '~/types'
+import { ArtworkImage, DomainEntityCategory } from '~/types'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
@@ -61,7 +61,7 @@ export default class AvatarUploadDialog
         this.$auth.user.address
       )
 
-      if (avatar) {
+      if (avatar && avatar.src) {
         // NB: resolve mime type from data url src quickly
         // maybe this is faster than .split() ?
         let imageType = avatar.src.substring(5, 14)
