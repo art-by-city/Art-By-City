@@ -2,10 +2,15 @@ import Arweave from 'arweave'
 import ArDB from '@textury/ardb'
 import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 import sharp from 'sharp'
+import { IncomingMessage, ServerResponse } from 'http'
 
 import { Artwork, ArtworkImage, Avatar } from '~/types'
 
-export default async function (req: any, res: any, next: any) {
+export default async function (
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: Function
+) {
   try {
     const pathParts = (req.url as string || '').split('/')
     if (pathParts[1] === 'avatar' || pathParts[1] === 'artwork') {
@@ -60,9 +65,18 @@ export default async function (req: any, res: any, next: any) {
             // const imageType = matches[1]
             const imageDataBase64 = matches[2]
 
-            const thumbnail = await generateThumbnail(Buffer.from(imageDataBase64, 'base64'))
+            // NB: can remove once Minds updates user agent
+            let format: 'webp' | 'png' = 'webp'
+            if (req.headers['user-agent']?.startsWith('MindsMediaProxy/3.0')) {
+              format = 'png'
+            }
 
-            res.setHeader('Content-Type', 'image/webp')
+            const thumbnail = await generateThumbnail(
+              Buffer.from(imageDataBase64, 'base64'),
+              format
+            )
+
+            res.setHeader('Content-Type', `image/${format}`)
             res.end(thumbnail)
           } else {
             next()
@@ -82,9 +96,10 @@ export default async function (req: any, res: any, next: any) {
   }
 }
 
-async function generateThumbnail(image: Buffer): Promise<Buffer> {
+async function generateThumbnail(image: Buffer, format: 'webp' | 'png'):
+  Promise<Buffer> {
   return sharp(image).resize(4096, 4096, {
     fit: sharp.fit.inside,
     withoutEnlargement: true
-  }).webp().toBuffer()
+  }).toFormat(format).toBuffer()
 }

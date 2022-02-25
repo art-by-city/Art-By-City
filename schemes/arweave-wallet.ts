@@ -11,13 +11,13 @@ import type { Auth } from '~auth/runtime'
 import { PermissionType } from 'arconnect'
 
 // TODO -> Extend TokenableSchemeOptions and add these
-const APP_INFO = {
+export const APP_INFO = {
   name: 'Art x By x City',
   logo: 'logo/logo_by_daliah_ammar_square.png'
 }
 
 // TODO -> Extend TokenableSchemeOptions and add these
-const APP_PERMISSIONS = [
+export const APP_PERMISSIONS: PermissionType[] = [
   'ACCESS_ADDRESS'
 ]
 
@@ -129,7 +129,7 @@ export default class ArweaveWalletScheme<
 
     if (window.arweaveWallet) {
       await window.arweaveWallet.connect(
-        APP_PERMISSIONS as PermissionType[],
+        APP_PERMISSIONS,
         APP_INFO
       )
       await this.fetchUser()

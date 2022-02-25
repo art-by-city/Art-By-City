@@ -2,7 +2,6 @@
   <v-dialog
     :value="open"
     persistent
-    @click:outside="onCloseDialog"
     width="400"
   >
     <v-container dense class="pa-1">
@@ -12,7 +11,12 @@
             <v-card-title>Edit Profile</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <v-form ref="form" v-model="valid" autocomplete="off">
+              <v-form
+                ref="form"
+                v-model="valid"
+                autocomplete="off"
+                :disabled="isUploading || isSigned"
+              >
                 <v-text-field
                   v-model="asset.displayName"
                   type="text"
@@ -43,8 +47,11 @@
             <v-card-actions>
               <TransactionFormControls
                 :loading="isUploading"
-                @cancel="onCancel"
+                :signed="isSigned"
+                :txTotal="txTotal"
+                @sign="onSign"
                 @submit="onSubmit"
+                @cancel="onCancel"
               />
             </v-card-actions>
           </v-card>
@@ -57,22 +64,21 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import { Profile, UserTransaction } from '~/types'
+import { DomainEntityCategory, Profile } from '~/types'
 import { maxLength, twitter as twitterRule } from '~/helpers/rules'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload } from '~/types'
 
 @Component({
   components: {
     TransactionFormControls
   }
 })
-export default class EditProfileDialog extends TransactionDialog {
+export default class EditProfileDialog extends TransactionDialog<Profile> {
   asset: Profile = {}
+  type: DomainEntityCategory = 'profile'
   valid = false
   $refs!: {
     form: Vue & {
@@ -105,19 +111,10 @@ export default class EditProfileDialog extends TransactionDialog {
   }
 
   created() {
-    if (this.$auth.loggedIn) {
-      this.$store.subscribe(async (mutation, _state) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED' && payload.type === 'profile') {
-            this.$fetch()
-          }
-        }
-      })
-    }
+    this.$nuxt.$on('profile-CONFIRMED', () => { this.$fetch() })
   }
 
-  async onSubmit() {
+  async onSign() {
     this.valid = this.$refs.form.validate()
 
     if (this.asset && this.valid) {
@@ -127,38 +124,18 @@ export default class EditProfileDialog extends TransactionDialog {
         this.asset.twitter = this.asset.twitter.substring(1)
       }
 
-      const transaction = await this.$profileService.createProfileTransaction(
+      this.transaction = await this.$profileService.createProfileTransaction(
         this.asset
       )
 
-      const signed = await this.$arweaveService.sign(transaction)
+      this.isSigned = await this.$arweaveService.sign(this.transaction)
 
-      if (signed) {
-        const tx: UserTransaction = {
-          transaction,
-          type: 'profile',
-          status: 'PENDING_CONFIRMATION',
-          created: new Date().getTime()
-        }
-
-        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
-          if (err) {
-            this.$toastService.error(err.message)
-            this.isUploading = false
-          } else {
-            this.close()
-          }
-        })
-      } else {
-        this.isUploading = false
-      }
+      this.isUploading = false
     }
   }
 
   close() {
-    this.open = false
-    this.asset = {}
-    this.isUploading = false
+    this.baseClose()
   }
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="user-avatar">
     <v-avatar color="transparent" :size="size">
-      <nuxt-link :to="`/${user.address}`" class="mb-n1">
+      <nuxt-link :to="`/${username || user.address}`" class="mb-n1">
         <v-img :src="src" aspect-ratio="1" :width="size">
           <template v-slot:placeholder>
             <TransactionPlaceholder :txId="user.address" />
@@ -21,13 +21,13 @@
           <nuxt-link
             :class="`${dark ? 'white' : 'black'}--text text-truncate`"
             :style="`max-width: ${usernameWidth}`"
-            :to="`/${user.address}`"
+            :to="`/${username || user.address}`"
           >
-            {{ username }}
+            {{ displayName }}
           </nuxt-link>
         </span>
       </template>
-      {{ username }}
+      {{ displayName }}
     </v-tooltip>
   </div>
 </template>
@@ -37,8 +37,7 @@ import { Vue, Component, Prop } from 'nuxt-property-decorator'
 import MD5 from 'crypto-js/md5'
 
 import User from '~/models/user/user'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { Profile, SetUserTransactionStatusPayload } from '~/types'
+import { Profile } from '~/types'
 
 @Component
 export default class UserAvatar extends Vue {
@@ -48,6 +47,7 @@ export default class UserAvatar extends Vue {
   }) readonly user!: User
 
   src: string = ''
+  username: string | null = null
   profile: Profile | null = null
 
   @Prop({
@@ -68,8 +68,16 @@ export default class UserAvatar extends Vue {
     default: '100%'
   }) readonly usernameWidth!: string
 
-  get username() {
-    return this.profile?.displayName || this.user.address
+  get displayName() {
+    if (this.profile?.displayName) {
+      return this.profile?.displayName
+    }
+
+    if (this.username) {
+      return `@${this.username}`
+    }
+
+    return this.user.address || ''
   }
 
   get size() {
@@ -87,24 +95,53 @@ export default class UserAvatar extends Vue {
     }
   }
 
+  get isOwner() {
+    return this.$auth.loggedIn && this.$auth.user.address === this.user.address
+  }
+
   created() {
-    if (this.$auth.loggedIn && this.user.address === this.$auth.user.address) {
-      this.$store.subscribe(async (mutation, _state) => {
-        if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-          const payload = mutation.payload as SetUserTransactionStatusPayload
-          if (payload.status === 'CONFIRMED' && payload.type === 'avatar') {
-            this.$fetch()
-          }
+    this.$nuxt.$on('avatar-CONFIRMED', async () => {
+      if (this.isOwner) {
+        const avatar = await this.$avatarService.fetchAvatar(this.user.address)
+
+        if (avatar) {
+          this.src = avatar.src
         }
-      })
-    }
+      }
+    })
+    this.$nuxt.$on('username-CONFIRMED', async () => {
+      if (this.isOwner) {
+        this.username = await this.$usernameService.resolveUsername(
+          this.user.address
+        )
+      }
+    })
+    this.$nuxt.$on('profile-CONFIRMED', async () => {
+      if (this.isOwner) {
+        await this.fetchAndSetProfile()
+      }
+    })
   }
 
   fetchOnServer = false
   async fetch() {
-    const avatar = await this.$avatarService.fetchAvatar(this.user.address)
+    await this.fetchAndSetAvatar()
+    await this.fetchAndSetProfile()
+    this.username = this.user.username || null
+  }
 
-    if (avatar) {
+  async fetchAndSetProfile() {
+    this.profile = await this.$profileService.fetchProfile(this.user.address)
+  }
+
+  async fetchAndSetAvatar() {
+    let avatar = this.user.avatar
+
+    if (!avatar) {
+      avatar = await this.$avatarService.fetchAvatar(this.user.address)
+    }
+
+    if (avatar && avatar.src) {
       this.src = avatar.src
     } else {
       const gravatarBase = 'https://www.gravatar.com/avatar'
@@ -112,8 +149,6 @@ export default class UserAvatar extends Vue {
 
       this.src = `${gravatarBase}/${userAddrHash}?f=y&d=identicon&s=${this.size}`
     }
-
-    this.profile = await this.$profileService.fetchProfile(this.user.address)
   }
 }
 </script>

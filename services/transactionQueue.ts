@@ -14,6 +14,7 @@ import {
   SET_TRANSACTION_STATUS
 } from '~/store/transactions/mutations'
 import { ArweaveService } from './base'
+import Transaction from 'arweave/web/lib/transaction'
 
 export default class TransactionQueueService extends ArweaveService {
   private queue!: QueueObject<UserTransaction>
@@ -62,10 +63,10 @@ export default class TransactionQueueService extends ArweaveService {
         'PENDING_CONFIRMATION',
         'CONFIRMING'
       ].includes(payload.status)) {
-      const tx = this.$accessor.transactions.getById(payload.id)
+      const utx = this.$accessor.transactions.getById(payload.id)
 
-      if (tx) {
-        this.push(tx, this.sleep)
+      if (utx) {
+        this.push(utx, this.sleep)
       }
     }
   }
@@ -79,10 +80,10 @@ export default class TransactionQueueService extends ArweaveService {
       mutation.payload.transactions &&
       mutation.payload.transactions.transactions
     ) {
-      const transactions =
+      const userTransactions =
         mutation.payload.transactions.transactions as UserTransaction[]
       const processingTransactions =
-        transactions.filter((tx) => isProcessing(tx.status))
+        userTransactions.filter((utx) => isProcessing(utx.status))
       this.push(processingTransactions)
     }
   }
@@ -106,22 +107,25 @@ export default class TransactionQueueService extends ArweaveService {
     this.buildQueue()
   }
 
-  private async push(tx: UserTransaction | UserTransaction[], delay?: number) {
+  private async push(utx: UserTransaction | UserTransaction[], delay?: number) {
     if (delay) {
-      setTimeout(() => { this.queue.push(tx) }, delay, this)
+      setTimeout(() => { this.queue.push(utx) }, delay, this)
     } else {
-      this.queue.push(tx)
+      this.queue.push(utx)
     }
   }
 
-  private async processUserTransaction(tx: UserTransaction, done: Function) {
-    switch (tx.status) {
+  private async processUserTransaction(
+    utx: UserTransaction,
+    done: Function
+  ) {
+    switch (utx.status) {
       case 'PENDING_SUBMISSION':
-        this.submitUserTransaction(tx, done)
+        // this.submitUserTransaction(tx, done)
         break
       case 'PENDING_CONFIRMATION':
       case 'CONFIRMING':
-        this.checkUserTransactionStatus(tx, done)
+        this.checkUserTransactionStatus(utx, done)
         break
       case 'CONFIRMED':
       case 'DROPPED':
@@ -132,11 +136,11 @@ export default class TransactionQueueService extends ArweaveService {
   }
 
   private async checkUserTransactionStatus(
-    tx: UserTransaction,
+    utx: UserTransaction,
     done: Function
   ) {
-    const res = await this.$arweave.transactions.getStatus(tx.transaction.id)
-    const lastSubmission = tx.lastSubmission || tx.created
+    const res = await this.$arweave.transactions.getStatus(utx.id)
+    const lastSubmission = utx.lastSubmission || utx.created
 
     let status: UserTransactionStatus ='CONFIRMING'
     let confirmations: number | undefined = undefined
@@ -150,14 +154,14 @@ export default class TransactionQueueService extends ArweaveService {
       status = 'PENDING_CONFIRMATION'
     } else if (
       res.status === 404
-      && ['PENDING_CONFIRMATION', 'CONFIRMING'].includes(tx.status)
+      && ['PENDING_CONFIRMATION', 'CONFIRMING'].includes(utx.status)
     ) {
       let waitedLongEnough: boolean = false
-      if (tx.transaction.last_tx) {
+      if (utx.last_tx) {
         try {
           // NB: check tx anchor for >50 confirms
           const anchor = await this.$arweave.transactions.getStatus(
-            tx.transaction.last_tx
+            utx.last_tx
           )
 
           if (
@@ -186,29 +190,33 @@ export default class TransactionQueueService extends ArweaveService {
     }
 
     this.$accessor.transactions.updateStatus({
-      id: tx.transaction.id,
+      id: utx.id,
       status,
       confirmations,
-      type: tx.type
+      type: utx.type
     })
+
+    if (status === 'CONFIRMED' || status === 'DROPPED') {
+      if (utx.type === 'like') {
+        window.$nuxt.$emit(`${utx.type}-${status}`, utx.entityId)
+      } else {
+        window.$nuxt.$emit(`${utx.type}-${status}`)
+      }
+    }
 
     done()
   }
 
-  async submitUserTransaction(tx: UserTransaction, done: Function) {
-    const res = await this.$arweave.transactions.post(tx.transaction)
+  async submitUserTransaction(
+    tx: Transaction,
+    utx: UserTransaction,
+    done: Function
+  ) {
+    const res = await this.$arweave.transactions.post(tx)
 
     let error
     if ([200, 202].includes(res.status)) {
-      // call store queue transaction
-      // PENDING_CONFIRMATION
-      this.$accessor.transactions.queueTransaction(tx)
-      // this.$accessor.transactions.updateStatus({
-      //   id: tx.transaction.id,
-      //   status: 'PENDING_CONFIRMATION',
-      //   type: tx.type,
-      //   lastSubmission: new Date().getTime()
-      // })
+      this.$accessor.transactions.queueTransaction(utx)
     } else if ([410].includes(res.status)) {
       error = new Error('Insufficient funds')
     } else {

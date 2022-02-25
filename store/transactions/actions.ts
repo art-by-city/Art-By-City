@@ -1,22 +1,17 @@
 import { actionTree } from 'typed-vuex'
 
 import {
-  CreateUserTransactionPayload,
   SetUserTransactionStatusPayload,
+  TransactionNotificationType,
   UserTransaction
 } from '~/types'
 import { accessorType } from '~/store'
 import state from './state'
 import getters from './getters'
-import mutations, { ADD_TRANSACTION, SET_TRANSACTION_STATUS } from './mutations'
+import mutations, { ADD_TRANSACTION, REMOVE_TRANSACTION, SET_TRANSACTION_STATUS } from './mutations'
 
 const actions = actionTree({ state, getters, mutations }, {
   queueTransaction({}, tx: UserTransaction) {
-    // const tx: UserTransaction = {
-    //   ...payload,
-    //   status: 'PENDING_CONFIRMATION',
-    //   created: new Date().getTime()
-    // }
     const accessor = (<typeof accessorType>this.app.$accessor)
 
     accessor.transactions[ADD_TRANSACTION](tx)
@@ -26,39 +21,42 @@ const actions = actionTree({ state, getters, mutations }, {
     payload: SetUserTransactionStatusPayload
   ) {
     const tx = state.transactions.find(
-      (tx) => tx.transaction.id === payload.id
+      (tx) => tx.id === payload.id
     )
 
     if (tx) {
       const prevStatus = '' + tx.status
 
-      commit(SET_TRANSACTION_STATUS, payload)
+      if (payload.status === 'CONFIRMED' || payload.status === 'DROPPED') {
+        commit(REMOVE_TRANSACTION, { id: payload.id, result: payload.status })
+      } else {
+        commit(SET_TRANSACTION_STATUS, payload)
+      }
 
       if (prevStatus !== payload.status) {
         const accessor = (<typeof accessorType>this.app.$accessor)
+        let type!: TransactionNotificationType
         switch (payload.status) {
           case 'PENDING_CONFIRMATION':
-            accessor.notifications.addTransactionNotification({
-              txType: tx.type, type: 'Submitted', txId: tx.transaction.id
-            })
+            type = 'Submitted'
             break
           case 'CONFIRMING':
-            accessor.notifications.addTransactionNotification({
-              txType: tx.type, type: 'Accepted', txId: tx.transaction.id
-            })
+            type = 'Accepted'
             break
           case 'DROPPED':
-            accessor.notifications.addTransactionNotification({
-              txType: tx.type, type: 'Dropped', txId: tx.transaction.id
-            })
+            type = 'Dropped'
             break
           case 'CONFIRMED':
-            accessor.notifications.addTransactionNotification({
-              txType: tx.type, type: 'Confirmed', txId: tx.transaction.id
-            })
+            type = 'Confirmed'
             break
           default:
             break
+        }
+
+        if (type) {
+          accessor.notifications.addTransactionNotification({
+            txType: tx.type, type, txId: tx.id
+          })
         }
       }
     }

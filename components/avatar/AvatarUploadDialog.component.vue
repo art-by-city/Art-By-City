@@ -2,7 +2,6 @@
   <v-dialog
     :value="open"
     persistent
-    @click:outside="onCloseDialog"
     width="400"
   >
     <v-container dense class="pa-1">
@@ -12,13 +11,19 @@
             <v-card-title>Upload Avatar</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <AvatarUploadInput v-model="asset" />
+              <AvatarUploadInput
+                v-model="asset"
+                :disabled="isUploading || isSigned"
+              />
             </v-card-text>
             <v-card-actions>
               <TransactionFormControls
                 :loading="isUploading"
-                @cancel="onCancel"
+                :signed="isSigned"
+                :txTotal="txTotal"
+                @sign="onSign"
                 @submit="onSubmit"
+                @cancel="onCancel"
               />
             </v-card-actions>
           </v-card>
@@ -31,7 +36,7 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import { ArtworkImage, UserTransaction } from '~/types'
+import { ArtworkImage, DomainEntityCategory } from '~/types'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
@@ -45,8 +50,9 @@ import { uuidv4 } from '~/helpers'
     AvatarUploadInput
   }
 })
-export default class AvatarUploadDialog extends TransactionDialog {
-  asset: ArtworkImage | null = null
+export default class AvatarUploadDialog
+  extends TransactionDialog<ArtworkImage> {
+  type: DomainEntityCategory = 'avatar'
 
   fetchOnServer = false
   async fetch() {
@@ -55,7 +61,7 @@ export default class AvatarUploadDialog extends TransactionDialog {
         this.$auth.user.address
       )
 
-      if (avatar) {
+      if (avatar && avatar.src) {
         // NB: resolve mime type from data url src quickly
         // maybe this is faster than .split() ?
         let imageType = avatar.src.substring(5, 14)
@@ -73,35 +79,17 @@ export default class AvatarUploadDialog extends TransactionDialog {
     }
   }
 
-  async onSubmit() {
+  async onSign() {
     if (this.asset) {
       this.isUploading = true
 
-      const transaction = await this.$avatarService.createAvatarTransaction(
+      this.transaction = await this.$avatarService.createAvatarTransaction(
         { src: this.asset.dataUrl }
       )
 
-      const signed = await this.$arweaveService.sign(transaction)
+      this.isSigned = await this.$arweaveService.sign(this.transaction)
 
-      if (signed) {
-        const tx: UserTransaction = {
-          transaction,
-          type: 'avatar',
-          status: 'PENDING_CONFIRMATION',
-          created: new Date().getTime()
-        }
-
-        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
-          if (err) {
-            this.$toastService.error(err.message)
-            this.isUploading = false
-          } else {
-            this.close()
-          }
-        })
-      } else {
-        this.isUploading = false
-      }
+      this.isUploading = false
     }
   }
 }

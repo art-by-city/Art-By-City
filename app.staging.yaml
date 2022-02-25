@@ -1,4 +1,4 @@
-runtime: nodejs14
+runtime: nodejs16
 
 instance_class: F2
 
@@ -27,6 +27,7 @@ env_variables:
   ARWEAVE_HOST: arweave.net
   ARWEAVE_PORT: 443
   ARTIST_PREREGISTRATION_URL: https://us-central1-art-by-city-staging-299519.cloudfunctions.net/artist-preregistration
+  USERNAMES_CONTRACT_ID: UHPC-7wenVg-JyS81EXKCnLlKvjSbfrIsnWt1F8hueg
 
 includes:
   - secrets.yaml

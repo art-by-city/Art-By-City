@@ -23,6 +23,7 @@
       ref="form"
       v-model="valid"
       autocomplete="off"
+      :disabled="isUploading || isSigned"
     >
       <v-row dense justify="center">
         <div class="artwork-image-selector-container">
@@ -57,6 +58,7 @@
                       <v-btn
                         icon
                         small
+                        :disabled="isUploading || isSigned"
                         @click="onCropArtworkImageClicked(i)"
                       >
                         <v-icon>mdi-crop</v-icon>
@@ -64,6 +66,7 @@
                       <v-btn
                         icon
                         small
+                        :disabled="isUploading || isSigned"
                         @click="onDeleteArtworkImageClicked(i)"
                       >
                         <v-icon>mdi-delete</v-icon>
@@ -71,6 +74,7 @@
                       <v-btn
                         icon
                         small
+                        :disabled="isUploading || isSigned"
                         class="drag-handle"
                       >
                         <v-icon>mdi-drag-variant</v-icon>
@@ -114,6 +118,7 @@
             name="artworkTitle"
             label="Title"
             counter="128"
+            @input="generateSlugFromTitle"
             :rules="[rules.required, rules.maxLength(128)]"
           ></v-text-field>
 
@@ -130,7 +135,7 @@
             v-model="artwork.created"
             name="artworkCreated"
             label="Created (Year)"
-            placeholder="2021"
+            placeholder="2022"
             :rules="[rules.year]"
           ></v-text-field>
 
@@ -169,6 +174,9 @@
       <v-row dense justify="center">
         <TransactionFormControls
           :loading="isUploading"
+          :signed="isSigned"
+          :txTotal="txTotal"
+          @sign="onSign"
           @cancel="onCancel"
           @submit="onSubmit"
         />
@@ -181,6 +189,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
+import Transaction from 'arweave/web/lib/transaction'
 
 import { Artwork, ArtworkImage, UserTransaction } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
@@ -218,6 +227,8 @@ export default class ArtworkEditForm extends Vue {
   valid = false
   dirty = false
   isUploading: boolean = false
+  isSigned: boolean = false
+  transaction: Transaction | null = null
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
   @Emit('save') _save(txId: string) {
@@ -271,10 +282,12 @@ export default class ArtworkEditForm extends Vue {
       return true
     },
     slug: (value: string = '') => {
-      const validSlugRegex = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
+      const validSlugRegex = /^[a-z0-9]+(?:[-_\.]*[a-z0-9]+)*$/
 
       if (!validSlugRegex.test(value)) {
-        return 'Must be a valid URL slug (lowerchase alphanumerics, hyphen, underscore)'
+        return 'Must be a valid URL slug'
+          + ' (lowerchase alphanumerics, hyphen, underscore, period),'
+          + ' must not end with a hyphen, underscore, or period'
       }
 
       return true
@@ -290,13 +303,21 @@ export default class ArtworkEditForm extends Vue {
   }
 
   get slugBase(): string {
-    const username = this.artwork.creator.address
+    const username = this.$auth.user.username || this.artwork.creator.address
 
     return `artby.city/${username}/`
   }
 
   get hasImageValidationErrors(): boolean {
     return this.dirty && this.artwork.images.length < 1
+  }
+
+  get txTotal() {
+    if (this.transaction) {
+      return this.transaction.reward
+    }
+
+    return undefined
   }
 
   @debounce
@@ -360,7 +381,7 @@ export default class ArtworkEditForm extends Vue {
     this.cropper?.destroy()
   }
 
-  async onSubmit() {
+  async onSign() {
     this.dirty = true
     this.valid = this.$refs.form.validate()
 
@@ -371,32 +392,38 @@ export default class ArtworkEditForm extends Vue {
     if (this.valid) {
       this.isUploading = true
 
-      const transaction = await this.$artworkService.createArtworkTransaction(
+      this.transaction = await this.$artworkService.createArtworkTransaction(
         this.artwork
       )
 
-      const signed = await this.$arweaveService.sign(transaction)
+      this.isSigned = await this.$arweaveService.sign(this.transaction)
 
-      if (signed) {
-        const tx: UserTransaction = {
-          transaction,
+      this.isUploading = false
+    }
+  }
+
+  async onSubmit() {
+    if (this.isSigned && this.transaction) {
+      this.isUploading = true
+      const txId = this.transaction.id
+      this.$txQueueService.submitUserTransaction(
+        this.transaction,
+        {
+          id: this.transaction.id,
+          last_tx: this.transaction.last_tx,
           type: 'artwork',
           status: 'PENDING_CONFIRMATION',
           created: new Date().getTime()
-        }
-
-        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
-          this.isUploading = false
+        },
+        (err?: Error) => {
           if (err) {
             console.error('Error submitting user tx', err)
             this.$toastService.error('Error submitting user tx: ' + err.message)
           } else {
-            return this._save(transaction.id)
+            return this._save(txId)
           }
-        })
-      } else {
-        this.isUploading = false
-      }
+        }
+      )
     }
   }
 
@@ -441,9 +468,15 @@ export default class ArtworkEditForm extends Vue {
   private async suggestMetadataFromFile(image: File) {
     // Suggested title is filename without extension
     this.artwork.title = image.name.slice(0, image.name.lastIndexOf('.'))
+    this.generateSlugFromTitle()
+  }
+
+  private generateSlugFromTitle() {
     this.artwork.slug = this.artwork.title
       .toLowerCase()
-      .replace(/[^a-z0-9_\-]/g, '')
+      .trim()
+      .replace(/[\s]/g, '-')
+      .replace(/[^a-z0-9_\-\.]/g, '')
   }
 }
 </script>

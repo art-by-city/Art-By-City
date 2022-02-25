@@ -26,6 +26,9 @@ export default class LikedByList extends Vue {
 
     for (let i = 0; i < users.length; i++) {
       users[i].avatar = await this.$avatarService.fetchAvatar(users[i].address)
+      users[i].username = await this.$usernameService.resolveUsername(
+        users[i].address
+      )
     }
 
     this.users = users

@@ -74,14 +74,6 @@ export default class DefaultLayout extends Vue {
         this.toasts = this.$store.state.toasts.list
       }
     )
-    // if (this.$auth.loggedIn) {
-    //   this.$store.watch(
-    //     (state) => state.auth.user.changelogLastVersionViewed,
-    //     () => {
-    //       this.$forceUpdate()
-    //     }
-    //   )
-    // }
 
     this.$nuxt.$on('needs-auth', (cb: Function) => {
       if (this.$auth.loggedIn) {
@@ -93,6 +85,8 @@ export default class DefaultLayout extends Vue {
         this.showSignupModal()
       }
     })
+
+    this.$nuxt.$on('username-CONFIRMED', () => { this.$auth.fetchUser() })
   }
 
   async login() {

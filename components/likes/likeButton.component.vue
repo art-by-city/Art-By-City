@@ -21,7 +21,8 @@
         v-if="totalLikes > 0"
         :style="`color: ${color};`"
       >
-        {{ totalLikes }} <span v-if="isSubmittingLikeTx">+1</span>
+        {{ totalLikes }}
+        <!-- <span v-if="isSubmittingLikeTx">+1</span> -->
       </span>
     </v-btn>
     <v-dialog
@@ -44,6 +45,14 @@
         </v-row>
       </v-container>
     </v-dialog>
+    <LikeDialog
+      :show.sync="showLikeDialog"
+      :entityOwner="entityOwner"
+      :entityTxId="entityTxId"
+      :entityDescription="entityDescription"
+      :ownerDisplayName="ownerDisplayName"
+      @pending="onLikePending"
+    />
   </span>
 </template>
 
@@ -51,13 +60,13 @@
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 import { debounce } from '~/helpers'
-import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import { SetUserTransactionStatusPayload, UserTransaction } from '~/types'
-import LikedByList from '~/components/likes/LikedByList.component.vue'
+import LikedByList from './LikedByList.component.vue'
+import LikeDialog from './LikeDialog.component.vue'
 
 @Component({
   components: {
-    LikedByList
+    LikedByList,
+    LikeDialog
   }
 })
 export default class LikeButton extends Vue {
@@ -77,37 +86,23 @@ export default class LikeButton extends Vue {
     required: true
   }) readonly entityOwner!: string
 
+  @Prop({
+    type: String,
+    required: true
+  }) entityDescription!: string
+
+  @Prop({
+    type: String,
+    required: true
+  }) ownerDisplayName!: string
+
   private isLiked: boolean = false
   private totalLikes: number = 0
   private popupOpen: boolean = false
   private isResolvingIsLiked: boolean = true
   private isSubmittingLikeTx: boolean = false
   private isUploading: boolean = false
-  private fetchOnServer: boolean = false
-  async fetch() {
-    this.isSubmittingLikeTx = this.$auth.loggedIn
-      && this.$accessor.transactions.listProcessing.some(
-        (tx) => {
-          return tx.type === 'like'
-            && this.entityOwner === tx.target
-            && this.entityTxId === tx.entityId
-        }
-      )
-
-    if (!this.isSubmittingLikeTx && this.$auth.loggedIn) {
-      this.isLiked = await this.$likesService.isEntityLikedBy(
-        this.entityTxId,
-        this.$auth.user.address
-      )
-    } else {
-      // TODO -> subscribe to store here & resolve this.isLiked
-      this.subscribeToLikeTx()
-    }
-
-    this.isResolvingIsLiked = false
-
-    await this.fetchLikeCount()
-  }
+  private showLikeDialog: boolean = false
 
   get color() {
     if (this.isLiked) {
@@ -137,40 +132,53 @@ export default class LikeButton extends Vue {
     return 'mdi-heart-outline'
   }
 
-  @debounce
-  async toggleLike() {
-    if (!this.isLiked && !this.isResolvingIsLiked && !this.isUploading) {
-      this.isUploading = true
-
-      const transaction = await this.$likesService.createLikeTransaction(
-        this.entityTxId,
-        this.entityOwner
+  private fetchOnServer: boolean = false
+  async fetch() {
+    this.isSubmittingLikeTx = this.$auth.loggedIn
+      && this.$accessor.transactions.listProcessing.some(
+        (tx) => {
+          return tx.type === 'like'
+            && this.entityOwner === tx.target
+            && this.entityTxId === tx.entityId
+        }
       )
 
-      const signed = await this.$arweaveService.sign(transaction)
+    if (!this.isSubmittingLikeTx && this.$auth.loggedIn) {
+      this.isLiked = await this.$likesService.isEntityLikedBy(
+        this.entityTxId,
+        this.$auth.user.address
+      )
+    }
 
-      if (signed) {
-        const tx: UserTransaction = {
-          transaction,
-          type: 'like',
-          status: 'PENDING_CONFIRMATION',
-          created: new Date().getTime(),
-          target: this.entityOwner,
-          entityId: this.entityTxId
-        }
+    this.isResolvingIsLiked = false
 
-        this.$txQueueService.submitUserTransaction(tx, (err?: Error) => {
-          this.isUploading = false
-          if (err) {
-            this.$toastService.error(err.message)
-          } else {
-            this.isSubmittingLikeTx = true
-            this.subscribeToLikeTx()
-          }
-        })
-      } else {
-        this.isUploading = false
+    await this.fetchLikeCount()
+  }
+
+  created() {
+    this.$nuxt.$on('like-CONFIRMED', (entityTxId: string) => {
+      if (this.entityTxId === entityTxId) {
+        this.isLiked = true
+        this.isSubmittingLikeTx = false
+        this.fetchLikeCount()
       }
+    })
+
+    this.$nuxt.$on('like-DROPPED', (entityTxId: string) => {
+      if (this.entityTxId === entityTxId) {
+        this.isSubmittingLikeTx = false
+      }
+    })
+  }
+
+  onLikePending(isPending: boolean) {
+    this.isSubmittingLikeTx = isPending
+  }
+
+  @debounce
+  async toggleLike() {
+    if (!this.isLiked && !this.isResolvingIsLiked && !this.isSubmittingLikeTx) {
+      this.showLikeDialog = true
     }
   }
 
@@ -182,19 +190,6 @@ export default class LikeButton extends Vue {
   @debounce
   onCloseDialog() {
     this.popupOpen = false
-  }
-
-  private subscribeToLikeTx() {
-    this.$store.subscribe(async (mutation, _state) => {
-      if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
-        const payload = mutation.payload as SetUserTransactionStatusPayload
-        if (payload.status === 'CONFIRMED' && payload.type === 'like') {
-          this.isLiked = true
-          this.isSubmittingLikeTx = false
-          await this.fetchLikeCount()
-        }
-      }
-    })
   }
 
   private async fetchLikeCount() {
