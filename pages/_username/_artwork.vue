@@ -195,7 +195,7 @@ export default class ArtworkPage extends FormPageComponent {
     const url =
       `${this.$config.baseUrl}/${usernameOrAddress}/${txIdOrSlug}`
     const thumbnailUrl =
-      `${this.$config.baseUrl}/api/artwork/${usernameOrAddress}/${txIdOrSlug}`
+      `${this.$config.baseUrl}/api/artwork/${this.artwork.creator.address}/${txIdOrSlug}`
     const twitter = this.profile?.twitter || ''
 
     return {
