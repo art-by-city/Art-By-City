@@ -101,7 +101,7 @@
       <v-row dense>
         <v-col cols="10" offset="1" sm="6" offset-sm="3">
           <v-tabs v-model="tab" color="black">
-            <v-tab nuxt :to="`/${artist.username || artist.address}`">
+            <v-tab nuxt :to="$route.path">
               Art
             </v-tab>
             <v-tab nuxt to="#liked">Liked ({{ likesCount }})</v-tab>
@@ -114,25 +114,15 @@
           cols="12"
             sm="6"  offset-sm="3"
         >
-          <v-tabs-items v-model="tab">
-            <v-tab-item
-              :value="`/${artist.username || artist.address}`"
-              transition="fade-transition"
-              reverse-transition="fade-transition"
-            >
-              <ArtistFeed
+          <template v-if="tab === 'liked'">
+            <LikesFeed :address="artist.address" />
+          </template>
+          <template v-else>
+            <ArtistFeed
                 :address="artist.address"
                 @fetched="onArtistFeedFetched"
               />
-            </v-tab-item>
-            <v-tab-item
-              value="liked"
-              transition="fade-transition"
-              reverse-transition="fade-transition"
-            >
-              <LikesFeed :address="artist.address" />
-            </v-tab-item>
-          </v-tabs-items>
+          </template>
         </v-col>
       </v-row>
     </v-container>
