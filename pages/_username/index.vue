@@ -1,15 +1,15 @@
 <template>
   <div class="user-profile-page">
     <v-container fluid v-if="artist">
-      <v-row>
+      <v-row dense>
         <v-col
           cols="2" offset="2"
             sm="2" offset-sm="3"
         >
-          <v-row class="mt-4">
+          <v-row class="mt-4" justify="center">
             <UserAvatar :user="artist" />
           </v-row>
-          <v-row class="mt-4 mx-auto">
+          <v-row class="mt-4 mb-1 mx-auto" justify="center">
             <template v-if="isOwner">
               <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
                 <template v-slot:activator>
@@ -17,16 +17,18 @@
                     v-model="showEditSpeedDial"
                     text
                     outlined
+                    x-small
                   >
                     Edit
                   </v-btn>
                 </template>
 
-                <v-btn @click="onEditAvatarClicked">Avatar</v-btn>
+                <v-btn small @click="onEditAvatarClicked">Avatar</v-btn>
 
-                <v-btn @click="onEditProfileClicked">Profile</v-btn>
+                <v-btn small @click="onEditProfileClicked">Profile</v-btn>
 
                 <v-btn
+                  small
                   @click="onEditUsernameClicked"
                 >
                   Username
@@ -45,6 +47,7 @@
                     <v-btn
                       text
                       outlined
+                      x-small
                       disabled
                     >
                       Follow
@@ -64,7 +67,7 @@
             <v-card-title>
               {{ primaryName }}
             </v-card-title>
-            <v-card-subtitle>
+            <v-card-subtitle class="pb-0">
               <p class="mb-0">{{ secondaryName }}</p>
               <p class="mb-0" v-if="tertiaryName">
                 <img
@@ -87,32 +90,49 @@
                 </a>
               </p>
             </v-card-subtitle>
-            <v-card-text>
-              <div v-if="artist.profile">
+            <v-card-text class="pb-0">
+              <ExpandParagraph v-if="artist.profile" dense>
                 {{ artist.profile.bio }}
-              </div>
-              <v-btn
-                v-if="likesCount > 0"
-                text
-                :to="`${this.artist.username || this.artist.address}/likes`"
-              >
-                Liked Art: {{ likesCount }}
-              </v-btn>
+              </ExpandParagraph>
             </v-card-text>
           </v-card>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row dense>
         <v-col cols="10" offset="1" sm="6" offset-sm="3">
+          <v-tabs v-model="tab" color="black">
+            <v-tab nuxt :to="`/${artist.username || artist.address}`">
+              Art
+            </v-tab>
+            <v-tab nuxt to="#liked">Liked ({{ likesCount }})</v-tab>
+          </v-tabs>
           <v-divider></v-divider>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row dense>
         <v-col
           cols="12"
             sm="6"  offset-sm="3"
         >
-          <ArtistFeed :address="artist.address" />
+          <v-tabs-items v-model="tab">
+            <v-tab-item
+              :value="`/${artist.username || artist.address}`"
+              transition="fade-transition"
+              reverse-transition="fade-transition"
+            >
+              <ArtistFeed
+                :address="artist.address"
+                @fetched="onArtistFeedFetched"
+              />
+            </v-tab-item>
+            <v-tab-item
+              value="liked"
+              transition="fade-transition"
+              reverse-transition="fade-transition"
+            >
+              <LikesFeed :address="artist.address" />
+            </v-tab-item>
+          </v-tabs-items>
         </v-col>
       </v-row>
     </v-container>
@@ -139,6 +159,8 @@ import EditProfileDialog from
 import UsernameDialog from
   '~/components/username/UsernameDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
+import LikesFeed from '~/components/profile/LikesFeed.component.vue'
+import ExpandParagraph from '~/components/common/ExpandParagraph.component.vue'
 import { DomainEntity, DomainEntityCategory } from '~/types'
 
 @Component({
@@ -146,6 +168,8 @@ import { DomainEntity, DomainEntityCategory } from '~/types'
     AvatarUploadDialog,
     ArtistFeed,
     EditProfileDialog,
+    ExpandParagraph,
+    LikesFeed,
     UsernameDialog
   }
 })
@@ -192,6 +216,7 @@ export default class UserProfilePage extends PageComponent {
   showEditProfileDialog: Boolean = false
   showUsernameDialog: Boolean = false
   likesCount: number = 0
+  tab: null | string = null
 
   get isOwner(): boolean {
     return this.$auth.user
@@ -306,6 +331,14 @@ export default class UserProfilePage extends PageComponent {
   @debounce
   onEditUsernameClicked() {
     this.showUsernameDialog = true
+  }
+
+  alreadySwitchedToLikes = false
+  onArtistFeedFetched(count: number) {
+    if (count < 1 && !this.alreadySwitchedToLikes) {
+      this.alreadySwitchedToLikes = true
+      this.$router.replace('#liked')
+    }
   }
 }
 </script>

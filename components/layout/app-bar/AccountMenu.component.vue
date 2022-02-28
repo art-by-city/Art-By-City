@@ -7,7 +7,10 @@
       <UserAvatar dark dense :user="$auth.user" usernameWidth="120px" />
     </template>
     <v-list dense>
-      <v-list-item dense exact :to="`/${$auth.user.address}`">
+      <v-list-item
+        dense exact
+        :to="`/${$auth.user.username || $auth.user.address}`"
+      >
         <v-list-item-action>
           <v-icon>mdi-account</v-icon>
         </v-list-item-action>
@@ -16,12 +19,16 @@
         </v-list-item-content>
       </v-list-item>
 
-      <v-list-item dense exact :to="`/${$auth.user.address}/likes`">
+      <v-list-item
+        dense
+        exact
+        :to="`/${$auth.user.username || $auth.user.address}#liked`"
+      >
         <v-list-item-action>
           <v-icon>mdi-heart</v-icon>
         </v-list-item-action>
         <v-list-item-content>
-          <v-list-item-title>Likes</v-list-item-title>
+          <v-list-item-title>Liked</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
 
