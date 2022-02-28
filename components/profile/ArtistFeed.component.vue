@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'nuxt-property-decorator'
+import { Component, Emit, Prop, Vue } from 'nuxt-property-decorator'
 
 import { FeedItem } from '~/types'
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
@@ -43,11 +43,20 @@ export default class ArtistFeed extends Vue {
     required: true
   }) readonly address!: string
 
+  @Emit('fetched') onFetched(count: number) {
+    return count
+  }
+
   fetchOnServer = false
   async fetch() {
-    this.feed.push(
-      ...(await this.$artworkService.fetchFeed(this.address, this.cursor))
+    const artwork = await this.$artworkService.fetchFeed(
+      this.address,
+      this.cursor
     )
+
+    this.feed.push(...artwork)
+
+    this.onFetched(this.feed.length)
   }
 
   onLoadMoreIntersected(visible: boolean) {
