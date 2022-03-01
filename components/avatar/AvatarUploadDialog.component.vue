@@ -17,6 +17,13 @@
                 @cropmode="onCropModeToggled"
                 @dirty="onDirty"
               />
+
+              <div class="text-caption">
+                Avatars will be resized to 400 by 400 pixels.
+              </div>
+              <div class="text-caption">
+                Animated GIFs will not be resized but are restricted to 5MB.
+              </div>
             </v-card-text>
             <v-card-actions class="pt-0">
               <TransactionFormControls
@@ -115,7 +122,6 @@ export default class AvatarUploadDialog
   }
 
   onDirty() {
-    console.log('avataruploaddialog ondirty')
     this.isDirty = true
   }
 }

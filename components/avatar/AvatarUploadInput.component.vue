@@ -1,82 +1,76 @@
 <template>
   <div class="avatar-upload-input">
-    <v-card elevation="0" v-show="cropMode">
-      <v-card-text>
+    <v-card elevation="0" v-show="cropMode" height="222px">
+      <v-card-text class="pa-0 mx-auto">
         <img
           id="cropImage"
           class="crop-image"
           :src="cropImage"
         />
       </v-card-text>
-      <v-card-actions v-if="cropMode" class="pb-0">
-        <v-btn small icon @click="onSaveCropSelection">
-          <v-icon>mdi-content-save</v-icon>
-        </v-btn>
+      <v-card-actions v-if="cropMode" class="crop-actions mx-auto py-0">
         <v-btn small icon @click="onCancelCropSelection">
           <v-icon>mdi-cancel</v-icon>
         </v-btn>
+        <v-spacer></v-spacer>
+        <v-btn small icon @click="onSaveCropSelection">
+          <v-icon>mdi-content-save</v-icon>
+        </v-btn>
       </v-card-actions>
     </v-card>
-    <template v-if="!cropMode">
-      <div class="artwork-image-selector-container">
-        <div v-if="value" class="artwork-image-selector">
-          <v-hover v-slot:default="hoverProps">
-            <v-avatar color="transparent" size="192">
-              <v-img
-                aspect-ratio="1"
-                width="192"
-                height="192"
-                :src="value.url"
-                class="clickable"
-              >
-                <v-overlay absolute :value="hoverProps.hover">
-                  <v-file-input
-                    class="artwork-upload-button"
-                    accept="image/*"
-                    hide-input
-                    prepend-icon="mdi-camera"
-                    @change="processAndSetImage"
-                    :disabled="disabled"
-                  ></v-file-input>
-                  <div style="display: inline-flex;">
-                    <v-btn
-                      icon
-                      small
-                      :disabled="disabled"
-                      @click="onCropArtworkImageClicked"
-                    >
-                      <v-icon>mdi-crop</v-icon>
-                    </v-btn>
-                  </div>
-                </v-overlay>
-              </v-img>
-            </v-avatar>
-          </v-hover>
-        </div>
 
-        <div
-          v-else
-          class="artwork-image-selector"
-          :class="{ 'has-error': this.hasImageValidationErrors }"
-        >
-          <v-responsive class="file-input-border">
-            <v-file-input
-              class="artwork-upload-button add-artwork-image-button"
-              accept="image/*"
-              hide-input
-              prepend-icon="mdi-camera-plus"
-              @change="processAndSetImage"
-            ></v-file-input>
-          </v-responsive>
-          <span
-            v-if="this.hasImageValidationErrors"
-            class="red--text caption"
-          >
-            At least 1 image is required
-          </span>
-        </div>
+    <div v-if="!cropMode" class="artwork-image-selector-container">
+      <div v-if="value" class="artwork-image-selector mx-auto">
+        <v-hover v-slot:default="hoverProps">
+          <v-avatar color="transparent" size="192">
+            <v-img
+              aspect-ratio="1"
+              width="192"
+              height="192"
+              :src="value.url"
+              class="clickable"
+            >
+              <v-overlay absolute :value="hoverProps.hover">
+                <v-file-input
+                  class="artwork-upload-button"
+                  accept="image/jpeg,image/png,image/gif"
+                  hide-input
+                  prepend-icon="mdi-camera"
+                  @change="processAndSetImage"
+                  :disabled="disabled"
+                ></v-file-input>
+                <div style="display: inline-flex;">
+                  <v-btn
+                    icon
+                    small
+                    :disabled="disabled || value.imageType === 'image/gif'"
+                    @click="onCropArtworkImageClicked"
+                  >
+                    <v-icon>mdi-crop</v-icon>
+                  </v-btn>
+                </div>
+              </v-overlay>
+            </v-img>
+          </v-avatar>
+        </v-hover>
       </div>
-    </template>
+
+      <div
+        v-else
+        class="artwork-image-selector"
+        :class="{ 'has-error': this.hasImageValidationErrors }"
+      >
+        <v-responsive class="file-input-border">
+          <v-file-input
+            class="artwork-upload-button add-artwork-image-button"
+            accept="image/*"
+            hide-input
+            prepend-icon="mdi-camera-plus"
+            @change="processAndSetImage"
+          ></v-file-input>
+        </v-responsive>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -95,7 +89,6 @@ export default class AvatarUploadInput extends Vue {
   cropImage: string = ''
   cropMode: boolean = false
   cropper?: Cropper
-  hasImageValidationErrors: boolean = false
 
   @Model('input', { type: Object }) value?: URLArtworkImage | null
 
@@ -105,24 +98,27 @@ export default class AvatarUploadInput extends Vue {
     default: false
   }) readonly disabled!: boolean
 
-  @Emit('input') async onAvatarChanged(): Promise<URLArtworkImage | void> {
+  @Emit('input') async onAvatarChanged(url: string, type: string):
+    Promise<URLArtworkImage | void> {
     if (this.value && this.cropper) {
       this.onDirty()
-      const url = this.value.url
-      const type = this.value.imageType
+      const guid = uuidv4()
 
-      return await new Promise<URLArtworkImage>((resolve, reject) => {
+      if (type === 'image/gif') {
+        return {
+          guid, imageType: type, url
+        }
+      }
+
+      return await new Promise<URLArtworkImage>((resolve) => {
         this.cropper?.getCroppedCanvas({
           width: 400,
           height: 400
         }).toBlob((blob) => {
           if (blob) {
             URL.revokeObjectURL(url)
-            // this.toggleCropMode(false)
-            // this.cropper?.destroy()
-
             resolve({
-              guid: uuidv4(),
+              guid,
               imageType: type,
               url: URL.createObjectURL(blob)
             })
@@ -148,15 +144,22 @@ export default class AvatarUploadInput extends Vue {
     if (this.value) {
       URL.revokeObjectURL(this.value?.url)
     }
+    if (this.cropper) {
+      this.cropper.destroy()
+    }
   }
 
   @debounce
   async processAndSetImage(image?: File) {
     if (image) {
-      const url = URL.createObjectURL(image)
-      this.refreshCropper(url, () => {
-        this.onAvatarChanged()
-      })
+      if (image.type === 'image/gif' && image.size > 5000000) {
+        this.$toastService.error('Animated avatars must be less than 5 MB.')
+      } else {
+        const url = URL.createObjectURL(image)
+        this.refreshCropper(url, () => {
+          this.onAvatarChanged(url, image.type)
+        })
+      }
     }
   }
 
@@ -173,6 +176,8 @@ export default class AvatarUploadInput extends Vue {
         {
           viewMode: 1,
           aspectRatio: 1,
+          minContainerHeight: 192,
+          minContainerWidth: 192,
           ready() {
             if (cb) {
               cb()
@@ -197,12 +202,8 @@ export default class AvatarUploadInput extends Vue {
 
   @debounce
   onSaveCropSelection() {
-    this.cropAndSave()
-  }
-
-  private cropAndSave() {
     if (this.cropper && this.value) {
-      this.onAvatarChanged()
+      this.onAvatarChanged(this.value.url, this.value.imageType)
       this.toggleCropMode(false)
     }
   }
@@ -210,15 +211,19 @@ export default class AvatarUploadInput extends Vue {
   @debounce
   onCancelCropSelection() {
     this.toggleCropMode(false)
-    this.cropper?.destroy()
   }
 }
 </script>
 
 <style scoped>
 .avatar-upload-input {
-  width: 192px;
+  width: 300px;
   /* height: 192px; */
+  margin: 0 auto;
+}
+
+.avatar-upload-input >>> .cropper-container.cropper-bg {
+  background-repeat: repeat;
   margin: 0 auto;
 }
 
@@ -233,7 +238,7 @@ export default class AvatarUploadInput extends Vue {
 }
 .artwork-image-selector:nth-child(1) {
   min-height: 192px;
-  width: 100%;
+  width: 192px;
   margin-bottom: 25px;
   flex-basis: fill;
 }
@@ -271,5 +276,9 @@ export default class AvatarUploadInput extends Vue {
   border: 1px dashed black;
   height: 100%;
   border-radius: 50%;
+}
+
+.crop-actions {
+  width: 150px;
 }
 </style>
