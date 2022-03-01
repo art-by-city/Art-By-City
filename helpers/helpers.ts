@@ -1,6 +1,9 @@
 export const readFileAsDataUrlAsync = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
+    reader.onerror = async (error) => {
+      reject(error)
+    }
     reader.onload = (evt) => {
       if (!evt.target || !evt.target.result) {
         reject('Error reading file')
@@ -9,6 +12,29 @@ export const readFileAsDataUrlAsync = (file: File): Promise<string> => {
       resolve(reader.result as string)
     }
     reader.readAsDataURL(file)
+  })
+}
+
+export const readFileAsArrayBufferAsync = (file: File): Promise<{
+  buffer: ArrayBuffer
+  type: string
+}> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = async (error) => {
+      reject(error)
+    }
+    reader.onload = (evt) => {
+      if (!evt.target || !evt.target.result) {
+        reject('Error reading file')
+      }
+
+      resolve({
+        buffer: reader.result as ArrayBuffer,
+        type: file.type
+      })
+    }
+    reader.readAsArrayBuffer(file)
   })
 }
 
