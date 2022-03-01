@@ -55,11 +55,7 @@
         </v-hover>
       </div>
 
-      <div
-        v-else
-        class="artwork-image-selector"
-        :class="{ 'has-error': this.hasImageValidationErrors }"
-      >
+      <div v-else class="artwork-image-selector">
         <v-responsive class="file-input-border">
           <v-file-input
             class="artwork-upload-button add-artwork-image-button"
