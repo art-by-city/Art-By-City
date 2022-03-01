@@ -27,6 +27,14 @@ export interface BaseArtworkImage extends TrackableEntity {
   imageType: string
 }
 
+export interface ArrayBufferArtworkImage extends BaseArtworkImage {
+  buffer: ArrayBuffer
+}
+
+export interface URLArtworkImage extends BaseArtworkImage {
+  url: string
+}
+
 export interface DataURLArtworkImage extends BaseArtworkImage {
   dataUrl: string
 }

@@ -10,14 +10,18 @@
           <v-card>
             <v-card-title>Upload Avatar</v-card-title>
             <v-divider></v-divider>
-            <v-card-text>
+            <v-card-text class="pb-0">
               <AvatarUploadInput
                 v-model="asset"
                 :disabled="isUploading || isSigned"
+                @cropmode="onCropModeToggled"
+                @dirty="onDirty"
               />
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions class="pt-0">
               <TransactionFormControls
+                :info="info"
+                :disabled="asset === null || !isDirty || isCropping"
                 :loading="isUploading"
                 :signed="isSigned"
                 :txTotal="txTotal"
@@ -36,13 +40,13 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import { ArtworkImage, DomainEntityCategory } from '~/types'
+import { DomainEntityCategory, URLArtworkImage } from '~/types'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import AvatarUploadInput from './AvatarUploadInput.component.vue'
-import { uuidv4 } from '~/helpers'
+import { readFileAsDataUrlAsync, uuidv4 } from '~/helpers'
 
 @Component({
   components: {
@@ -51,8 +55,10 @@ import { uuidv4 } from '~/helpers'
   }
 })
 export default class AvatarUploadDialog
-  extends TransactionDialog<ArtworkImage> {
+  extends TransactionDialog<URLArtworkImage> {
   type: DomainEntityCategory = 'avatar'
+  isCropping: boolean = false
+  info: string = ''
 
   fetchOnServer = false
   async fetch() {
@@ -73,7 +79,7 @@ export default class AvatarUploadDialog
         this.asset = {
           guid: uuidv4(),
           imageType,
-          dataUrl: avatar.src
+          url: avatar.src
         }
       }
     }
@@ -82,15 +88,35 @@ export default class AvatarUploadDialog
   async onSign() {
     if (this.asset) {
       this.isUploading = true
+      this.info = 'Processing avatar...'
 
+      const guid = this.asset.guid
+      const type = this.asset.imageType
+      const file = await fetch(this.asset.url)
+        .then(r => r.blob())
+        .then(blob => new File([blob], guid, { type }))
+      const src = await readFileAsDataUrlAsync(file)
+
+      this.info = 'Building avatar transaction...'
       this.transaction = await this.$avatarService.createAvatarTransaction(
-        { src: this.asset.dataUrl }
+        { src }
       )
 
+      this.info = 'Waiting on signature...'
       this.isSigned = await this.$arweaveService.sign(this.transaction)
 
+      this.info = ''
       this.isUploading = false
     }
+  }
+
+  onCropModeToggled(enabled: boolean) {
+    this.isCropping = enabled
+  }
+
+  onDirty() {
+    console.log('avataruploaddialog ondirty')
+    this.isDirty = true
   }
 }
 </script>

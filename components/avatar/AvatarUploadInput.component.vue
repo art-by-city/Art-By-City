@@ -1,27 +1,23 @@
 <template>
   <div class="avatar-upload-input">
-    <template v-if="cropMode && cropImage">
-      <v-container>
-        <v-row dense>
-          <img
-            id="cropImage"
-            class="crop-image"
-            :src="cropImage.dataUrl"
-          />
-        </v-row>
-        <v-row dense>
-          <v-col>
-            <v-btn small icon @click="onSaveCropSelection">
-              <v-icon>mdi-content-save</v-icon>
-            </v-btn>
-            <v-btn small icon @click="onCancelCropSelection">
-              <v-icon>mdi-cancel</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </template>
-    <template v-else>
+    <v-card elevation="0" v-show="cropMode">
+      <v-card-text>
+        <img
+          id="cropImage"
+          class="crop-image"
+          :src="cropImage"
+        />
+      </v-card-text>
+      <v-card-actions v-if="cropMode" class="pb-0">
+        <v-btn small icon @click="onSaveCropSelection">
+          <v-icon>mdi-content-save</v-icon>
+        </v-btn>
+        <v-btn small icon @click="onCancelCropSelection">
+          <v-icon>mdi-cancel</v-icon>
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+    <template v-if="!cropMode">
       <div class="artwork-image-selector-container">
         <div v-if="value" class="artwork-image-selector">
           <v-hover v-slot:default="hoverProps">
@@ -30,7 +26,7 @@
                 aspect-ratio="1"
                 width="192"
                 height="192"
-                :src="value.dataUrl"
+                :src="value.url"
                 class="clickable"
               >
                 <v-overlay absolute :value="hoverProps.hover">
@@ -50,14 +46,6 @@
                       @click="onCropArtworkImageClicked"
                     >
                       <v-icon>mdi-crop</v-icon>
-                    </v-btn>
-                    <v-btn
-                      icon
-                      small
-                      :disabled="disabled"
-                      @click="onDeleteArtworkImageClicked(i)"
-                    >
-                      <v-icon>mdi-delete</v-icon>
                     </v-btn>
                   </div>
                 </v-overlay>
@@ -95,25 +83,21 @@
 <script lang="ts">
 import { Component, Emit, Model, Prop, Vue } from 'nuxt-property-decorator'
 import Cropper from 'cropperjs'
-import draggable from 'vuedraggable'
 
-import { debounce, uuidv4, readFileAsDataUrlAsync } from '~/helpers'
-import { ArtworkImage } from '~/types'
+import { debounce, uuidv4 } from '~/helpers'
+import { URLArtworkImage } from '~/types'
 
-@Component({
-  components: {
-    draggable
-  }
-})
+@Component
 export default class AvatarUploadInput extends Vue {
-  @Model('input', { type: Object }) value?: ArtworkImage | null
-  cropImage?: ArtworkImage
   $refs!: {
     cropImage: HTMLImageElement
   }
+  cropImage: string = ''
   cropMode: boolean = false
   cropper?: Cropper
   hasImageValidationErrors: boolean = false
+
+  @Model('input', { type: Object }) value?: URLArtworkImage | null
 
   @Prop({
     type: Boolean,
@@ -121,72 +105,112 @@ export default class AvatarUploadInput extends Vue {
     default: false
   }) readonly disabled!: boolean
 
-  @debounce
-  @Emit('change') onImageFileInputChanged(image: File): File {
-    return image
-  }
+  @Emit('input') async onAvatarChanged(): Promise<URLArtworkImage | void> {
+    if (this.value && this.cropper) {
+      this.onDirty()
+      const url = this.value.url
+      const type = this.value.imageType
 
-  @Emit('input') onAvatarChanged(avatar: ArtworkImage): ArtworkImage {
-    return avatar
-  }
+      return await new Promise<URLArtworkImage>((resolve, reject) => {
+        this.cropper?.getCroppedCanvas({
+          width: 400,
+          height: 400
+        }).toBlob((blob) => {
+          if (blob) {
+            URL.revokeObjectURL(url)
+            // this.toggleCropMode(false)
+            // this.cropper?.destroy()
 
-  @debounce
-  onSaveCropSelection() {
-    if (this.cropper) {
-      const type = 'image/png'
-      this.onAvatarChanged({
-        guid: uuidv4(),
-        imageType: type,
-        dataUrl: this.cropper
-          .getCroppedCanvas()
-          .toDataURL(type)
+            resolve({
+              guid: uuidv4(),
+              imageType: type,
+              url: URL.createObjectURL(blob)
+            })
+          }
+        }, type)
       })
-      this.cropMode = false
-      this.cropper.destroy()
     }
   }
 
-  @debounce
-  onCancelCropSelection() {
-    this.cropMode = false
-    this.cropper?.destroy()
+  @Emit('cropmode') onCropMode(enabled: boolean) {
+    return enabled
+  }
+
+  @Emit('dirty') onDirty() {}
+
+  mounted() {
+    if (this.value) {
+      this.refreshCropper(this.value?.url)
+    }
+  }
+
+  unmounted() {
+    if (this.value) {
+      URL.revokeObjectURL(this.value?.url)
+    }
   }
 
   @debounce
   async processAndSetImage(image?: File) {
     if (image) {
-      this.onAvatarChanged({
-        guid: uuidv4(),
-        dataUrl: await readFileAsDataUrlAsync(image),
-        imageType: image.type
+      const url = URL.createObjectURL(image)
+      this.refreshCropper(url, () => {
+        this.onAvatarChanged()
       })
     }
+  }
+
+  private refreshCropper(url: string, cb?: Function) {
+    this.cropImage = url
+
+    if (this.cropper) {
+      this.cropper.destroy()
+    }
+
+    this.$nextTick(() => {
+      this.cropper = new Cropper(
+        document.getElementById('cropImage') as HTMLImageElement,
+        {
+          viewMode: 1,
+          aspectRatio: 1,
+          ready() {
+            if (cb) {
+              cb()
+            }
+          }
+        }
+      )
+    })
+  }
+
+  private toggleCropMode(enabled: boolean) {
+    this.cropMode = enabled
+    this.onCropMode(enabled)
   }
 
   @debounce
   onCropArtworkImageClicked() {
     if (this.value) {
-      this.cropMode = true
-      this.cropImage = this.value
-
-      if (this.cropper) {
-        this.cropper.destroy()
-      }
-
-      this.$nextTick(() => {
-        this.cropper = new Cropper(
-          document.getElementById('cropImage') as HTMLImageElement,
-          {
-            viewMode: 1
-          }
-        )
-      })
+      this.toggleCropMode(true)
     }
   }
 
   @debounce
-  onDeleteArtworkImageClicked() {
-    this.value = null
+  onSaveCropSelection() {
+    this.cropAndSave()
+  }
+
+  private cropAndSave() {
+    if (this.cropper && this.value) {
+      this.onAvatarChanged()
+      this.toggleCropMode(false)
+    }
+  }
+
+  @debounce
+  onCancelCropSelection() {
+    this.toggleCropMode(false)
+    this.cropper?.destroy()
   }
 }
 </script>
@@ -194,7 +218,7 @@ export default class AvatarUploadInput extends Vue {
 <style scoped>
 .avatar-upload-input {
   width: 192px;
-  height: 192px;
+  /* height: 192px; */
   margin: 0 auto;
 }
 
