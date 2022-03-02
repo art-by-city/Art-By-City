@@ -171,8 +171,14 @@ export default class UserProfilePage extends PageComponent {
     const description = this.artist?.profile?.bio || title
     const url =
       `${this.$config.baseUrl}/${this.artist.username || this.artist.address}`
-    const avatarUrl =
-      `${this.$config.baseUrl}/api/avatar/${this.artist.address}`
+
+    let avatarUrl = ''
+    if (this.artist.avatar) {
+      avatarUrl = this.artist.avatar?.version === 1
+        ? `${this.$config.baseUrl}/api/avatar/${this.artist.address}`
+        : this.artist.avatar.src
+    }
+
     const avatarAlt = `${this.primaryName}'s avatar`
     const twitter = this.artist?.profile?.twitter || ''
 
@@ -269,6 +275,7 @@ export default class UserProfilePage extends PageComponent {
       } else {
         this.artist = { username, address }
         await this.fetchAndSet('profile')
+        await this.fetchAndSet('avatar')
 
         if (this.artist?.address) {
           this.likesCount = await this.$likesService.fetchTotalLikedByUser(
@@ -299,6 +306,9 @@ export default class UserProfilePage extends PageComponent {
           if (entity) {
             this.$router.replace(`/${entity}`)
           }
+          break
+        case 'avatar':
+          entity = await this.$avatarService.fetchAvatar(this.artist.address)
           break
       }
     }

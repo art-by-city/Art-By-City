@@ -42,7 +42,8 @@ export default class AvatarService extends TransactionService {
         return {
           id: txId,
           src: res.data.src,
-          type: imageType
+          type: imageType,
+          version: 1
         }
       } else {
         // v2 format
@@ -57,7 +58,8 @@ export default class AvatarService extends TransactionService {
         return {
           id: txId,
           src,
-          type
+          type,
+          version: 2
         }
       }
     }
