@@ -20,7 +20,7 @@
         >
           <v-img
             contain
-            max-width="32px"
+            width="32px"
             class="dark-svg"
             :class="{ 'spin': shouldIconAnimate }"
             src="/icons/transfer.svg"
