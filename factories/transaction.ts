@@ -52,7 +52,8 @@ export default class TransactionFactory {
 
     tx.addTag('App-Name', this.config.name)
     tx.addTag('App-Version', this.config.version)
-    if (data) {
+    const hasContentTypeTag = tags.some(tag => tag.tag === 'Content-Type')
+    if (data && !hasContentTypeTag) {
       tx.addTag('Content-Type', 'application/json')
     }
     tx.addTag('Category', category)
