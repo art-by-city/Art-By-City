@@ -151,7 +151,6 @@ export default class AvatarUploadInput extends Vue {
 
   @debounce
   async processAndSetImage(image?: File) {
-    console.log('processAndSetImage', image)
     if (image) {
       if (image.type === 'image/gif' && image.size > 5000000) {
         this.$toastService.error('Animated avatars must be less than 5 MB.')
