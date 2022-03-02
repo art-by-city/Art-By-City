@@ -17,6 +17,7 @@ import TransactionFormControls from
 export default class TransactionDialog<T> extends Vue {
   isUploading: boolean = false
   isSigned: boolean = false
+  isDirty: boolean = false
   asset: T | null = null
   type!: DomainEntityCategory
   transaction: Transaction | null = null

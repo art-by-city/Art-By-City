@@ -10,14 +10,25 @@
           <v-card>
             <v-card-title>Upload Avatar</v-card-title>
             <v-divider></v-divider>
-            <v-card-text>
+            <v-card-text class="pb-0">
               <AvatarUploadInput
                 v-model="asset"
                 :disabled="isUploading || isSigned"
+                @cropmode="onCropModeToggled"
+                @dirty="onDirty"
               />
+
+              <div class="text-caption">
+                Avatars will be resized to 400 by 400 pixels.
+              </div>
+              <div class="text-caption">
+                Animated GIFs will not be resized but are restricted to 5MB.
+              </div>
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions class="pt-0">
               <TransactionFormControls
+                :info="info"
+                :disabled="asset === null || !isDirty || isCropping"
                 :loading="isUploading"
                 :signed="isSigned"
                 :txTotal="txTotal"
@@ -36,13 +47,13 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import { ArtworkImage, DomainEntityCategory } from '~/types'
+import { DomainEntityCategory, URLArtworkImage } from '~/types'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import AvatarUploadInput from './AvatarUploadInput.component.vue'
-import { uuidv4 } from '~/helpers'
+import { readFileAsArrayBufferAsync, uuidv4 } from '~/helpers'
 
 @Component({
   components: {
@@ -51,8 +62,10 @@ import { uuidv4 } from '~/helpers'
   }
 })
 export default class AvatarUploadDialog
-  extends TransactionDialog<ArtworkImage> {
+  extends TransactionDialog<URLArtworkImage> {
   type: DomainEntityCategory = 'avatar'
+  isCropping: boolean = false
+  info: string = ''
 
   fetchOnServer = false
   async fetch() {
@@ -61,19 +74,13 @@ export default class AvatarUploadDialog
         this.$auth.user.address
       )
 
-      if (avatar && avatar.src) {
-        // NB: resolve mime type from data url src quickly
-        // maybe this is faster than .split() ?
-        let imageType = avatar.src.substring(5, 14)
-        // data:image/jpe
-        if (imageType[6] === 'j') {
-          imageType += 'g'
-        }
+      if (avatar) {
+        const guid = uuidv4()
 
         this.asset = {
-          guid: uuidv4(),
-          imageType,
-          dataUrl: avatar.src
+          guid,
+          imageType: avatar.type,
+          url: avatar.src
         }
       }
     }
@@ -82,15 +89,32 @@ export default class AvatarUploadDialog
   async onSign() {
     if (this.asset) {
       this.isUploading = true
+      this.info = 'Processing avatar...'
 
+      const type = this.asset.imageType
+      const blob = await fetch(this.asset.url).then(r => r.blob())
+      const buffer = await readFileAsArrayBufferAsync(blob)
+
+      this.info = 'Building avatar transaction...'
       this.transaction = await this.$avatarService.createAvatarTransaction(
-        { src: this.asset.dataUrl }
+        buffer,
+        type
       )
 
+      this.info = 'Waiting on signature...'
       this.isSigned = await this.$arweaveService.sign(this.transaction)
 
+      this.info = ''
       this.isUploading = false
     }
+  }
+
+  onCropModeToggled(enabled: boolean) {
+    this.isCropping = enabled
+  }
+
+  onDirty() {
+    this.isDirty = true
   }
 }
 </script>

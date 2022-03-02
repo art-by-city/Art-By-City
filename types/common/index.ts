@@ -5,6 +5,7 @@ export interface TrackableEntity {
 export interface Avatar {
   id?: string
   src: string
+  type: string
 }
 
 export interface Profile {
