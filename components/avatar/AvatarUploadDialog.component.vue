@@ -53,7 +53,7 @@ import TransactionDialog from
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import AvatarUploadInput from './AvatarUploadInput.component.vue'
-import { readFileAsDataUrlAsync, uuidv4 } from '~/helpers'
+import { readFileAsArrayBufferAsync, uuidv4 } from '~/helpers'
 
 @Component({
   components: {
@@ -74,18 +74,12 @@ export default class AvatarUploadDialog
         this.$auth.user.address
       )
 
-      if (avatar && avatar.src) {
-        // NB: resolve mime type from data url src quickly
-        // maybe this is faster than .split() ?
-        let imageType = avatar.src.substring(5, 14)
-        // data:image/jpe
-        if (imageType[6] === 'j') {
-          imageType += 'g'
-        }
+      if (avatar) {
+        const guid = uuidv4()
 
         this.asset = {
-          guid: uuidv4(),
-          imageType,
+          guid,
+          imageType: avatar.type,
           url: avatar.src
         }
       }
@@ -97,16 +91,14 @@ export default class AvatarUploadDialog
       this.isUploading = true
       this.info = 'Processing avatar...'
 
-      const guid = this.asset.guid
       const type = this.asset.imageType
-      const file = await fetch(this.asset.url)
-        .then(r => r.blob())
-        .then(blob => new File([blob], guid, { type }))
-      const src = await readFileAsDataUrlAsync(file)
+      const blob = await fetch(this.asset.url).then(r => r.blob())
+      const buffer = await readFileAsArrayBufferAsync(blob)
 
       this.info = 'Building avatar transaction...'
       this.transaction = await this.$avatarService.createAvatarTransaction(
-        { src }
+        buffer,
+        type
       )
 
       this.info = 'Waiting on signature...'

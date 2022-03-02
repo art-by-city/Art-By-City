@@ -1,4 +1,4 @@
-export const readFileAsDataUrlAsync = (file: File): Promise<string> => {
+export const readFileAsDataUrlAsync = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onerror = async (error) => {
@@ -11,14 +11,12 @@ export const readFileAsDataUrlAsync = (file: File): Promise<string> => {
 
       resolve(reader.result as string)
     }
-    reader.readAsDataURL(file)
+    reader.readAsDataURL(blob)
   })
 }
 
-export const readFileAsArrayBufferAsync = (file: File): Promise<{
-  buffer: ArrayBuffer
-  type: string
-}> => {
+export const readFileAsArrayBufferAsync = (blob: Blob):
+  Promise<ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onerror = async (error) => {
@@ -29,12 +27,9 @@ export const readFileAsArrayBufferAsync = (file: File): Promise<{
         reject('Error reading file')
       }
 
-      resolve({
-        buffer: reader.result as ArrayBuffer,
-        type: file.type
-      })
+      resolve(reader.result as ArrayBuffer)
     }
-    reader.readAsArrayBuffer(file)
+    reader.readAsArrayBuffer(blob)
   })
 }
 

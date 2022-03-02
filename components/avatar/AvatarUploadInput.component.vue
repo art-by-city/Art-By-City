@@ -55,11 +55,11 @@
         </v-hover>
       </div>
 
-      <div v-else class="artwork-image-selector">
+      <div v-else class="artwork-image-selector mx-auto">
         <v-responsive class="file-input-border">
           <v-file-input
             class="artwork-upload-button add-artwork-image-button"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/gif"
             hide-input
             prepend-icon="mdi-camera-plus"
             @change="processAndSetImage"
@@ -96,7 +96,7 @@ export default class AvatarUploadInput extends Vue {
 
   @Emit('input') async onAvatarChanged(url: string, type: string):
     Promise<URLArtworkImage | void> {
-    if (this.value && this.cropper) {
+    if (this.cropper) {
       this.onDirty()
       const guid = uuidv4()
 
@@ -104,6 +104,10 @@ export default class AvatarUploadInput extends Vue {
         return {
           guid, imageType: type, url
         }
+      }
+
+      if (!type.startsWith('image/')) {
+        type = 'image/png'
       }
 
       return await new Promise<URLArtworkImage>((resolve) => {

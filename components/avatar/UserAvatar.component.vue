@@ -143,6 +143,13 @@ export default class UserAvatar extends Vue {
 
     if (avatar && avatar.src) {
       this.src = avatar.src
+
+      // Check for old format avatar and ask user to update
+      if (this.isOwner && !this.dense && avatar.src.startsWith('data:image')) {
+        this.$toastService.warning(
+          'Your avatar is using an old data format and needs to be republished'
+        )
+      }
     } else {
       const gravatarBase = 'https://www.gravatar.com/avatar'
       const userAddrHash = MD5(this.user.address.toLowerCase())
