@@ -7,6 +7,9 @@
     <v-row dense justify="center" v-if="txTotal">
       <b>Submit transaction?</b>
     </v-row>
+    <v-row dense justify="center" v-if="info">
+      <caption>{{ info }}</caption>
+    </v-row>
     <v-row dense justify="center">
       <v-col cols="12" sm="auto" order="2" order-sm="1" class="center-text">
         <v-btn
@@ -66,6 +69,11 @@ export default class TransactionFormControls extends Vue {
     type: String,
     required: false
   }) txTotal?: string
+
+  @Prop({
+    type: String,
+    required: false
+  }) readonly info?: string
 
   get humanReadableTxTotal() {
     if (this.txTotal) {
