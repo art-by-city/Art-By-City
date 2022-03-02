@@ -31,14 +31,19 @@
               class="clickable"
             >
               <v-overlay absolute :value="hoverProps.hover">
-                <v-file-input
-                  class="artwork-upload-button"
+                <label
+                  class="artwork-upload-label"
+                  for="upload"
+                >
+                  <v-icon>mdi-camera-plus</v-icon>
+                </label>
+                <input
+                  id="upload"
+                  class="artwork-upload-input"
+                  type="file"
                   accept="image/jpeg,image/png,image/gif"
-                  hide-input
-                  prepend-icon="mdi-camera"
-                  @change="processAndSetImage"
-                  :disabled="disabled"
-                ></v-file-input>
+                  @input="processAndSetImage"
+                />
                 <div style="display: inline-flex;">
                   <v-btn
                     icon
@@ -150,15 +155,19 @@ export default class AvatarUploadInput extends Vue {
   }
 
   @debounce
-  async processAndSetImage(image?: File) {
-    if (image) {
-      if (image.type === 'image/gif' && image.size > 5000000) {
-        this.$toastService.error('Animated avatars must be less than 5 MB.')
-      } else {
-        const url = URL.createObjectURL(image)
-        this.refreshCropper(url, () => {
-          this.onAvatarChanged(url, image.type)
-        })
+  async processAndSetImage(event: InputEvent) {
+    if (event.target) {
+      const target = event.target as HTMLInputElement
+      if (target.files && target.files[0]) {
+        const image = target.files[0]
+          if (image.type === 'image/gif' && image.size > 5000000) {
+            this.$toastService.error('Animated avatars must be less than 5 MB.')
+          } else {
+            const url = URL.createObjectURL(image)
+            this.refreshCropper(url, () => {
+              this.onAvatarChanged(url, image.type)
+            })
+          }
       }
     }
   }
@@ -280,5 +289,16 @@ export default class AvatarUploadInput extends Vue {
 
 .crop-actions {
   width: 150px;
+}
+
+.artwork-upload-label {
+  cursor: pointer;
+  height: 28px;
+  width: 28px;
+  display: inline-flex;
+}
+
+.artwork-upload-input {
+  display: none;
 }
 </style>
