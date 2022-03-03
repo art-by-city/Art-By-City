@@ -1,10 +1,11 @@
 import { Context } from '@nuxt/types'
 import Transaction from 'arweave/node/lib/transaction'
+import { Bundle, DataItem } from 'arbundles'
 
-import { Artwork, DataURLArtworkImage, FeedItem } from '~/types'
+import { Artwork, FeedItem } from '~/types'
 import { uuidv4 } from '~/helpers'
 import { TransactionService, LikesService } from './'
-import { ArtworkFactory } from '../factories'
+import { ArtworkFactory, BundleFactory } from '../factories'
 import { LIKED_ENTITY_TAG } from './likes'
 
 export default class ArtworkService extends TransactionService {
@@ -17,33 +18,57 @@ export default class ArtworkService extends TransactionService {
   }
 
   async createArtworkTransaction(artwork: Artwork): Promise<Transaction> {
-    const artworkData: Partial<Artwork> = { ...artwork }
+    const manifest: Partial<Artwork> = { ...artwork }
 
-    delete artworkData.id
-    delete artworkData.hashtags
-
-    if (artworkData.images) {
-      (artworkData.images as Partial<DataURLArtworkImage>[]).forEach(image => {
-        delete image.guid
-      })
+    delete manifest.id
+    delete manifest.hashtags
+    manifest.published = new Date()
+    if (manifest.city) {
+      manifest.city = manifest.city.toLowerCase()
     }
-
-    artworkData.published = new Date()
-
-    if (artworkData.city) {
-      artworkData.city = artworkData.city.toLowerCase()
+    if (!manifest.images) {
+      manifest.images = []
     }
-
-    const jsonData = JSON.stringify(artworkData)
-    const tags: { tag: string, value: string }[] = []
-
+    const tags: { tag: string, value: string }[] = [
+      { tag: 'Bundle-Format', value: 'binary' },
+      { tag: 'Bundle-Version', value: '2.0.0' }
+    ]
     if (artwork.slug) {
       tags.push({ tag: 'slug', value: artwork.slug })
     }
 
+    const imageDataItems: DataItem[] = []
+    for (let i = 0; i < artwork.images.length; i++) {
+      const image = artwork.images[i]
+      const data = JSON.stringify({ src: image.dataUrl })
+      const dataItem = await this.createAndSignDataItem(
+        data,
+        [{ name: 'Content-Type', value: 'application/json'/*image.imageType*/ }]
+      )
+      imageDataItems.push(dataItem)
+      manifest.images[i] = {
+        guid: uuidv4(),
+        dataUrl: imageDataItems[i].id,
+        imageType: artwork.images[0].imageType
+      }
+    }
+
+    const manifestDataItem = await this.createAndSignDataItem(
+      JSON.stringify(manifest)
+    )
+
+    const dataItems = [ manifestDataItem, ...imageDataItems ]
+
+    for (let i = 0; i < dataItems.length; i++) {
+      const dataItem = dataItems[i]
+      console.log('data item id', dataItem.id, dataItem.signature)
+    }
+
+    const bundle = await BundleFactory.create(dataItems)
+
     const tx = await this.transactionFactory.buildEntityTransaction(
       'artwork',
-      jsonData,
+      bundle.getRaw(),
       tags
     )
 
@@ -56,18 +81,35 @@ export default class ArtworkService extends TransactionService {
       'artwork',
       owner,
       {
-        type: 'application/json',
+        // type: 'application/json',
         sort: 'HEIGHT_DESC',
         tags: [{ tag: 'slug', value: txIdOrSlug }]
       }
     )
 
+    console.log('artwork service fetch result', result.transactions.length)
+
     if (result.transactions[0]) {
-      return await this.fetch(result.transactions[0].id)
+      // return await this.fetch(result.transactions[0].id)
+      return await this.fetchBundle(result.transactions[0].id)
     }
 
     // If no slug matches, try treating it as a txid
-    return await this.fetch(txIdOrSlug)
+    return txIdOrSlug.length === 43
+      ? await this.fetch(txIdOrSlug)
+      : null
+  }
+
+  async fetchBundle(id: string): Promise<null> {
+    console.log(`ArtworkService->fetchBundle(${id})`)
+
+    const data = await this.$arweave.transactions.getData(id, { decode: true }) as Uint8Array
+    console.log('ArtworkService->fetchBundle() data.length', data.length, data.byteLength)
+    const buffer = Buffer.from(data)
+    const bundle = new Bundle(buffer)
+    console.log('ArtworkService->fetchBundle() bundle txIds', bundle.getIds())
+
+    return null
   }
 
   async fetch(id: string): Promise<Artwork | null> {

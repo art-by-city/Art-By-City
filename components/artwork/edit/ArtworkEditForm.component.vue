@@ -186,12 +186,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
+import { Vue, Component, Emit } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
 import Transaction from 'arweave/web/lib/transaction'
 
-import { Artwork, ArtworkImage, UserTransaction } from '~/types'
+import { Artwork, ArtworkImage } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from
@@ -212,13 +212,23 @@ import TransactionFormControls from
   }
 })
 export default class ArtworkEditForm extends Vue {
-  @Prop({ type: Object, required: true }) artwork!: Artwork
   $refs!: {
     cropImage: HTMLImageElement,
     form: Vue & {
       validate: () => boolean
       resetValidation: () => void
     }
+  }
+  artwork: Artwork = {
+    id: '',
+    creator: {
+      address: this.$auth.user?.address || ''
+    },
+    title: '',
+    slug: '',
+    description: '',
+    hashtags: [],
+    images: []
   }
   cropMode: boolean = false
   cropImage?: ArtworkImage
@@ -231,8 +241,8 @@ export default class ArtworkEditForm extends Vue {
   transaction: Transaction | null = null
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
-  @Emit('save') _save(txId: string) {
-    return txId
+  @Emit('save') save(txId: string, slug?: string) {
+    return { txId, slug }
   }
   @Emit('cancel') onCancel() {}
 
@@ -396,6 +406,11 @@ export default class ArtworkEditForm extends Vue {
         this.artwork
       )
 
+      // if (!this.transaction) {
+      //   this.isUploading = false
+      //   return
+      // }
+
       this.isSigned = await this.$arweaveService.sign(this.transaction)
 
       this.isUploading = false
@@ -420,7 +435,7 @@ export default class ArtworkEditForm extends Vue {
             console.error('Error submitting user tx', err)
             this.$toastService.error('Error submitting user tx: ' + err.message)
           } else {
-            return this._save(txId)
+            return this.save(txId, this.artwork.slug)
           }
         }
       )

@@ -3,7 +3,6 @@
     <v-row justify="center">
       <v-col cols="6">
         <ArtworkEditForm
-          :artwork="artwork"
           @save="onSave"
           @cancel="onCancel"
         />
@@ -17,7 +16,6 @@ import { Component } from 'nuxt-property-decorator'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ArtworkEditForm } from '~/components/artwork/edit'
-import { Artwork } from '~/types'
 
 @Component({
   middleware: 'auth',
@@ -30,23 +28,10 @@ export default class UploadPage extends FormPageComponent {
     return { title: 'Publish' }
   }
 
-  artwork: Artwork = {
-    id: '',
-    creator: {
-      address: this.$auth.user?.address || ''
-    },
-    title: '',
-    slug: '',
-    description: '',
-    hashtags: [],
-    images: []
-  }
-
-  onSave(txId: string) {
+  onSave({ txId, slug }: { txId: string, slug: string }) {
     const profileUrl = this.$auth.user.username || this.$auth.user.address
-    const artworkUrl = this.artwork.slug || txId
     if (profileUrl) {
-      this.$router.push(`/${profileUrl}/${artworkUrl}`)
+      this.$router.push(`/${profileUrl}/${slug || txId}`)
     }
   }
 
