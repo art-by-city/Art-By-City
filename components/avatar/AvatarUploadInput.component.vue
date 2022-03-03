@@ -161,6 +161,28 @@ export default class AvatarUploadInput extends Vue {
         })
       }
     }
+
+    this.$nextTick(() => {
+      this.cropper = new Cropper(
+        document.getElementById('cropImage') as HTMLImageElement,
+        {
+          viewMode: 1,
+          aspectRatio: 1,
+          minContainerHeight: 192,
+          minContainerWidth: 192,
+          ready() {
+            if (cb) {
+              cb()
+            }
+          }
+        }
+      )
+    })
+  }
+
+  private toggleCropMode(enabled: boolean) {
+    this.cropMode = enabled
+    this.onCropMode(enabled)
   }
 
   private refreshCropper(url: string, cb?: Function) {

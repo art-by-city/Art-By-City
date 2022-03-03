@@ -16,7 +16,21 @@ import FeedComponent from '~/components/feed/Feed.component.vue'
 })
 export default class DiscoverPage extends Vue {
   get head() {
-    return { title: 'Discover' }
+    const title = 'Discover'
+    const desc = 'Discover Art published on the Permaweb'
+
+    return {
+      title,
+      meta: [
+        {
+          hid: 'description',
+          name: 'Description',
+          content: desc
+        },
+        { property: 'og:title',       content: title },
+        { property: 'og:description', content: desc  }
+      ]
+    }
   }
 }
 </script>
