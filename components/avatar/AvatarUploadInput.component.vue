@@ -20,14 +20,14 @@
     </v-card>
 
     <div v-if="!cropMode" class="artwork-image-selector-container">
-      <div v-if="value" class="artwork-image-selector mx-auto">
+      <div class="artwork-image-selector mx-auto">
         <v-hover v-slot:default="hoverProps">
-          <v-avatar color="transparent" size="192">
+          <v-avatar color="transparent" size="192" :class="{ 'file-input-border': !src }">
             <v-img
               aspect-ratio="1"
               width="192"
               height="192"
-              :src="value.url"
+              :src="src"
               class="clickable"
             >
               <v-overlay absolute :value="hoverProps.hover">
@@ -48,7 +48,8 @@
                   <v-btn
                     icon
                     small
-                    :disabled="disabled || value.imageType === 'image/gif'"
+                    v-if="src"
+                    :disabled="disabled || imageType === 'image/gif'"
                     @click="onCropArtworkImageClicked"
                   >
                     <v-icon>mdi-crop</v-icon>
@@ -58,18 +59,6 @@
             </v-img>
           </v-avatar>
         </v-hover>
-      </div>
-
-      <div v-else class="artwork-image-selector mx-auto">
-        <v-responsive class="file-input-border">
-          <v-file-input
-            class="artwork-upload-button add-artwork-image-button"
-            accept="image/jpeg,image/png,image/gif"
-            hide-input
-            prepend-icon="mdi-camera-plus"
-            @change="processAndSetImage"
-          ></v-file-input>
-        </v-responsive>
       </div>
     </div>
   </div>
@@ -138,6 +127,14 @@ export default class AvatarUploadInput extends Vue {
   }
 
   @Emit('dirty') onDirty() {}
+
+  get src() {
+    return this.value?.url || ''
+  }
+
+  get imageType() {
+    return this.value?.imageType || ''
+  }
 
   mounted() {
     if (this.value) {
@@ -282,9 +279,8 @@ export default class AvatarUploadInput extends Vue {
 }
 
 .file-input-border {
-  border: 1px dashed black;
-  height: 100%;
-  border-radius: 50%;
+  border: 1px dashed;
+  border-color: black !important;
 }
 
 .crop-actions {
