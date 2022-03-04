@@ -75,11 +75,8 @@ export default class AvatarUploadDialog
       )
 
       if (avatar) {
-        const guid = uuidv4()
-
         this.asset = {
-          guid,
-          imageType: avatar.type,
+          type: avatar.type,
           url: avatar.src
         }
       }
@@ -91,7 +88,7 @@ export default class AvatarUploadDialog
       this.isUploading = true
       this.info = 'Processing avatar...'
 
-      const type = this.asset.imageType
+      const type = this.asset.type
       const blob = await fetch(this.asset.url).then(r => r.blob())
       const buffer = await readFileAsArrayBufferAsync(blob)
 

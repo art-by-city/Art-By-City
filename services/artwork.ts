@@ -1,9 +1,13 @@
 import { Context } from '@nuxt/types'
 import Transaction from 'arweave/node/lib/transaction'
-import { DataItem } from 'arbundles'
 
-import { Artwork, FeedItem } from '~/types'
-import { uuidv4 } from '~/helpers'
+import {
+  Artwork,
+  ArtworkCreationOptions,
+  FeedItem,
+  LegacyArtwork
+} from '~/types'
+import { readFileAsArrayBufferAsync, uuidv4 } from '~/helpers'
 import {
   ArtworkFactory,
   ArtworkManifestFactory,
@@ -23,21 +27,34 @@ export default class ArtworkService extends TransactionService {
     this.$likesService = context.$likesService
   }
 
-  async createArtworkTransaction(artwork: Artwork): Promise<Transaction> {
+  async createArtworkTransaction(artwork: ArtworkCreationOptions):
+    Promise<Transaction> {
     const signer = await SignerFactory.create()
 
-    const imageDataItems: DataItem[] = []
-    for (let i = 0; i < artwork.images.length; i++) {
-      imageDataItems.push(
-        await DataItemFactory.create(
-          JSON.stringify({ src: artwork.images[i].dataUrl }),
-          signer,
-          [{ name: 'Content-Type', value: 'application/json'/*image.imageType*/ }]
-        )
-      )
-    }
+    const images = await Promise.all(
+      artwork.images.map(async ({ url, type }) => {
+        const blob = await fetch(url).then(r => r.blob())
+        const buffer = await readFileAsArrayBufferAsync(blob)
 
-    const manifest = ArtworkManifestFactory.create(artwork, imageDataItems)
+        const image = new Uint8Array(buffer)
+        const preview = new Uint8Array(buffer)
+
+        return [
+          await DataItemFactory.create(
+            preview,
+            signer,
+            [{ name: 'Content-Type', value: type }]
+          ),
+          await DataItemFactory.create(
+            image,
+            signer,
+            [{ name: 'Content-Type', value: type }]
+          )
+        ]
+      })
+    )
+
+    const manifest = ArtworkManifestFactory.create(artwork, images)
     const manifestDataItem = await DataItemFactory.create(
       JSON.stringify(manifest),
       signer,
@@ -50,7 +67,7 @@ export default class ArtworkService extends TransactionService {
       ]
     )
 
-    const bundle = BundleFactory.create([ manifestDataItem, ...imageDataItems ])
+    const bundle = BundleFactory.create([ manifestDataItem, ...images.flat() ])
     const tx = await this.$arweave.createTransaction({
       data: bundle.getRaw()
     })
@@ -63,7 +80,7 @@ export default class ArtworkService extends TransactionService {
   }
 
   async fetchByTxIdOrSlug(txIdOrSlug: string, owner: string):
-    Promise<Artwork | null> {
+    Promise<Artwork | LegacyArtwork | null> {
     const result = await this.transactionFactory.searchTransactions(
       'artwork',
       owner,
@@ -84,7 +101,7 @@ export default class ArtworkService extends TransactionService {
       : null
   }
 
-  async fetch(id: string): Promise<Artwork | null> {
+  async fetch(id: string): Promise<Artwork | LegacyArtwork | null> {
     try {
       // const txDataString = await this.$arweave.transactions.getData(id, {
       //   decode: true
@@ -96,7 +113,7 @@ export default class ArtworkService extends TransactionService {
       const buffer = Buffer.from(res.data, 'base64')
       const txData = JSON.parse(buffer.toString())
 
-      return new ArtworkFactory().create({ id, ...txData })
+      return new ArtworkFactory().build(id, txData)
     } catch (error) {
       console.error(error)
 

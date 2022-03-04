@@ -43,7 +43,7 @@
                   aspect-ratio="1.7"
                   max-height="300px"
                   contain
-                  :src="image.dataUrl"
+                  :src="image.url"
                   class="clickable"
                 >
                   <v-overlay absolute :value="hoverProps.hover">
@@ -191,7 +191,7 @@ import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
 import Transaction from 'arweave/web/lib/transaction'
 
-import { Artwork, ArtworkImage } from '~/types'
+import { ArtworkCreationOptions, URLArtworkImage } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from
@@ -219,19 +219,15 @@ export default class ArtworkEditForm extends Vue {
       resetValidation: () => void
     }
   }
-  artwork: Artwork = {
-    id: '',
-    creator: {
-      address: this.$auth.user?.address || ''
-    },
+  artwork: ArtworkCreationOptions = {
+    creator: this.$auth.user?.address || '',
     title: '',
     slug: '',
     description: '',
-    hashtags: [],
     images: []
   }
   cropMode: boolean = false
-  cropImage?: ArtworkImage
+  cropImage?: URLArtworkImage
   cropImageIndex?: number
   cropper?: Cropper
   valid = false
@@ -313,7 +309,7 @@ export default class ArtworkEditForm extends Vue {
   }
 
   get slugBase(): string {
-    const username = this.$auth.user.username || this.artwork.creator.address
+    const username = this.$auth.user.username || this.artwork.creator
 
     return `artby.city/${username}/`
   }
@@ -362,9 +358,12 @@ export default class ArtworkEditForm extends Vue {
       this.cropper.destroy()
     }
     this.$nextTick(() => {
-      this.cropper = new Cropper(document.getElementById('cropImage') as HTMLImageElement, {
-        viewMode: 1
-      })
+      this.cropper = new Cropper(
+        document.getElementById('cropImage') as HTMLImageElement,
+        {
+          viewMode: 1
+        }
+      )
     })
   }
 
@@ -372,16 +371,18 @@ export default class ArtworkEditForm extends Vue {
   onSaveCropSelection() {
     if (this.cropper && typeof this.cropImageIndex !== 'undefined') {
       const type = 'image/png'
-      this.artwork.images.splice(this.cropImageIndex, 1, {
-        guid: uuidv4(),
-        imageType: type,
-        dataUrl: this.cropper
-          .getCroppedCanvas()
-          .toDataURL(type)
-      })
+      const idx = this.cropImageIndex
+      this.cropper.getCroppedCanvas().toBlob(blob => {
+        if (blob) {
+          this.artwork.images.splice(idx, 1, {
+            guid: uuidv4(),
+            type,
+            url: URL.createObjectURL(blob)
+          })
 
-      this.cropMode = false
-      this.cropper.destroy()
+          this.cropMode = false
+        }
+      })
     }
   }
 
@@ -442,36 +443,18 @@ export default class ArtworkEditForm extends Vue {
     }
   }
 
-  private async processArtworkImage(image: File): Promise<ArtworkImage> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onerror = async (error) => {
-        reject(error)
-      }
-      reader.onload = async (evt) => {
-        if (!evt.target) {
-          reject('Error reading file')
-          return
-        }
-
-        resolve({
-          guid: uuidv4(),
-          dataUrl: reader.result?.toString() || '',
-          imageType: image.type
-        })
-      }
-      reader.readAsDataURL(image)
-    })
-  }
-
   private async processAndSetArtworkImage(image: File, index?: number) {
-    const processedImage = await this.processArtworkImage(image)
+    const urlImage = {
+      guid: uuidv4(),
+      type: image.type,
+      url: URL.createObjectURL(image)
+    }
 
     if (typeof index === 'undefined') {
       index = this.artwork.images.length
-      this.artwork.images.push(processedImage)
+      this.artwork.images.push(urlImage)
     } else {
-      this.artwork.images[index] = processedImage
+      this.artwork.images[index] = urlImage
     }
 
     if (index === 0) {

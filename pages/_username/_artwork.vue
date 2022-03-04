@@ -1,8 +1,9 @@
 <template>
   <div>
-    <v-container v-if="artwork && !isUserAgentBot">
+    <v-container v-if="artwork && !dontEmbedImages">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
         <v-img
+          v-if="!artwork.version"
           class="preview-artwork"
           max-height="75vh"
           max-width="75vw"
@@ -10,6 +11,19 @@
           contain
           @click="onPreviewArtworkClicked"
         ></v-img>
+        <v-img
+          v-else
+          class="preview-artwork"
+          max-height="75vh"
+          max-width="75vw"
+          :src="artworkUrlFromId(previewImage)"
+          contain
+          @click="onPreviewArtworkClicked"
+        >
+          <template v-slot:placeholder>
+            <TransactionPlaceholder :txId="previewImage" />
+          </template>
+        </v-img>
       </v-row>
       <v-row
         v-if="artwork.images && artwork.images.length > 1"
@@ -23,12 +37,25 @@
             :key="i"
           >
             <v-img
+              v-if="!artwork.version"
               aspect-ratio="1.7"
               :src="image.dataUrl"
               class="clickable"
               :class="{ 'highlighted': image === previewImage }"
               @click="setPreviewImage(image)"
             >
+            </v-img>
+            <v-img
+              v-else
+              aspect-ratio="1.7"
+              :src="artworkUrlFromId(image.preview)"
+              class="clickable"
+              :class="{ 'highlighted': image.preview === previewImage }"
+              @click="setPreviewImage(image.preview)"
+            >
+              <template v-slot:placeholder>
+                <TransactionPlaceholder :txId="image.preview" />
+              </template>
             </v-img>
           </div>
         </div>
@@ -47,7 +74,7 @@
             <strong>Created by</strong>
             &nbsp;
             <nuxt-link
-              :to="`/${username || artwork.creator.address}`"
+              :to="`/${username || artwork.creator.address || artwork.creator}`"
               class="text-truncate"
             >
               {{ displayName }}
@@ -123,17 +150,13 @@
               :ownerDisplayName="displayName"
             />
           </div>
-          <!--
-            <div class="text-lowercase">{{ artwork.type }}</div>
-            <div class="text-lowercase">{{ hashtagsString }}</div>
-          -->
         </v-col>
       </v-row>
 
       <ArtworkZoomDialog
         v-if="previewImage"
         :show.sync="zoom"
-        :src="previewImage.dataUrl || ''"
+        :src="previewImage.dataUrl || artworkUrlFromId(previewImage) ||''"
       />
     </v-container>
     <v-container v-else>
@@ -166,7 +189,8 @@ import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
 import {
   Artwork,
-  ArtworkImage,
+  LegacyArtwork,
+  LegacyArtworkImage,
   UserTransaction,
   SetUserTransactionStatusPayload,
   Profile
@@ -187,15 +211,18 @@ import ProgressService from '~/services/progress/service'
 export default class ArtworkPage extends FormPageComponent {
   head() {
     if (!this.artwork) { return {} }
-
-    const usernameOrAddress = this.username || this.artwork.creator.address
+    const creator = this.artwork.version === 0
+      ? this.artwork.creator.address
+      : this.artwork.creator
+    const usernameOrAddress = this.username || creator
     const txIdOrSlug = this.artwork.slug || this.artwork.id
 
     const title = `${this.artwork.title} by ${this.displayName}`
     const url =
       `${this.$config.baseUrl}/${usernameOrAddress}/${txIdOrSlug}`
-    const thumbnailUrl =
-      `${this.$config.baseUrl}/api/artwork/${this.artwork.creator.address}/${txIdOrSlug}`
+    const thumbnailUrl = this.artwork.version === 0
+      ? `${this.$config.baseUrl}/api/artwork/${creator}/${txIdOrSlug}`
+      : this.artwork.images[0].preview
     const twitter = this.profile?.twitter || ''
 
     return {
@@ -219,16 +246,15 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
-  artwork: Artwork | null = null
+  artwork: Artwork | LegacyArtwork | null = null
   profile: Profile | null = null
   username: string | null = null
-  previewImage: ArtworkImage | null = null
-  cachedArtwork!: Artwork
+  previewImage: string | LegacyArtworkImage | null = null
   zoom = false
   txIdOrSlug: string = this.$route.params.artwork
   txId?: string
   tx: UserTransaction | null = null
-  isUserAgentBot: boolean = false
+  dontEmbedImages: boolean = false
 
   get displayName() {
     if (this.profile?.displayName) {
@@ -239,14 +265,23 @@ export default class ArtworkPage extends FormPageComponent {
       return `@${this.username}`
     }
 
-    return this.artwork?.creator.address || ''
+    return this.artwork
+      ? this.artwork.version === 0
+        ? this.artwork.creator.address
+        : this.artwork.creator
+      : ''
+  }
+
+  artworkUrlFromId(id: string) {
+    const { protocol, host, port } = this.$arweave.api.config
+    return `${protocol}://${host}:${port}/${id}`
   }
 
   async fetch() {
     if (process.server) {
       const userAgent = this.$nuxt.context.req.headers['user-agent']
       if (userAgent?.toLowerCase().startsWith('twitterbot')) {
-        this.isUserAgentBot = true
+        this.dontEmbedImages = true
       }
     }
 
@@ -265,15 +300,13 @@ export default class ArtworkPage extends FormPageComponent {
         )
 
         if (artwork) {
-          if (this.isUserAgentBot) {
+          if (this.dontEmbedImages) {
             artwork.images = []
           }
 
           this.artwork = artwork
           this.username = username || null
-          this.profile = await this.$profileService.fetchProfile(
-            artwork.creator.address
-          )
+          this.profile = await this.$profileService.fetchProfile(address)
           this.setPreviewImage()
         } else {
           this.txId = this.txIdOrSlug
@@ -300,11 +333,7 @@ export default class ArtworkPage extends FormPageComponent {
     }
   }
 
-  get hashtagsString() {
-    return this.artwork?.hashtags.map(h => `#${h}`).join(', ') || ''
-  }
-
-  setPreviewImage(image?: ArtworkImage) {
+  setPreviewImage(image?: LegacyArtworkImage | string) {
     if (image) {
       this.previewImage = image
     } else if (
@@ -312,7 +341,9 @@ export default class ArtworkPage extends FormPageComponent {
       && this.artwork.images
       && this.artwork.images.length > 0
     ) {
-      this.previewImage = this.artwork.images[0]
+      this.previewImage = this.artwork.version === 0
+        ? this.artwork.images[0]
+        : this.artwork.images[0].preview
     } else {
       this.previewImage = null
     }

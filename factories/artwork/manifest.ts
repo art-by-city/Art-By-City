@@ -1,10 +1,14 @@
 import { DataItem } from 'arbundles'
 
-import { Artwork, ArtworkManifest } from '~/types'
+import { ArtworkCreationOptions, ArtworkManifest } from '~/types'
 
 export default class ArtworkManifestFactory {
-  static create(artwork: Artwork, imageItems: DataItem[]): ArtworkManifest {
+  static create(
+    artwork: ArtworkCreationOptions,
+    imageItems: DataItem[][]
+  ): ArtworkManifest {
     return {
+      version: 1,
       published: new Date(),
       created: artwork.created,
       creator: artwork.creator,
@@ -15,10 +19,10 @@ export default class ArtworkManifestFactory {
       medium: artwork.medium,
       city: artwork.city?.toLowerCase(),
       license: artwork.license,
-      images: imageItems.map(item => {
+      images: imageItems.map(([image, preview]) => {
         return {
-          id: item.id,
-          preview: item.id
+          image: image.id,
+          preview: preview.id
         }
       })
     }

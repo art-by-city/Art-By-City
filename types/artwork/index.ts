@@ -1,43 +1,43 @@
-import { TrackableEntity } from '../common'
+import { TrackableEntity } from '..'
 
-export interface Artwork {
-  id: string
-  published?: Date
+export * from './legacy'
+
+export interface ArtworkCreationOptions {
   created?: number
-  creator: ArtworkCreator
+  creator: string
   title: string
   slug: string
   description?: string
   type?: string
-  hashtags: string[]
-  images: ArtworkImage[]
+  medium?: string
+  city?: string
+  license?: License
+  images: (URLArtworkImage & TrackableEntity)[]
+}
+
+export interface URLArtworkImage { url: string, type: string }
+
+export interface ArtworkManifest {
+  version: 1
+  published: Date
+  created?: number
+  creator: string
+  title: string
+  slug: string
+  description?: string
+  type?: string
+  images: ArtworkImageWithPreview[]
   license?: License
   medium?: string
   city?: string
 }
 
-export interface ArtworkCreator {
-  address: string
+export interface Artwork extends ArtworkManifest {
+  id: string
+  images: (ArtworkImageWithPreview & TrackableEntity)[]
 }
 
-export type ArtworkImage = DataURLArtworkImage
-
-export interface BaseArtworkImage extends TrackableEntity {
-  id?: string
-  imageType: string
-}
-
-export interface ArrayBufferArtworkImage extends BaseArtworkImage {
-  buffer: ArrayBuffer
-}
-
-export interface URLArtworkImage extends BaseArtworkImage {
-  url: string
-}
-
-export interface DataURLArtworkImage extends BaseArtworkImage {
-  dataUrl: string
-}
+type ArtworkImageWithPreview = { image: string, preview: string }
 
 export interface License {
   reference: string
@@ -45,23 +45,6 @@ export interface License {
   name: string
   licenseId: string
   seeAlso: string[]
-}
-
-export interface ArtworkManifest {
-  published: Date
-  created?: number
-  creator: ArtworkCreator
-  title: string
-  slug: string
-  description?: string
-  type?: string
-  images: {
-    id: string
-    preview: string
-  }[]
-  license?: License
-  medium?: string
-  city?: string
 }
 
 /**

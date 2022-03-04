@@ -95,9 +95,7 @@ export default class AvatarUploadInput extends Vue {
       const guid = uuidv4()
 
       if (type === 'image/gif') {
-        return {
-          guid, imageType: type, url
-        }
+        return { type, url }
       }
 
       if (!type.startsWith('image/')) {
@@ -111,11 +109,7 @@ export default class AvatarUploadInput extends Vue {
         }).toBlob((blob) => {
           if (blob) {
             URL.revokeObjectURL(url)
-            resolve({
-              guid,
-              imageType: type,
-              url: URL.createObjectURL(blob)
-            })
+            resolve({ type, url: URL.createObjectURL(blob) })
           }
         }, type)
       })
@@ -133,7 +127,7 @@ export default class AvatarUploadInput extends Vue {
   }
 
   get imageType() {
-    return this.value?.imageType || ''
+    return this.value?.type || ''
   }
 
   mounted() {
@@ -209,7 +203,7 @@ export default class AvatarUploadInput extends Vue {
   @debounce
   onSaveCropSelection() {
     if (this.cropper && this.value) {
-      this.onAvatarChanged(this.value.url, this.value.imageType)
+      this.onAvatarChanged(this.value.url, this.value.type)
       this.toggleCropMode(false)
     }
   }
