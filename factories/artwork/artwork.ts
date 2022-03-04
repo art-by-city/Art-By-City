@@ -19,6 +19,10 @@ export default class ArtworkFactory implements IFactory<Artwork> {
       throw new FactoryCreationError('missing images')
     }
 
+    if (!opts.slug) {
+      throw new FactoryCreationError('missing slug')
+    }
+
     const artwork: Artwork = {
       id: opts.id,
       published: opts.published,
@@ -26,6 +30,7 @@ export default class ArtworkFactory implements IFactory<Artwork> {
       title: opts.title,
       hashtags: opts.hashtags || [],
       images: opts.images,
+      slug: opts.slug,
       ...opts
     }
 

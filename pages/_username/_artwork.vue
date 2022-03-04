@@ -133,7 +133,7 @@
       <ArtworkZoomDialog
         v-if="previewImage"
         :show.sync="zoom"
-        :src="previewImage.dataUrl"
+        :src="previewImage.dataUrl || ''"
       />
     </v-container>
     <v-container v-else>

@@ -1,12 +1,18 @@
 import { Context } from '@nuxt/types'
 import Transaction from 'arweave/node/lib/transaction'
-import { Bundle, DataItem } from 'arbundles'
+import { DataItem } from 'arbundles'
 
 import { Artwork, FeedItem } from '~/types'
 import { uuidv4 } from '~/helpers'
-import { TransactionService, LikesService } from './'
-import { ArtworkFactory, BundleFactory } from '../factories'
+import {
+  ArtworkFactory,
+  ArtworkManifestFactory,
+  BundleFactory,
+  DataItemFactory,
+  SignerFactory
+} from '~/factories'
 import { LIKED_ENTITY_TAG } from './likes'
+import { TransactionService, LikesService } from './'
 
 export default class ArtworkService extends TransactionService {
   $likesService!: LikesService
@@ -18,59 +24,40 @@ export default class ArtworkService extends TransactionService {
   }
 
   async createArtworkTransaction(artwork: Artwork): Promise<Transaction> {
-    const manifest: Partial<Artwork> = { ...artwork }
-
-    delete manifest.id
-    delete manifest.hashtags
-    manifest.published = new Date()
-    if (manifest.city) {
-      manifest.city = manifest.city.toLowerCase()
-    }
-    if (!manifest.images) {
-      manifest.images = []
-    }
-    const tags: { tag: string, value: string }[] = [
-      { tag: 'Bundle-Format', value: 'binary' },
-      { tag: 'Bundle-Version', value: '2.0.0' }
-    ]
-    if (artwork.slug) {
-      tags.push({ tag: 'slug', value: artwork.slug })
-    }
+    const signer = await SignerFactory.create()
 
     const imageDataItems: DataItem[] = []
     for (let i = 0; i < artwork.images.length; i++) {
-      const image = artwork.images[i]
-      const data = JSON.stringify({ src: image.dataUrl })
-      const dataItem = await this.createAndSignDataItem(
-        data,
-        [{ name: 'Content-Type', value: 'application/json'/*image.imageType*/ }]
+      imageDataItems.push(
+        await DataItemFactory.create(
+          JSON.stringify({ src: artwork.images[i].dataUrl }),
+          signer,
+          [{ name: 'Content-Type', value: 'application/json'/*image.imageType*/ }]
+        )
       )
-      imageDataItems.push(dataItem)
-      manifest.images[i] = {
-        guid: uuidv4(),
-        dataUrl: imageDataItems[i].id,
-        imageType: artwork.images[0].imageType
-      }
     }
 
-    const manifestDataItem = await this.createAndSignDataItem(
-      JSON.stringify(manifest)
+    const manifest = ArtworkManifestFactory.create(artwork, imageDataItems)
+    const manifestDataItem = await DataItemFactory.create(
+      JSON.stringify(manifest),
+      signer,
+      [
+        { name: 'Content-Type', value: 'application/json' },
+        { name: 'slug', value: artwork.slug },
+        { name: 'Category', value: 'artwork' },
+        { name: 'App-Name', value: this.config.app.name },
+        { name: 'App-Version', value: this.config.app.version }
+      ]
     )
 
-    const dataItems = [ manifestDataItem, ...imageDataItems ]
-
-    for (let i = 0; i < dataItems.length; i++) {
-      const dataItem = dataItems[i]
-      console.log('data item id', dataItem.id, dataItem.signature)
-    }
-
-    const bundle = await BundleFactory.create(dataItems)
-
-    const tx = await this.transactionFactory.buildEntityTransaction(
-      'artwork',
-      bundle.getRaw(),
-      tags
-    )
+    const bundle = BundleFactory.create([ manifestDataItem, ...imageDataItems ])
+    const tx = await this.$arweave.createTransaction({
+      data: bundle.getRaw()
+    })
+    tx.addTag('App-Name', this.config.app.name)
+    tx.addTag('App-Version', this.config.app.version)
+    tx.addTag('Bundle-Format', 'binary')
+    tx.addTag('Bundle-Version', '2.0.0')
 
     return tx
   }
@@ -81,17 +68,14 @@ export default class ArtworkService extends TransactionService {
       'artwork',
       owner,
       {
-        // type: 'application/json',
+        type: 'application/json',
         sort: 'HEIGHT_DESC',
         tags: [{ tag: 'slug', value: txIdOrSlug }]
       }
     )
 
-    console.log('artwork service fetch result', result.transactions.length)
-
     if (result.transactions[0]) {
-      // return await this.fetch(result.transactions[0].id)
-      return await this.fetchBundle(result.transactions[0].id)
+      return await this.fetch(result.transactions[0].id)
     }
 
     // If no slug matches, try treating it as a txid
@@ -100,31 +84,19 @@ export default class ArtworkService extends TransactionService {
       : null
   }
 
-  async fetchBundle(id: string): Promise<null> {
-    console.log(`ArtworkService->fetchBundle(${id})`)
-
-    const data = await this.$arweave.transactions.getData(id, { decode: true }) as Uint8Array
-    console.log('ArtworkService->fetchBundle() data.length', data.length, data.byteLength)
-    const buffer = Buffer.from(data)
-    const bundle = new Bundle(buffer)
-    console.log('ArtworkService->fetchBundle() bundle txIds', bundle.getIds())
-
-    return null
-  }
-
   async fetch(id: string): Promise<Artwork | null> {
     try {
-      const txDataString = await this.$arweave.transactions.getData(id, {
-        decode: true,
-        string: true
-      }) as string
+      // const txDataString = await this.$arweave.transactions.getData(id, {
+      //   decode: true
+      // })
+      const { protocol, host, port } = this.config.api
+      const res = await this.context.$axios.get(
+        `${protocol}://${host}:${port}/tx/${id}/data`
+      )
+      const buffer = Buffer.from(res.data, 'base64')
+      const txData = JSON.parse(buffer.toString())
 
-      const txData = JSON.parse(txDataString)
-      txData.id = id
-
-      const artwork = new ArtworkFactory().create(txData)
-
-      return artwork
+      return new ArtworkFactory().create({ id, ...txData })
     } catch (error) {
       console.error(error)
 

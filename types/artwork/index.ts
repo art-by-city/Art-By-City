@@ -6,7 +6,7 @@ export interface Artwork {
   created?: number
   creator: ArtworkCreator
   title: string
-  slug?: string
+  slug: string
   description?: string
   type?: string
   hashtags: string[]
@@ -45,6 +45,23 @@ export interface License {
   name: string
   licenseId: string
   seeAlso: string[]
+}
+
+export interface ArtworkManifest {
+  published: Date
+  created?: number
+  creator: ArtworkCreator
+  title: string
+  slug: string
+  description?: string
+  type?: string
+  images: {
+    id: string
+    preview: string
+  }[]
+  license?: License
+  medium?: string
+  city?: string
 }
 
 /**

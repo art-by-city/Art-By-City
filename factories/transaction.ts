@@ -22,7 +22,7 @@ export interface TransactionSearchResults {
 export default class TransactionFactory {
   private arweave!: Arweave
   private config!: ArweaveAppConfig
-  private ardb!: ArDB
+  ardb!: ArDB
 
   constructor(arweave: Arweave, ardb: ArDB, config: ArweaveAppConfig) {
     this.arweave = arweave
