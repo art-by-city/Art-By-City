@@ -92,7 +92,6 @@ export default class AvatarUploadInput extends Vue {
     Promise<URLArtworkImage | void> {
     if (this.cropper) {
       this.onDirty()
-      const guid = uuidv4()
 
       if (type === 'image/gif') {
         return { type, url }

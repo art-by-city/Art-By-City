@@ -49,7 +49,7 @@
                   <v-overlay absolute :value="hoverProps.hover">
                     <v-file-input
                       class="artwork-upload-button"
-                      accept="image/*"
+                      :accept="accept"
                       hide-input
                       prepend-icon="mdi-camera"
                       @change="onArtworkImageChanged(i, $event)"
@@ -94,7 +94,7 @@
               >
                 <v-file-input
                   class="artwork-upload-button add-artwork-image-button"
-                  accept="image/*"
+                  :accept="accept"
                   hide-input
                   prepend-icon="mdi-camera-plus"
                   @change="onAddArtworkImageClicked"
@@ -176,6 +176,7 @@
           :loading="isUploading"
           :signed="isSigned"
           :txTotal="txTotal"
+          :info="info"
           @sign="onSign"
           @cancel="onCancel"
           @submit="onSubmit"
@@ -235,6 +236,10 @@ export default class ArtworkEditForm extends Vue {
   isUploading: boolean = false
   isSigned: boolean = false
   transaction: Transaction | null = null
+  info: string = ''
+
+  readonly accept = 'image/apng,image/avif,image/gif,image/jpeg,image/png,'
+                  + 'image/svg+xml,image/webp'
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
   @Emit('save') save(txId: string, slug?: string) {
@@ -403,17 +408,21 @@ export default class ArtworkEditForm extends Vue {
     if (this.valid) {
       this.isUploading = true
 
+      this.info = 'Building Artwork transaction...'
+      const startBuild = Date.now()
       this.transaction = await this.$artworkService.createArtworkTransaction(
         this.artwork
       )
+      const endBuild = Date.now()
+      console.log('Building Artwork tx took', endBuild - startBuild)
 
-      // if (!this.transaction) {
-      //   this.isUploading = false
-      //   return
-      // }
+      this.info = 'Waiting on signature...'
+      const startSign = Date.now()
+      this.isSigned = await this.$arweaveService.sign(this.transaction, true)
+      const endSign = Date.now()
+      console.log('Signing tx took', endSign - startSign, this.transaction.id)
 
-      this.isSigned = await this.$arweaveService.sign(this.transaction)
-
+      this.info = ''
       this.isUploading = false
     }
   }
@@ -435,6 +444,7 @@ export default class ArtworkEditForm extends Vue {
           if (err) {
             console.error('Error submitting user tx', err)
             this.$toastService.error('Error submitting user tx: ' + err.message)
+            this.isUploading = false
           } else {
             return this.save(txId, this.artwork.slug)
           }

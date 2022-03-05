@@ -1,8 +1,9 @@
 import { Context } from '@nuxt/types'
 import Arweave from 'arweave'
 import Transaction from 'arweave/web/lib/transaction'
+import * as ArweaveUtils from 'arweave/web/lib/utils'
 
-
+import { SignerFactory } from '~/factories'
 import { ArweaveConfig } from '~/types'
 
 export default class ArweaveService {
@@ -16,9 +17,13 @@ export default class ArweaveService {
     this.context = context
   }
 
-  async sign(transaction: Transaction): Promise<boolean> {
+  async sign(transaction: Transaction, manual: boolean = false): Promise<boolean> {
     try {
-      await this.$arweave.transactions.sign(transaction)
+      if (!manual) {
+        await this.$arweave.transactions.sign(transaction)
+      } else {
+        await this.signManually(transaction)
+      }
     } catch (error) {
       error.message
         ? this.context.$toastService.error(error.message)
@@ -28,6 +33,23 @@ export default class ArweaveService {
     }
 
     return true
+  }
+
+  private async signManually(tx: Transaction) {
+    const signer = await SignerFactory.create()
+    const owner = ArweaveUtils.bufferTob64(signer.publicKey)
+
+    tx.setOwner(owner)
+    const txSignatureData = await tx.getSignatureData()
+    const rawSignature = await signer.sign(txSignatureData)
+    const id = new Uint8Array(
+      await window.crypto.subtle.digest('SHA-256', rawSignature)
+    )
+    tx.setSignature({
+      id: ArweaveUtils.bufferTob64Url(id),
+      owner,
+      signature: ArweaveUtils.bufferTob64Url(rawSignature),
+    })
   }
 }
 

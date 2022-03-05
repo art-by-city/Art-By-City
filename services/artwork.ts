@@ -7,70 +7,30 @@ import {
   FeedItem,
   LegacyArtwork
 } from '~/types'
-import { readFileAsArrayBufferAsync, uuidv4 } from '~/helpers'
-import {
-  ArtworkFactory,
-  ArtworkManifestFactory,
-  BundleFactory,
-  DataItemFactory,
-  SignerFactory
-} from '~/factories'
+import { uuidv4 } from '~/helpers'
+import { ArtworkFactory, ArtworkBundleFactory } from '~/factories'
 import { LIKED_ENTITY_TAG } from './likes'
 import { TransactionService, LikesService } from './'
 
 export default class ArtworkService extends TransactionService {
   $likesService!: LikesService
+  artworkBundleFactory!: ArtworkBundleFactory
 
   constructor(context: Context) {
     super(context)
 
     this.$likesService = context.$likesService
+    this.artworkBundleFactory = new ArtworkBundleFactory(
+      this.config.app.name,
+      this.config.app.version
+    )
   }
 
-  async createArtworkTransaction(artwork: ArtworkCreationOptions):
-    Promise<Transaction> {
-    const signer = await SignerFactory.create()
-
-    const images = await Promise.all(
-      artwork.images.map(async ({ url, type }) => {
-        const blob = await fetch(url).then(r => r.blob())
-        const buffer = await readFileAsArrayBufferAsync(blob)
-
-        const image = new Uint8Array(buffer)
-        const preview = new Uint8Array(buffer)
-
-        return [
-          await DataItemFactory.create(
-            preview,
-            signer,
-            [{ name: 'Content-Type', value: type }]
-          ),
-          await DataItemFactory.create(
-            image,
-            signer,
-            [{ name: 'Content-Type', value: type }]
-          )
-        ]
-      })
-    )
-
-    const manifest = ArtworkManifestFactory.create(artwork, images)
-    const manifestDataItem = await DataItemFactory.create(
-      JSON.stringify(manifest),
-      signer,
-      [
-        { name: 'Content-Type', value: 'application/json' },
-        { name: 'slug', value: artwork.slug },
-        { name: 'Category', value: 'artwork' },
-        { name: 'App-Name', value: this.config.app.name },
-        { name: 'App-Version', value: this.config.app.version }
-      ]
-    )
-
-    const bundle = BundleFactory.create([ manifestDataItem, ...images.flat() ])
-    const tx = await this.$arweave.createTransaction({
-      data: bundle.getRaw()
-    })
+  async createArtworkTransaction(
+    opts: ArtworkCreationOptions
+  ): Promise<Transaction> {
+    const bundle = await this.artworkBundleFactory.create(opts)
+    const tx = await this.$arweave.createTransaction({ data: bundle.getRaw() })
     tx.addTag('App-Name', this.config.app.name)
     tx.addTag('App-Version', this.config.app.version)
     tx.addTag('Bundle-Format', 'binary')
@@ -79,8 +39,10 @@ export default class ArtworkService extends TransactionService {
     return tx
   }
 
-  async fetchByTxIdOrSlug(txIdOrSlug: string, owner: string):
-    Promise<Artwork | LegacyArtwork | null> {
+  async fetchByTxIdOrSlug(
+    txIdOrSlug: string,
+    owner: string
+  ): Promise<Artwork | LegacyArtwork | null> {
     const result = await this.transactionFactory.searchTransactions(
       'artwork',
       owner,
@@ -103,9 +65,6 @@ export default class ArtworkService extends TransactionService {
 
   async fetch(id: string): Promise<Artwork | LegacyArtwork | null> {
     try {
-      // const txDataString = await this.$arweave.transactions.getData(id, {
-      //   decode: true
-      // })
       const { protocol, host, port } = this.config.api
       const res = await this.context.$axios.get(
         `${protocol}://${host}:${port}/tx/${id}/data`

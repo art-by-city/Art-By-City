@@ -31,7 +31,7 @@ export default class UploadPage extends FormPageComponent {
   onSave({ txId, slug }: { txId: string, slug: string }) {
     const profileUrl = this.$auth.user.username || this.$auth.user.address
     if (profileUrl) {
-      this.$router.push(`/${profileUrl}/${slug || txId}`)
+      this.$router.push(`/${profileUrl}/${slug || txId}?txId=${txId}`)
     }
   }
 

@@ -144,7 +144,7 @@
         <v-col cols="5">
           <div v-if="$auth.loggedIn" style="align-self: flex-end">
             <LikeButton
-              :entityOwner="artwork.creator.address"
+              :entityOwner="artwork.creator || artwork.creator.address"
               :entityTxId="artwork.id"
               :entityDescription="artwork.title"
               :ownerDisplayName="displayName"
@@ -166,7 +166,7 @@
             <TransactionConfirmationProgress :utx="tx" />
           </template>
           <template v-else>
-            <!-- <h1>404 Artwork not found :(</h1> -->
+            <h1>404 Artwork not found :(</h1>
           </template>
         </v-col>
       </v-row>
@@ -181,10 +181,7 @@ import LikeButton from '~/components/likes/likeButton.component.vue'
 import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkZoomDialog from
   '~/components/artwork/ArtworkZoomDialog.component.vue'
-import {
-  ArtworkEditControls,
-  ArtworkEditForm
-} from '~/components/artwork/edit'
+import { ArtworkEditForm } from '~/components/artwork/edit'
 import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
 import {
@@ -203,7 +200,6 @@ import ProgressService from '~/services/progress/service'
   components: {
     LikeButton,
     ArtworkZoomDialog,
-    ArtworkEditControls,
     ArtworkEditForm,
     TransactionConfirmationProgress
   }
@@ -272,11 +268,6 @@ export default class ArtworkPage extends FormPageComponent {
       : ''
   }
 
-  artworkUrlFromId(id: string) {
-    const { protocol, host, port } = this.$arweave.api.config
-    return `${protocol}://${host}:${port}/${id}`
-  }
-
   async fetch() {
     if (process.server) {
       const userAgent = this.$nuxt.context.req.headers['user-agent']
@@ -308,8 +299,13 @@ export default class ArtworkPage extends FormPageComponent {
           this.username = username || null
           this.profile = await this.$profileService.fetchProfile(address)
           this.setPreviewImage()
-        } else {
-          this.txId = this.txIdOrSlug
+          if (this.$route.query.txId) {
+            this.$router.replace(
+              `/${this.$route.params.username}/${this.$route.params.artwork}`
+            )
+          }
+        } else if (this.$route.query.txId) {
+          this.txId = this.$route.query.txId.toString()
           this.tx = this.$accessor.transactions.getById(this.txId)
           this.$store.subscribe(async (mutation) => {
             if (mutation.type === `transactions/${SET_TRANSACTION_STATUS}`) {
@@ -331,6 +327,11 @@ export default class ArtworkPage extends FormPageComponent {
     } finally {
       ProgressService.stop()
     }
+  }
+
+  artworkUrlFromId(id: string) {
+    const { protocol, host, port } = this.$arweave.api.config
+    return `${protocol}://${host}:${port}/${id}`
   }
 
   setPreviewImage(image?: LegacyArtworkImage | string) {

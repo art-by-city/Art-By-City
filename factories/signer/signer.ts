@@ -10,9 +10,9 @@ export default class SignerFactory {
       'SIGNATURE',
       'SIGN_TRANSACTION'
     ], APP_INFO)
-    const publicKey = await window.arweaveWallet.getActivePublicKey()
-    const publicKeyBuffer = Buffer.from(publicKey, 'base64')
 
-    return new ArweaveWalletSigner(publicKeyBuffer)
+    const publicKey = await window.arweaveWallet.getActivePublicKey()
+
+    return new ArweaveWalletSigner(Buffer.from(publicKey, 'base64'))
   }
 }
