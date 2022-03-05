@@ -5,7 +5,7 @@
         <img
           id="cropImage"
           class="crop-image"
-          :src="cropImage.dataUrl"
+          :src="cropImage.url"
         />
       </v-row>
       <v-row dense>
@@ -171,12 +171,20 @@
           <LicenseSelector v-model="artwork.license" />
         </v-col>
       </v-row>
+      <v-row dense>
+        <div class="text-caption">
+          Note: Images will have JPEG thumbnail previews generated in 1080p and
+          4k resolutions but will not exceed source image dimensions.
+        </div>
+      </v-row>
       <v-row dense justify="center">
         <TransactionFormControls
           :loading="isUploading"
           :signed="isSigned"
           :txTotal="txTotal"
+          :txSize="txSize"
           :info="info"
+          :pct="uploadPct"
           @sign="onSign"
           @cancel="onCancel"
           @submit="onSubmit"
@@ -237,6 +245,7 @@ export default class ArtworkEditForm extends Vue {
   isSigned: boolean = false
   transaction: Transaction | null = null
   info: string = ''
+  uploadPct?: number | null = null
 
   readonly accept = 'image/apng,image/avif,image/gif,image/jpeg,image/png,'
                   + 'image/svg+xml,image/webp'
@@ -246,6 +255,7 @@ export default class ArtworkEditForm extends Vue {
     return { txId, slug }
   }
   @Emit('cancel') onCancel() {}
+  @Emit('uploading') onUploading(isUploading: boolean) { return isUploading }
 
   rules = {
     required: (value: string = '') => value.length < 1 ? 'Required' : true,
@@ -331,6 +341,12 @@ export default class ArtworkEditForm extends Vue {
     return undefined
   }
 
+  get txSize() {
+    if (this.transaction) {
+      return this.transaction.data_size
+    }
+  }
+
   @debounce
   async onArtworkImageChanged(index: number, image: File | undefined) {
     if (image) {
@@ -355,21 +371,27 @@ export default class ArtworkEditForm extends Vue {
   }
 
   @debounce
-  onCropArtworkImageClicked(index: number) {
+  async onCropArtworkImageClicked(index: number) {
     this.cropMode = true
     this.cropImageIndex = index
     this.cropImage = this.artwork.images[index]
     if (this.cropper) {
       this.cropper.destroy()
     }
-    this.$nextTick(() => {
-      this.cropper = new Cropper(
-        document.getElementById('cropImage') as HTMLImageElement,
-        {
-          viewMode: 1
-        }
-      )
+    await new Promise<void>(resolve => {
+      this.$nextTick(() => {
+        this.cropper = new Cropper(
+          document.getElementById('cropImage') as HTMLImageElement,
+          {
+            viewMode: 1,
+            ready() {
+              resolve()
+            }
+          }
+        )
+      })
     })
+
   }
 
   @debounce
@@ -409,20 +431,22 @@ export default class ArtworkEditForm extends Vue {
       this.isUploading = true
 
       this.info = 'Building Artwork transaction...'
-      const startBuild = Date.now()
+      let processedImageCount = 0
+      this.uploadPct = 0
       this.transaction = await this.$artworkService.createArtworkTransaction(
-        this.artwork
+        this.artwork,
+        ({ idx }: any) => {
+          processedImageCount++
+          // this.info = `Building Artwork transaction... ${processedImageCount} / ${this.artwork.images.length}`
+          this.uploadPct = 100 * (processedImageCount) / this.artwork.images.length
+        }
       )
-      const endBuild = Date.now()
-      console.log('Building Artwork tx took', endBuild - startBuild)
 
       this.info = 'Waiting on signature...'
-      const startSign = Date.now()
       this.isSigned = await this.$arweaveService.sign(this.transaction, true)
-      const endSign = Date.now()
-      console.log('Signing tx took', endSign - startSign, this.transaction.id)
 
       this.info = ''
+      this.uploadPct = null
       this.isUploading = false
     }
   }
@@ -430,7 +454,9 @@ export default class ArtworkEditForm extends Vue {
   async onSubmit() {
     if (this.isSigned && this.transaction) {
       this.isUploading = true
+      this.onUploading(true)
       const txId = this.transaction.id
+      this.uploadPct = 0
       this.$txQueueService.submitUserTransaction(
         this.transaction,
         {
@@ -441,6 +467,9 @@ export default class ArtworkEditForm extends Vue {
           created: new Date().getTime()
         },
         (err?: Error) => {
+          this.info = ''
+          this.uploadPct = null
+          this.onUploading(false)
           if (err) {
             console.error('Error submitting user tx', err)
             this.$toastService.error('Error submitting user tx: ' + err.message)
@@ -448,6 +477,11 @@ export default class ArtworkEditForm extends Vue {
           } else {
             return this.save(txId, this.artwork.slug)
           }
+        },
+        true,
+        (pctComplete: number) => {
+          this.info = `Uploading transaction...`
+          this.uploadPct = pctComplete
         }
       )
     }

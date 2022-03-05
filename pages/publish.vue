@@ -3,6 +3,7 @@
     <v-row justify="center">
       <v-col cols="6">
         <ArtworkEditForm
+          @uploading="onUploading"
           @save="onSave"
           @cancel="onCancel"
         />
@@ -13,6 +14,7 @@
 
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
+import { Location } from 'vue-router'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ArtworkEditForm } from '~/components/artwork/edit'
@@ -28,6 +30,16 @@ export default class UploadPage extends FormPageComponent {
     return { title: 'Publish' }
   }
 
+  isUploading: boolean = false
+
+  beforeRouteLeave(to: any, from: any, next: Function) {
+    if (!this.isUploading) {
+      next()
+    } else {
+      alert('Cannot navigate away while publication upload is in progress.')
+    }
+  }
+
   onSave({ txId, slug }: { txId: string, slug: string }) {
     const profileUrl = this.$auth.user.username || this.$auth.user.address
     if (profileUrl) {
@@ -36,10 +48,13 @@ export default class UploadPage extends FormPageComponent {
   }
 
   onCancel() {
-    if (confirm('Are you sure you want to cancel this upload?')) {
-      // NB: Hard reload the page to clear state and re-render on server
-      this.$router.go(0)
+    if (confirm('Are you sure you want to cancel this publication?')) {
+      this.$router.back()
     }
+  }
+
+  onUploading(isUploading: boolean) {
+    this.isUploading = isUploading
   }
 }
 </script>

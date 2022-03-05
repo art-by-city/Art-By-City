@@ -26,7 +26,7 @@ export interface ArtworkManifest {
   slug: string
   description?: string
   type?: string
-  images: ArtworkImageWithPreview[]
+  images: ArtworkImageWithPreviews[]
   license?: License
   medium?: string
   city?: string
@@ -34,10 +34,14 @@ export interface ArtworkManifest {
 
 export interface Artwork extends ArtworkManifest {
   id: string
-  images: (ArtworkImageWithPreview & TrackableEntity)[]
+  images: (ArtworkImageWithPreviews & TrackableEntity)[]
 }
 
-type ArtworkImageWithPreview = { image: string, preview: string }
+type ArtworkImageWithPreviews = {
+  image: string,
+  preview: string,
+  preview4k: string
+}
 
 export interface License {
   reference: string

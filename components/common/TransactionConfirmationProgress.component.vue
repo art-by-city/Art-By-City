@@ -48,10 +48,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'nuxt-property-decorator'
+import { Component, Emit, Prop, Vue } from 'nuxt-property-decorator'
 
 import { UserTransaction } from '~/types'
-import { debounce } from '~/helpers'
 
 @Component
 export default class TransactionConfirmationProgress extends Vue {
@@ -60,8 +59,12 @@ export default class TransactionConfirmationProgress extends Vue {
     required: true
   }) utx!: UserTransaction
 
+  numConfirmations?: number
+
+  @Emit('confirmed') onConfirmed() {}
+
   get confirmations(): number {
-    return this.utx.confirmations || 0
+    return this.numConfirmations || this.utx.confirmations || 0
   }
 
   get confirmationsPct(): number {
@@ -70,13 +73,28 @@ export default class TransactionConfirmationProgress extends Vue {
     )
   }
 
-  @debounce
-  onResubmitClicked() {
-    this.$accessor.transactions.updateStatus({
-      id: this.utx.id,
-      status: 'PENDING_SUBMISSION',
-      type: this.utx.type
-    })
+  created() {
+    this.$nuxt.$on(
+      'artwork-CONFIRMED',
+      async ({ id, confirmations }: { id: string, confirmations: number }) => {
+        if (id === this.utx.id) {
+          this.numConfirmations = confirmations
+
+          if (confirmations === this.$config.arweave.waitForConfirmations) {
+            this.onConfirmed()
+          }
+        }
+      }
+    )
   }
+
+  // @debounce
+  // onResubmitClicked() {
+  //   this.$accessor.transactions.updateStatus({
+  //     id: this.utx.id,
+  //     status: 'PENDING_SUBMISSION',
+  //     type: this.utx.type
+  //   })
+  // }
 }
 </script>

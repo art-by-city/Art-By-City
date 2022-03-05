@@ -48,10 +48,13 @@
             <v-img
               v-else
               aspect-ratio="1.7"
-              :src="artworkUrlFromId(image.preview)"
+              :src="artworkUrlFromId(image.preview4k || image.preview)"
               class="clickable"
-              :class="{ 'highlighted': image.preview === previewImage }"
-              @click="setPreviewImage(image.preview)"
+              :class="{
+                'highlighted': image.preview4k === previewImage
+                  || image.preview === previewImage
+              }"
+              @click="setPreviewImage(image.preview4k || image.preview)"
             >
               <template v-slot:placeholder>
                 <TransactionPlaceholder :txId="image.preview" />
@@ -163,10 +166,10 @@
       <v-row justify="center">
         <v-col cols="auto">
           <template v-if="tx">
-            <TransactionConfirmationProgress :utx="tx" />
+            <TransactionConfirmationProgress :utx="tx" @confirmed="$fetch" />
           </template>
           <template v-else>
-            <h1>404 Artwork not found :(</h1>
+            <!-- <h1>404 Artwork not found :(</h1> -->
           </template>
         </v-col>
       </v-row>
@@ -344,7 +347,7 @@ export default class ArtworkPage extends FormPageComponent {
     ) {
       this.previewImage = this.artwork.version === 0
         ? this.artwork.images[0]
-        : this.artwork.images[0].preview
+        : this.artwork.images[0].preview4k || this.artwork.images[0].preview
     } else {
       this.previewImage = null
     }
