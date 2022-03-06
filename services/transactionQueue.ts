@@ -189,18 +189,20 @@ export default class TransactionQueueService extends ArweaveService {
       }
     }
 
-    this.$accessor.transactions.updateStatus({
+    const txStatus = {
       id: utx.id,
       status,
       confirmations,
       type: utx.type
-    })
+    }
 
-    if (status === 'CONFIRMED' || status === 'DROPPED') {
+    this.$accessor.transactions.updateStatus(txStatus)
+
+    if (['CONFIRMING', 'CONFIRMED', 'DROPPED'].includes(status)) {
       if (utx.type === 'like') {
         window.$nuxt.$emit(`${utx.type}-${status}`, utx.entityId)
       } else {
-        window.$nuxt.$emit(`${utx.type}-${status}`)
+        window.$nuxt.$emit(`${utx.type}-${status}`, txStatus)
       }
     }
 
@@ -210,18 +212,38 @@ export default class TransactionQueueService extends ArweaveService {
   async submitUserTransaction(
     tx: Transaction,
     utx: UserTransaction,
-    done: Function
+    done: Function,
+    chunk: boolean = false,
+    infoCb?: Function
   ) {
-    const res = await this.$arweave.transactions.post(tx)
+    let error, status: number, statusText: string
 
-    let error
-    if ([200, 202].includes(res.status)) {
+    if (!chunk) {
+      const res = await this.$arweave.transactions.post(tx)
+
+      status = res.status
+      statusText = res.statusText
+    } else {
+      const uploader = await this.$arweave.transactions.getUploader(tx)
+
+      while (!uploader.isComplete) {
+        await uploader.uploadChunk()
+        if (infoCb) {
+          infoCb(uploader.pctComplete)
+        }
+      }
+
+      status = uploader.lastResponseStatus
+      statusText = uploader.lastResponseError
+    }
+
+    if ([200, 202].includes(status)) {
       this.$accessor.transactions.queueTransaction(utx)
-    } else if ([410].includes(res.status)) {
+    } else if ([410].includes(status)) {
       error = new Error('Insufficient funds')
     } else {
       error = new Error(
-        `Failed to submit tx (${res.status}): ${res.statusText}`
+        `Failed to submit tx (${status}): ${statusText}`
       )
     }
 

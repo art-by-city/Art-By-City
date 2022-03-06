@@ -22,7 +22,7 @@ export interface TransactionSearchResults {
 export default class TransactionFactory {
   private arweave!: Arweave
   private config!: ArweaveAppConfig
-  private ardb!: ArDB
+  ardb!: ArDB
 
   constructor(arweave: Arweave, ardb: ArDB, config: ArweaveAppConfig) {
     this.arweave = arweave
@@ -53,7 +53,8 @@ export default class TransactionFactory {
     tx.addTag('App-Name', this.config.name)
     tx.addTag('App-Version', this.config.version)
     const hasContentTypeTag = tags.some(tag => tag.tag === 'Content-Type')
-    if (data && !hasContentTypeTag) {
+    const isBundle = tags.some(tag => tag.tag.startsWith('Bundle'))
+    if (data && !hasContentTypeTag && !isBundle) {
       tx.addTag('Content-Type', 'application/json')
     }
     tx.addTag('Category', category)
@@ -61,8 +62,6 @@ export default class TransactionFactory {
     for (const tag of tags) {
       tx.addTag(tag.tag, tag.value)
     }
-
-    // tx.reward = Math.floor(Number.parseInt(tx.reward) * 1.1).toString()
 
     return tx
   }

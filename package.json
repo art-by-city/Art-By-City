@@ -28,6 +28,7 @@
     "@types/prop-types": "^15.7.3",
     "@types/react": "^17.0.3",
     "@types/sharp": "^0.29.5",
+    "arbundles": "^0.6.15",
     "arconnect": "^0.2.9",
     "arweave": "^1.10.16",
     "async": "^3.2.1",

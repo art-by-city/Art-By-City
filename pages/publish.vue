@@ -3,7 +3,7 @@
     <v-row justify="center">
       <v-col cols="6">
         <ArtworkEditForm
-          :artwork="artwork"
+          @uploading="onUploading"
           @save="onSave"
           @cancel="onCancel"
         />
@@ -14,10 +14,10 @@
 
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
+import { Location } from 'vue-router'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ArtworkEditForm } from '~/components/artwork/edit'
-import { Artwork } from '~/types'
 
 @Component({
   middleware: 'auth',
@@ -30,31 +30,31 @@ export default class UploadPage extends FormPageComponent {
     return { title: 'Publish' }
   }
 
-  artwork: Artwork = {
-    id: '',
-    creator: {
-      address: this.$auth.user?.address || ''
-    },
-    title: '',
-    slug: '',
-    description: '',
-    hashtags: [],
-    images: []
+  isUploading: boolean = false
+
+  beforeRouteLeave(to: any, from: any, next: Function) {
+    if (!this.isUploading) {
+      next()
+    } else {
+      alert('Cannot navigate away while publication upload is in progress.')
+    }
   }
 
-  onSave(txId: string) {
+  onSave({ txId, slug }: { txId: string, slug: string }) {
     const profileUrl = this.$auth.user.username || this.$auth.user.address
-    const artworkUrl = this.artwork.slug || txId
     if (profileUrl) {
-      this.$router.push(`/${profileUrl}/${artworkUrl}`)
+      this.$router.push(`/${profileUrl}/${slug || txId}?txId=${txId}`)
     }
   }
 
   onCancel() {
-    if (confirm('Are you sure you want to cancel this upload?')) {
-      // NB: Hard reload the page to clear state and re-render on server
-      this.$router.go(0)
+    if (confirm('Are you sure you want to cancel this publication?')) {
+      this.$router.back()
     }
+  }
+
+  onUploading(isUploading: boolean) {
+    this.isUploading = isUploading
   }
 }
 </script>

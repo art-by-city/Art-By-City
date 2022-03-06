@@ -3,7 +3,7 @@
     <v-hover :disabled="disabled">
       <template v-slot:default="props">
         <v-img
-          :src="src"
+          :src="src()"
           style="cursor: pointer"
           aspect-ratio="1"
           class="elevation-2"
@@ -58,7 +58,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import { Artwork, Profile } from '~/types'
+import { Artwork, LegacyArtwork, Profile } from '~/types'
 import { debounce } from '~/helpers'
 
 @Component
@@ -74,20 +74,30 @@ export default class ArtworkCard extends Vue {
   @debounce
   @Emit('click') onArtworkCardClicked() {
     if (this.artwork) {
-      const creatorUrl = this.username || this.artwork.creator.address
+      const address = this.artwork.version === 0
+        ? this.artwork.creator.address
+        : this.artwork.creator
+      const creatorUrl = this.username || address
       const artworkUrl = this.artwork.slug || this.artwork.id
 
       this.$router.push(`/${creatorUrl}/${artworkUrl}`)
     }
   }
 
-  artwork: Artwork | null = null
+  artwork: Artwork | LegacyArtwork | null = null
   profile: Profile | null = null
   username: string | null = null
 
-  get src() {
+  artworkUrlFromId(id: string) {
+    const { protocol, host, port } = this.$arweave.api.config
+    return `${protocol}://${host}:${port}/${id}`
+  }
+
+  src() {
     if (this.artwork && this.artwork.images.length > 0) {
-      return this.artwork.images[0].dataUrl
+      return this.artwork.version === 0
+        ? this.artwork.images[0].dataUrl
+        : this.artworkUrlFromId(this.artwork.images[0].preview)
     }
 
     return ''
@@ -102,7 +112,11 @@ export default class ArtworkCard extends Vue {
       return `@${this.username}`
     }
 
-    return this.artwork?.creator.address || ''
+    return this.artwork
+      ? this.artwork.version === 0
+        ? this.artwork.creator.address
+        : this.artwork.creator
+      : ''
   }
 
   fetchOnServer = false
@@ -110,13 +124,12 @@ export default class ArtworkCard extends Vue {
     this.artwork = await this.$artworkService.fetch(this.txId)
 
     if (this.artwork) {
-      this.profile = await this.$profileService.fetchProfile(
-        this.artwork.creator.address
-      )
+      const address = this.artwork.version === 0
+        ? this.artwork.creator.address
+        : this.artwork.creator
+      this.profile = await this.$profileService.fetchProfile(address)
 
-      this.username = await this.$usernameService.resolveUsername(
-        this.artwork.creator.address
-      )
+      this.username = await this.$usernameService.resolveUsername(address)
     }
   }
 }
