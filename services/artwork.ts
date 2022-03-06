@@ -1,57 +1,50 @@
 import { Context } from '@nuxt/types'
 import Transaction from 'arweave/node/lib/transaction'
 
-import { Artwork, DataURLArtworkImage, FeedItem } from '~/types'
+import {
+  Artwork,
+  ArtworkCreationOptions,
+  FeedItem,
+  LegacyArtwork
+} from '~/types'
 import { uuidv4 } from '~/helpers'
-import { TransactionService, LikesService } from './'
-import { ArtworkFactory } from '../factories'
+import { ArtworkFactory, ArtworkBundleFactory } from '~/factories'
 import { LIKED_ENTITY_TAG } from './likes'
+import { TransactionService, LikesService } from './'
 
 export default class ArtworkService extends TransactionService {
   $likesService!: LikesService
+  artworkBundleFactory!: ArtworkBundleFactory
 
   constructor(context: Context) {
     super(context)
 
     this.$likesService = context.$likesService
+    this.artworkBundleFactory = new ArtworkBundleFactory(
+      this.config.app.name,
+      this.config.app.version
+    )
   }
 
-  async createArtworkTransaction(artwork: Artwork): Promise<Transaction> {
-    const artworkData: Partial<Artwork> = { ...artwork }
-
-    delete artworkData.id
-    delete artworkData.hashtags
-
-    if (artworkData.images) {
-      (artworkData.images as Partial<DataURLArtworkImage>[]).forEach(image => {
-        delete image.guid
-      })
-    }
-
-    artworkData.published = new Date()
-
-    if (artworkData.city) {
-      artworkData.city = artworkData.city.toLowerCase()
-    }
-
-    const jsonData = JSON.stringify(artworkData)
-    const tags: { tag: string, value: string }[] = []
-
-    if (artwork.slug) {
-      tags.push({ tag: 'slug', value: artwork.slug })
-    }
-
-    const tx = await this.transactionFactory.buildEntityTransaction(
-      'artwork',
-      jsonData,
-      tags
-    )
+  async createArtworkTransaction(
+    opts: ArtworkCreationOptions,
+    logCb?: Function
+  ): Promise<Transaction> {
+    const bundle = await this.artworkBundleFactory.create(opts, logCb)
+    const data = bundle.getRaw()
+    const tx = await this.$arweave.createTransaction({ data })
+    tx.addTag('App-Name', this.config.app.name)
+    tx.addTag('App-Version', this.config.app.version)
+    tx.addTag('Bundle-Format', 'binary')
+    tx.addTag('Bundle-Version', '2.0.0')
 
     return tx
   }
 
-  async fetchByTxIdOrSlug(txIdOrSlug: string, owner: string):
-    Promise<Artwork | null> {
+  async fetchByTxIdOrSlug(
+    txIdOrSlug: string,
+    owner: string
+  ): Promise<Artwork | LegacyArtwork | null> {
     const result = await this.transactionFactory.searchTransactions(
       'artwork',
       owner,
@@ -67,22 +60,21 @@ export default class ArtworkService extends TransactionService {
     }
 
     // If no slug matches, try treating it as a txid
-    return await this.fetch(txIdOrSlug)
+    return txIdOrSlug.length === 43
+      ? await this.fetch(txIdOrSlug)
+      : null
   }
 
-  async fetch(id: string): Promise<Artwork | null> {
+  async fetch(id: string): Promise<Artwork | LegacyArtwork | null> {
     try {
-      const txDataString = await this.$arweave.transactions.getData(id, {
-        decode: true,
-        string: true
-      }) as string
+      const { protocol, host, port } = this.config.api
+      const res = await this.context.$axios.get(
+        `${protocol}://${host}:${port}/tx/${id}/data`
+      )
+      const buffer = Buffer.from(res.data, 'base64')
+      const txData = JSON.parse(buffer.toString())
 
-      const txData = JSON.parse(txDataString)
-      txData.id = id
-
-      const artwork = new ArtworkFactory().create(txData)
-
-      return artwork
+      return new ArtworkFactory().build(id, txData)
     } catch (error) {
       console.error(error)
 

@@ -5,7 +5,7 @@
         <img
           id="cropImage"
           class="crop-image"
-          :src="cropImage.dataUrl"
+          :src="cropImage.url"
         />
       </v-row>
       <v-row dense>
@@ -43,13 +43,13 @@
                   aspect-ratio="1.7"
                   max-height="300px"
                   contain
-                  :src="image.dataUrl"
+                  :src="image.url"
                   class="clickable"
                 >
                   <v-overlay absolute :value="hoverProps.hover">
                     <v-file-input
                       class="artwork-upload-button"
-                      accept="image/*"
+                      :accept="accept"
                       hide-input
                       prepend-icon="mdi-camera"
                       @change="onArtworkImageChanged(i, $event)"
@@ -94,7 +94,7 @@
               >
                 <v-file-input
                   class="artwork-upload-button add-artwork-image-button"
-                  accept="image/*"
+                  :accept="accept"
                   hide-input
                   prepend-icon="mdi-camera-plus"
                   @change="onAddArtworkImageClicked"
@@ -171,11 +171,20 @@
           <LicenseSelector v-model="artwork.license" />
         </v-col>
       </v-row>
+      <v-row dense>
+        <div class="text-caption">
+          Note: Images will have JPEG thumbnail previews generated in 1080p and
+          4k resolutions but will not exceed source image dimensions.
+        </div>
+      </v-row>
       <v-row dense justify="center">
         <TransactionFormControls
           :loading="isUploading"
           :signed="isSigned"
           :txTotal="txTotal"
+          :txSize="txSize"
+          :info="info"
+          :pct="uploadPct"
           @sign="onSign"
           @cancel="onCancel"
           @submit="onSubmit"
@@ -186,12 +195,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
+import { Vue, Component, Emit } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
 import Transaction from 'arweave/web/lib/transaction'
 
-import { Artwork, ArtworkImage, UserTransaction } from '~/types'
+import { ArtworkCreationOptions, URLArtworkImage } from '~/types'
 import { debounce, uuidv4 } from '~/helpers'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from
@@ -212,7 +221,6 @@ import TransactionFormControls from
   }
 })
 export default class ArtworkEditForm extends Vue {
-  @Prop({ type: Object, required: true }) artwork!: Artwork
   $refs!: {
     cropImage: HTMLImageElement,
     form: Vue & {
@@ -220,8 +228,15 @@ export default class ArtworkEditForm extends Vue {
       resetValidation: () => void
     }
   }
+  artwork: ArtworkCreationOptions = {
+    creator: this.$auth.user?.address || '',
+    title: '',
+    slug: '',
+    description: '',
+    images: []
+  }
   cropMode: boolean = false
-  cropImage?: ArtworkImage
+  cropImage?: URLArtworkImage
   cropImageIndex?: number
   cropper?: Cropper
   valid = false
@@ -229,12 +244,18 @@ export default class ArtworkEditForm extends Vue {
   isUploading: boolean = false
   isSigned: boolean = false
   transaction: Transaction | null = null
+  info: string = ''
+  uploadPct?: number | null = null
+
+  readonly accept = 'image/apng,image/avif,image/gif,image/jpeg,image/png,'
+                  + 'image/svg+xml,image/webp'
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
-  @Emit('save') _save(txId: string) {
-    return txId
+  @Emit('save') save(txId: string, slug?: string) {
+    return { txId, slug }
   }
   @Emit('cancel') onCancel() {}
+  @Emit('uploading') onUploading(isUploading: boolean) { return isUploading }
 
   rules = {
     required: (value: string = '') => value.length < 1 ? 'Required' : true,
@@ -303,7 +324,7 @@ export default class ArtworkEditForm extends Vue {
   }
 
   get slugBase(): string {
-    const username = this.$auth.user.username || this.artwork.creator.address
+    const username = this.$auth.user.username || this.artwork.creator
 
     return `artby.city/${username}/`
   }
@@ -318,6 +339,12 @@ export default class ArtworkEditForm extends Vue {
     }
 
     return undefined
+  }
+
+  get txSize() {
+    if (this.transaction) {
+      return this.transaction.data_size
+    }
   }
 
   @debounce
@@ -344,34 +371,45 @@ export default class ArtworkEditForm extends Vue {
   }
 
   @debounce
-  onCropArtworkImageClicked(index: number) {
+  async onCropArtworkImageClicked(index: number) {
     this.cropMode = true
     this.cropImageIndex = index
     this.cropImage = this.artwork.images[index]
     if (this.cropper) {
       this.cropper.destroy()
     }
-    this.$nextTick(() => {
-      this.cropper = new Cropper(document.getElementById('cropImage') as HTMLImageElement, {
-        viewMode: 1
+    await new Promise<void>(resolve => {
+      this.$nextTick(() => {
+        this.cropper = new Cropper(
+          document.getElementById('cropImage') as HTMLImageElement,
+          {
+            viewMode: 1,
+            ready() {
+              resolve()
+            }
+          }
+        )
       })
     })
+
   }
 
   @debounce
   onSaveCropSelection() {
     if (this.cropper && typeof this.cropImageIndex !== 'undefined') {
       const type = 'image/png'
-      this.artwork.images.splice(this.cropImageIndex, 1, {
-        guid: uuidv4(),
-        imageType: type,
-        dataUrl: this.cropper
-          .getCroppedCanvas()
-          .toDataURL(type)
-      })
+      const idx = this.cropImageIndex
+      this.cropper.getCroppedCanvas().toBlob(blob => {
+        if (blob) {
+          this.artwork.images.splice(idx, 1, {
+            guid: uuidv4(),
+            type,
+            url: URL.createObjectURL(blob)
+          })
 
-      this.cropMode = false
-      this.cropper.destroy()
+          this.cropMode = false
+        }
+      })
     }
   }
 
@@ -392,12 +430,23 @@ export default class ArtworkEditForm extends Vue {
     if (this.valid) {
       this.isUploading = true
 
+      this.info = 'Building Artwork transaction...'
+      let processedImageCount = 0
+      this.uploadPct = 0
       this.transaction = await this.$artworkService.createArtworkTransaction(
-        this.artwork
+        this.artwork,
+        ({ idx }: any) => {
+          processedImageCount++
+          // this.info = `Building Artwork transaction... ${processedImageCount} / ${this.artwork.images.length}`
+          this.uploadPct = 100 * (processedImageCount) / this.artwork.images.length
+        }
       )
 
-      this.isSigned = await this.$arweaveService.sign(this.transaction)
+      this.info = 'Waiting on signature...'
+      this.isSigned = await this.$arweaveService.sign(this.transaction, true)
 
+      this.info = ''
+      this.uploadPct = null
       this.isUploading = false
     }
   }
@@ -405,7 +454,9 @@ export default class ArtworkEditForm extends Vue {
   async onSubmit() {
     if (this.isSigned && this.transaction) {
       this.isUploading = true
+      this.onUploading(true)
       const txId = this.transaction.id
+      this.uploadPct = 0
       this.$txQueueService.submitUserTransaction(
         this.transaction,
         {
@@ -416,47 +467,38 @@ export default class ArtworkEditForm extends Vue {
           created: new Date().getTime()
         },
         (err?: Error) => {
+          this.info = ''
+          this.uploadPct = null
+          this.onUploading(false)
           if (err) {
             console.error('Error submitting user tx', err)
             this.$toastService.error('Error submitting user tx: ' + err.message)
+            this.isUploading = false
           } else {
-            return this._save(txId)
+            return this.save(txId, this.artwork.slug)
           }
+        },
+        true,
+        (pctComplete: number) => {
+          this.info = `Uploading transaction...`
+          this.uploadPct = pctComplete
         }
       )
     }
   }
 
-  private async processArtworkImage(image: File): Promise<ArtworkImage> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onerror = async (error) => {
-        reject(error)
-      }
-      reader.onload = async (evt) => {
-        if (!evt.target) {
-          reject('Error reading file')
-          return
-        }
-
-        resolve({
-          guid: uuidv4(),
-          dataUrl: reader.result?.toString() || '',
-          imageType: image.type
-        })
-      }
-      reader.readAsDataURL(image)
-    })
-  }
-
   private async processAndSetArtworkImage(image: File, index?: number) {
-    const processedImage = await this.processArtworkImage(image)
+    const urlImage = {
+      guid: uuidv4(),
+      type: image.type,
+      url: URL.createObjectURL(image)
+    }
 
     if (typeof index === 'undefined') {
       index = this.artwork.images.length
-      this.artwork.images.push(processedImage)
+      this.artwork.images.push(urlImage)
     } else {
-      this.artwork.images[index] = processedImage
+      this.artwork.images[index] = urlImage
     }
 
     if (index === 0) {

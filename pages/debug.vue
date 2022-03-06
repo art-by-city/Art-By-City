@@ -18,6 +18,7 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 import Arweave from 'arweave'
+import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 
 import { debounce } from '~/helpers'
 import FormPageComponent from '../components/pages/formPage.component'
@@ -71,27 +72,50 @@ export default class DebugPage extends FormPageComponent {
   }
 
   async postToArweave() {
-    if (!this.request) {
-      this.$toastService.error('add a file first')
-      return
-    }
+    // if (!this.request) {
+    //   this.$toastService.error('add a file first')
+    //   return
+    // }
     try {
       ProgressService.start()
-      // rq5F6F8dJt9HdpqjT9rb4okcGCfcErLfWeLNii5qwFw
-      const arweave = new Arweave(this.$config.arweave.api)
+      // // rq5F6F8dJt9HdpqjT9rb4okcGCfcErLfWeLNii5qwFw
+      // const arweave = new Arweave(this.$config.arweave.api)
 
-      const tx = await arweave.createTransaction({ data: this.request.data })
-      tx.addTag('App-Name', APP_NAME)
-      tx.addTag('Content-Type', this.request.type)
-      await arweave.transactions.sign(tx)
-      await arweave.transactions.post(tx)
+      // const tx = await arweave.createTransaction({ data: this.request.data })
+      // tx.addTag('App-Name', APP_NAME)
+      // tx.addTag('Content-Type', this.request.type)
+      // await arweave.transactions.sign(tx)
+      // await arweave.transactions.post(tx)
 
-      const txMsg = ['DebugPage.postToArweave() posted tx id', tx.id]
-      console.log(...txMsg)
-      this.$toastService.success(txMsg.join(' '))
+      // const txMsg = ['DebugPage.postToArweave() posted tx id', tx.id]
+      // console.log(...txMsg)
+      // this.$toastService.success(txMsg.join(' '))
 
-      const res = await arweave.api.get(tx.id)
-      console.log('DebugPage.postToArweave() res', res)
+      // const res = await arweave.api.get(tx.id)
+      // console.log('DebugPage.postToArweave() res', res)
+
+      // MlV6DeOtRmakDOf6vgOBlif795tcWimgyPsYYNQ8q1Y/glyph75bundled
+      const owner = 'MlV6DeOtRmakDOf6vgOBlif795tcWimgyPsYYNQ8q1Y'
+      const slug = 'glyph75bundled'
+
+      let query = this.$ardb
+      .search('transactions')
+      .tag('App-Name', this.$config.arweave.app.name)
+      .tag('App-Version', this.$config.arweave.app.version)
+      // .type('application/json')
+      // .tag('Bundle-Format', 'binary')
+      // .tag('Category', 'avatar')
+      // .tag('Category', 'artwork')
+      .tag('slug', slug)
+      // .from(owner)
+      // .tag('Bundle-Format', 'binary')
+
+      // tags.forEach(tag => console.log(window.atob(tag.name), window.atob(tag.value)))
+
+      const txs = await query.find({ sort: 'HEIGHT_DESC' }) as ArdbTransaction[]
+      const firstTxId = txs.length > 0 ? txs[0].id : ''
+      console.log(this.$config.arweave.app.name, this.$config.arweave.app.version)
+      console.log('fetch result', txs.length, firstTxId)
     } catch (error) {
       console.error('error in postToArweave()', error)
     } finally {

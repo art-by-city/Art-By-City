@@ -33,16 +33,16 @@ export default class AvatarService extends TransactionService {
 
         // NB: resolve mime type from data url src quickly
         // maybe this is faster than .split() ?
-        let imageType = res.data.src.substring(5, 14)
+        let type = res.data.src.substring(5, 14)
         // data:image/jpe
-        if (imageType[6] === 'j') {
-          imageType += 'g'
+        if (type[6] === 'j') {
+          type += 'g'
         }
 
         return {
           id: txId,
           src: res.data.src,
-          type: imageType,
+          type: type,
           version: 1
         }
       } else {

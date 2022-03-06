@@ -2,13 +2,31 @@
   <v-container dense class="transaction-form-controls">
     <v-divider class="mb-2"></v-divider>
     <v-row dense justify="center" v-if="txTotal">
-      ~&nbsp;<span>{{ humanReadableTxTotal }}</span>&nbsp;AR
+      <span v-if="txSize">
+        {{ (Number.parseInt(txSize) / 1048576).toPrecision(5) }} <b>MB</b>
+      </span>
+      <span class="px-2">≈</span>
+      <span>
+        {{ humanReadableTxTotal }} <b>AR</b>
+      </span>
     </v-row>
     <v-row dense justify="center" v-if="txTotal">
       <b>Submit transaction?</b>
     </v-row>
     <v-row dense justify="center" v-if="info">
       <caption>{{ info }}</caption>
+      <v-progress-linear
+        v-if="pct || pct === 0"
+        v-model="pct"
+        stream
+        striped
+        buffer-value="0"
+        height="24"
+      >
+        <template v-slot:default="{ value }">
+          <strong>{{ Math.ceil(value) }}%</strong>
+        </template>
+      </v-progress-linear>
     </v-row>
     <v-row dense justify="center">
       <v-col cols="12" sm="auto" order="2" order-sm="1" class="center-text">
@@ -48,37 +66,47 @@ export default class TransactionFormControls extends Vue {
   @Prop({
     type: Boolean,
     required: false
-  }) loading?: boolean
+  }) readonly loading?: boolean
 
   @Prop({
     type: Boolean,
     required: false
-  }) disabled?: boolean
+  }) readonly disabled?: boolean
 
   @Prop({
     type: Boolean,
     required: false
-  }) signed?: boolean
+  }) readonly signed?: boolean
 
   @Prop({
     type: Boolean,
     required: false
-  }) isContract?: boolean
+  }) readonly isContract?: boolean
 
   @Prop({
     type: String,
     required: false
-  }) txTotal?: string
+  }) readonly txTotal?: string
+
+  @Prop({
+    type: String,
+    required: false
+  }) readonly txSize?: string
 
   @Prop({
     type: String,
     required: false
   }) readonly info?: string
 
+    @Prop({
+    type: Number,
+    required: false
+  }) readonly pct?: number
+
   get humanReadableTxTotal() {
     if (this.txTotal) {
       return this.$arweave.ar.winstonToAr(this.txTotal, {
-        decimals: 8
+        decimals: 5
       })
     }
 

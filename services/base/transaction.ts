@@ -1,7 +1,7 @@
 import { Context } from '@nuxt/types'
 
 import { ArDBService } from './'
-import { TransactionFactory } from '~/factories'
+import { BundleFactory, TransactionFactory } from '~/factories'
 
 export default class TransactionService extends ArDBService {
   transactionFactory!: TransactionFactory

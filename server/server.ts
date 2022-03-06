@@ -4,7 +4,7 @@ import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 import sharp from 'sharp'
 import { IncomingMessage, ServerResponse } from 'http'
 
-import { Artwork, ArtworkImage, Avatar } from '~/types'
+import { LegacyArtwork, LegacyArtworkImage, Avatar } from '~/types'
 
 export default async function (
   req: IncomingMessage,
@@ -56,8 +56,8 @@ export default async function (
           }
 
           if (category === 'artwork') {
-            const artwork = txResult.data as Artwork
-            const image = artwork.images[0] as ArtworkImage
+            const artwork = txResult.data as LegacyArtwork
+            const image = artwork.images[0] as LegacyArtworkImage
             matches = image.dataUrl.match('data:(image/.*);base64,(.*)')
           }
 
