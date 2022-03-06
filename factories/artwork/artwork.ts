@@ -29,19 +29,15 @@ export default class ArtworkFactory {
       throw new FactoryCreationError('missing images')
     }
 
-    if (!opts.slug) {
-      throw new FactoryCreationError('missing slug')
-    }
-
-    if (!opts.published) {
-      throw new FactoryCreationError('missing published')
-    }
-
-    if (!opts.images) {
-      throw new FactoryCreationError('missing images')
-    }
-
     if ('version' in opts && opts.version) {
+      if (!opts.published) {
+        throw new FactoryCreationError('missing published')
+      }
+
+      if (!opts.slug) {
+        throw new FactoryCreationError('missing slug')
+      }
+
       return {
         ...opts,
         id,
@@ -58,10 +54,10 @@ export default class ArtworkFactory {
       const artwork: LegacyArtwork = {
         id,
         version: 0,
-        published: opts.published,
+        published: opts.published || new Date(),
         creator: opts.creator as { address: string },
         title: opts.title,
-        slug: opts.slug,
+        slug: opts.slug || id,
         created: opts.created,
         description: opts.description,
         type: opts.type,
