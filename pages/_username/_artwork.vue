@@ -221,11 +221,7 @@ export default class ArtworkPage extends FormPageComponent {
       `${this.$config.baseUrl}/${usernameOrAddress}/${txIdOrSlug}`
     const thumbnailUrl = this.artwork.version === 0
       ? `${this.$config.baseUrl}/api/artwork/${creator}/${txIdOrSlug}`
-<<<<<<< HEAD
       : this.artworkUrlFromId(this.artwork.images[0].preview)
-=======
-      : this.artwork.images[0].preview
->>>>>>> db3cd2015243e11b1c040a89fa586341b4071738
     const twitter = this.profile?.twitter || ''
 
     return {
