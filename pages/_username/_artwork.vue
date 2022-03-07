@@ -169,7 +169,27 @@
             <TransactionConfirmationProgress :utx="tx" @confirmed="$fetch" />
           </template>
           <template v-else>
-            <!-- <h1>404 Artwork not found :(</h1> -->
+            <h1>404 Artwork Not Found</h1>
+            <p>
+              The requested Artwork could not be found either because it doesn't
+              exist or that it hasn't yet been indexed and cached by an Arweave
+              Gateway.
+            </p>
+            <p>
+              It may take upwards of 8 hours for Arweave Gateways to index and
+              cache Artwork.
+            </p>
+            <p>
+              You can
+              <v-btn
+                text
+                :disabled="$fetchState.pending"
+                @onClick="debouncedFetch"
+              >
+                refresh
+              </v-btn>
+              to see if the Artwork is available
+            </p>
           </template>
         </v-col>
       </v-row>
@@ -269,6 +289,11 @@ export default class ArtworkPage extends FormPageComponent {
         ? this.artwork.creator.address
         : this.artwork.creator
       : ''
+  }
+
+  @debounce
+  debouncedFetch() {
+    this.$fetch()
   }
 
   async fetch() {
