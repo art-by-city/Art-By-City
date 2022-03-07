@@ -69,12 +69,10 @@ export default class ArtworkService extends TransactionService {
     try {
       const { protocol, host, port } = this.config.api
       const res = await this.context.$axios.get(
-        `${protocol}://${host}:${port}/tx/${id}/data`
+        `${protocol}://${host}:${port}/${id}`
       )
-      const buffer = Buffer.from(res.data, 'base64')
-      const txData = JSON.parse(buffer.toString())
 
-      return new ArtworkFactory().build(id, txData)
+      return new ArtworkFactory().build(id, res.data)
     } catch (error) {
       console.error(error)
 
