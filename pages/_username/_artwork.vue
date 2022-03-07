@@ -172,7 +172,7 @@
             <h1>404 Artwork Not Found</h1>
             <p>
               The requested Artwork could not be found either because it doesn't
-              exist or that it hasn't yet been indexed and cached by an Arweave
+              exist or it hasn't yet been indexed and cached by an Arweave
               Gateway.
             </p>
             <p>
@@ -185,7 +185,7 @@
                 text
                 outlined
                 :disabled="$fetchState.pending"
-                @onClick="debouncedFetch"
+                @click="debouncedFetch"
               >
                 click to refresh
               </v-btn>
