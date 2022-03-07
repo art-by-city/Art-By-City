@@ -20,7 +20,7 @@ export default class ExpandParagraph extends Vue {
     type: [String, Number],
     required: false,
     default: '100px'
-  }) readonly height!: string | number
+  }) readonly maxHeight!: string | number
 
   @Prop({
     type: Boolean,
@@ -29,7 +29,7 @@ export default class ExpandParagraph extends Vue {
   }) readonly dense!: boolean
 
   get style() {
-    return this.open ? '' : `height: ${this.height}`
+    return this.open ? '' : `height: ${this.maxHeight}`
   }
 
   open: boolean = false
