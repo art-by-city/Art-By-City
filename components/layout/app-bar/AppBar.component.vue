@@ -8,28 +8,65 @@
     max-width="100%"
     class="app-bar"
   >
-    <v-btn class="app-logo" text color="white" plain to="/">
-      ART &times; BY &times; CITY
+    <v-btn id="app-logo" text tile color="white" plain to="/">
+      <!-- ART &times; BY &times; CITY -->
+      <img
+        id="app-logo-image"
+        src="logo/logo_by_daliah_ammar_dark_transparent.png"
+      />
     </v-btn>
 
     <v-spacer></v-spacer>
 
     <template v-if="!$auth.loggedIn">
-      <v-btn text to="/discover">discover</v-btn>
+      <v-btn
+        class="app-bar-button"
+        to="/discover"
+        text
+        tile
+      >
+        discover
+      </v-btn>
       <v-divider vertical class="white-divider" />
     </template>
 
     <template v-if="$auth.loggedIn">
-      <v-btn text to="/publish">publish</v-btn>
-      <v-divider vertical class="mx-4 white-divider" />
+      <v-btn
+        class="app-bar-button"
+        to="/discover"
+        text
+        tile
+      >
+        discover
+      </v-btn>
+      <v-btn
+        class="app-bar-button"
+        to="/publish"
+        text
+        tile
+      >
+        publish
+      </v-btn>
+      <v-divider vertical class="ml-0 mr-4 white-divider" />
       <AccountMenu @logout="onLogoutClicked" />
       <NotificationsMenu />
       <TransactionsMenu />
     </template>
     <template v-else>
-      <v-btn v-if="!isMobile" text @click="onLoginClicked">log in</v-btn>
+      <v-btn
+        v-if="!isMobile"
+        class="app-bar-button"
+        @click="onLoginClicked"
+        text
+        tile
+      >log in</v-btn>
       <v-divider vertical class="white-divider" />
-      <v-btn class="pr-0" text @click="onSignUpClicked">sign up</v-btn>
+      <v-btn
+        class="app-bar-button pr-0"
+        @click="onSignUpClicked"
+        text
+        tile
+      >sign up</v-btn>
     </template>
   </v-app-bar>
 </template>
@@ -92,8 +129,17 @@ export default class AppBar extends Vue {
   text-decoration: none;
 }
 
-.app-logo >>> .v-btn__content {
+.app-bar >>> .app-bar-button {
+  height: 100%;
+}
+
+#app-logo >>> .v-btn__content {
   opacity: 1 !important;
+}
+
+#app-logo-image {
+  width: 120px;
+  height: 36px;
 }
 
 .white-divider {

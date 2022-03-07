@@ -1,11 +1,6 @@
 <template>
   <div class="index-page">
-    <template v-if="$auth.loggedIn">
-      <FeedComponent />
-    </template>
-    <template v-else>
-      <PitchContent />
-    </template>
+    <PitchContent />
   </div>
 </template>
 
