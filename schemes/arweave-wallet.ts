@@ -119,9 +119,7 @@ export default class ArweaveWalletScheme<
               this.$auth.reset()
             }
 
-          } catch (err) {
-            console.error('[arweave-wallet.ts] error', err)
-          }
+          } catch (err) {}
         })
       }
 

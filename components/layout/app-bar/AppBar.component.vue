@@ -12,7 +12,7 @@
       <!-- ART &times; BY &times; CITY -->
       <img
         id="app-logo-image"
-        src="logo/logo_by_daliah_ammar_dark_transparent.png"
+        src="/logo/logo_by_daliah_ammar_dark_transparent.png"
       />
     </v-btn>
 

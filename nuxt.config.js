@@ -21,7 +21,7 @@ export default {
     link: [{
       rel: 'icon',
       type: 'image/png',
-      href: 'logo/logo_by_daliah_ammar_square_stacked_64.png'
+      href: '/logo/logo_by_daliah_ammar_square_stacked_64.png'
     }]
   },
   /*
