@@ -105,31 +105,28 @@ export default class ArweaveWalletScheme<
   }
 
   async mounted(): Promise<void> {
-    return new Promise<void>(async resolve => {
-      let { tokenExpired } = this.check(true)
+    const { tokenExpired } = this.check(true)
 
-      if (tokenExpired) {
-        this.$auth.reset()
-      } else if (process.client) {
-
-        const timeout = setTimeout(() => {
-          resolve()
-        }, 3000)
-
+    if (tokenExpired) {
+      this.$auth.reset()
+    } else {
+      if (process.client) {
         window.addEventListener('arweaveWalletLoaded', async () => {
-          clearTimeout(timeout)
           try {
-            await window.arweaveWallet.getActiveAddress()
-          } catch (e) {
-            this.$auth.reset()
-          }
+            const activeAddress = await window.arweaveWallet.getActiveAddress()
+            const tokenAddress = this.token.get() as string | false
+            if (tokenAddress !== activeAddress) {
+              this.$auth.reset()
+            }
 
-          resolve(this.fetchUser())
+          } catch (err) {
+            console.error('[arweave-wallet.ts] error', err)
+          }
         })
-      } else {
-        resolve(this.fetchUser())
       }
-    })
+
+      return this.fetchUser()
+    }
   }
 
   async login(): Promise<void> {
@@ -162,9 +159,9 @@ export default class ArweaveWalletScheme<
   }
 
   async fetchUser(): Promise<void> {
-    let address = this.token.get()
+    let address = this.token.get() as string | false
 
-    if (!address || address === true) {
+    if (!address) {
       address = await window.arweaveWallet.getActiveAddress()
     }
 
