@@ -183,12 +183,13 @@
               You can
               <v-btn
                 text
+                outlined
                 :disabled="$fetchState.pending"
                 @onClick="debouncedFetch"
               >
-                refresh
+                click to refresh
               </v-btn>
-              to see if the Artwork is available
+              and see if the Artwork is available.
             </p>
           </template>
         </v-col>

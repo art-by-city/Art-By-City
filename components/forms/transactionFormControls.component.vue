@@ -19,7 +19,6 @@
         v-if="pct || pct === 0"
         v-model="pct"
         stream
-        striped
         buffer-value="0"
         height="24"
       >
