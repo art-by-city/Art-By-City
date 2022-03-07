@@ -1,24 +1,23 @@
 <template>
   <div class="artwork-zoom-dialog">
     <v-dialog
-      :value="zoom"
+      v-model="zoom"
       @click:outside="onCloseZoomDialog"
-      max-height="95vh"
-      max-width="95vw"
+      fullscreen
     >
       <div
         class="artwork-zoom-dialog-container"
-        @mouseout="onContainerMouseOut"
+        @mouseout.prevent="onContainerMouseOut"
       >
         <div
           class="artwork-zoom-image-overlay"
-          @mousemove="onImgMouseMove"
-          @touchmove="onImgTouchMove"
-          @mousedown="onImgMouseDown"
-          @touchstart="onImgTouchStart"
-          @mouseup="onImgMouseUp"
-          @touchend="onImgTouchEnd"
-          @wheel="onMouseWheel"
+          @mousemove.prevent="onImgMouseMove"
+          @touchmove.prevent="onImgTouchMove"
+          @mousedown.prevent="onImgMouseDown"
+          @touchstart.prevent="onImgTouchStart"
+          @mouseup.prevent="onImgMouseUp"
+          @touchend.prevent="onImgTouchEnd"
+          @wheel.prevent="onMouseWheel"
         >
         </div>
         <img
@@ -28,27 +27,46 @@
           :src="image.src"
           :style="zoomImageStyle"
         />
+
+        <div id="artwork-zoom-close" class="ma-12">
+          <v-btn
+            fab
+            dark
+            color="black"
+            x-small
+            @click="onCloseZoomDialog"
+          >
+            <v-icon dark color="white">mdi-close-circle</v-icon>
+          </v-btn>
+        </div>
+
+        <div id="artwork-zoom-controls" class="mb-10">
+          <v-btn
+            fab
+            dark
+            color="black"
+            x-small
+            @click.stop="onZoomButtonClicked(-0.1)"
+          >
+            <v-icon dark color="white">mdi-magnify-minus</v-icon>
+          </v-btn>
+          <v-btn
+            fab
+            dark
+            color="black"
+            x-small
+            @click.stop="onZoomButtonClicked(0.1)"
+          >
+            <v-icon dark color="white">mdi-magnify-plus</v-icon>
+          </v-btn>
+          <span
+            id="artwork-zoom-percent"
+            class="black white--text rounded-pill"
+          >
+            {{ Math.round((zoomFactor+1)*100) }}%
+          </span>
+        </div>
       </div>
-      <v-container class="artwork-zoom-controls">
-        <v-row justify="center" @click="onCloseZoomDialog">
-          <v-col cols="1" offset="2" md="1" offset-md="6">
-            <v-btn icon @click="onCloseZoomDialog">
-              <v-icon dark color="white">mdi-close-circle</v-icon>
-            </v-btn>
-          </v-col>
-          <v-col cols="auto" offset="1" md="2" offset-md="3" style="text-align: right;">
-            <v-btn icon @click.stop="onZoomButtonClicked(-0.1)">
-              <v-icon color="white">mdi-magnify-minus</v-icon>
-            </v-btn>
-            <v-btn icon @click.stop="onZoomButtonClicked(0.1)">
-              <v-icon color="white">mdi-magnify-plus</v-icon>
-            </v-btn>
-            <span @click.stop class="white--text">
-              {{ Math.round((zoomFactor+1)*100) }}%
-            </span>
-          </v-col>
-        </v-row>
-      </v-container>
     </v-dialog>
   </div>
 </template>
@@ -171,16 +189,13 @@ export default class ArtworkZoomDialog extends Vue {
   }
 
   onImgTouchEnd(evt: TouchEvent) {
-    evt.preventDefault()
     this.stopDragging()
   }
   onImgMouseUp(evt: MouseEvent) {
-    evt.preventDefault()
     this.stopDragging()
   }
 
   onContainerMouseOut(evt: MouseEvent) {
-    evt.preventDefault()
     this.stopDragging()
   }
 
@@ -206,8 +221,8 @@ export default class ArtworkZoomDialog extends Vue {
   get zoomImageStyle() {
     const scale = 1 + this.zoomFactor
 
-    let left = this.left - Math.floor(this.image.width / 2)
-    let top = this.top - Math.floor(this.image.height / 2)
+    const left = (this.left - Math.floor(this.image.width / 2)) / scale
+    const top = (this.top - Math.floor(this.image.height / 2)) / scale
 
     return { transform: `scale(${scale}) translate(${left}px, ${top}px)` }
   }
@@ -222,8 +237,8 @@ export default class ArtworkZoomDialog extends Vue {
 .artwork-zoom-dialog-container {
   background-color: rgba(0,0,0,0.5);
   text-align: center;
-  height: 90vh;
-  width: 95vw;
+  height: 100%;
+  width: 100%;
 }
 
 .artwork-zoom-image {
@@ -237,14 +252,23 @@ export default class ArtworkZoomDialog extends Vue {
   margin-left: auto;
   margin-right: auto;
   cursor: grab;
+
+  /* noselect */
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and FF */
 }
 
 .artwork-zoom-image-overlay {
   float: left;
   z-index: 9992;
   position: absolute;
-  width: 95vw;
-  height: 90vh;
+  width: 100%;
+  height: 100%;
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -261,9 +285,21 @@ export default class ArtworkZoomDialog extends Vue {
   overflow: hidden;
 }
 
-.artwork-zoom-controls {
+#artwork-zoom-controls {
   z-index: 9993;
-  position: absolute;
-  padding-top: 0px;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  margin-left: -60px;
+}
+
+#artwork-zoom-close {
+  z-index: 9993;
+  position: fixed;
+  top: 0;
+}
+
+#artwork-zoom-percent {
+  padding: 6px !important;
 }
 </style>
