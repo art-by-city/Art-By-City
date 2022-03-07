@@ -168,7 +168,7 @@
           <template v-if="tx">
             <TransactionConfirmationProgress :utx="tx" @confirmed="$fetch" />
           </template>
-          <template v-else>
+          <template v-if="!tx && !$fetchState.pending">
             <h1>404 Artwork Not Found</h1>
             <p>
               The requested Artwork could not be found either because it doesn't
