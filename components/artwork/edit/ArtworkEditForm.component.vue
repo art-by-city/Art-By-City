@@ -435,9 +435,8 @@ export default class ArtworkEditForm extends Vue {
       this.uploadPct = 0
       this.transaction = await this.$artworkService.createArtworkTransaction(
         this.artwork,
-        ({ idx }: any) => {
+        () => {
           processedImageCount++
-          // this.info = `Building Artwork transaction... ${processedImageCount} / ${this.artwork.images.length}`
           this.uploadPct = 100 * (processedImageCount) / this.artwork.images.length
         }
       )
