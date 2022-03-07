@@ -131,6 +131,24 @@
       <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
       <EditProfileDialog :show.sync="showEditProfileDialog" />
       <UsernameDialog :show.sync="showUsernameDialog" />
+
+      <v-snackbar
+        v-model="showRecentPublicationMessage"
+        timeout="-1"
+      >
+        Your Artwork was accepted by the Arweave Network but won't be available
+        until it is indexed and cached by an Arweave Gateway (~8hrs).
+        <template v-slot:action="{ attrs }">
+          <v-btn
+            color="red"
+            text
+            v-bind="attrs"
+            @click="showRecentPublicationMessage = false"
+          >
+            OK
+          </v-btn>
+        </template>
+      </v-snackbar>
     </template>
   </div>
 </template>
@@ -248,6 +266,8 @@ export default class UserProfilePage extends PageComponent {
 
     return ''
   }
+
+  showRecentPublicationMessage = this.$route.query['publishSuccess'] === 'true'
 
   created() {
     this.$nuxt.$on('profile-CONFIRMED', () => {

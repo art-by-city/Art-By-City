@@ -14,7 +14,6 @@
 
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
-import { Location } from 'vue-router'
 
 import FormPageComponent from '~/components/pages/formPage.component'
 import { ArtworkEditForm } from '~/components/artwork/edit'
@@ -43,7 +42,7 @@ export default class UploadPage extends FormPageComponent {
   onSave({ txId, slug }: { txId: string, slug: string }) {
     const profileUrl = this.$auth.user.username || this.$auth.user.address
     if (profileUrl) {
-      this.$router.push(`/${profileUrl}/${slug || txId}?txId=${txId}`)
+      this.$router.push(`/${profileUrl}?publishSuccess=true`)
     }
   }
 
