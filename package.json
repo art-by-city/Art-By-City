@@ -30,7 +30,7 @@
     "@types/sharp": "^0.29.5",
     "arbundles": "^0.6.15",
     "arconnect": "^0.2.9",
-    "arweave": "^1.10.16",
+    "arweave": "^1.10.23",
     "async": "^3.2.1",
     "cropperjs": "^1.5.9",
     "crypto-js": "^4.1.1",

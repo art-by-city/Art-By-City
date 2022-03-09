@@ -23,6 +23,7 @@
                 :loading="isUploading"
                 :signed="isSigned"
                 :txTotal="txTotal"
+                :info="info"
                 @sign="onSign"
                 @submit="onSubmit"
                 @cancel="onCancel"
@@ -75,6 +76,8 @@ export default class LikeDialog extends TransactionDialog<Like> {
     required: true
   }) ownerDisplayName!: string
 
+  info: string = ''
+
   @Emit('pending') pending(isPending: boolean) {
     return isPending
   }
@@ -82,13 +85,16 @@ export default class LikeDialog extends TransactionDialog<Like> {
   async onSign() {
     this.isUploading = true
 
+    this.info = 'Building Artwork transaction...'
     this.transaction = await this.$likesService.createLikeTransaction(
       this.entityTxId,
       this.entityOwner
     )
 
+    this.info = 'Waiting on signature...'
     this.isSigned = await this.$arweaveService.sign(this.transaction)
 
+    this.info = ''
     this.isUploading = false
   }
 

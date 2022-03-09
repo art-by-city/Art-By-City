@@ -116,7 +116,7 @@ export default {
   },
   proxy: {
     '/gateway': {
-      target: `${process.env.ARWEAVE_PROTOCOL || 'http'}://${process.env.ARWEAVE_HOST}`,
+      target: `${process.env.ARWEAVE_PROTOCOL || 'http'}://${process.env.ARWEAVE_HOST || 'localhost'}:${process.env.ARWEAVE_PORT || 1984}`,
       pathRewrite: { '^/gateway/': '' }
     }
   },
