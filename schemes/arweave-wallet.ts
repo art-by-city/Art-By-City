@@ -26,11 +26,11 @@ const DEFAULTS: ArweaveWalletSchemeOptions = {
   name: 'arweave',
   token: {
     property: 'token',
-    required: false,
+    required: true,
     type: false,
     name: 'Arweave',
     maxAge: false,
-    global: false,
+    global: true,
     prefix: '_token.',
     expirationPrefix: '_token_expiration.'
   },
@@ -83,6 +83,7 @@ export default class ArweaveWalletScheme<
     const token = this.token.sync()
 
     if (!token) {
+      response.tokenExpired = true
       return response
     }
 
@@ -92,13 +93,12 @@ export default class ArweaveWalletScheme<
       return response
     }
 
-    const tokenStatus = this.token.status()
+    // const tokenStatus = this.token.status()
+    // if (tokenStatus.expired()) {
+    //   response.tokenExpired = true
 
-    if (tokenStatus.expired()) {
-      response.tokenExpired = true
-
-      return response
-    }
+    //   return response
+    // }
 
     response.valid = true
 
