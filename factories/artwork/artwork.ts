@@ -54,7 +54,7 @@ export default class ArtworkFactory {
       const artwork: LegacyArtwork = {
         id,
         version: 0,
-        published: opts.published || new Date(),
+        published: opts.published,
         creator: opts.creator as { address: string },
         title: opts.title,
         slug: opts.slug || id,
