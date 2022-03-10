@@ -29,9 +29,9 @@ declare module 'vuex/types/index' {
   }
 }
 
-export default ({ app }: Context, inject: Inject) => {
+export default (ctx: Context, inject: Inject) => {
   try {
-    inject('auth', new Auth())
+    inject('auth', new Auth(ctx))
   } catch (error) {
     console.error('Error during Auth plugin bootstrap', error)
   }
