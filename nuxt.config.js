@@ -91,6 +91,9 @@ export default {
   },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
+    cookie: {
+      secure: process.env.BASE_URL === 'http://localhost:3000'
+    },
     redirect: {
       logout: '/',
       login: '/',

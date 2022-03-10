@@ -21,15 +21,16 @@ export const APP_PERMISSIONS: PermissionType[] = [
   'ACCESS_ADDRESS'
 ]
 
-const DEFAULTS: TokenableSchemeOptions = {
+type ArweaveWalletSchemeOptions = {} & TokenableSchemeOptions
+const DEFAULTS: ArweaveWalletSchemeOptions = {
   name: 'arweave',
   token: {
     property: 'token',
+    required: false,
     type: false,
     name: 'Arweave',
     maxAge: false,
     global: false,
-    required: true,
     prefix: '_token.',
     expirationPrefix: '_token_expiration.'
   },
@@ -110,19 +111,6 @@ export default class ArweaveWalletScheme<
     if (tokenExpired) {
       this.$auth.reset()
     } else {
-      if (process.client) {
-        window.addEventListener('arweaveWalletLoaded', async () => {
-          try {
-            const activeAddress = await window.arweaveWallet.getActiveAddress()
-            const tokenAddress = this.token.get() as string | false
-            if (tokenAddress !== activeAddress) {
-              this.$auth.reset()
-            }
-
-          } catch (err) {}
-        })
-      }
-
       return this.fetchUser()
     }
   }
@@ -138,7 +126,6 @@ export default class ArweaveWalletScheme<
       await this.fetchUser()
     } else {
       const error = new ArweaveWalletNotInstalledError()
-
       this.$auth.callOnError(error, { method: 'login' })
 
       return Promise.reject(error)
