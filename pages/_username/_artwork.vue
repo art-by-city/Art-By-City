@@ -147,7 +147,7 @@
         <v-col cols="5">
           <div v-if="$auth.loggedIn" style="align-self: flex-end">
             <LikeButton
-              :entityOwner="artwork.creator || artwork.creator.address"
+              :entityOwner="creator"
               :entityTxId="artwork.id"
               :entityDescription="artwork.title"
               :ownerDisplayName="displayName"
@@ -285,6 +285,14 @@ export default class ArtworkPage extends FormPageComponent {
       return `@${this.username}`
     }
 
+    return this.artwork
+      ? this.artwork.version === 0
+        ? this.artwork.creator.address
+        : this.artwork.creator
+      : ''
+  }
+
+  get creator() {
     return this.artwork
       ? this.artwork.version === 0
         ? this.artwork.creator.address
