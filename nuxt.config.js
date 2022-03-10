@@ -67,8 +67,8 @@ export default {
    ** Nuxt.js modules
    */
   modules: [
-    '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    { src: '@nuxtjs/axios', mode: 'client' },
+    { src: '@nuxtjs/auth-next', mode: 'client' }
   ],
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
@@ -92,18 +92,20 @@ export default {
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     cookie: {
+      name: 'arweave',
+      maxAge: false,
       secure: process.env.BASE_URL === 'http://localhost:3000'
     },
     redirect: {
       logout: '/',
-      login: '/',
+      login: false,
       home: false
     },
     strategies: {
-      local: false,
       'arweave-wallet': {
         scheme: '~/schemes/arweave-wallet.ts'
-      }
+      },
+      local: false
     },
     plugins: [
       { src: '~/plugins/persist-store.ts', ssr: false }
