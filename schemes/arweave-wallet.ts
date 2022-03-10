@@ -82,23 +82,16 @@ export default class ArweaveWalletScheme<
 
     const token = this.token.sync()
 
-    if (!token) {
-      response.tokenExpired = true
-      return response
-    }
-
     if (!checkStatus) {
       response.valid = true
 
       return response
     }
 
-    // const tokenStatus = this.token.status()
-    // if (tokenStatus.expired()) {
-    //   response.tokenExpired = true
-
-    //   return response
-    // }
+    if (!token) {
+      response.tokenExpired = true
+      return response
+    }
 
     response.valid = true
 
