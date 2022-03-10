@@ -1,6 +1,6 @@
 import { Signer } from 'arbundles/src/signing'
 
-import { APP_INFO } from '~/schemes/arweave-wallet'
+import { APP_INFO } from '~/app/auth'
 import ArweaveWalletSigner from './arweaveWalletSigner'
 
 export default class SignerFactory {

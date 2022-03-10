@@ -32,7 +32,6 @@
       "node",
       "@nuxt/types",
       "@nuxtjs/axios",
-      "@nuxtjs/auth-next",
       "@types/async",
       "@types/crypto-js",
       "@types/prettier",

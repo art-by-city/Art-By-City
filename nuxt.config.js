@@ -47,6 +47,7 @@ export default {
    *  NB: Order of plugins matters, as plugins may rely on other plugins
    */
   plugins: [
+    { src: '~/plugins/auth.ts' },
     { src: '~/plugins/arweave.ts' },
     { src: '~/plugins/ardb.ts' },
     { src: '~/plugins/smartweave.ts' },
@@ -54,6 +55,7 @@ export default {
     '~/plugins/components.ts',
     '~/plugins/filters.ts',
     { src: '~/plugins/localforage.ts', ssr: false },
+    { src: '~/plugins/persist-store.ts', ssr: false },
   ],
   /*
    ** Nuxt.js dev-modules
@@ -67,8 +69,7 @@ export default {
    ** Nuxt.js modules
    */
   modules: [
-    '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    '@nuxtjs/axios'
   ],
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
@@ -90,25 +91,6 @@ export default {
     artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081',
   },
   serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
-  auth: {
-    cookie: {
-      secure: process.env.BASE_URL === 'http://localhost:3000'
-    },
-    redirect: {
-      logout: '/',
-      login: '/',
-      home: false
-    },
-    strategies: {
-      local: false,
-      'arweave-wallet': {
-        scheme: '~/schemes/arweave-wallet.ts'
-      }
-    },
-    plugins: [
-      { src: '~/plugins/persist-store.ts', ssr: false }
-    ]
-  },
   router: {},
   /*
    ** Axios module configuration
