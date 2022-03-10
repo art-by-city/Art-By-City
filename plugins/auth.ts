@@ -1,7 +1,7 @@
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 
-import Auth from '~/app/auth'
+import { Auth } from '~/app/auth'
 
 declare module 'vue/types/vue' {
   // this.$myInjectedFunction inside Vue components
