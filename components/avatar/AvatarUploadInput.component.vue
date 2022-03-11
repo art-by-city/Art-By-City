@@ -22,7 +22,11 @@
     <div v-if="!cropMode" class="artwork-image-selector-container">
       <div class="artwork-image-selector mx-auto">
         <v-hover v-slot:default="hoverProps">
-          <v-avatar color="transparent" size="192" :class="{ 'file-input-border': !src }">
+          <v-avatar
+            color="transparent"
+            size="192"
+            :class="{ 'file-input-border': !src }"
+          >
             <v-img
               aspect-ratio="1"
               width="192"
@@ -68,7 +72,7 @@
 import { Component, Emit, Model, Prop, Vue } from 'nuxt-property-decorator'
 import Cropper from 'cropperjs'
 
-import { debounce, uuidv4 } from '~/helpers'
+import { debounce } from '~/helpers'
 import { URLArtworkImage } from '~/types'
 
 @Component

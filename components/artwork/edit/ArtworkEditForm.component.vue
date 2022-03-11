@@ -47,13 +47,26 @@
                   class="clickable"
                 >
                   <v-overlay absolute :value="hoverProps.hover">
-                    <v-file-input
+                  <label
+                    class="artwork-upload-label"
+                    for="upload"
+                  >
+                    <v-icon>mdi-camera-plus</v-icon>
+                  </label>
+                  <input
+                    id="upload"
+                    class="artwork-upload-input"
+                    type="file"
+                    :accept="accept"
+                    @input="onArtworkImageChanged($event, i)"
+                  />
+                    <!-- <v-file-input
                       class="artwork-upload-button"
                       :accept="accept"
                       hide-input
                       prepend-icon="mdi-camera"
-                      @change="onArtworkImageChanged(i, $event)"
-                    ></v-file-input>
+                      @change="onAddArtworkImageClicked($event)"
+                    ></v-file-input> -->
                     <div style="display: inline-flex;">
                       <v-btn
                         icon
@@ -97,7 +110,7 @@
                   :accept="accept"
                   hide-input
                   prepend-icon="mdi-camera-plus"
-                  @change="onAddArtworkImageClicked"
+                  @change="onAddArtworkImageClicked($event)"
                 ></v-file-input>
               </v-responsive>
               <span
@@ -348,9 +361,12 @@ export default class ArtworkEditForm extends Vue {
   }
 
   @debounce
-  async onArtworkImageChanged(index: number, image: File | undefined) {
-    if (image) {
-      await this.processAndSetArtworkImage(image, index)
+  async onArtworkImageChanged(event: InputEvent, index: number) {
+    if (event.target) {
+      const target = event.target as HTMLInputElement
+      if (target.files && target.files[0]) {
+        await this.processAndSetArtworkImage(target.files[0], index)
+      }
     }
   }
 
@@ -567,12 +583,17 @@ export default class ArtworkEditForm extends Vue {
   margin-bottom: 25px;
   flex-basis: fill;
 }
-.break {
-  flex-basis: 100%;
-  height: 0;
-}
 .crop-image {
   display: block;
   max-width: 100%;
+}
+.artwork-upload-label {
+  cursor: pointer;
+  height: 28px;
+  width: 28px;
+  display: inline-flex;
+}
+.artwork-upload-input {
+  display: none;
 }
 </style>

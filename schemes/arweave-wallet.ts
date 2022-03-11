@@ -36,7 +36,7 @@ const DEFAULTS: ArweaveWalletSchemeOptions = {
   },
   endpoints: {
     login: false,
-    logout: false,
+    logout: '/',
     user: false
   }
 }
