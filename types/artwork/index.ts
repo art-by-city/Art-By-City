@@ -37,10 +37,11 @@ export interface Artwork extends ArtworkManifest {
   images: (ArtworkImageWithPreviews & TrackableEntity)[]
 }
 
-type ArtworkImageWithPreviews = {
+export type ArtworkImageWithPreviews = {
   image: string,
   preview: string,
-  preview4k: string
+  preview4k: string,
+  animated?: boolean
 }
 
 export interface License {

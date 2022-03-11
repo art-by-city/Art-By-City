@@ -1,9 +1,16 @@
 import { Bundle, DataItem } from 'arbundles'
 
 import { readFileAsArrayBufferAsync } from '~/helpers'
-import { ArtworkCreationOptions, ArtworkManifest } from '~/types'
+import { ArtworkCreationOptions, ArtworkImageWithPreviews, ArtworkManifest } from '~/types'
 import { BundleFactory, DataItemFactory, SignerFactory } from '..'
 import PreviewFactory from './preview'
+
+const animatedImageTypes = [
+  'image/apng',
+  'image/avif',
+  'image/gif',
+  'image/webp'
+]
 
 export default class ArtworkBundleFactory {
   appName!: string
@@ -104,11 +111,23 @@ export default class ArtworkBundleFactory {
       city: artwork.city?.toLowerCase(),
       license: artwork.license,
       images: imageItems.map(([preview, preview4k, image]) => {
-        return {
+        const imageWithPreview: ArtworkImageWithPreviews = {
           image: image.id,
           preview: preview.id,
           preview4k: preview4k.id
         }
+
+        const isAnimated = image.tags.some(
+          tag =>
+            tag.name === 'Content-Type'
+            && animatedImageTypes.includes(tag.value)
+        )
+
+        if (isAnimated) {
+          imageWithPreview.animated = true
+        }
+
+        return imageWithPreview
       })
     }
   }
