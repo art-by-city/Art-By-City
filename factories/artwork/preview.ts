@@ -31,11 +31,11 @@ export default class PreviewFactory {
         this.canvas.height = naturalHeight * scale
 
         const ctx = this.canvas.getContext('2d')
-        if (ctx) {
-          ctx.imageSmoothingEnabled = true
-          ctx.imageSmoothingQuality = 'low'
-        }
-        ctx?.drawImage(image, 0, 0, this.canvas.width, this.canvas.height)
+        ctx!.imageSmoothingEnabled = true
+        ctx!.imageSmoothingQuality = 'low'
+        ctx!.fillStyle = 'white'
+        ctx!.fillRect(0, 0, this.canvas.width, this.canvas.height)
+        ctx!.drawImage(image, 0, 0, this.canvas.width, this.canvas.height)
 
         this.canvas.toBlob(blob => {
           if (blob) {

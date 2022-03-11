@@ -1,7 +1,7 @@
 <template>
   <div class="artwork-card">
     <v-hover :disabled="disabled">
-      <template v-slot:default="props">
+      <template v-slot:default="{ hover }">
         <v-img
           :src="src()"
           style="cursor: pointer"
@@ -15,10 +15,13 @@
 
           <v-fade-transition>
             <v-overlay
-              v-if="!disabled && props.hover"
+              v-if="!disabled && (hover || isAnimated)"
               absolute
-              class="artwork-overlay"
+              class="artwork-overlay fill-height"
             >
+              <div v-if="isAnimated" id="playIcon">
+                <v-icon x-large>mdi-play</v-icon>
+              </div>
               <v-row align="end" class="fill-height pa-1 pl-4">
                 <v-col
                   cols="auto"
@@ -31,20 +34,22 @@
                     v-if="disabled"
                     class="artwork-card-disable-overlay"
                   ></div>
-                  <a class="artwork-card-title white--text">
-                    {{ artwork ? artwork.title : '' }}
-                  </a>
-                  <br />
-                  <a
-                    class="
-                      artwork-card-title
-                      white--text
-                      font-italic
-                      font-weight-thin
-                    "
-                  >
-                    {{ displayName }}
-                  </a>
+                  <template v-if="hover">
+                    <a class="artwork-card-title white--text">
+                      {{ artwork ? artwork.title : '' }}
+                    </a>
+                    <br />
+                    <a
+                      class="
+                        artwork-card-title
+                        white--text
+                        font-italic
+                        font-weight-thin
+                      "
+                    >
+                      {{ displayName }}
+                    </a>
+                  </template>
                 </v-col>
               </v-row>
             </v-overlay>
@@ -103,6 +108,13 @@ export default class ArtworkCard extends Vue {
     return ''
   }
 
+  get isAnimated(): boolean {
+    return !!(
+      this.artwork
+      && this.artwork.version !== 0
+      && this.artwork.images[0].animated)
+  }
+
   get displayName() {
     if (this.profile?.displayName) {
       return this.profile?.displayName
@@ -153,5 +165,12 @@ export default class ArtworkCard extends Vue {
   top: 0;
   left: 0;
   z-index: 8990;
+}
+
+#playIcon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -24px;
 }
 </style>

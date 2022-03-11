@@ -47,19 +47,19 @@
                   class="clickable"
                 >
                   <v-overlay absolute :value="hoverProps.hover">
-                  <label
-                    class="artwork-upload-label"
-                    for="upload"
-                  >
-                    <v-icon>mdi-camera-plus</v-icon>
-                  </label>
-                  <input
-                    id="upload"
-                    class="artwork-upload-input"
-                    type="file"
-                    :accept="accept"
-                    @input="onArtworkImageChanged($event, i)"
-                  />
+                    <label
+                      class="artwork-upload-label"
+                      for="upload"
+                    >
+                      <v-icon>mdi-camera-plus</v-icon>
+                    </label>
+                    <input
+                      id="upload"
+                      class="artwork-upload-input"
+                      type="file"
+                      :accept="accept"
+                      @input="onArtworkImageChanged($event, i)"
+                    />
                     <!-- <v-file-input
                       class="artwork-upload-button"
                       :accept="accept"

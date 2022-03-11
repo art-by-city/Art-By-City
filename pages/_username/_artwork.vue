@@ -14,15 +14,22 @@
         <v-img
           v-else
           class="preview-artwork"
+          :class="{ 'animated': previewImage.animated }"
           max-height="75vh"
           max-width="75vw"
-          :src="artworkUrlFromId(previewImage)"
+          :src="previewSrc"
+          :lazy-src="artworkUrlFromId(previewImage.preview4k)"
           contain
           @click="onPreviewArtworkClicked"
         >
           <template v-slot:placeholder>
-            <TransactionPlaceholder :txId="previewImage" />
+            <TransactionPlaceholder :txId="previewImage.preview4k" />
           </template>
+          <v-overlay absolute :value="!showAnimation && previewImage.animated">
+            <v-btn x-large icon @click.prevent="showAnimation = true">
+              <v-icon>mdi-play</v-icon>
+            </v-btn>
+          </v-overlay>
         </v-img>
       </v-row>
       <v-row
@@ -42,7 +49,7 @@
               :src="image.dataUrl"
               class="clickable"
               :class="{ 'highlighted': image === previewImage }"
-              @click="setPreviewImage(image)"
+              @click="setPreviewImage(i)"
             >
             </v-img>
             <v-img
@@ -51,10 +58,10 @@
               :src="artworkUrlFromId(image.preview4k || image.preview)"
               class="clickable"
               :class="{
-                'highlighted': image.preview4k === previewImage
+                'highlighted': image.guid === previewImage.image.guid
                   || image.preview === previewImage
               }"
-              @click="setPreviewImage(image.preview4k || image.preview)"
+              @click="setPreviewImage(i)"
             >
               <template v-slot:placeholder>
                 <TransactionPlaceholder :txId="image.preview" />
@@ -159,7 +166,7 @@
       <ArtworkZoomDialog
         v-if="previewImage"
         :show.sync="zoom"
-        :src="previewImage.dataUrl || artworkUrlFromId(previewImage) ||''"
+        :src="previewImage.dataUrl || artworkUrlFromId(previewImage.image) ||''"
       />
     </v-container>
     <v-container v-else>
@@ -214,7 +221,8 @@ import {
   LegacyArtworkImage,
   UserTransaction,
   SetUserTransactionStatusPayload,
-  Profile
+  Profile,
+  ArtworkImageWithPreviews
   } from '~/types'
 import { debounce } from '~/helpers'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
@@ -269,12 +277,13 @@ export default class ArtworkPage extends FormPageComponent {
   artwork: Artwork | LegacyArtwork | null = null
   profile: Profile | null = null
   username: string | null = null
-  previewImage: string | LegacyArtworkImage | null = null
+  previewImage: ArtworkImageWithPreviews | LegacyArtworkImage | null = null
   zoom = false
   txIdOrSlug: string = this.$route.params.artwork
   txId?: string
   tx: UserTransaction | null = null
   dontEmbedImages: boolean = false
+  showAnimation: boolean = false
 
   get displayName() {
     if (this.profile?.displayName) {
@@ -298,6 +307,19 @@ export default class ArtworkPage extends FormPageComponent {
         ? this.artwork.creator.address
         : this.artwork.creator
       : ''
+  }
+
+  get previewSrc() {
+    if (this.previewImage && this.artwork && this.artwork.version !== 0) {
+      const preview = this.previewImage as ArtworkImageWithPreviews
+      return this.artworkUrlFromId(
+        preview.animated && this.showAnimation
+          ? preview.image
+          : preview.preview4k
+      )
+    } else {
+      return ''
+    }
   }
 
   @debounce
@@ -371,24 +393,42 @@ export default class ArtworkPage extends FormPageComponent {
     return `${protocol}://${host}:${port}/${id}`
   }
 
-  setPreviewImage(image?: LegacyArtworkImage | string) {
-    if (image) {
-      this.previewImage = image
-    } else if (
-      this.artwork
-      && this.artwork.images
-      && this.artwork.images.length > 0
-    ) {
-      this.previewImage = this.artwork.version === 0
-        ? this.artwork.images[0]
-        : this.artwork.images[0].preview4k || this.artwork.images[0].preview
-    } else {
-      this.previewImage = null
+  setPreviewImage(index?: number) {
+    if (!index) {
+      index = 0
     }
+
+    if (this.artwork && this.artwork.images.length - 1 >= index) {
+      this.previewImage = this.artwork.images[index]
+    }
+
+    // if (index) {
+    //   this.previewImage = thi
+    // } else if (
+    //   this.artwork
+    //   && this.artwork.images
+    //   && this.artwork.images.length > 0
+    // ) {
+    //   this.previewImage = this.artwork.version === 0
+    //     ? this.artwork.images[0]
+    //     : this.artwork.images[0].preview4k || this.artwork.images[0].preview
+    // } else {
+    //   this.previewImage = null
+    // }
   }
 
   @debounce
   onPreviewArtworkClicked() {
+    if (this.previewImage && this.artwork && this.artwork.version !== 0) {
+      const preview = this.previewImage as ArtworkImageWithPreviews
+      if (preview.animated) {
+        // load in animation
+        this.showAnimation = true
+
+        return
+      }
+    }
+
     this.zoom = true
   }
 }
@@ -397,6 +437,9 @@ export default class ArtworkPage extends FormPageComponent {
 <style scoped>
 .preview-artwork {
   cursor: zoom-in;
+}
+.preview-artwork.animated {
+  cursor: unset;
 }
 .clickable {
   cursor: pointer;
