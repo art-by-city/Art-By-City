@@ -25,7 +25,7 @@
           <template v-slot:placeholder>
             <TransactionPlaceholder :txId="previewImage.preview4k" />
           </template>
-          <v-overlay absolute :value="!showAnimation && previewImage.animated">
+          <v-overlay absolute :value="showAnimationOverlay">
             <v-btn x-large icon @click.prevent="showAnimation = true">
               <v-icon>mdi-play</v-icon>
             </v-btn>
@@ -58,8 +58,8 @@
               :src="artworkUrlFromId(image.preview4k || image.preview)"
               class="clickable"
               :class="{
-                'highlighted': image.guid === previewImage.image.guid
-                  || image.preview === previewImage
+                'highlighted': image.preview === previewImage
+                  || (previewImage && image.guid === previewImage.image.guid)
               }"
               @click="setPreviewImage(i)"
             >
@@ -320,6 +320,13 @@ export default class ArtworkPage extends FormPageComponent {
     } else {
       return ''
     }
+  }
+
+  get showAnimationOverlay(): boolean {
+    return !!(
+      !this.showAnimation
+      && (this.previewImage as any).animated
+    )
   }
 
   @debounce
