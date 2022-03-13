@@ -137,7 +137,7 @@
         timeout="-1"
       >
         Your Artwork was accepted by the Arweave Network but won't be available
-        until it is indexed and cached by an Arweave Gateway (~8hrs).
+        until it is indexed and cached by an Arweave Gateway (~8-24hrs).
         <template v-slot:action="{ attrs }">
           <v-btn
             color="red"

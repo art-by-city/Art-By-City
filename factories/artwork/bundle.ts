@@ -24,7 +24,7 @@ export default class ArtworkBundleFactory {
   async create(
     opts: ArtworkCreationOptions,
     logCb?: Function
-  ): Promise<Bundle> {
+  ): Promise<{ bundle: Bundle, manifestId: string }> {
     const signer = await SignerFactory.create()
     const resizer = new PreviewFactory()
 
@@ -91,7 +91,10 @@ export default class ArtworkBundleFactory {
       ]
     )
 
-    return BundleFactory.create([ manifestDataItem, ...images.flat() ])
+    return {
+      bundle: BundleFactory.create([ manifestDataItem, ...images.flat() ]),
+      manifestId: manifestDataItem.id
+    }
   }
 
   private createManifest(

@@ -30,13 +30,19 @@ export default class ArtworkService extends TransactionService {
     opts: ArtworkCreationOptions,
     logCb?: Function
   ): Promise<Transaction> {
-    const bundle = await this.artworkBundleFactory.create(opts, logCb)
+    const {
+      bundle,
+      manifestId
+    } = await this.artworkBundleFactory.create(opts, logCb)
     const data = bundle.getRaw()
     const tx = await this.$arweave.createTransaction({ data })
     tx.addTag('App-Name', this.config.app.name)
     tx.addTag('App-Version', this.config.app.version)
     tx.addTag('Bundle-Format', 'binary')
     tx.addTag('Bundle-Version', '2.0.0')
+    tx.addTag('Category', 'artwork:bundle')
+    tx.addTag('slug', opts.slug)
+    tx.addTag('Manifest-ID', manifestId)
 
     return tx
   }
