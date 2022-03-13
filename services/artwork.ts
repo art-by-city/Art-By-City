@@ -1,5 +1,6 @@
 import { Context } from '@nuxt/types'
 import Transaction from 'arweave/node/lib/transaction'
+import _ from 'lodash'
 
 import {
   Artwork,
@@ -52,6 +53,31 @@ export default class ArtworkService extends TransactionService {
     owner: string
   ): Promise<Artwork | LegacyArtwork | null> {
     const result = await this.transactionFactory.searchTransactions(
+      'artwork:bundle',
+      owner,
+      {
+        sort: 'HEIGHT_DESC',
+        tags: [
+          { tag: 'slug', value: txIdOrSlug },
+          { tag: 'Bundle-Format', value: 'binary' },
+          { tag: 'Bundle-Version', value: '2.0.0' }
+        ]
+      }
+    )
+
+    if (result.transactions[0]) {
+      const tx = result.transactions[0]
+      try {
+        const tags: { name: string, value: string }[] = (tx as any)._tags
+        const manifestTag = tags.find((tag) => tag.name === 'Manifest-ID')
+
+        if (manifestTag) {
+          return await this.fetch(manifestTag.value)
+        }
+      } catch (err) {}
+    }
+
+    const v0result = await this.transactionFactory.searchTransactions(
       'artwork',
       owner,
       {
@@ -61,8 +87,8 @@ export default class ArtworkService extends TransactionService {
       }
     )
 
-    if (result.transactions[0]) {
-      return await this.fetch(result.transactions[0].id)
+    if (v0result.transactions[0]) {
+      return await this.fetch(v0result.transactions[0].id)
     }
 
     // If no slug matches, try treating it as a txid
@@ -87,7 +113,7 @@ export default class ArtworkService extends TransactionService {
   async fetchFeed(
     creator?: string | string[] | null,
     cursor?: string,
-    limit?: number
+    limit: number = 9
   ): Promise<FeedItem[]> {
     if (!creator) {
       switch (this.config.app.name) {
@@ -117,7 +143,7 @@ export default class ArtworkService extends TransactionService {
             'uc8wFvl6oJO0QymalfxFFCTLkdl2HmF9xQrWvzk8uXM',
             'LtILfPM8agd7RU6AaQmwh0SFEvxPu-tb06E_iHksvUM',
             'P9TlkKY8NEuiBWf-YGIcVV9ZVWjhh9WgtoM8ej8jhJ8',
-            'lULoyhunyPeZGVrZnDnTfDBxS-XOFV-qaNphiwPH2Ps',
+            // 'lULoyhunyPeZGVrZnDnTfDBxS-XOFV-qaNphiwPH2Ps',
 
             'mKRPxOSIe08BddCnrL9en8C3hUGqwA5l1sUZilGsjDg',
             'zIe2L7WAptLeDdDUcGPOFtBkItZuRE2wE2GQh2LfFqc',
@@ -141,18 +167,54 @@ export default class ArtworkService extends TransactionService {
     }
 
     const result = await this.transactionFactory.searchTransactions(
-      'artwork',
+      'artwork:bundle',
       creator,
       {
-        type: 'application/json',
         sort: 'HEIGHT_DESC',
-        tags: [],
-        limit: limit || 9,
+        tags: [
+          { tag: 'Bundle-Format', value: 'binary' },
+          { tag: 'Bundle-Version', value: '2.0.0' }
+        ],
+        limit,
         cursor
       }
     )
 
-    return this.buildFeed(result.transactions.map(tx => tx.id), result.cursor)
+    let txIds = result.transactions.map(tx => {
+      try {
+        const tags: { name: string, value: string }[] = (tx as any)._tags
+        const manifestTag = tags.find((tag) => tag.name === 'Manifest-ID')
+
+        if (manifestTag) {
+          return manifestTag.value
+        }
+
+        return ''
+      } catch (err) {
+        return ''
+      }
+    }).filter(txId => !!txId)
+
+    let nextCursor = result.cursor
+    if (result.transactions.length < limit) {
+      const v0limit = limit - txIds.length
+      const v0result = await this.transactionFactory.searchTransactions(
+        'artwork',
+        creator,
+        {
+          type: 'application/json',
+          sort: 'HEIGHT_DESC',
+          tags: [],
+          limit: v0limit,
+          cursor
+        }
+      )
+
+      txIds = _.union(txIds, v0result.transactions.map(tx => tx.id))
+      nextCursor = v0result.cursor
+    }
+
+    return this.buildFeed(txIds, nextCursor)
   }
 
   async fetchLikedArtworkFeed(address: string, cursor?: string):

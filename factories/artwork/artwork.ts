@@ -1,5 +1,6 @@
 import {
   Artwork,
+  ArtworkImageWithPreviews,
   ArtworkManifest,
   LegacyArtwork,
   LegacyArtworkImage,
@@ -64,7 +65,7 @@ export default class ArtworkFactory {
         license: opts.license,
         medium: opts.medium,
         city: opts.city,
-        images: (opts.images as LegacyArtworkImage[]).map(image => {
+        images: (opts.images as ArtworkImageWithPreviews[]).map(image => {
           return { guid: uuidv4(), ...image }
         })
       }
