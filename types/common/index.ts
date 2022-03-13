@@ -26,6 +26,7 @@ export type DomainEntity =
 
 export type DomainEntityCategory =
   | 'artwork'
+  | 'artwork:bundle'
   | 'avatar'
   | 'like'
   | 'profile'

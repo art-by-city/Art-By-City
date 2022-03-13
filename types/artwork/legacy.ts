@@ -1,9 +1,10 @@
+import { ArtworkImageWithPreviews } from '.'
 import { TrackableEntity } from '../common'
 
 export interface LegacyArtwork extends LegacyArtworkManifest {
   version: 0
   id: string
-  images: (LegacyArtworkImage & TrackableEntity)[]
+  images: (ArtworkImageWithPreviews & TrackableEntity)[]
 }
 
 export interface LegacyArtworkManifest {
@@ -14,7 +15,7 @@ export interface LegacyArtworkManifest {
   created?: number
   description?: string
   type?: string
-  images: LegacyArtworkImage[]
+  images: ArtworkImageWithPreviews[]
   license?: {
     reference: string
     detailsUrl: string

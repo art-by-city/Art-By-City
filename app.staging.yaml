@@ -28,6 +28,7 @@ env_variables:
   ARWEAVE_PORT: 443
   ARTIST_PREREGISTRATION_URL: https://us-central1-art-by-city-staging-299519.cloudfunctions.net/artist-preregistration
   USERNAMES_CONTRACT_ID: UHPC-7wenVg-JyS81EXKCnLlKvjSbfrIsnWt1F8hueg
+  ARWEAVE_GATEWAY: https://staging.gateway.artby.city
 
 includes:
   - secrets.yaml
