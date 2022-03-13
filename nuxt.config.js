@@ -85,7 +85,8 @@ export default {
       waitForConfirmations: process.env.ARWEAVE_TX_CONFIRMATIONS || 12,
       contracts: {
         usernames: process.env.USERNAMES_CONTRACT_ID || ''
-      }
+      },
+      gateway: process.env.ARWEAVE_GATEWAY || 'http://localhost:1984'
     },
     artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081',
   },
@@ -121,7 +122,7 @@ export default {
   },
   proxy: {
     '/gateway': {
-      target: `${process.env.ARWEAVE_PROTOCOL || 'http'}://${process.env.ARWEAVE_HOST || 'localhost'}:${process.env.ARWEAVE_PORT || 1984}`,
+      target: `${process.env.ARWEAVE_GATEWAY || 'http://localhost:1984'}`,
       pathRewrite: { '^/gateway/': '' }
     }
   },
