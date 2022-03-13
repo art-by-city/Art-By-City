@@ -94,15 +94,12 @@ export default class ArtworkCard extends Vue {
   username: string | null = null
 
   artworkUrlFromId(id: string) {
-    const { protocol, host, port } = this.$arweave.api.config
-    return `${protocol}://${host}:${port}/${id}`
+    return `/gateway/${id}`
   }
 
   src() {
     if (this.artwork && this.artwork.images.length > 0) {
-      return this.artwork.version === 0
-        ? this.artwork.images[0].dataUrl
-        : this.artworkUrlFromId(this.artwork.images[0].preview)
+      return this.artworkUrlFromId(this.artwork.images[0].preview)
     }
 
     return ''

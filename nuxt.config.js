@@ -90,7 +90,6 @@ export default {
     },
     artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081',
   },
-  serverMiddleware: [{ path: '/api', handler: '~/server/server.ts' }],
   auth: {
     cookie: {
       name: 'arweave',

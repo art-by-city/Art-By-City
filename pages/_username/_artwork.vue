@@ -396,8 +396,7 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   artworkUrlFromId(id: string) {
-    const { protocol, host, port } = this.$arweave.api.config
-    return `${protocol}://${host}:${port}/${id}`
+    return `/gateway/${id}`
   }
 
   setPreviewImage(index?: number) {
