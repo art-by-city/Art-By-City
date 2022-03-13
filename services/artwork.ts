@@ -210,7 +210,8 @@ export default class ArtworkService extends TransactionService {
         }
       )
 
-      txIds = _.union(txIds, v0result.transactions.map(tx => tx.id))
+      const v0txIds = v0result.transactions.map(tx => tx.id)
+      txIds = _.union(txIds, v0txIds)
       nextCursor = v0result.cursor
     }
 
