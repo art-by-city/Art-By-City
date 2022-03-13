@@ -3,16 +3,6 @@
     <v-container v-if="artwork && !dontEmbedImages">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
         <v-img
-          v-if="!artwork.version"
-          class="preview-artwork"
-          max-height="75vh"
-          max-width="75vw"
-          :src="previewImage.dataUrl"
-          contain
-          @click="onPreviewArtworkClicked"
-        ></v-img>
-        <v-img
-          v-else
           class="preview-artwork"
           :class="{ 'animated': previewImage.animated }"
           max-height="75vh"
@@ -44,16 +34,6 @@
             :key="i"
           >
             <v-img
-              v-if="!artwork.version"
-              aspect-ratio="1.7"
-              :src="image.dataUrl"
-              class="clickable"
-              :class="{ 'highlighted': image === previewImage }"
-              @click="setPreviewImage(i)"
-            >
-            </v-img>
-            <v-img
-              v-else
               aspect-ratio="1.7"
               :src="artworkUrlFromId(image.preview4k || image.preview)"
               class="clickable"
@@ -166,7 +146,7 @@
       <ArtworkZoomDialog
         v-if="previewImage"
         :show.sync="zoom"
-        :src="previewImage.dataUrl || artworkUrlFromId(previewImage.image) ||''"
+        :src="artworkUrlFromId(previewImage.image) ||''"
       />
     </v-container>
     <v-container v-else>
@@ -248,9 +228,9 @@ export default class ArtworkPage extends FormPageComponent {
     const title = `${this.artwork.title} by ${this.displayName}`
     const url =
       `${this.$config.baseUrl}/${usernameOrAddress}/${txIdOrSlug}`
-    const thumbnailUrl = this.artwork.version === 0
-      ? `${this.$config.baseUrl}/api/artwork/${creator}/${txIdOrSlug}`
-      : this.artworkUrlFromId(this.artwork.images[0].preview)
+    const thumbnailUrl = this.$config.arweave.gateway
+      + '/'
+      + this.artwork.images[0].preview
     const twitter = this.profile?.twitter || ''
 
     return {
