@@ -290,7 +290,7 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   get previewSrc() {
-    if (this.previewImage && this.artwork && this.artwork.version !== 0) {
+    if (this.previewImage && this.artwork) {
       const preview = this.previewImage as ArtworkImageWithPreviews
       return this.artworkUrlFromId(
         preview.animated && this.showAnimation
@@ -387,20 +387,6 @@ export default class ArtworkPage extends FormPageComponent {
     if (this.artwork && this.artwork.images.length - 1 >= index) {
       this.previewImage = this.artwork.images[index]
     }
-
-    // if (index) {
-    //   this.previewImage = thi
-    // } else if (
-    //   this.artwork
-    //   && this.artwork.images
-    //   && this.artwork.images.length > 0
-    // ) {
-    //   this.previewImage = this.artwork.version === 0
-    //     ? this.artwork.images[0]
-    //     : this.artwork.images[0].preview4k || this.artwork.images[0].preview
-    // } else {
-    //   this.previewImage = null
-    // }
   }
 
   @debounce
