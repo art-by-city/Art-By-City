@@ -133,7 +133,9 @@ export default class ArtworkService extends TransactionService {
             'k4fkc6NDiMmfVR06qX5P5XvAOlLi9J9fgBaa8pLvIBc',
             '6uzZ2xVslWpFib3BR-J731uogU-FRuKDUifFVRZq8xE',
             'CxuvfybNxiEPpXGqIbM7tzzdSYOlOW9VOUWkf0FWH4c',
-            '9XaFpHnpswVxZ7juWnG5iK9tYocYG_EYRf9WRmzbfCQ'
+            '9XaFpHnpswVxZ7juWnG5iK9tYocYG_EYRf9WRmzbfCQ',
+            '83cE_sKfvJ2XugWumQZPY8KU9PpWqC8P_CnItpJWXn4',
+            'Qk6U75ZH_Wtwq5BsNSZK35eYq2lUZbVtP_qfif2JeZk',
           ]
           break
         case 'ArtByCity-Staging':
