@@ -478,7 +478,7 @@ export default class ArtworkEditForm extends Vue {
           id: this.transaction.id,
           last_tx: this.transaction.last_tx,
           type: 'artwork',
-          status: 'PENDING_CONFIRMATION',
+          status: 'PENDING_SUBMISSION',
           created: new Date().getTime()
         },
         (err?: Error) => {

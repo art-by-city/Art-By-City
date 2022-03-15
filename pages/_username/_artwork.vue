@@ -391,13 +391,11 @@ export default class ArtworkPage extends FormPageComponent {
 
   @debounce
   onPreviewArtworkClicked() {
-    if (this.previewImage && this.artwork && this.artwork.version !== 0) {
+    if (this.previewImage && this.artwork) {
       const preview = this.previewImage as ArtworkImageWithPreviews
       if (preview.animated) {
         // load in animation
         this.showAnimation = true
-
-        return
       }
     }
 

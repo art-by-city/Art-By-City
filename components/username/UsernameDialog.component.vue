@@ -163,7 +163,7 @@ export default class UsernameDialog extends TransactionDialog<string> {
           id: txId,
           last_tx: anchor,
           type: 'username',
-          status: 'PENDING_CONFIRMATION',
+          status: 'PENDING_SUBMISSION',
           created: new Date().getTime()
         })
       } else {

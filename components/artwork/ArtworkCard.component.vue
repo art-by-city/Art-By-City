@@ -106,10 +106,7 @@ export default class ArtworkCard extends Vue {
   }
 
   get isAnimated(): boolean {
-    return !!(
-      this.artwork
-      && this.artwork.version !== 0
-      && this.artwork.images[0].animated)
+    return !!(this.artwork && this.artwork.images[0].animated)
   }
 
   get displayName() {
