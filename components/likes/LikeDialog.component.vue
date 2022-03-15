@@ -107,7 +107,7 @@ export default class LikeDialog extends TransactionDialog<Like> {
           id: this.transaction.id,
           last_tx: this.transaction.last_tx,
           type: this.type,
-          status: 'PENDING_CONFIRMATION',
+          status: 'PENDING_SUBMISSION',
           created: new Date().getTime(),
           target: this.entityOwner,
           entityId: this.entityTxId

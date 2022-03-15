@@ -121,8 +121,6 @@ export default class TransactionQueueService extends ArweaveService {
   ) {
     switch (utx.status) {
       case 'PENDING_SUBMISSION':
-        // this.submitUserTransaction(tx, done)
-        break
       case 'PENDING_CONFIRMATION':
       case 'CONFIRMING':
         this.checkUserTransactionStatus(utx, done)
