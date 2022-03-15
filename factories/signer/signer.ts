@@ -6,6 +6,7 @@ import ArweaveWalletSigner from './arweaveWalletSigner'
 export default class SignerFactory {
   static async create(): Promise<Signer> {
     await window.arweaveWallet.connect([
+      'ACCESS_ADDRESS',
       'ACCESS_PUBLIC_KEY',
       'SIGNATURE',
       'SIGN_TRANSACTION'
