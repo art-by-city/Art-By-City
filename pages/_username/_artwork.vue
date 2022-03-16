@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-container v-if="artwork && !dontEmbedImages">
+    <v-container v-if="artwork">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
         <v-img
           class="preview-artwork"
@@ -262,7 +262,6 @@ export default class ArtworkPage extends FormPageComponent {
   txIdOrSlug: string = this.$route.params.artwork
   txId?: string
   tx: UserTransaction | null = null
-  dontEmbedImages: boolean = false
   showAnimation: boolean = false
 
   get displayName() {
@@ -315,13 +314,6 @@ export default class ArtworkPage extends FormPageComponent {
   }
 
   async fetch() {
-    if (process.server) {
-      const userAgent = this.$nuxt.context.req.headers['user-agent']
-      if (userAgent?.toLowerCase().startsWith('twitterbot')) {
-        this.dontEmbedImages = true
-      }
-    }
-
     ProgressService.start()
     try {
       const { username, address } = await this.$usernameService.resolve(
@@ -337,10 +329,6 @@ export default class ArtworkPage extends FormPageComponent {
         )
 
         if (artwork) {
-          if (this.dontEmbedImages) {
-            artwork.images = []
-          }
-
           this.artwork = artwork
           this.username = username || null
           this.profile = await this.$profileService.fetchProfile(address)
