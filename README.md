@@ -7,10 +7,6 @@
 ## NOTE
 ArLocal should be running if you're on a local dev env!
 ```bash
-# run our arlocal script from package.json
-$ npm run arlocal
-
-# OR run it yourself
 $ npx run arlocal
 ```
 
