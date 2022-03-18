@@ -68,8 +68,7 @@ export default class ArtworkService extends TransactionService {
     if (result.transactions[0]) {
       const tx = result.transactions[0]
       try {
-        const tags: { name: string, value: string }[] = (tx as any)._tags
-        const manifestTag = tags.find((tag) => tag.name === 'Manifest-ID')
+        const manifestTag = tx.tags.find((tag) => tag.name === 'Manifest-ID')
 
         if (manifestTag) {
           return await this.fetch(manifestTag.value)
@@ -184,8 +183,7 @@ export default class ArtworkService extends TransactionService {
 
     let txIds = result.transactions.map(tx => {
       try {
-        const tags: { name: string, value: string }[] = (tx as any)._tags
-        const manifestTag = tags.find((tag) => tag.name === 'Manifest-ID')
+        const manifestTag = tx.tags.find((tag) => tag.name === 'Manifest-ID')
 
         if (manifestTag) {
           return manifestTag.value
@@ -226,8 +224,9 @@ export default class ArtworkService extends TransactionService {
 
     const likedEntityTxIds = result.transactions.map(tx => {
       try {
-        const tags: { name: string, value: string }[] = (tx as any)._tags
-        const likedEntityTag = tags.find((tag) => tag.name === LIKED_ENTITY_TAG)
+        const likedEntityTag = tx.tags.find(
+          tag => tag.name === LIKED_ENTITY_TAG
+        )
 
         if (likedEntityTag) {
           return likedEntityTag.value

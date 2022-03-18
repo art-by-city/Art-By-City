@@ -1,4 +1,4 @@
-import ArdbTransaction from '@textury/ardb/lib/models/transaction'
+import ArdbTransaction from 'ardb/lib/models/transaction'
 import Transaction from 'arweave/node/lib/transaction'
 import _ from 'lodash'
 
@@ -108,10 +108,8 @@ export default class LikesService extends TransactionService {
 
     // Ensure likes are for unique entity tx
     result.transactions = _.uniqWith(result.transactions, (txA, txB) => {
-      const tagsA: { name: string, value: string }[] = (txA as any)._tags
-      const entityIdA = tagsA.find((tag) => LIKED_ENTITY_TAG === tag.name)
-      const tagsB: { name: string, value: string }[] = (txB as any)._tags
-      const entityIdB = tagsB.find((tag) => LIKED_ENTITY_TAG === tag.name)
+      const entityIdA = txA.tags.find((tag) => LIKED_ENTITY_TAG === tag.name)
+      const entityIdB = txB.tags.find((tag) => LIKED_ENTITY_TAG === tag.name)
 
       return !entityIdA || !entityIdB || _.isEqual(entityIdA, entityIdB)
     })
