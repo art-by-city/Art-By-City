@@ -2,6 +2,7 @@
   <v-app dark class="app">
     <AppBar
       :config="$config"
+      :loading="isLoggingIn"
       @login="login"
       @logout="logout"
       @signup="showSignupModal"
@@ -62,6 +63,7 @@ import { ArweaveWalletNotInstalledError } from '~/schemes/arweave-wallet'
 export default class DefaultLayout extends Vue {
   toasts: ToastMessage[] = []
   showAuthDialog: string = ''
+  isLoggingIn: boolean = false
 
   removeToast(toast: ToastMessage) {
     this.$store.commit('toasts/remove', toast)
@@ -91,6 +93,7 @@ export default class DefaultLayout extends Vue {
 
   async login() {
     try {
+      this.isLoggingIn = true
       await this.$auth.loginWith('arweave-wallet')
       this.$nuxt.$emit('auth-completed')
       this.showAuthDialog = 'alpha-agreement'
@@ -100,6 +103,8 @@ export default class DefaultLayout extends Vue {
       } else {
         this.$toastService.error(error)
       }
+    } finally {
+      this.isLoggingIn = false
     }
   }
 

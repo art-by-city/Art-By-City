@@ -59,6 +59,8 @@
         @click="onLoginClicked"
         text
         tile
+        :loading="loading"
+        :disabled="loading"
       >log in</v-btn>
       <v-divider vertical class="white-divider" />
       <v-btn
@@ -92,6 +94,12 @@ export default class AppBar extends Vue {
     type: Object,
     required: true
   }) readonly config!: ConfigStoreState
+
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly loading: boolean | undefined
 
   get isMobile() {
     switch (this.$vuetify.breakpoint.name) {
