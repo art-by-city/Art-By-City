@@ -1,8 +1,8 @@
 <template>
   <div class="liked-by-list">
-    <template v-for="(user, i) in users">
+    <template v-for="({ address }, i) in likesAndTips">
       <v-divider v-if="i > 0"></v-divider>
-      <UserAvatar :key="i" dense :user="user" usernameWidth="298px" />
+      <UserAvatar :key="i" dense :user="{ address }" usernameWidth="298px" />
     </template>
   </div>
 </template>
@@ -10,11 +10,13 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import { User } from '~/models'
-
 @Component
 export default class LikedByList extends Vue {
-  users: User[] = []
+  likesAndTips: {
+    address: string,
+    amount: string,
+    txId: string
+  }[] = []
 
   @Prop({
     type: String,
@@ -22,16 +24,7 @@ export default class LikedByList extends Vue {
   }) readonly entityTxId!: string
 
   async fetch() {
-    const users = await this.$likesService.fetchLikedBy(this.entityTxId)
-
-    for (let i = 0; i < users.length; i++) {
-      users[i].avatar = await this.$avatarService.fetchAvatar(users[i].address)
-      users[i].username = await this.$usernameService.resolveUsername(
-        users[i].address
-      )
-    }
-
-    this.users = users
+    this.likesAndTips = await this.$likesService.fetchLikedBy(this.entityTxId)
   }
 }
 </script>

@@ -3,22 +3,61 @@
     :value="open"
     persistent
     width="400"
+    class="overflow-x-hidden"
   >
     <v-container dense class="pa-1">
       <v-row dense>
         <v-col dense cols="12" class="pa-0">
           <v-card>
-            <v-card-text class="text-body-1 mb-0 pb-0 black--text">
+            <v-card-text
+              class="
+                text-body-1
+                mb-0
+                pb-0
+                black--text
+                overflow-x-hidden
+                overflow-y-hidden
+              "
+            >
               Like
               <b>{{ entityDescription }}</b>
               by
               <i>{{ ownerDisplayName }}</i>
               ?
-              <p class="text-caption mb-0">
-                (Includes {{ likeFee }} tip to {{ ownerDisplayName }})
+              <p class="text-caption mt-1 mb-0">
+                Includes {{ likeFee }} <b>AR</b> tip to
+                <i>{{ ownerDisplayName }}</i>
+                <v-btn
+                  v-if="!isEditingTip"
+                  text
+                  outlined
+                  x-small
+                  @click="isEditingTip = true"
+                  class="ml-1"
+                >
+                  Edit
+                </v-btn>
               </p>
+              <v-form
+                ref="form"
+                v-model="valid"
+                autocomplete="off"
+                :disabled="isUploading || isSigned"
+              >
+                <v-text-field
+                  v-if="isEditingTip"
+                  type="number"
+                  v-model="likeFee"
+                  dense
+                  :step="LIKING_ARTIST_FEE"
+                  :min="LIKING_ARTIST_FEE"
+                  :rules="[minimumTip]"
+                >
+                  {{ likeFee }}
+                </v-text-field>
+              </v-form>
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions class="pt-0">
               <TransactionFormControls
                 :loading="isUploading"
                 :signed="isSigned"
@@ -38,6 +77,7 @@
 
 <script lang="ts">
 import { Component, Prop, Emit } from 'nuxt-property-decorator'
+import _ from 'lodash'
 
 import { DomainEntityCategory, Like } from '~/types'
 import TransactionDialog from
@@ -54,7 +94,6 @@ import { LIKING_ARTIST_FEE } from '~/services/likes'
 export default class LikeDialog extends TransactionDialog<Like> {
   asset: Like = false
   type: DomainEntityCategory = 'like'
-  likeFee = LIKING_ARTIST_FEE
 
   @Prop({
     type: String,
@@ -78,24 +117,51 @@ export default class LikeDialog extends TransactionDialog<Like> {
 
   info: string = ''
 
+  LIKING_ARTIST_FEE = LIKING_ARTIST_FEE
+  likeFee: string = LIKING_ARTIST_FEE
+  isEditingTip: boolean = false
+  valid: boolean = true
+  $refs!: {
+    form: Vue & {
+      validate: () => boolean
+      resetValidation: () => void
+    }
+  }
+
   @Emit('pending') pending(isPending: boolean) {
     return isPending
   }
 
+  minimumTip(value: string = '') {
+    const valueFloat = Number.parseFloat(value)
+    const feeFloat = Number.parseFloat(LIKING_ARTIST_FEE)
+
+    if (!value || _.isNaN(valueFloat) || valueFloat < feeFloat) {
+      return `Tip must be at least ${LIKING_ARTIST_FEE} AR.`
+    }
+
+    return true
+  }
+
   async onSign() {
-    this.isUploading = true
+    this.valid = this.$refs.form.validate()
 
-    this.info = 'Building Artwork transaction...'
-    this.transaction = await this.$likesService.createLikeTransaction(
-      this.entityTxId,
-      this.entityOwner
-    )
+    if (this.valid) {
+      this.isUploading = true
 
-    this.info = 'Waiting on signature...'
-    this.isSigned = await this.$arweaveService.sign(this.transaction)
+      this.info = 'Building Artwork transaction...'
+      this.transaction = await this.$likesService.createLikeTransaction(
+        this.entityTxId,
+        this.entityOwner,
+        this.likeFee
+      )
 
-    this.info = ''
-    this.isUploading = false
+      this.info = 'Waiting on signature...'
+      this.isSigned = await this.$arweaveService.sign(this.transaction)
+
+      this.info = ''
+      this.isUploading = false
+    }
   }
 
   async onSubmit() {
@@ -127,8 +193,19 @@ export default class LikeDialog extends TransactionDialog<Like> {
   }
 
   close() {
+    this.isEditingTip = false
     this.asset = false
     this.baseClose()
   }
 }
 </script>
+
+<style scoped>
+/* Hide slider messages to make dialog smaller */
+.v-input__slider >>> .v-messages {
+  display: none;
+}
+.v-input__slider >>> .v-input__slot {
+  margin-bottom: 5px !important;
+}
+</style>
