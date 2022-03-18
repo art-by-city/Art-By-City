@@ -8,6 +8,7 @@
       max-width="36"
       min-width="36"
       @click="toggleLike"
+      :disabled="disabled"
     >
       <v-icon :color="color">{{ icon }}</v-icon>
     </v-btn>
@@ -39,7 +40,10 @@
               <v-card-title>Liked By</v-card-title>
               <v-divider></v-divider>
               <v-card-text>
-                <LikedByList :entityTxId="entityTxId" />
+                <LikedByList
+                  :entityTxId="entityTxId"
+                  :entityOwner="entityOwner"
+                />
               </v-card-text>
             </v-card>
           </v-col>
@@ -76,6 +80,12 @@ export default class LikeButton extends Vue {
     required: false,
     default: false
   }) readonly dark: boolean | undefined
+
+    @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly disabled: boolean | undefined
 
   @Prop({
     type: String,
@@ -194,7 +204,10 @@ export default class LikeButton extends Vue {
   }
 
   private async fetchLikeCount() {
-    this.totalLikes = await this.$likesService.fetchTotalLikes(this.entityTxId)
+    this.totalLikes = await this.$likesService.fetchTotalLikes(
+      this.entityTxId,
+      this.entityOwner
+    )
   }
 }
 </script>
