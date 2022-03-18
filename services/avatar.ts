@@ -49,10 +49,9 @@ export default class AvatarService extends TransactionService {
         // v2 format
         const config = this.config.api
         const src = `${config.protocol}://${config.host}:${config.port}/${txId}`
-        const tx: any = result.transactions[0]
+        const tx = result.transactions[0]
 
-        const tags: { name: string, value: string }[] = tx._tags
-        const type = tags.find(tag => tag.name === 'Content-Type')?.value
+        const type = tx.tags.find(tag => tag.name === 'Content-Type')?.value
           || 'image/png'
 
         return {

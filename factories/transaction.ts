@@ -1,8 +1,8 @@
 import Arweave from 'arweave'
 import Transaction from 'arweave/web/lib/transaction'
 import { CreateTransactionInterface } from 'arweave/web/common'
-import ArDB from '@textury/ardb'
-import ArdbTransaction from '@textury/ardb/lib/models/transaction'
+import ArDB from 'ardb'
+import ArdbTransaction from 'ardb/lib/models/transaction'
 
 import { ArweaveAppConfig, DomainEntityCategory } from '../types'
 

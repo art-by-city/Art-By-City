@@ -1,4 +1,4 @@
-import ArDB from '@textury/ardb'
+import ArDB from 'ardb'
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 

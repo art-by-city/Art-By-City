@@ -18,7 +18,7 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 import Arweave from 'arweave'
-import ArdbTransaction from '@textury/ardb/lib/models/transaction'
+import ArdbTransaction from 'ardb/lib/models/transaction'
 
 import { debounce } from '~/helpers'
 import FormPageComponent from '../components/pages/formPage.component'
