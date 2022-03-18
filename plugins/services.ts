@@ -8,11 +8,12 @@ import ToastService from '~/services/toast/service'
 import ChangelogService from '~/services/changelog/service'
 import {
   ArtworkService,
+  ArweaveService,
   AvatarService,
+  LikesService,
+  TipsService,
   TransactionQueueService,
   UserService,
-  LikesService,
-  ArweaveService,
   UsernameService
 } from '~/services'
 
@@ -32,6 +33,7 @@ declare module 'vue/types/vue' {
     $txQueueService: TransactionQueueService
     $likesService: LikesService
     $arweaveService: ArweaveService
+    $tipsService: TipsService
   }
 }
 
@@ -52,6 +54,7 @@ declare module '@nuxt/types' {
     $txQueueService: TransactionQueueService
     $likesService: LikesService
     $arweaveService: ArweaveService
+    $tipsService: TipsService
   }
   // nuxtContext.$myInjectedFunction
   interface Context {
@@ -68,6 +71,7 @@ declare module '@nuxt/types' {
     $txQueueService: TransactionQueueService
     $likesService: LikesService
     $arweaveService: ArweaveService
+    $tipsService: TipsService
   }
 }
 
@@ -87,6 +91,7 @@ declare module 'vuex/types/index' {
     $txQueueService: TransactionQueueService
     $likesService: LikesService
     $arweaveService: ArweaveService
+    $tipsService: TipsService
   }
 }
 
@@ -103,6 +108,7 @@ const servicesPlugin: Plugin = (context, inject) => {
   inject('txQueueService', new TransactionQueueService(context))
   inject('likesService', new LikesService(context))
   inject('arweaveService', new ArweaveService(context))
+  inject('tipsService', new TipsService(context))
 
   // Injected last, depends on LikesService
   inject('artworkService', new ArtworkService(context))

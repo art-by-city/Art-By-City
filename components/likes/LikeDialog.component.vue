@@ -149,7 +149,7 @@ export default class LikeDialog extends TransactionDialog<Like> {
     if (this.valid) {
       this.isUploading = true
 
-      this.info = 'Building Artwork transaction...'
+      this.info = 'Building Like transaction...'
       this.transaction = await this.$likesService.createLikeTransaction(
         this.entityTxId,
         this.entityOwner,

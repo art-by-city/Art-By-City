@@ -36,8 +36,8 @@
 
               </v-speed-dial>
             </template>
-            <template v-else>
-              <v-tooltip top>
+            <template v-if="!isOwner && $auth.loggedIn">
+              <!-- <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <span
                     v-on="on"
@@ -55,7 +55,17 @@
                   </span>
                 </template>
                 Coming soon!
-              </v-tooltip>
+              </v-tooltip> -->
+              <span>
+              <v-btn
+                text
+                outlined
+                x-small
+                @click="onTipClicked"
+              >
+                Tip
+              </v-btn>
+              </span>
             </template>
           </v-row>
         </v-col>
@@ -105,6 +115,7 @@
               Art
             </v-tab>
             <v-tab nuxt to="#liked">Liked ({{ likesCount }})</v-tab>
+            <v-tab nuxt to="#tips">Tips</v-tab>
           </v-tabs>
           <v-divider></v-divider>
         </v-col>
@@ -117,11 +128,14 @@
           <template v-if="tab === 'liked'">
             <LikesFeed :address="artist.address" />
           </template>
+          <template v-if="tab === 'tips'">
+            <TipsFeed :address="artist.address" />
+          </template>
           <template v-else>
             <ArtistFeed
-                :address="artist.address"
-                @fetched="onArtistFeedFetched"
-              />
+              :address="artist.address"
+              @fetched="onArtistFeedFetched"
+            />
           </template>
         </v-col>
       </v-row>
@@ -150,6 +164,13 @@
         </template>
       </v-snackbar>
     </template>
+    <template v-if="!isOwner && $auth.loggedIn && artist">
+      <TipArtistDialog
+        :show.sync="showTipArtistDialog"
+        :recipientAddress="artist.address"
+        :recipientDisplayName="primaryName"
+      />
+    </template>
   </div>
 </template>
 
@@ -166,8 +187,11 @@ import EditProfileDialog from
   '~/components/profile/EditProfileDialog.component.vue'
 import UsernameDialog from
   '~/components/username/UsernameDialog.component.vue'
+import TipArtistDialog from
+  '~/components/tips/TipArtistDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 import LikesFeed from '~/components/profile/LikesFeed.component.vue'
+import TipsFeed from '~/components/tips/TipsFeed.component.vue'
 import ExpandParagraph from '~/components/common/ExpandParagraph.component.vue'
 import { DomainEntity, DomainEntityCategory } from '~/types'
 
@@ -178,7 +202,9 @@ import { DomainEntity, DomainEntityCategory } from '~/types'
     EditProfileDialog,
     ExpandParagraph,
     LikesFeed,
-    UsernameDialog
+    UsernameDialog,
+    TipArtistDialog,
+    TipsFeed
   }
 })
 export default class UserProfilePage extends PageComponent {
@@ -227,8 +253,9 @@ export default class UserProfilePage extends PageComponent {
   artist: User | null = null
   showEditSpeedDial: boolean = false
   showAvatarUploadDialog: boolean = false
-  showEditProfileDialog: Boolean = false
-  showUsernameDialog: Boolean = false
+  showEditProfileDialog: boolean = false
+  showUsernameDialog: boolean = false
+  showTipArtistDialog: boolean = false
   likesCount: number = 0
   tab: null | string = null
 
@@ -351,6 +378,11 @@ export default class UserProfilePage extends PageComponent {
   @debounce
   onEditUsernameClicked() {
     this.showUsernameDialog = true
+  }
+
+  @debounce
+  onTipClicked() {
+    this.showTipArtistDialog = true
   }
 
   alreadySwitchedToLikes = false

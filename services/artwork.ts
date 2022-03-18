@@ -243,8 +243,14 @@ export default class ArtworkService extends TransactionService {
 
   private buildFeed(txs: string[], cursor: string): FeedItem[] {
     return txs.map((txId) => {
-      const item = { guid: uuidv4(), category: 'artwork', txId, cursor }
-      return item as FeedItem
+      const item: FeedItem = {
+        guid: uuidv4(),
+        category: 'artwork',
+        txId,
+        cursor
+      }
+
+      return item
     })
   }
 }

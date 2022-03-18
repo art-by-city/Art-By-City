@@ -73,7 +73,8 @@ export default class TransactionFactory {
       type: 'application/json',
       sort: 'HEIGHT_DESC',
       tags: []
-    }
+    },
+    recipient?: string | string[]
   ): Promise<TransactionSearchResults> {
     let query = this.ardb
       .search('transactions')
@@ -82,6 +83,10 @@ export default class TransactionFactory {
 
     if (owner) {
       query = query.from(owner)
+    }
+
+    if (recipient) {
+      query = query.to(recipient)
     }
 
     if (opts.type) {
