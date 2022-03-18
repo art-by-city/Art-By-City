@@ -23,8 +23,16 @@ export default class LikedByList extends Vue {
     required: true
   }) readonly entityTxId!: string
 
+  @Prop({
+    type: String,
+    required: true
+  }) readonly entityOwner!: string
+
   async fetch() {
-    this.likesAndTips = await this.$likesService.fetchLikedBy(this.entityTxId)
+    this.likesAndTips = await this.$likesService.fetchLikedBy(
+      this.entityTxId,
+      this.entityOwner
+    )
   }
 }
 </script>

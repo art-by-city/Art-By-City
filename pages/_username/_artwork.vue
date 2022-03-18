@@ -132,8 +132,12 @@
           </v-row>
         </v-col>
         <v-col cols="5">
-          <div v-if="$auth.loggedIn" style="align-self: flex-end">
+          <div
+            v-if="$auth.loggedIn && $auth.user.address"
+            style="align-self: flex-end"
+          >
             <LikeButton
+              :disabled="creator === $auth.user.address"
               :entityOwner="creator"
               :entityTxId="artwork.id"
               :entityDescription="artwork.title"

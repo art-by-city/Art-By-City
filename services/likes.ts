@@ -1,10 +1,9 @@
 import ArdbTransaction from '@textury/ardb/lib/models/transaction'
 import Transaction from 'arweave/node/lib/transaction'
+import _ from 'lodash'
 
 import { TransactionService } from './'
-import { User } from '~/models'
-import { TransactionSearchResults } from '../factories/transaction'
-import _ from 'lodash'
+import { TransactionSearchResults } from '~/factories/transaction'
 
 export const LIKED_ENTITY_TAG = 'liked-entity'
 export const LIKING_ARTIST_FEE = '0.0002' // AR
@@ -26,10 +25,10 @@ export default class LikesService extends TransactionService {
     return tx
   }
 
-  async isEntityLikedBy(entityTxId: string, likedBy: string): Promise<boolean> {
+  async isEntityLikedBy(entityTxId: string, address: string): Promise<boolean> {
     const result = await this.transactionFactory.searchTransactions(
       'like',
-      likedBy,
+      address,
       {
         tags: [{ tag: LIKED_ENTITY_TAG, value: entityTxId }]
       }
@@ -39,14 +38,21 @@ export default class LikesService extends TransactionService {
   }
 
   private async fetchEntityLikeTxs(
-    entityTxId: string
+    entityTxId: string,
+    entityOwner: string
   ): Promise<ArdbTransaction[]> {
     const result = await this.transactionFactory.searchTransactions(
       'like',
       undefined,
       {
-        tags: [{ tag: LIKED_ENTITY_TAG, value: entityTxId }]
+        tags: [{ tag: LIKED_ENTITY_TAG, value: entityTxId }],
+        limit: 100
       }
+    )
+
+    // Remove self-likes
+    result.transactions = result.transactions.filter(
+      tx => tx.owner.address !== entityOwner
     )
 
     // Ensure likes are unique by likedBy address
@@ -56,14 +62,15 @@ export default class LikesService extends TransactionService {
   }
 
   async fetchLikedBy(
-    entityTxId: string
+    entityTxId: string,
+    entityOwner: string
   ): Promise<{
       address: string,
       amount: string,
       txId: string
     }[]> {
     return (
-      await this.fetchEntityLikeTxs(entityTxId)
+      await this.fetchEntityLikeTxs(entityTxId, entityOwner)
     ).map((tx) => { return {
       address: tx.owner.address,
       amount: tx.quantity.winston,
@@ -71,21 +78,32 @@ export default class LikesService extends TransactionService {
     } })
   }
 
-  async fetchTotalLikes(entityTxId: string): Promise<number> {
-    return (await this.fetchEntityLikeTxs(entityTxId)).length || 0
+  async fetchTotalLikes(
+    entityTxId: string,
+    entityOwner: string
+  ): Promise<number> {
+    return (await this.fetchEntityLikeTxs(entityTxId, entityOwner)).length || 0
   }
 
-  async fetchUserLikes(likedBy: string, cursor?: string, limit?: number):
-    Promise<TransactionSearchResults> {
+  async fetchUserLikes(
+    address: string,
+    cursor?: string,
+    limit: number = 100
+  ): Promise<TransactionSearchResults> {
     const result = await this.transactionFactory.searchTransactions(
       'like',
-      likedBy,
+      address,
       {
         sort: 'HEIGHT_DESC',
         tags: [],
         cursor,
         limit
       }
+    )
+
+    // Filter out self-likes
+    result.transactions = result.transactions.filter(
+      tx => tx.recipient !== address
     )
 
     // Ensure likes are for unique entity tx
@@ -101,9 +119,9 @@ export default class LikesService extends TransactionService {
     return result
   }
 
-  async fetchTotalLikedByUser(likedBy: string): Promise<number> {
+  async fetchTotalLikedByUser(address: string): Promise<number> {
     return (
-      await this.fetchUserLikes(likedBy, undefined, 100)
+      await this.fetchUserLikes(address, undefined, 100)
     ).transactions.length || 0
   }
 }
