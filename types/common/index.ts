@@ -17,6 +17,10 @@ export interface Profile {
 
 export type Username = string
 export type Like = boolean
+export type Tip = {
+  amount: string
+  from: string
+}
 
 export type DomainEntity =
   | Avatar
@@ -30,4 +34,5 @@ export type DomainEntityCategory =
   | 'avatar'
   | 'like'
   | 'profile'
+  | 'tip'
   | 'username'
