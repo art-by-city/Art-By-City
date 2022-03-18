@@ -15,6 +15,7 @@
       class="like-count"
       text
       mid-width="64"
+      :disabled="totalLikes < 1"
       @click="showLikedByPopup"
     >
       <span

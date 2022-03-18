@@ -7,19 +7,20 @@ import { TransactionSearchResults } from '../factories/transaction'
 import _ from 'lodash'
 
 export const LIKED_ENTITY_TAG = 'liked-entity'
-export const LIKING_ARTIST_FEE = '0.0002' // $0.01 USD @ 1AR/$50
+export const LIKING_ARTIST_FEE = '0.0002' // AR
 
 export default class LikesService extends TransactionService {
   async createLikeTransaction(
     likedEntityTxId: string,
-    likedEntityOwner: string
+    likedEntityOwner: string,
+    likeTip: string = LIKING_ARTIST_FEE
   ): Promise<Transaction> {
     const tx = await this.transactionFactory.buildEntityTransaction(
       'like',
       undefined,
       [{ tag: LIKED_ENTITY_TAG, value: likedEntityTxId }],
       likedEntityOwner,
-      LIKING_ARTIST_FEE
+      likeTip
     )
 
     return tx
@@ -54,10 +55,20 @@ export default class LikesService extends TransactionService {
     return result.transactions
   }
 
-  async fetchLikedBy(entityTxId: string): Promise<User[]> {
+  async fetchLikedBy(
+    entityTxId: string
+  ): Promise<{
+      address: string,
+      amount: string,
+      txId: string
+    }[]> {
     return (
       await this.fetchEntityLikeTxs(entityTxId)
-    ).map((tx) => { return { address: tx.owner.address } })
+    ).map((tx) => { return {
+      address: tx.owner.address,
+      amount: tx.quantity.winston,
+      txId: tx.id
+    } })
   }
 
   async fetchTotalLikes(entityTxId: string): Promise<number> {
