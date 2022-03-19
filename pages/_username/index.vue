@@ -128,10 +128,10 @@
           <template v-if="tab === 'liked'">
             <LikesFeed :address="artist.address" />
           </template>
-          <template v-if="tab === 'tips'">
+          <template v-else-if="tab === 'tips'">
             <TipsFeed :address="artist.address" />
           </template>
-          <template v-if="tab === $route.path">
+          <template v-else>
             <ArtistFeed
               :address="artist.address"
               @fetched="onArtistFeedFetched"
