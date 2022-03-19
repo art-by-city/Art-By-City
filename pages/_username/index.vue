@@ -131,7 +131,7 @@
           <template v-if="tab === 'tips'">
             <TipsFeed :address="artist.address" />
           </template>
-          <template v-else>
+          <template v-if="tab === $route.path">
             <ArtistFeed
               :address="artist.address"
               @fetched="onArtistFeedFetched"
