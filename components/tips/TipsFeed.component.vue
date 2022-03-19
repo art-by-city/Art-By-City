@@ -16,7 +16,7 @@
         {{ item.amount }} <b>AR</b>
       </v-col>
       <v-col cols="auto">
-        <UserAvatar :key="i" dense :user="{ address }" />
+        <UserAvatar :key="i" dense :user="{ address: item.from }" />
       </v-col>
       <v-col cols="auto">
         <a
