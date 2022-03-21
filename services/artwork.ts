@@ -17,6 +17,11 @@ export default class ArtworkService extends TransactionService {
   $likesService!: LikesService
   artworkBundleFactory!: ArtworkBundleFactory
 
+  cache: {
+    slugs: { [slug: string]: string }
+    artwork: { [id: string]: Artwork | LegacyArtwork }
+  } = { slugs: {}, artwork: {} }
+
   constructor(context: Context) {
     super(context)
 
@@ -52,7 +57,11 @@ export default class ArtworkService extends TransactionService {
     txIdOrSlug: string,
     owner: string
   ): Promise<Artwork | LegacyArtwork | null> {
-    const result = await this.transactionFactory.searchTransactions(
+    if (this.cache.slugs[txIdOrSlug]) {
+      return await this.fetch(this.cache.slugs[txIdOrSlug])
+    }
+
+    const { transactions } = await this.transactionFactory.searchTransactions(
       'artwork:bundle',
       owner,
       {
@@ -65,12 +74,14 @@ export default class ArtworkService extends TransactionService {
       }
     )
 
-    if (result.transactions[0]) {
-      const tx = result.transactions[0]
+    if (transactions[0]) {
+      const tx = transactions[0]
       try {
         const manifestTag = tx.tags.find((tag) => tag.name === 'Manifest-ID')
 
         if (manifestTag) {
+          this.cache.slugs[txIdOrSlug] = manifestTag.value
+
           return await this.fetch(manifestTag.value)
         }
       } catch (err) {}
@@ -87,6 +98,8 @@ export default class ArtworkService extends TransactionService {
     )
 
     if (v0result.transactions[0]) {
+      this.cache.slugs[txIdOrSlug] = v0result.transactions[0].id
+
       return await this.fetch(v0result.transactions[0].id)
     }
 
@@ -98,10 +111,16 @@ export default class ArtworkService extends TransactionService {
 
   async fetch(id: string): Promise<Artwork | LegacyArtwork | null> {
     try {
-      // NB: Use /gateway proxy for arweave.net to avoid CORS fails
-      const res = await this.context.$axios.get(`/gateway/${id}`)
+      if (!this.cache.artwork[id]) {
+        // NB: Use /gateway proxy for arweave.net to avoid CORS fails
+        const res = await this.context.$axios.get(`/gateway/${id}`)
 
-      return new ArtworkFactory().build(id, res.data)
+        const artwork = new ArtworkFactory().build(id, res.data)
+
+        this.cache.artwork[id] = artwork
+      }
+
+      return this.cache.artwork[id]
     } catch (error) {
       console.error(error)
 
