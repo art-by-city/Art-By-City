@@ -23,6 +23,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
+import _ from 'lodash'
 
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
 import ProgressService from '~/services/progress/service'
@@ -63,7 +64,7 @@ export default class FeedComponent extends Vue {
       const prevCursor = this.cursor
       const nextCursor = this.feed[this.feed.length - 1].cursor
 
-      if (prevCursor !== nextCursor) {
+      if (!_.isEqual(prevCursor, nextCursor)) {
         this.cursor = nextCursor
         this.$fetch()
       }
