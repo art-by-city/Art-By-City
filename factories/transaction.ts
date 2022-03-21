@@ -67,7 +67,7 @@ export default class TransactionFactory {
   }
 
   async searchTransactions(
-    category: DomainEntityCategory,
+    category: DomainEntityCategory | DomainEntityCategory[],
     owner?: string | string[],
     opts: TransactionSearchOptions = {
       type: 'application/json',

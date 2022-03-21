@@ -167,21 +167,20 @@ export default class ArtworkService extends TransactionService {
       }
     }
 
-    const result = await this.transactionFactory.searchTransactions(
-      'artwork:bundle',
+    const {
+      transactions,
+      cursor: nextCursor
+    } = await this.transactionFactory.searchTransactions(
+      ['artwork', 'artwork:bundle'],
       creator,
       {
         sort: 'HEIGHT_DESC',
-        tags: [
-          { tag: 'Bundle-Format', value: 'binary' },
-          { tag: 'Bundle-Version', value: '2.0.0' }
-        ],
         limit,
         cursor
       }
     )
 
-    let txIds = result.transactions.map(tx => {
+    let txIds = _.uniq(transactions.map(tx => {
       try {
         const manifestTag = tx.tags.find((tag) => tag.name === 'Manifest-ID')
 
@@ -189,37 +188,19 @@ export default class ArtworkService extends TransactionService {
           return manifestTag.value
         }
 
-        return ''
+        return tx.id
       } catch (err) {
         return ''
       }
-    }).filter(txId => !!txId)
-
-    let nextCursor = result.cursor
-    if (result.transactions.length < limit) {
-      const v0limit = limit - txIds.length
-      const v0result = await this.transactionFactory.searchTransactions(
-        'artwork',
-        creator,
-        {
-          type: 'application/json',
-          sort: 'HEIGHT_DESC',
-          tags: [],
-          limit: v0limit,
-          cursor
-        }
-      )
-
-      const v0txIds = v0result.transactions.map(tx => tx.id)
-      txIds = _.union(txIds, v0txIds)
-      nextCursor = v0result.cursor
-    }
+    }).filter(txId => !!txId))
 
     return this.buildFeed(txIds, nextCursor)
   }
 
-  async fetchLikedArtworkFeed(address: string, cursor?: string):
-    Promise<FeedItem[]> {
+  async fetchLikedArtworkFeed(
+    address: string,
+    cursor?: string
+  ): Promise<FeedItem[]> {
     const result = await this.$likesService.fetchUserLikes(address, cursor, 9)
 
     const likedEntityTxIds = result.transactions.map(tx => {
