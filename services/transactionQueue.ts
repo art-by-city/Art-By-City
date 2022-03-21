@@ -15,6 +15,7 @@ import {
 } from '~/store/transactions/mutations'
 import { ArweaveService } from './base'
 import Transaction from 'arweave/web/lib/transaction'
+import _ from 'lodash'
 
 export default class TransactionQueueService extends ArweaveService {
   private queue!: QueueObject<UserTransaction>
@@ -216,33 +217,49 @@ export default class TransactionQueueService extends ArweaveService {
   ) {
     let error, status: number, statusText: string
 
-    if (!chunk) {
-      const res = await this.$arweave.transactions.post(tx)
+    const balance = await this.$arweave.wallets.getBalance(
+      this.context.$auth.user.address
+    )
 
-      status = res.status
-      statusText = res.statusText
-    } else {
-      const uploader = await this.$arweave.transactions.getUploader(tx)
+    const price = await this.$arweave.transactions.getPrice(
+      Number.parseInt(tx.data_size)
+    )
 
-      while (!uploader.isComplete) {
-        await uploader.uploadChunk()
-        if (infoCb) {
-          infoCb(uploader.pctComplete)
-        }
-      }
+    const diff = Number.parseInt(this.$arweave.ar.sub(balance, price))
 
-      status = uploader.lastResponseStatus
-      statusText = uploader.lastResponseError
+    if (diff < 0) {
+      error = new Error('Insufficient funds')
     }
 
-    if ([200, 202].includes(status)) {
-      this.$accessor.transactions.queueTransaction(utx)
-    } else if ([410].includes(status)) {
-      error = new Error('Insufficient funds')
-    } else {
-      error = new Error(
-        `Failed to submit tx (${status}): ${statusText}`
-      )
+    if (!error) {
+      if (!chunk) {
+        const res = await this.$arweave.transactions.post(tx)
+
+        status = res.status
+        statusText = res.statusText
+      } else {
+        const uploader = await this.$arweave.transactions.getUploader(tx)
+
+        while (!uploader.isComplete) {
+          await uploader.uploadChunk()
+          if (infoCb) {
+            infoCb(uploader.pctComplete)
+          }
+        }
+
+        status = uploader.lastResponseStatus
+        statusText = uploader.lastResponseError
+      }
+
+      if ([200, 202].includes(status)) {
+        this.$accessor.transactions.queueTransaction(utx)
+      } else if ([410].includes(status)) {
+        error = new Error('Insufficient funds')
+      } else {
+        error = new Error(
+          `Failed to submit tx (${status}): ${statusText}`
+        )
+      }
     }
 
     done(error)
