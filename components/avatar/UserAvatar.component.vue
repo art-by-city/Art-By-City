@@ -102,7 +102,10 @@ export default class UserAvatar extends Vue {
   created() {
     this.$nuxt.$on('avatar-CONFIRMED', async () => {
       if (this.isOwner) {
-        const avatar = await this.$avatarService.fetchAvatar(this.user.address)
+        const avatar = await this.$avatarService.fetchAvatar(
+          this.user.address,
+          true
+        )
 
         if (avatar) {
           this.src = avatar.src
@@ -118,7 +121,7 @@ export default class UserAvatar extends Vue {
     })
     this.$nuxt.$on('profile-CONFIRMED', async () => {
       if (this.isOwner) {
-        await this.fetchAndSetProfile()
+        await this.fetchAndSetProfile(true)
       }
     })
   }
@@ -130,8 +133,11 @@ export default class UserAvatar extends Vue {
     this.username = this.user.username || null
   }
 
-  async fetchAndSetProfile() {
-    this.profile = await this.$profileService.fetchProfile(this.user.address)
+  async fetchAndSetProfile(force: boolean = false) {
+    this.profile = await this.$profileService.fetchProfile(
+      this.user.address,
+      force
+    )
   }
 
   async fetchAndSetAvatar() {

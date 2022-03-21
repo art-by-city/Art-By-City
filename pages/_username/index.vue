@@ -299,7 +299,7 @@ export default class UserProfilePage extends PageComponent {
   created() {
     this.$nuxt.$on('profile-CONFIRMED', () => {
       if (this.isOwner) {
-        this.fetchAndSet('profile')
+        this.fetchAndSet('profile', true)
       }
     })
 
@@ -338,13 +338,19 @@ export default class UserProfilePage extends PageComponent {
     }
   }
 
-  private async fetchAndSet(category: DomainEntityCategory) {
+  private async fetchAndSet(
+    category: DomainEntityCategory,
+    force: boolean = false
+  ) {
     let entity: DomainEntity | null = null
 
     if (this.artist?.address) {
       switch (category) {
         case 'profile':
-          entity = await this.$profileService.fetchProfile(this.artist.address)
+          entity = await this.$profileService.fetchProfile(
+            this.artist.address,
+            force
+          )
           break
         case 'username':
           entity = await this.$usernameService.resolveUsername(
