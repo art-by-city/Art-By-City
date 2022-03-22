@@ -6,6 +6,16 @@ import { uuidv4 } from '../helpers'
 import { TransactionService } from './'
 
 export default class TipsService extends TransactionService {
+  cache: {
+    tips: {
+      [address: string]: {
+        [cursor: string]: (FeedItem & Tip)[]
+      }
+    }
+  } = {
+    tips: {}
+  }
+
   async createTipTransaction(
     recipient: string,
     tip: Tip
@@ -22,19 +32,34 @@ export default class TipsService extends TransactionService {
   async fetchFeed(
     address: string,
     cursor?: string,
-    limit: number = 20
+    force: boolean = false,
+    limit: number = 100
   ): Promise<(FeedItem & Tip)[]> {
-    const {
-      transactions,
-      cursor: nextCursor
-    } = await this.transactionFactory.searchTransactions(
-      'tip',
-      undefined,
-      { sort: 'HEIGHT_DESC', cursor, limit },
-      address
-    )
+    if (
+      force
+      || !this.cache.tips[address]
+      || !this.cache.tips[address][cursor || '']
+    ) {
+      const {
+        transactions,
+        cursor: nextCursor
+      } = await this.transactionFactory.searchTransactions(
+        'tip',
+        undefined,
+        { sort: 'HEIGHT_DESC', cursor, limit },
+        address
+      )
 
-    return this.buildFeed(transactions, nextCursor)
+      if (!this.cache.tips[address]) {
+        this.cache.tips[address] = {}
+      }
+      this.cache.tips[address][cursor || ''] = this.buildFeed(
+        transactions,
+        nextCursor
+      )
+    }
+
+    return this.cache.tips[address][cursor || ''] || []
   }
 
   private buildFeed(
