@@ -12,6 +12,8 @@ export interface TransactionSearchOptions {
   tags?: { tag: string, value: string }[]
   limit?: number
   cursor?: string
+  min?: number
+  max?: number
 }
 
 export interface TransactionSearchResults {
@@ -97,6 +99,14 @@ export default class TransactionFactory {
       for (const tag of opts.tags) {
         query = query.tag(tag.tag, tag.value)
       }
+    }
+
+    if (opts.min) {
+      query = query.min(opts.min)
+    }
+
+    if (opts.max) {
+      query = query.max(opts.max)
     }
 
     if (opts.cursor) {
