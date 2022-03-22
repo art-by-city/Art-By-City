@@ -12,6 +12,9 @@ import { uuidv4 } from '~/helpers'
 import { ArtworkFactory, ArtworkBundleFactory } from '~/factories'
 import { LIKED_ENTITY_TAG } from './likes'
 import { TransactionService, LikesService } from './'
+import ArdbTransaction from 'ardb/lib/models/transaction'
+
+const PAGE_SIZE = 9
 
 export default class ArtworkService extends TransactionService {
   $likesService!: LikesService
@@ -131,7 +134,7 @@ export default class ArtworkService extends TransactionService {
   async fetchFeed(
     creator?: string | string[] | null,
     cursor?: string,
-    limit: number = 9
+    limit: number = PAGE_SIZE
   ): Promise<FeedItem[]> {
     if (!creator) {
       switch (this.config.app.name) {
@@ -190,28 +193,52 @@ export default class ArtworkService extends TransactionService {
       transactions,
       cursor: nextCursor
     } = await this.transactionFactory.searchTransactions(
-      ['artwork', 'artwork:bundle'],
+      ['artwork:bundle'],
       creator,
       {
         sort: 'HEIGHT_DESC',
-        limit,
-        cursor
+        cursor,
+        limit
       }
     )
 
-    let txIds = _.uniq(transactions.map(tx => {
-      try {
-        const manifestTag = tx.tags.find((tag) => tag.name === 'Manifest-ID')
-
-        if (manifestTag) {
-          return manifestTag.value
+    if (limit - transactions.length > 0) {
+      // Search for v0 artwork (published before block #891282)
+      const maxV0artworkBlockHeight = 891282
+      const {
+        transactions: transactionsV0
+      } = await this.transactionFactory.searchTransactions(
+        ['artwork'],
+        creator,
+        {
+          sort: 'HEIGHT_DESC',
+          limit: 100, // There won't be many if we are using max block height
+          cursor,
+          max: maxV0artworkBlockHeight
         }
+      )
 
-        return tx.id
-      } catch (err) {
-        return ''
-      }
-    }).filter(txId => !!txId))
+      transactions.push(...transactionsV0)
+    }
+
+    const txIds = _
+      .chain(transactions)
+      .map(tx => {
+        try {
+          const manifestTag = tx.tags.find((tag) => tag.name === 'Manifest-ID')
+
+          if (manifestTag) {
+            return manifestTag.value
+          }
+
+          return tx.id
+        } catch (err) {
+          return ''
+        }
+      })
+      .filter(txId => !!txId)
+      .uniq()
+      .value()
 
     return this.buildFeed(txIds, nextCursor)
   }
@@ -224,7 +251,7 @@ export default class ArtworkService extends TransactionService {
       address,
       cursor,
       false,
-      9 // TODO -> make a constant
+      PAGE_SIZE
     )
 
     const likedEntityTxIds = result.transactions.map(tx => {
