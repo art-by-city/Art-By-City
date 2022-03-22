@@ -220,7 +220,12 @@ export default class ArtworkService extends TransactionService {
     address: string,
     cursor?: string
   ): Promise<FeedItem[]> {
-    const result = await this.$likesService.fetchUserLikes(address, cursor, 9)
+    const result = await this.$likesService.fetchUserLikes(
+      address,
+      cursor,
+      false,
+      9 // TODO -> make a constant
+    )
 
     const likedEntityTxIds = result.transactions.map(tx => {
       try {
