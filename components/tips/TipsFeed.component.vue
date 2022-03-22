@@ -7,18 +7,24 @@
       <v-col cols="auto">
         {{ total }} <b>AR</b>
       </v-col>
+      <v-spacer></v-spacer>
+      <v-col cols="auto">
+        <v-btn icon small @click="onRefreshClicked">
+          <v-icon dense>mdi-refresh</v-icon>
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row
       v-for="(item, i) in feed"
       :key="item.guid"
     >
-      <v-col cols="auto">
+      <v-col cols="4" md="auto">
         {{ item.amount }} <b>AR</b>
       </v-col>
-      <v-col cols="auto">
+      <v-col cols="4" md="auto">
         <UserAvatar :key="i" dense :user="{ address: item.from }" />
       </v-col>
-      <v-col cols="auto">
+      <v-col cols="4" md="auto" class="text-truncate">
         <a
           :href="`https://viewblock.io/arweave/tx/${item.txId}`"
           target="_blank"
@@ -35,6 +41,8 @@
       <FeedLoadMore
         @intersect="onLoadMoreIntersected"
         :pending="$fetchState.pending"
+        :button="hasMore"
+        @click="onLoadMoreIntersected(true)"
       />
     </v-row>
   </v-container>
@@ -45,6 +53,7 @@ import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
 import { FeedItem, Tip } from '~/types'
 import FeedLoadMore from '~/components/feed/FeedLoadMore.component.vue'
+import { debounce } from '~/helpers'
 
 @Component({
   components: {
@@ -54,6 +63,8 @@ import FeedLoadMore from '~/components/feed/FeedLoadMore.component.vue'
 export default class TipsFeed extends Vue {
   feed: (FeedItem & Tip)[] = []
   cursor?: string
+  forceCache: boolean = false
+  hasMore: boolean = true
 
   get total() {
     return this.$arweave.ar.winstonToAr(
@@ -72,9 +83,18 @@ export default class TipsFeed extends Vue {
 
   fetchOnServer = false
   async fetch() {
-    const tips = await this.$tipsService.fetchFeed(this.address, this.cursor)
+    const items = await this.$tipsService.fetchFeed(
+      this.address,
+      this.cursor,
+      this.forceCache,
+      100
+    )
 
-    this.feed.push(...tips)
+    if (items.length < 1) {
+      this.hasMore = false
+    }
+
+    this.feed.push(...items)
   }
 
   onLoadMoreIntersected(visible: boolean) {
@@ -82,6 +102,15 @@ export default class TipsFeed extends Vue {
       this.cursor = this.feed[this.feed.length - 1].cursor
       this.$fetch()
     }
+  }
+
+  @debounce
+  async onRefreshClicked() {
+    this.cursor = undefined
+    this.feed = []
+    this.forceCache = true
+    this.hasMore = true
+    this.$fetch()
   }
 }
 </script>
