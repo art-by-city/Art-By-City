@@ -4,7 +4,8 @@ import {
   DateWithTooltip,
   UserAvatar,
   SplashLogo,
-  TransactionPlaceholder
+  TransactionPlaceholder,
+  CurrencyEstimate
 } from '~/components/common'
 
 Vue.use({
@@ -13,5 +14,6 @@ Vue.use({
     vue.component('UserAvatar', UserAvatar)
     vue.component('SplashLogo', SplashLogo)
     vue.component('TransactionPlaceholder', TransactionPlaceholder)
+    vue.component('CurrencyEstimate', CurrencyEstimate)
   }
 })

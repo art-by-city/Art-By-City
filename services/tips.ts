@@ -72,10 +72,7 @@ export default class TipsService extends TransactionService {
         category: 'tip',
         txId: tx.id,
         cursor,
-        amount: this.$arweave.ar.winstonToAr(tx.quantity.winston, {
-          formatted: true,
-          decimals: 4
-        }),
+        amount: tx.quantity.winston,
         from: tx.owner.address
       }
 
