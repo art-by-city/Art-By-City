@@ -73,7 +73,8 @@ export default class TipsService extends TransactionService {
         txId: tx.id,
         cursor,
         amount: tx.quantity.winston,
-        from: tx.owner.address
+        from: tx.owner.address,
+        timestamp: tx.block.timestamp
       }
 
       return item

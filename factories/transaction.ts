@@ -10,10 +10,11 @@ export interface TransactionSearchOptions {
   type?: 'application/json',
   sort?: 'HEIGHT_ASC' | 'HEIGHT_DESC',
   tags?: { tag: string, value: string }[]
-  limit?: number
+  limit?: number | 'all'
   cursor?: string
   min?: number
   max?: number
+  to?: string | string[]
 }
 
 export interface TransactionSearchResults {
@@ -109,17 +110,23 @@ export default class TransactionFactory {
       query = query.max(opts.max)
     }
 
+    if (opts.to) {
+      query = query.to(opts.to)
+    }
+
     if (opts.cursor) {
       query = query.cursor(opts.cursor)
     }
 
-    if (opts.limit) {
+    if (opts.limit && opts.limit !== 'all') {
       query = query.limit(opts.limit)
     }
 
     const sort = opts?.sort || 'HEIGHT_DESC'
 
-    const transactions = await query.find({ sort }) as ArdbTransaction[]
+    const transactions = opts.limit === 'all'
+      ? await query.findAll({ sort }) as ArdbTransaction[]
+      : await query.find({ sort }) as ArdbTransaction[]
     const cursor = query.getCursor()
 
     return { cursor, transactions }

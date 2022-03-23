@@ -65,9 +65,12 @@ import { DomainEntityCategory, Tip } from '~/types'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 
 @Component({})
-export default class TipArtistDialog extends TransactionDialog<Tip> {
+export default class TipArtistDialog extends TransactionDialog<Partial<Tip>> {
   readonly MIN_TIP: string = '0.0001'
-  asset: Tip = { amount: this.MIN_TIP, from: this.$auth.user?.address || '' }
+  asset: Partial<Tip> = {
+    amount: this.MIN_TIP,
+    from: this.$auth.user?.address || ''
+  }
   type: DomainEntityCategory = 'tip'
   info: string = ''
   valid: boolean = true
@@ -108,7 +111,7 @@ export default class TipArtistDialog extends TransactionDialog<Tip> {
       this.info = 'Building Tip transaction...'
       this.transaction = await this.$tipsService.createTipTransaction(
         this.recipientAddress,
-        this.asset
+        this.asset as Tip
       )
 
       this.info = 'Waiting on signature...'
