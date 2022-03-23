@@ -37,25 +37,6 @@
               </v-speed-dial>
             </template>
             <template v-if="!isOwner && $auth.loggedIn">
-              <!-- <v-tooltip top>
-                <template v-slot:activator="{ on, attrs }">
-                  <span
-                    v-on="on"
-                    v-bind="attrs"
-                    class="cursor--not-allowed"
-                  >
-                    <v-btn
-                      text
-                      outlined
-                      x-small
-                      disabled
-                    >
-                      Follow
-                    </v-btn>
-                  </span>
-                </template>
-                Coming soon!
-              </v-tooltip> -->
               <span>
               <v-btn
                 text
@@ -89,16 +70,33 @@
                 />
                 <span>{{ tertiaryName }}</span>
               </p>
-              <p class="mb-0" v-if="artist.profile && artist.profile.twitter">
-                <v-icon small>mdi-twitter</v-icon>
-                <a
-                  class="text-decoration-none"
-                  :href="`https://twitter.com/${artist.profile.twitter}`"
-                  target="_blank"
-                >
-                  @{{ artist.profile.twitter }}
-                </a>
-              </p>
+              <a
+                v-if="artist.profile && artist.profile.twitter"
+                class="pr-3 text-decoration-none"
+                :href="`https://twitter.com/${artist.profile.twitter}`"
+                target="_blank"
+              >
+                <v-icon small color="black">mdi-twitter</v-icon>
+                @{{ artist.profile.twitter }}
+              </a>
+              <a
+                v-if="artist.profile && artist.profile.instagram"
+                class="pr-3 text-decoration-none"
+                :href="`https://instagram.com/${artist.profile.instagram}`"
+                target="_blank"
+              >
+                <v-icon small color="black">mdi-instagram</v-icon>
+                @{{ artist.profile.instagram }}
+              </a>
+              <a
+                v-if="artist.profile && artist.profile.twitch"
+                class="pr-3 text-decoration-none"
+                :href="`https://twitch.tv/${artist.profile.twitch}`"
+                target="_blank"
+              >
+                <v-icon small color="black">mdi-twitch</v-icon>
+                @{{ artist.profile.twitch }}
+              </a>
             </v-card-subtitle>
             <v-card-text class="pb-0">
               <ExpandParagraph v-if="artist.profile" dense>
