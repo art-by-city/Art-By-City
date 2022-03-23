@@ -39,7 +39,7 @@
             <v-card>
               <v-card-title>Liked By</v-card-title>
               <v-divider></v-divider>
-              <v-card-text>
+              <v-card-text style="overflow-y: scroll; max-height: 400px;">
                 <LikedByList
                   :entityTxId="entityTxId"
                   :entityOwner="entityOwner"

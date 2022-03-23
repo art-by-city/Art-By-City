@@ -6,3 +6,4 @@ export { default as TransactionConfirmationProgress } from
   './TransactionConfirmationProgress.component.vue'
 export { default as TransactionPlaceholder } from
   './TransactionPlaceholder.component.vue'
+export { default as CurrencyEstimate } from './CurrencyEstimate.component.vue'

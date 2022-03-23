@@ -5,7 +5,7 @@
         <b>Total</b>
       </v-col>
       <v-col cols="auto">
-        {{ total }} <b>AR</b>
+        <CurrencyEstimate :winston="totalWinston" />
       </v-col>
       <v-spacer></v-spacer>
       <v-col cols="auto">
@@ -19,10 +19,10 @@
       :key="item.guid"
     >
       <v-col cols="4" md="auto">
-        {{ item.amount }} <b>AR</b>
+        <CurrencyEstimate :winston="item.amount" />
       </v-col>
       <v-col cols="4" md="auto">
-        <UserAvatar :key="i" dense :user="{ address: item.from }" />
+        <UserAvatar dense :user="{ address: item.from }" />
       </v-col>
       <v-col cols="4" md="auto" class="text-truncate">
         <a
@@ -66,14 +66,10 @@ export default class TipsFeed extends Vue {
   forceCache: boolean = false
   hasMore: boolean = true
 
-  get total() {
-    return this.$arweave.ar.winstonToAr(
-      this.feed.map(item => item.amount).reduce((sum, amount) => {
-        const amountWinston = this.$arweave.ar.arToWinston(amount)
-        return this.$arweave.ar.add(sum, amountWinston)
-      }, '0'),
-      { formatted: true, decimals: 4 }
-    )
+  get totalWinston() {
+    return this.feed
+      .map(item => item.amount)
+      .reduce((sum, amount) => this.$arweave.ar.add(sum, amount), '0')
   }
 
   @Prop({

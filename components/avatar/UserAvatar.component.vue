@@ -10,12 +10,12 @@
       </nuxt-link>
     </v-avatar>
 
-    <v-tooltip bottom v-if="dense">
+    <v-tooltip bottom v-if="dense && !hideUsername">
       <template v-slot:activator="{ on, attrs }">
         <span
           v-bind="attrs"
           v-on="on"
-          class="ml-2"
+          class="ml-2 text-caption"
           style="display: inline-flex;"
         >
           <nuxt-link
@@ -68,14 +68,20 @@ export default class UserAvatar extends Vue {
     default: '100%'
   }) readonly usernameWidth!: string
 
-  get displayName() {
-    if (this.profile?.displayName) {
-      return this.profile?.displayName
-    }
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly hideUsername!: boolean
 
-    if (this.username) {
-      return `@${this.username}`
-    }
+  get displayName() {
+    // if (this.profile?.displayName) {
+    //   return this.profile?.displayName
+    // }
+
+    // if (this.username) {
+    //   return `@${this.username}`
+    // }
 
     return this.user.address || ''
   }
