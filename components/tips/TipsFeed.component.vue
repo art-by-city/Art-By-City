@@ -68,8 +68,7 @@ export default class TipsFeed extends Vue {
 
   get totalWinston() {
     return this.feed
-      .map(item => item.amount)
-      .reduce((sum, amount) => this.$arweave.ar.add(sum, amount), '0')
+      .reduce((sum, item) => this.$arweave.ar.add(sum, item.amount), '0')
   }
 
   @Prop({

@@ -5,12 +5,16 @@
         <b>Total</b>&nbsp;
         <CurrencyEstimate :winston="totalWinston" />
       </span>
-      <template v-for="({ address, amount, txId }, i) in likesAndTips">
+      <template v-for="({ from, amount, txId }, i) in likesAndTips">
         <v-divider v-if="i >= 1"></v-divider>
         <v-list-item :key="i" dense>
           <v-list-item-content>
             <v-list-item-title>
-              <UserAvatar dense :user="{ address }" username-width="240px" />
+              <UserAvatar
+                dense
+                :user="{ address: from }"
+                username-width="240px"
+              />
             </v-list-item-title>
             <v-list-item-subtitle>
               <CurrencyEstimate class="text-caption" :winston="amount" />
@@ -32,13 +36,11 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
+import { FeedItem, LikeWithTip } from '~/types'
+
 @Component
 export default class LikedByList extends Vue {
-  likesAndTips: {
-    address: string,
-    amount: string,
-    txId: string
-  }[] = []
+  likesAndTips: (FeedItem & LikeWithTip)[] = []
 
   @Prop({
     type: String,

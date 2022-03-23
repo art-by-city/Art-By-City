@@ -22,6 +22,11 @@ export type Like = boolean
 export type Tip = {
   amount: string
   from: string
+  timestamp: number
+}
+
+export type LikeWithTip = Tip & {
+  entityTxId: string
 }
 
 export type DomainEntity =
