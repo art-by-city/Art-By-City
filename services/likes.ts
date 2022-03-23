@@ -4,6 +4,8 @@ import _ from 'lodash'
 
 import { TransactionService } from './'
 import { TransactionSearchResults } from '~/factories/transaction'
+import { FeedItem, LikeWithTip } from '~/types'
+import { uuidv4 } from '~/helpers'
 
 export const LIKED_ENTITY_TAG = 'liked-entity'
 export const LIKING_ARTIST_FEE = '0.0002' // AR
@@ -22,11 +24,15 @@ export default class LikesService extends TransactionService {
       [entityId: string]: {
         [address: string]: boolean
       }
+    },
+    receivedLikes: {
+      [address: string]: ArdbTransaction[]
     }
   } = {
     userLikes: {},
     entityLikes: {},
-    entityLikedBy: {}
+    entityLikedBy: {},
+    receivedLikes: {}
   }
 
   async createLikeTransaction(
@@ -109,18 +115,21 @@ export default class LikesService extends TransactionService {
   async fetchLikedBy(
     entityTxId: string,
     entityOwner: string
-  ): Promise<{
-      address: string,
-      amount: string,
-      txId: string
-    }[]> {
+  ): Promise<(FeedItem & LikeWithTip)[]> {
     return (
       await this.fetchEntityLikeTxs(entityTxId, entityOwner)
-    ).map((tx) => { return {
-      address: tx.owner.address,
-      amount: tx.quantity.winston,
-      txId: tx.id
-    } })
+    ).map((tx) => {
+      return {
+        from: tx.owner.address,
+        amount: tx.quantity.winston,
+        txId: tx.id,
+        guid: uuidv4(),
+        cursor: '',
+        category: 'like',
+        timestamp: tx.block.timestamp,
+        entityTxId
+      }
+    })
   }
 
   async fetchTotalLikes(
@@ -179,5 +188,35 @@ export default class LikesService extends TransactionService {
     return (
       await this.fetchUserLikes(address)
     ).transactions.length || 0
+  }
+
+  async fetchAllLikesReceived(
+    address: string
+  ): Promise<(FeedItem & LikeWithTip)[]> {
+    const { transactions } = await this.transactionFactory.searchTransactions(
+      'like',
+      undefined,
+      {
+        tags: [],
+        limit: 'all',
+        to: address,
+        sort: 'HEIGHT_DESC'
+      }
+    )
+
+    return transactions.map(tx => {
+      const tag = tx.tags.find((tag) => tag.name === LIKED_ENTITY_TAG)
+
+      return {
+        from: tx.owner.address,
+        amount: tx.quantity.winston,
+        txId: tx.id,
+        guid: uuidv4(),
+        cursor: '',
+        category: 'like',
+        timestamp: tx.block.timestamp,
+        entityTxId: tag?.value || ''
+      }
+    })
   }
 }

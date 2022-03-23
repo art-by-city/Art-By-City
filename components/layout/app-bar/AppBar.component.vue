@@ -18,27 +18,17 @@
 
     <v-spacer></v-spacer>
 
-    <template v-if="!$auth.loggedIn">
-      <v-btn
-        class="app-bar-button"
-        to="/discover"
-        text
-        tile
-      >
-        discover
-      </v-btn>
-      <v-divider vertical class="white-divider" />
-    </template>
+    <v-btn
+      class="app-bar-button"
+      to="/discover"
+      text
+      tile
+    >
+      discover
+    </v-btn>
+    <v-divider v-if="!$auth.loggedIn" vertical class="white-divider" />
 
     <template v-if="$auth.loggedIn">
-      <v-btn
-        class="app-bar-button"
-        to="/discover"
-        text
-        tile
-      >
-        discover
-      </v-btn>
       <v-btn
         class="app-bar-button"
         to="/publish"
@@ -46,6 +36,14 @@
         tile
       >
         publish
+      </v-btn>
+      <v-btn
+        class="app-bar-button"
+        to="/earn"
+        text
+        tile
+      >
+        earn
       </v-btn>
       <v-divider vertical class="ml-0 mr-4 white-divider" />
       <AccountMenu @logout="onLogoutClicked" />
