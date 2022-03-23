@@ -6,9 +6,7 @@
         {{ (Number.parseInt(txSize) / 1048576).toPrecision(5) }} <b>MB</b>
       </span>
       <span class="px-2" v-if="txSize">≈</span>
-      <span>{{ humanReadableTxTotal }} <b>AR</b></span>
-      <span class="px-2" v-if="usdEstimate">≈</span>
-      <span v-if="usdEstimate">{{ usdEstimate }}</span>
+      <CurrencyEstimate :winston="txTotal" />
     </v-row>
     <v-row dense justify="center" v-if="txTotal">
       <b>Submit transaction?</b>
@@ -101,31 +99,6 @@ export default class TransactionFormControls extends Vue {
     type: Number,
     required: false
   }) readonly pct?: number
-
-  get humanReadableTxTotal() {
-    if (this.txTotal) {
-      return this.$arweave.ar.winstonToAr(this.txTotal, {
-        decimals: 5
-      })
-    }
-
-    return ''
-  }
-
-  get usdEstimate() {
-    if (this.txTotal && this.$priceService.priceUSD) {
-      let usd = Number.parseFloat(this.$arweave.ar.winstonToAr(this.txTotal))
-                  * this.$priceService.priceUSD
-
-      if (usd < 0.01) {
-        return '< $0.01'
-      }
-
-      return usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
-    }
-
-    return ''
-  }
 
   get continueButtonText() {
     if (this.isContract) {
