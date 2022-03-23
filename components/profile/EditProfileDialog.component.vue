@@ -23,7 +23,7 @@
                   name="displayName"
                   label="Display Name"
                   counter="50"
-                  :rules="[displayNameRules]"
+                  :rules="[rules.displayName]"
                 ></v-text-field>
 
                 <v-textarea
@@ -32,15 +32,31 @@
                   label="Bio"
                   rows="5"
                   counter="1024"
-                  :rules="[bioRules]"
+                  :rules="[rules.bio]"
                 ></v-textarea>
 
                 <v-text-field
                   v-model="asset.twitter"
                   name="twitter"
                   label="Twitter Username"
-                  hint="(Optional) Link your Twitter username for credit when your artwork is shared on social media"
-                  :rules="[twitterRules]"
+                  prepend-icon="mdi-twitter"
+                  :rules="[rules.twitter]"
+                ></v-text-field>
+
+                <v-text-field
+                  v-model="asset.instagram"
+                  name="instagram"
+                  label="Instagram Username"
+                  prepend-icon="mdi-instagram"
+                  :rules="[rules.instagram]"
+                ></v-text-field>
+
+                <v-text-field
+                  v-model="asset.twitch"
+                  name="twitch"
+                  label="Twitch Username"
+                  prepend-icon="mdi-twitch"
+                  :rules="[rules.twitch]"
                 ></v-text-field>
               </v-form>
             </v-card-text>
@@ -65,7 +81,7 @@
 import { Component } from 'nuxt-property-decorator'
 
 import { DomainEntityCategory, Profile } from '~/types'
-import { maxLength, twitter as twitterRule } from '~/helpers/rules'
+import { twitter, twitch, instagram, maxLength } from '~/helpers/rules'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
@@ -87,14 +103,14 @@ export default class EditProfileDialog extends TransactionDialog<Profile> {
     }
   }
 
-  get displayNameRules() {
-    return maxLength(50)
-  }
-  get bioRules() {
-    return maxLength(1024)
-  }
-  get twitterRules() {
-    return twitterRule
+  get rules() {
+    return {
+      twitter,
+      twitch,
+      instagram,
+      displayName: maxLength(50),
+      bio: maxLength(1024)
+    }
   }
 
   fetchOnServer = false
