@@ -114,8 +114,8 @@ export default class ArtworkService extends TransactionService {
   async fetch(id: string): Promise<Artwork | LegacyArtwork | null> {
     try {
       if (!this.cache.artwork[id]) {
-        // NB: Use /gateway proxy for arweave.net to avoid CORS fails
-        const res = await this.context.$axios.get(`/gateway/${id}`)
+        const url = `${this.context.$arweaveService.config.gateway}/${id}`
+        const res = await this.context.$axios.get(url)
 
         const artwork = new ArtworkFactory().build(id, res.data)
 

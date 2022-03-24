@@ -1,9 +1,10 @@
 export interface ArweaveConfig {
   app: ArweaveAppConfig
-  api: ArweaveApiConfig,
+  api: ArweaveApiConfig
   contracts: {
     [key: string]: string
   }
+  gateway: string
 }
 
 export interface ArweaveApiConfig {

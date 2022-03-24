@@ -119,12 +119,7 @@ export default {
   axios: {
     proxy: true
   },
-  proxy: {
-    '/gateway': {
-      target: `${process.env.ARWEAVE_GATEWAY || 'http://localhost:1984'}`,
-      pathRewrite: { '^/gateway/': '' }
-    }
-  },
+  proxy: {},
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module

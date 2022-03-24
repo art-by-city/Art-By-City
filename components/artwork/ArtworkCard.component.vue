@@ -94,7 +94,7 @@ export default class ArtworkCard extends Vue {
   username: string | null = null
 
   artworkUrlFromId(id: string) {
-    return `/gateway/${id}`
+    return `${this.$arweaveService.config.gateway}/${id}`
   }
 
   src() {
