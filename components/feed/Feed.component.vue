@@ -39,14 +39,21 @@ import FeedLoadMore from './FeedLoadMore.component.vue'
 export default class FeedComponent extends Vue {
   feed: FeedItem[] = []
   cursor?: string
+  cursorV0?: string
 
   fetchOnServer = false
   async fetch() {
     ProgressService.start()
     try {
-      this.feed.push(
-        ...(await this.$artworkService.fetchFeed(null, this.cursor, 5))
+      const { feed, cursor, cursorV0 } = await this.$artworkService.fetchFeed(
+        null,
+        this.cursor,
+        this.cursorV0,
+        5
       )
+      this.feed.push(...feed)
+      this.cursor = cursor
+      this.cursorV0 = cursorV0
     } catch (error) {
       console.error(error)
       this.$toastService.error(error)
@@ -57,17 +64,11 @@ export default class FeedComponent extends Vue {
 
   onLoadMoreIntersected(visible: boolean) {
     if (
-      !this.$fetchState.pending
-      && visible
-      && this.feed.length > 0
+      visible
+      && !this.$fetchState.pending
+      && (this.cursor || this.cursorV0)
     ) {
-      const prevCursor = this.cursor
-      const nextCursor = this.feed[this.feed.length - 1].cursor
-
-      if (!_.isEqual(prevCursor, nextCursor)) {
-        this.cursor = nextCursor
-        this.$fetch()
-      }
+      this.$fetch()
     }
   }
 }

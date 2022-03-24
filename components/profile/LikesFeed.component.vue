@@ -45,19 +45,16 @@ export default class LikesFeed extends Vue {
 
   fetchOnServer = false
   async fetch() {
-    this.feed.push(
-      ...(
-        await this.$artworkService.fetchLikedArtworkFeed(
-          this.address,
-          this.cursor
-        )
-      )
+    const { feed, cursor } = await this.$artworkService.fetchLikedArtworkFeed(
+      this.address,
+      this.cursor
     )
+    this.cursor = cursor
+    this.feed.push(...feed)
   }
 
   private onLoadMoreIntersected(visible: boolean) {
-    if (visible && this.feed.length > 0) {
-      this.cursor = this.feed[this.feed.length - 1].cursor
+    if (visible && !this.$fetchState.pending && this.cursor) {
       this.$fetch()
     }
   }

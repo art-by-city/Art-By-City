@@ -37,6 +37,7 @@ import FeedLoadMore from '~/components/feed/FeedLoadMore.component.vue'
 export default class ArtistFeed extends Vue {
   feed: FeedItem[] = []
   cursor?: string
+  cursorV0?: string
 
   @Prop({
     type: String,
@@ -49,19 +50,24 @@ export default class ArtistFeed extends Vue {
 
   fetchOnServer = false
   async fetch() {
-    const artwork = await this.$artworkService.fetchFeed(
+    const { cursor, cursorV0, feed } = await this.$artworkService.fetchFeed(
       this.address,
-      this.cursor
+      this.cursor,
+      this.cursorV0
     )
-
-    this.feed.push(...artwork)
+    this.cursor = cursor
+    this.cursorV0 = cursorV0
+    this.feed.push(...feed)
 
     this.onFetched(this.feed.length)
   }
 
   onLoadMoreIntersected(visible: boolean) {
-    if (visible && this.feed.length > 0) {
-      this.cursor = this.feed[this.feed.length - 1].cursor
+    if (
+      visible
+      && !this.$fetchState.pending
+      && (this.cursor || this.cursorV0)
+    ) {
       this.$fetch()
     }
   }

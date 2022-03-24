@@ -12,7 +12,6 @@ import { uuidv4 } from '~/helpers'
 import { ArtworkFactory, ArtworkBundleFactory } from '~/factories'
 import { LIKED_ENTITY_TAG } from './likes'
 import { TransactionService, LikesService } from './'
-import ArdbTransaction from 'ardb/lib/models/transaction'
 
 const PAGE_SIZE = 9
 
@@ -134,8 +133,9 @@ export default class ArtworkService extends TransactionService {
   async fetchFeed(
     creator?: string | string[] | null,
     cursor?: string,
+    cursorV0?: string,
     limit: number = PAGE_SIZE
-  ): Promise<FeedItem[]> {
+  ): Promise<{ cursor: string, cursorV0?: string, feed: FeedItem[]}> {
     if (!creator) {
       switch (this.config.app.name) {
         case 'ArtByCity':
@@ -202,23 +202,29 @@ export default class ArtworkService extends TransactionService {
       }
     )
 
+    let nextCursorV0: string | undefined = undefined
     if (limit - transactions.length > 0) {
       // Search for v0 artwork (published before block #891282)
       const maxV0artworkBlockHeight = 891282
       const {
-        transactions: transactionsV0
+        transactions: transactionsV0,
+        cursor: _nextCursorV0
       } = await this.transactionFactory.searchTransactions(
         ['artwork'],
         creator,
         {
           sort: 'HEIGHT_DESC',
           limit: 100, // There won't be many if we are using max block height
-          cursor,
+          cursor: cursorV0,
           max: maxV0artworkBlockHeight
         }
       )
 
-      transactions.push(...transactionsV0)
+      if (transactionsV0.length > 0) {
+        nextCursorV0 = _nextCursorV0
+        transactions.push(...transactionsV0)
+      }
+
     }
 
     const txIds = _
@@ -240,21 +246,28 @@ export default class ArtworkService extends TransactionService {
       .uniq()
       .value()
 
-    return this.buildFeed(txIds, nextCursor)
+    return {
+      cursor: nextCursor || cursor || '',
+      cursorV0: nextCursorV0 || cursorV0,
+      feed: this.buildFeed(txIds)
+    }
   }
 
   async fetchLikedArtworkFeed(
     address: string,
     cursor?: string
-  ): Promise<FeedItem[]> {
-    const result = await this.$likesService.fetchUserLikes(
+  ): Promise<{ cursor: string, feed: FeedItem[] }> {
+    const {
+      transactions,
+      cursor: nextCursor
+    } = await this.$likesService.fetchUserLikes(
       address,
       cursor,
       false,
       PAGE_SIZE
     )
 
-    const likedEntityTxIds = result.transactions.map(tx => {
+    const likedEntityTxIds = transactions.map(tx => {
       try {
         const likedEntityTag = tx.tags.find(
           tag => tag.name === LIKED_ENTITY_TAG
@@ -270,16 +283,19 @@ export default class ArtworkService extends TransactionService {
       }
     }).filter(txId => !!txId)
 
-    return this.buildFeed(likedEntityTxIds, result.cursor)
+
+    return {
+      cursor: nextCursor,
+      feed: this.buildFeed(likedEntityTxIds)
+    }
   }
 
-  private buildFeed(txs: string[], cursor: string): FeedItem[] {
+  private buildFeed(txs: string[]): FeedItem[] {
     return txs.map((txId) => {
       const item: FeedItem = {
         guid: uuidv4(),
         category: 'artwork',
-        txId,
-        cursor
+        txId
       }
 
       return item
