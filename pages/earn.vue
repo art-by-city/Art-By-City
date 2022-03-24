@@ -118,6 +118,7 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 
 import { Artwork, FeedItem, LegacyArtwork, LikeWithTip, Tip } from '~/types'
+import { convertARtoUSD } from '~/helpers'
 
 @Component({
   middleware: 'auth',
@@ -212,14 +213,10 @@ export default class EarnPage extends Vue {
 
   usdEstimate(winston: string) {
     if (winston && this.$priceService.priceUSD) {
-      let usd = Number.parseFloat(this.$arweave.ar.winstonToAr(winston))
-                  * this.$priceService.priceUSD
-
-      if (usd < 0.01) {
-        return '< $0.01'
-      }
-
-      return usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      return convertARtoUSD(
+        this.$arweave.ar.winstonToAr(winston),
+        this.$priceService.priceUSD
+      )
     }
 
     return ''
