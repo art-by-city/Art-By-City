@@ -75,13 +75,13 @@ export default class UserAvatar extends Vue {
   }) readonly hideUsername!: boolean
 
   get displayName() {
-    // if (this.profile?.displayName) {
-    //   return this.profile?.displayName
-    // }
+    if (this.profile?.displayName) {
+      return this.profile?.displayName
+    }
 
-    // if (this.username) {
-    //   return `@${this.username}`
-    // }
+    if (this.username) {
+      return `@${this.username}`
+    }
 
     return this.user.address || ''
   }
