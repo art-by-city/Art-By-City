@@ -27,6 +27,7 @@
               <p class="text-caption mt-1 mb-0">
                 Includes {{ likeFee }} <b>AR</b> tip to
                 <i>{{ ownerDisplayName }}</i>
+                <span>({{ usdEstimate }})</span>
                 <v-btn
                   v-if="!isEditingTip"
                   text
@@ -49,6 +50,8 @@
                   type="number"
                   v-model="likeFee"
                   dense
+                  prefix="AR"
+                  :suffix="usdEstimate"
                   :step="LIKING_ARTIST_FEE"
                   :min="LIKING_ARTIST_FEE"
                   :rules="[minimumTip]"
@@ -85,6 +88,7 @@ import TransactionDialog from
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import { LIKING_ARTIST_FEE } from '~/services/likes'
+import { convertARtoUSD } from '~/helpers'
 
 @Component({
   components: {
@@ -195,7 +199,19 @@ export default class LikeDialog extends TransactionDialog<Like> {
   close() {
     this.isEditingTip = false
     this.asset = false
+    this.likeFee = LIKING_ARTIST_FEE
     this.baseClose()
+  }
+
+  get usdEstimate(): string {
+    if (this.likeFee && this.$priceService.priceUSD) {
+      return '≈ ' + convertARtoUSD(
+        this.likeFee,
+        this.$priceService.priceUSD
+      )
+    }
+
+    return ''
   }
 }
 </script>

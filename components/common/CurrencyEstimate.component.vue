@@ -8,6 +8,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
+import { convertARtoUSD } from '~/helpers'
 
 @Component
 export default class CurrencyEstimate extends Vue {
@@ -26,16 +27,12 @@ export default class CurrencyEstimate extends Vue {
     return ''
   }
 
-  get usdEstimate() {
+  get usdEstimate(): string {
     if (this.winston && this.$priceService.priceUSD) {
-      let usd = Number.parseFloat(this.$arweave.ar.winstonToAr(this.winston))
-                  * this.$priceService.priceUSD
-
-      if (usd < 0.01) {
-        return '< $0.01'
-      }
-
-      return usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+      return convertARtoUSD(
+        this.$arweave.ar.winstonToAr(this.winston),
+        this.$priceService.priceUSD
+      )
     }
 
     return ''

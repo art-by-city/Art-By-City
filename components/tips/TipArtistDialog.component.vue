@@ -19,8 +19,7 @@
                 overflow-y-hidden
               "
             >
-              Send {{ asset.amount }} <b>AR</b> tip to
-              <i>{{ recipientDisplayName }}</i> ?
+              Send tip to <b>{{ recipientDisplayName }}</b>?
               <v-form
                 ref="form"
                 v-model="valid"
@@ -31,6 +30,8 @@
                   type="number"
                   v-model="asset.amount"
                   dense
+                  prefix="AR"
+                  :suffix="usdEstimate"
                   :step="MIN_TIP"
                   :min="MIN_TIP"
                   :rules="[minimumTip]"
@@ -62,9 +63,10 @@ import _ from 'lodash'
 import { Component, Prop } from 'nuxt-property-decorator'
 
 import { DomainEntityCategory, Tip } from '~/types'
+import { convertARtoUSD } from '~/helpers'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 
-@Component({})
+@Component
 export default class TipArtistDialog extends TransactionDialog<Partial<Tip>> {
   readonly MIN_TIP: string = '0.0001'
   asset: Partial<Tip> = {
@@ -124,6 +126,17 @@ export default class TipArtistDialog extends TransactionDialog<Partial<Tip>> {
 
   close() {
     this.baseClose()
+  }
+
+  get usdEstimate(): string {
+    if (this.asset.amount && this.$priceService.priceUSD) {
+      return '≈ ' + convertARtoUSD(
+        this.asset.amount,
+        this.$priceService.priceUSD
+      )
+    }
+
+    return ''
   }
 }
 </script>
