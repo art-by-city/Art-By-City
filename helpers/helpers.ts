@@ -1,3 +1,5 @@
+import Arweave from 'arweave/web/common'
+
 export const readFileAsDataUrlAsync = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -93,3 +95,13 @@ export function isDev() {
 }
 
 export const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+export function convertARtoUSD(ar: string, priceUSD: number) {
+  let usd = Number.parseFloat(ar) * priceUSD
+
+  if (usd < 0.01) {
+    return '< $0.01'
+  }
+
+  return usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+}
