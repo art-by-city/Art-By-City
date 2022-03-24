@@ -212,7 +212,6 @@ export default class LikesService extends TransactionService {
         amount: tx.quantity.winston,
         txId: tx.id,
         guid: uuidv4(),
-        cursor: '',
         category: 'like',
         timestamp: tx.block.timestamp,
         entityTxId: tag?.value || ''
