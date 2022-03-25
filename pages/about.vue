@@ -33,10 +33,8 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
-
-import PageComponent from '~/components/pages/page.component'
+import { Component, Vue } from 'nuxt-property-decorator'
 
 @Component
-export default class AboutPage extends PageComponent {}
+export default class AboutPage extends Vue {}
 </script>

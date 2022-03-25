@@ -13,9 +13,8 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 
-import FormPageComponent from '~/components/pages/formPage.component'
 import { ArtworkEditForm } from '~/components/artwork/edit'
 
 @Component({
@@ -24,7 +23,7 @@ import { ArtworkEditForm } from '~/components/artwork/edit'
     ArtworkEditForm
   }
 })
-export default class UploadPage extends FormPageComponent {
+export default class UploadPage extends Vue {
   get head() {
     return { title: 'Publish' }
   }

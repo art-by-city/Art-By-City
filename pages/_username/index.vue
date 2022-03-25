@@ -178,7 +178,6 @@ import { Component, Vue } from 'nuxt-property-decorator'
 import { User } from '~/models'
 import { debounce } from '~/helpers'
 import ProgressService from '~/services/progress/service'
-import PageComponent from '~/components/pages/page.component'
 import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
 import EditProfileDialog from
@@ -205,7 +204,7 @@ import { DomainEntity, DomainEntityCategory } from '~/types'
     TipsFeed
   }
 })
-export default class UserProfilePage extends PageComponent {
+export default class UserProfilePage extends Vue {
   head() {
     if (!this.artist) { return {} }
 
