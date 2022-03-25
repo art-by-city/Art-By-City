@@ -1,7 +1,6 @@
 <template>
   <v-app dark class="app">
     <AppBar
-      :config="$config"
       :loading="isLoggingIn"
       @login="login"
       @logout="logout"
@@ -19,7 +18,7 @@
 
     <AuthDialog @login="login" :show.sync="showAuthDialog" />
 
-    <div class="toast-alerts-container">
+    <div v-if="toasts" class="toast-alerts-container">
       <v-alert
         v-for="(toast, i) in toasts"
         :key="i"
@@ -47,9 +46,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Component, Vue, Watch } from 'nuxt-property-decorator'
 
-import ToastMessage from '~/models/toasts/toastMessage'
+import { ToastMessage } from '~/plugins/toasts'
 import { AppBar, Footer, AuthDialog } from '~/components'
 import { ArweaveWalletNotInstalledError } from '~/schemes/arweave-wallet'
 
@@ -66,16 +65,15 @@ export default class DefaultLayout extends Vue {
   isLoggingIn: boolean = false
 
   removeToast(toast: ToastMessage) {
-    this.$store.commit('toasts/remove', toast)
+    this.$toasts.remove(toast)
+  }
+
+  @Watch('$toasts.list', { immediate: true })
+  onToastsChanged(toasts: ToastMessage[]) {
+    this.toasts = toasts
   }
 
   created() {
-    this.$store.watch(
-      (state) => state.toasts.list,
-      () => {
-        this.toasts = this.$store.state.toasts.list
-      }
-    )
 
     this.$nuxt.$on('needs-auth', (cb: Function) => {
       if (this.$auth.loggedIn) {
@@ -101,7 +99,7 @@ export default class DefaultLayout extends Vue {
       if (error instanceof ArweaveWalletNotInstalledError) {
         this.showAuthDialog = 'sign-up'
       } else {
-        this.$toastService.error(error)
+        this.$toasts.error(error)
       }
     } finally {
       this.isLoggingIn = false

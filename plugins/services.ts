@@ -8,7 +8,6 @@ import {
   PriceService,
   ProfileService,
   TipsService,
-  ToastService,
   TransactionQueueService,
   UserService,
   UsernameService
@@ -19,7 +18,6 @@ declare module 'vue/types/vue' {
   interface Vue {
     $profileService: ProfileService
     $artworkService: ArtworkService
-    $toastService: ToastService
     $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
@@ -37,7 +35,6 @@ declare module '@nuxt/types' {
   interface NuxtAppOptions {
     $profileService: ProfileService
     $artworkService: ArtworkService
-    $toastService: ToastService
     $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
@@ -51,7 +48,6 @@ declare module '@nuxt/types' {
   interface Context {
     $profileService: ProfileService
     $artworkService: ArtworkService
-    $toastService: ToastService
     $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
@@ -68,7 +64,6 @@ declare module 'vuex/types/index' {
   interface Store<S> {
     $profileService: ProfileService
     $artworkService: ArtworkService
-    $toastService: ToastService
     $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
@@ -82,7 +77,6 @@ declare module 'vuex/types/index' {
 
 const servicesPlugin: Plugin = (context, inject) => {
   inject('profileService', new ProfileService(context))
-  inject('toastService', new ToastService(context))
   inject('usernameService', new UsernameService(context))
   inject('avatarService', new AvatarService(context))
   inject('userService', new UserService(context))

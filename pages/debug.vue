@@ -71,7 +71,7 @@ export default class DebugPage extends Vue {
 
   async postToArweave() {
     // if (!this.request) {
-    //   this.$toastService.error('add a file first')
+    //   this.$toasts.error('add a file first')
     //   return
     // }
     try {
@@ -87,7 +87,7 @@ export default class DebugPage extends Vue {
 
       // const txMsg = ['DebugPage.postToArweave() posted tx id', tx.id]
       // console.log(...txMsg)
-      // this.$toastService.success(txMsg.join(' '))
+      // this.$toasts.success(txMsg.join(' '))
 
       // const res = await arweave.api.get(tx.id)
       // console.log('DebugPage.postToArweave() res', res)
