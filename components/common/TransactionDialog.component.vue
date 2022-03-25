@@ -74,7 +74,7 @@ export default class TransactionDialog<T> extends Vue {
         },
         (err?: Error) => {
           if (err) {
-            this.$toastService.error(err.message)
+            this.$toasts.error(err.message)
             this.isUploading = false
           } else {
             this.close()

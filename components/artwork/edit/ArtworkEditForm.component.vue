@@ -487,7 +487,7 @@ export default class ArtworkEditForm extends Vue {
           this.onUploading(false)
           if (err) {
             console.error('Error submitting user tx', err)
-            this.$toastService.error('Error submitting user tx: ' + err.message)
+            this.$toasts.error('Error submitting user tx: ' + err.message)
             this.isUploading = false
           } else {
             return this.save(txId, this.artwork.slug)

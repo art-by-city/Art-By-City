@@ -1,7 +1,6 @@
 <template>
   <v-app dark class="app">
     <AppBar
-      :config="$config"
       :loading="isLoggingIn"
       @login="login"
       @logout="logout"
@@ -49,7 +48,7 @@
 <script lang="ts">
 import { Vue, Component } from 'nuxt-property-decorator'
 
-import ToastMessage from '~/models/toasts/toastMessage'
+import { ToastMessage } from '~/plugins/toasts'
 import { AppBar, Footer, AuthDialog } from '~/components'
 import { ArweaveWalletNotInstalledError } from '~/schemes/arweave-wallet'
 
@@ -101,7 +100,7 @@ export default class DefaultLayout extends Vue {
       if (error instanceof ArweaveWalletNotInstalledError) {
         this.showAuthDialog = 'sign-up'
       } else {
-        this.$toastService.error(error)
+        this.$toasts.error(error)
       }
     } finally {
       this.isLoggingIn = false

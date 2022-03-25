@@ -1,6 +1,6 @@
 import { ActionTree, MutationTree } from 'vuex'
 
-import ToastMessage from '~/models/toasts/toastMessage'
+import { ToastMessage } from '~/plugins/toasts'
 
 export const state = () => ({
   list: [] as ToastMessage[]
@@ -8,7 +8,7 @@ export const state = () => ({
 
 export type ToastStoreState = ReturnType<typeof state>
 
-export const mutations: MutationTree<ToastStoreState> ={
+export const mutations: MutationTree<ToastStoreState> = {
   add(state: ToastStoreState, toast: ToastMessage) {
     state.list.push(toast)
   },

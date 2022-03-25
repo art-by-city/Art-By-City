@@ -74,7 +74,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import { ConfigStoreState } from '~/store/config'
 import { debounce } from '~/helpers'
 import AccountMenu from './AccountMenu.component.vue'
 import TransactionsMenu from './TransactionsMenu.component.vue'
@@ -88,11 +87,6 @@ import NotificationsMenu from './NotificationsMenu.component.vue'
   }
 })
 export default class AppBar extends Vue {
-  @Prop({
-    type: Object,
-    required: true
-  }) readonly config!: ConfigStoreState
-
   @Prop({
     type: Boolean,
     required: false,

@@ -327,7 +327,7 @@ export default class UserProfilePage extends Vue {
       }
     } catch (error) {
       console.error(error)
-      this.$toastService.error(error)
+      this.$toasts.error(error)
     }
   }
 

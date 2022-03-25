@@ -504,7 +504,7 @@ export default class RegisterPage extends Vue {
         this.hasSubmitted = true
       } catch (err) {
         console.error(err)
-        this.$toastService.error('Error submitting response')
+        this.$toasts.error('Error submitting response')
       }
 
       this.submitting = false
