@@ -11,5 +11,4 @@ export default interface User {
   // roles: string[]
   // city: string
   // email: string
-  // changelogLastVersionViewed?: string
 }

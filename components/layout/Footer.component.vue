@@ -19,19 +19,7 @@
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
 @Component
-export default class Footer extends Vue {
-  @Prop({
-    type: Boolean,
-    required: false,
-    default: false
-  }) readonly isLoggedIn!: boolean
-
-  @Prop({
-    type: Boolean,
-    required: false,
-    default: false
-  }) readonly shouldChangelogIconBlink!: boolean
-}
+export default class Footer extends Vue {}
 </script>
 
 <style scoped lang="scss">
