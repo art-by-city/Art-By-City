@@ -2,14 +2,7 @@ import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 import { Store } from 'vuex'
 
-export type ToastType = 'success' | 'info' | 'warning' | 'error'
-export interface ToastMessage {
-  timestamp: number
-  type: ToastType
-  message: string
-  show: boolean
-  timeout?: number
-}
+import { ToastMessage, ToastType } from './'
 
 interface AxiosError {
   response: {
@@ -22,14 +15,11 @@ interface AxiosError {
   }
 }
 
-function isAxiosError(thing: any): thing is AxiosError {
-  return (thing as AxiosError).response !== undefined
-}
-
 const TOAST_TIMEOUT_MS = 5000
 
 export class ToastService {
   $store!: Store<any>
+  list: ToastMessage[] = []
 
   constructor({ store }: Context) {
     this.$store = store
@@ -47,8 +37,8 @@ export class ToastService {
       toast.timeout = TOAST_TIMEOUT_MS
     }
 
-    this.$store.commit('toasts/add', toast)
-    this.$store.dispatch('toasts/destroyOnExpiration', toast)
+    this.list.push(toast)
+    this.removeOnExpiration(toast)
   }
 
   success(message: string) {
@@ -63,42 +53,40 @@ export class ToastService {
     this.toast(message, 'warning')
   }
 
-  error(error: string | AxiosError) {
-    if (isAxiosError(error)) {
+  error(error: string | AxiosError | Error) {
+    if (typeof error === 'string') {
+      return this.toast(error, 'error')
+    }
+
+    if (error instanceof Error) {
+      return this.toast(error.message, 'error')
+    }
+
+    if (error.response) {
       const msg = error.response?.status === 413
         ? 'Image(s) too big'
         : error.response?.data?.error?.message || 'Unknown error'
 
       return this.toast(msg, 'error')
     }
-
-    return this.toast(error, 'error')
   }
-}
 
-declare module 'vue/types/vue' {
-  // this.$myInjectedFunction inside Vue components
-  interface Vue {
-    $toasts: ToastService
-  }
-}
+  remove(toast: ToastMessage) {
+    const idx = this.list.findIndex((t) => {
+      return t === toast
+    })
 
-declare module '@nuxt/types' {
-  // nuxtContext.app.$myInjectedFunction inside
-  // asyncData, fetch, plugins, middleware, nuxtServerInit
-  interface NuxtAppOptions {
-    $toasts: ToastService
+    if (idx > -1) {
+      this.list.splice(idx, 1)
+    }
   }
-  // nuxtContext.$myInjectedFunction
-  interface Context {
-    $toasts: ToastService
-  }
-}
 
-declare module 'vuex/types/index' {
-  // this.$myInjectedFunction inside Vuex stores
-  interface Store<S> {
-    $toasts: ToastService
+  private async removeOnExpiration(toast: ToastMessage): Promise<void> {
+    if (toast.timeout) {
+      setTimeout(() => {
+        this.remove(toast)
+      }, toast.timeout)
+    }
   }
 }
 

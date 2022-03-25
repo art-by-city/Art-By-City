@@ -54,6 +54,7 @@ export default {
     '~/plugins/components.ts',
     '~/plugins/filters.ts',
     { src: '~/plugins/localforage.ts', ssr: false },
+    { src: '~/plugins/toasts/toasts.ts' }
   ],
   /*
    ** Nuxt.js dev-modules
