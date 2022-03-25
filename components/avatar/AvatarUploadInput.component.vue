@@ -155,7 +155,7 @@ export default class AvatarUploadInput extends Vue {
       if (target.files && target.files[0]) {
         const image = target.files[0]
           if (image.type === 'image/gif' && image.size > 5000000) {
-            this.$toastService.error('Animated avatars must be less than 5 MB.')
+            this.$toasts.error('Animated avatars must be less than 5 MB.')
           } else {
             const url = URL.createObjectURL(image)
             this.refreshCropper(url, () => {

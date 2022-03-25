@@ -167,7 +167,7 @@ export default class UsernameDialog extends TransactionDialog<string> {
           created: new Date().getTime()
         })
       } else {
-        this.$toastService.error(
+        this.$toasts.error(
           'Could not register username: either you have an insufficient balance or the Gateway is unavailable'
         )
       }

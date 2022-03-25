@@ -184,7 +184,7 @@ export default class LikeDialog extends TransactionDialog<Like> {
         },
         (err?: Error) => {
           if (err) {
-            this.$toastService.error(err.message)
+            this.$toasts.error(err.message)
             this.isUploading = false
             this.pending(false)
           } else {

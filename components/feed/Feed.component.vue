@@ -54,7 +54,7 @@ export default class FeedComponent extends Vue {
       this.cursorV0 = cursorV0
     } catch (error) {
       console.error(error)
-      this.$toastService.error(error)
+      this.$toasts.error(error)
     }
   }
 

@@ -158,7 +158,7 @@ export default class UserAvatar extends Vue {
 
       // Check for old format avatar and ask user to update
       if (this.isOwner && !this.dense && avatar.src.startsWith('data:image')) {
-        this.$toastService.warning(
+        this.$toasts.warning(
           'Your avatar is using an old data format and needs to be republished'
         )
       }

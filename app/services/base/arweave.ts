@@ -26,8 +26,8 @@ export default class ArweaveService {
       }
     } catch (error) {
       error.message
-        ? this.context.$toastService.error(error.message)
-        : this.context.$toastService.error('Transaction rejected by User')
+        ? this.context.$toasts.error(error.message)
+        : this.context.$toasts.error('Transaction rejected by User')
 
       return false
     }
