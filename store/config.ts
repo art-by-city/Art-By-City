@@ -3,7 +3,6 @@ import { ActionTree } from 'vuex'
 import { ArtworkType } from '~/types'
 
 const defaultState = {
-  cities: [] as any[],
   hashtags: [] as string[],
   artworkTypes: [] as ArtworkType[],
   maxUserArtworks: 10 as number
@@ -14,14 +13,9 @@ export const DefaultConfigStoreState: ConfigStoreState = {...defaultState}
 
 export const mutations = {
   setConfig(state: ConfigStoreState, newState: ConfigStoreState) {
-    state.cities = newState.cities
     state.hashtags = newState.hashtags
     state.artworkTypes = newState.artworkTypes
     state.maxUserArtworks = newState.maxUserArtworks
-  },
-
-  setCities(state: ConfigStoreState, cities: any[]) {
-    state.cities = cities
   },
 
   setHashtags(state: ConfigStoreState, hashtags: string[]) {
