@@ -190,10 +190,9 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 
 import LikeButton from '~/components/likes/likeButton.component.vue'
-import FormPageComponent from '~/components/pages/formPage.component'
 import ArtworkZoomDialog from
   '~/components/artwork/ArtworkZoomDialog.component.vue'
 import { ArtworkEditForm } from '~/components/artwork/edit'
@@ -220,7 +219,7 @@ import ProgressService from '~/services/progress/service'
     TransactionConfirmationProgress
   }
 })
-export default class ArtworkPage extends FormPageComponent {
+export default class ArtworkPage extends Vue {
   head() {
     if (!this.artwork) { return {} }
     const creator = this.artwork.version === 0

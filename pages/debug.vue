@@ -16,12 +16,11 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 import Arweave from 'arweave'
 import ArdbTransaction from 'ardb/lib/models/transaction'
 
 import { debounce } from '~/helpers'
-import FormPageComponent from '../components/pages/formPage.component'
 import ProgressService from '~/services/progress/service'
 
 const APP_NAME = 'ArtByCity-DEV'
@@ -35,7 +34,7 @@ type FileUploadRequest = {
 @Component({
   middleware: 'env/dev'
 })
-export default class DebugPage extends FormPageComponent {
+export default class DebugPage extends Vue {
   request!: FileUploadRequest
 
   @debounce
