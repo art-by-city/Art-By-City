@@ -21,7 +21,7 @@ import Arweave from 'arweave'
 import ArdbTransaction from 'ardb/lib/models/transaction'
 
 import { debounce } from '~/helpers'
-import ProgressService from '~/services/progress/service'
+import ProgressService from '~/app/services/progress/service'
 
 const APP_NAME = 'ArtByCity-DEV'
 

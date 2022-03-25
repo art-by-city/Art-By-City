@@ -2,8 +2,8 @@ import ArdbTransaction from 'ardb/lib/models/transaction'
 import Transaction from 'arweave/node/lib/transaction'
 
 import { FeedItem, Tip } from '~/types'
-import { uuidv4 } from '../helpers'
-import { TransactionService } from './'
+import { uuidv4 } from '../../helpers'
+import { TransactionService } from '.'
 
 export default class TipsService extends TransactionService {
   cache: {

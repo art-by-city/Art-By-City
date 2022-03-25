@@ -26,7 +26,7 @@ import { Component, Vue } from 'nuxt-property-decorator'
 import _ from 'lodash'
 
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import ProgressService from '~/services/progress/service'
+import ProgressService from '~/app/services/progress/service'
 import { FeedItem } from '~/types'
 import FeedLoadMore from './FeedLoadMore.component.vue'
 
