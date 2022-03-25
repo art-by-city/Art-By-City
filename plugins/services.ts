@@ -1,10 +1,10 @@
 import { Plugin } from '@nuxt/types'
 
-import InvitationService from '~/services/invitation/service'
-import ProfileService from '~/services/profile/service'
-import ConfigService from '~/services/config/service'
-import CityService from '~/services/city/service'
-import ToastService from '~/services/toast/service'
+import InvitationService from '~/app/services/invitation/service'
+import ProfileService from '~/app/services/profile/service'
+import ConfigService from '~/app/services/config/service'
+import CityService from '~/app/services/city/service'
+import ToastService from '~/app/services/toast/service'
 import {
   ArtworkService,
   ArweaveService,
@@ -15,7 +15,7 @@ import {
   TransactionQueueService,
   UserService,
   UsernameService
-} from '~/services'
+} from '~/app/services'
 
 declare module 'vue/types/vue' {
   // this.$myInjectedFunction inside Vue components

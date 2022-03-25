@@ -1,7 +1,7 @@
 import { Context } from '@nuxt/types'
 
-import ToastMessage from '../../models/toasts/toastMessage'
-import ToastType from '../../models/toasts/toastType'
+import ToastMessage from '../../../models/toasts/toastMessage'
+import ToastType from '../../../models/toasts/toastType'
 
 interface AxiosError {
   response: {

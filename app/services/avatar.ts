@@ -1,7 +1,7 @@
 import Transaction from 'arweave/node/lib/transaction'
 
 import { Avatar } from '~/types'
-import { TransactionService } from './'
+import { TransactionService } from '.'
 
 export default class AvatarService extends TransactionService {
   cache: { avatars: { [address: string]: Avatar } } = { avatars: {} }

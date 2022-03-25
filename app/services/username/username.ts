@@ -2,7 +2,7 @@ import { Context } from '@nuxt/types'
 import { Contract } from 'redstone-smartweave'
 import Transaction from 'arweave/web/lib/transaction'
 
-import { SmartWeaveService } from '../'
+import { SmartWeaveService } from '..'
 import { UsernamesContractState, handle } from './contract'
 
 export default class UsernameService extends SmartWeaveService {

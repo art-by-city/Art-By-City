@@ -1,6 +1,6 @@
 import { Context } from '@nuxt/types'
 
-import ProgressService from '~/services/progress/service'
+import ProgressService from '~/app/services/progress/service'
 import Invitation from '~/models/invitation'
 
 export default class InvitationService {

@@ -1,7 +1,7 @@
 import { Context } from '@nuxt/types'
 import { NuxtAxiosInstance } from '@nuxtjs/axios'
 
-import ProgressService from '~/services/progress/service'
+import ProgressService from '~/app/services/progress/service'
 
 export default class ConfigService {
   _context!: Context

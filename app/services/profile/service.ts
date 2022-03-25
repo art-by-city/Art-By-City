@@ -1,7 +1,7 @@
 import Transaction from 'arweave/node/lib/transaction'
 
 import { Profile } from '~/types'
-import { TransactionService } from '~/services'
+import { TransactionService } from '~/app/services'
 
 export default class ProfileService extends TransactionService {
   cache: { profiles: { [address: string]: Profile } } = { profiles: {} }
