@@ -209,7 +209,7 @@ import {
   } from '~/types'
 import { debounce } from '~/helpers'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import ProgressService from '~/services/progress/service'
+import ProgressService from '~/app/services/progress/service'
 
 @Component({
   components: {

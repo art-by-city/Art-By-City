@@ -2,7 +2,7 @@ import ArdbTransaction from 'ardb/lib/models/transaction'
 import Transaction from 'arweave/node/lib/transaction'
 import _ from 'lodash'
 
-import { TransactionService } from './'
+import { TransactionService } from '.'
 import { TransactionSearchResults } from '~/factories/transaction'
 import { FeedItem, LikeWithTip } from '~/types'
 import { uuidv4 } from '~/helpers'

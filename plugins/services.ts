@@ -1,30 +1,24 @@
 import { Plugin } from '@nuxt/types'
 
-import InvitationService from '~/services/invitation/service'
-import ProfileService from '~/services/profile/service'
-import ConfigService from '~/services/config/service'
-import CityService from '~/services/city/service'
-import ToastService from '~/services/toast/service'
 import {
   ArtworkService,
   ArweaveService,
   AvatarService,
   LikesService,
   PriceService,
+  ProfileService,
   TipsService,
+  ToastService,
   TransactionQueueService,
   UserService,
   UsernameService
-} from '~/services'
+} from '~/app/services'
 
 declare module 'vue/types/vue' {
   // this.$myInjectedFunction inside Vue components
   interface Vue {
-    $invitationService: InvitationService
     $profileService: ProfileService
     $artworkService: ArtworkService
-    $configService: ConfigService
-    $cityService: CityService
     $toastService: ToastService
     $usernameService: UsernameService
     $avatarService: AvatarService
@@ -41,11 +35,8 @@ declare module '@nuxt/types' {
   // nuxtContext.app.$myInjectedFunction inside
   // asyncData, fetch, plugins, middleware, nuxtServerInit
   interface NuxtAppOptions {
-    $invitationService: InvitationService
     $profileService: ProfileService
     $artworkService: ArtworkService
-    $configService: ConfigService
-    $cityService: CityService
     $toastService: ToastService
     $usernameService: UsernameService
     $avatarService: AvatarService
@@ -58,11 +49,8 @@ declare module '@nuxt/types' {
   }
   // nuxtContext.$myInjectedFunction
   interface Context {
-    $invitationService: InvitationService
     $profileService: ProfileService
     $artworkService: ArtworkService
-    $configService: ConfigService
-    $cityService: CityService
     $toastService: ToastService
     $usernameService: UsernameService
     $avatarService: AvatarService
@@ -78,11 +66,8 @@ declare module '@nuxt/types' {
 declare module 'vuex/types/index' {
   // this.$myInjectedFunction inside Vuex stores
   interface Store<S> {
-    $invitationService: InvitationService
     $profileService: ProfileService
     $artworkService: ArtworkService
-    $configService: ConfigService
-    $cityService: CityService
     $toastService: ToastService
     $usernameService: UsernameService
     $avatarService: AvatarService
@@ -96,10 +81,7 @@ declare module 'vuex/types/index' {
 }
 
 const servicesPlugin: Plugin = (context, inject) => {
-  inject('invitationService', new InvitationService(context))
   inject('profileService', new ProfileService(context))
-  inject('configService', new ConfigService(context))
-  inject('cityService', new CityService(context))
   inject('toastService', new ToastService(context))
   inject('usernameService', new UsernameService(context))
   inject('avatarService', new AvatarService(context))

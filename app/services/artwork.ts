@@ -11,7 +11,7 @@ import {
 import { uuidv4 } from '~/helpers'
 import { ArtworkFactory, ArtworkBundleFactory } from '~/factories'
 import { LIKED_ENTITY_TAG } from './likes'
-import { TransactionService, LikesService } from './'
+import { TransactionService, LikesService } from '.'
 
 const PAGE_SIZE = 9
 

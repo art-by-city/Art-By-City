@@ -19,16 +19,6 @@ export const emailRules = [
   }
 ]
 
-export const inviteCodeRules = [
-  (value: string = '') => {
-    if (value.length != 20) {
-      return 'A valid invitation code is required'
-    }
-
-    return true
-  }
-]
-
 export const passwordRules = [
   (value: string = '') => {
     if (value.length < 8) {
