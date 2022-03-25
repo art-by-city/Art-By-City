@@ -1,5 +1,5 @@
 <template>
-  <div v-intersect="onIntersect">
+  <div v-intersect="onIntersect" class="feed-load-more">
     <v-btn
       v-if="button"
       v-show="!pending"
@@ -15,7 +15,7 @@
       :indeterminate="pending"
       color="black"
       background-color="transparent"
-      height="1"
+      height="2"
       bottom
       class="my-2"
     ></v-progress-linear>
@@ -56,3 +56,9 @@ export default class FeedLoadMore extends Vue {
   onLoadMoreClicked() {}
 }
 </script>
+
+<style scoped>
+.feed-load-more {
+  width: 100%;
+}
+</style>
