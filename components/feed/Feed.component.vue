@@ -26,7 +26,6 @@ import { Component, Vue } from 'nuxt-property-decorator'
 import _ from 'lodash'
 
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import ProgressService from '~/app/services/progress/service'
 import { FeedItem } from '~/types'
 import FeedLoadMore from './FeedLoadMore.component.vue'
 
@@ -43,7 +42,6 @@ export default class FeedComponent extends Vue {
 
   fetchOnServer = false
   async fetch() {
-    ProgressService.start()
     try {
       const { feed, cursor, cursorV0 } = await this.$artworkService.fetchFeed(
         null,
@@ -57,8 +55,6 @@ export default class FeedComponent extends Vue {
     } catch (error) {
       console.error(error)
       this.$toastService.error(error)
-    } finally {
-      ProgressService.stop()
     }
   }
 

@@ -21,7 +21,6 @@ import Arweave from 'arweave'
 import ArdbTransaction from 'ardb/lib/models/transaction'
 
 import { debounce } from '~/helpers'
-import ProgressService from '~/app/services/progress/service'
 
 const APP_NAME = 'ArtByCity-DEV'
 
@@ -76,7 +75,7 @@ export default class DebugPage extends Vue {
     //   return
     // }
     try {
-      ProgressService.start()
+      this.$nuxt.$loading.start()
       // // rq5F6F8dJt9HdpqjT9rb4okcGCfcErLfWeLNii5qwFw
       // const arweave = new Arweave(this.$config.arweave.api)
 
@@ -118,7 +117,7 @@ export default class DebugPage extends Vue {
     } catch (error) {
       console.error('error in postToArweave()', error)
     } finally {
-      ProgressService.stop()
+      this.$nuxt.$loading.finish()
     }
   }
 }

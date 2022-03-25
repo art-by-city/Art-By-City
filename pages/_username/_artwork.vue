@@ -209,7 +209,6 @@ import {
   } from '~/types'
 import { debounce } from '~/helpers'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
-import ProgressService from '~/app/services/progress/service'
 
 @Component({
   components: {
@@ -317,7 +316,6 @@ export default class ArtworkPage extends Vue {
   }
 
   async fetch() {
-    ProgressService.start()
     try {
       const { username, address } = await this.$usernameService.resolve(
         this.$route.params.username
@@ -361,8 +359,6 @@ export default class ArtworkPage extends Vue {
     } catch (error) {
       console.error(error)
       this.$toastService.error(error)
-    } finally {
-      ProgressService.stop()
     }
   }
 

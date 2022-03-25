@@ -1,7 +1,6 @@
 import { ActionTree, MutationTree } from 'vuex'
 
 import { ArtworkOptions } from '~/types'
-import ProgressService from '~/app/services/progress/service'
 
 const maxArtworkHistory = 5
 
@@ -51,8 +50,6 @@ export const mutations: MutationTree<ArtworkStoreState> = {
 
 export const actions: ActionTree<ArtworkStoreState, any> = {
   async fetch({ state, commit }): Promise<void> {
-    ProgressService.start()
-
     const params = { ...state.options }
 
     try {
@@ -61,13 +58,9 @@ export const actions: ActionTree<ArtworkStoreState, any> = {
     } catch (error) {
       console.error(error)
     }
-
-    ProgressService.stop()
   },
 
   async fetchMore({ state, commit }): Promise<void> {
-    ProgressService.start()
-
     const params = { ...state.options }
 
     try {
@@ -77,7 +70,5 @@ export const actions: ActionTree<ArtworkStoreState, any> = {
     } catch (error) {
       console.error(error)
     }
-
-    ProgressService.stop()
   }
 }

@@ -177,7 +177,6 @@ import { Component, Vue } from 'nuxt-property-decorator'
 
 import { User } from '~/models'
 import { debounce } from '~/helpers'
-import ProgressService from '~/app/services/progress/service'
 import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
 import EditProfileDialog from
@@ -308,7 +307,6 @@ export default class UserProfilePage extends Vue {
   }
 
   async fetch() {
-    ProgressService.start()
     try {
       const { username, address } = await this.$usernameService.resolve(
         this.$route.params.username
@@ -330,8 +328,6 @@ export default class UserProfilePage extends Vue {
     } catch (error) {
       console.error(error)
       this.$toastService.error(error)
-    } finally {
-      ProgressService.stop()
     }
   }
 
