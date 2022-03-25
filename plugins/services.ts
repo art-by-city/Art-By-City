@@ -5,7 +5,6 @@ import ProfileService from '~/services/profile/service'
 import ConfigService from '~/services/config/service'
 import CityService from '~/services/city/service'
 import ToastService from '~/services/toast/service'
-import ChangelogService from '~/services/changelog/service'
 import {
   ArtworkService,
   ArweaveService,
@@ -27,7 +26,6 @@ declare module 'vue/types/vue' {
     $configService: ConfigService
     $cityService: CityService
     $toastService: ToastService
-    $changelogService: ChangelogService
     $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
@@ -49,7 +47,6 @@ declare module '@nuxt/types' {
     $configService: ConfigService
     $cityService: CityService
     $toastService: ToastService
-    $changelogService: ChangelogService
     $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
@@ -67,7 +64,6 @@ declare module '@nuxt/types' {
     $configService: ConfigService
     $cityService: CityService
     $toastService: ToastService
-    $changelogService: ChangelogService
     $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
@@ -88,7 +84,6 @@ declare module 'vuex/types/index' {
     $configService: ConfigService
     $cityService: CityService
     $toastService: ToastService
-    $changelogService: ChangelogService
     $usernameService: UsernameService
     $avatarService: AvatarService
     $userService: UserService
@@ -106,7 +101,6 @@ const servicesPlugin: Plugin = (context, inject) => {
   inject('configService', new ConfigService(context))
   inject('cityService', new CityService(context))
   inject('toastService', new ToastService(context))
-  inject('changelogService', new ChangelogService(context))
   inject('usernameService', new UsernameService(context))
   inject('avatarService', new AvatarService(context))
   inject('userService', new UserService(context))
