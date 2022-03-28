@@ -51,7 +51,7 @@
 import { Component, Vue, Emit } from 'nuxt-property-decorator'
 import _ from 'lodash'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 @Component
 export default class HeroSection extends Vue {

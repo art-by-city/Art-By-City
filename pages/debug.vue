@@ -20,7 +20,7 @@ import { Component, Vue } from 'nuxt-property-decorator'
 import Arweave from 'arweave'
 import ArdbTransaction from 'ardb/lib/models/transaction'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 const APP_NAME = 'ArtByCity-DEV'
 

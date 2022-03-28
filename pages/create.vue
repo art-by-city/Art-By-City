@@ -75,7 +75,7 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 import { WalletProvidersList } from '~/components'
 
 @Component({

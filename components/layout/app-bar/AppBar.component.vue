@@ -74,7 +74,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 import AccountMenu from './AccountMenu.component.vue'
 import TransactionsMenu from './TransactionsMenu.component.vue'
 import NotificationsMenu from './NotificationsMenu.component.vue'

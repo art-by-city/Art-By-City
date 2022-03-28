@@ -56,7 +56,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 @Component
 export default class TransactionFormControls extends Vue {
