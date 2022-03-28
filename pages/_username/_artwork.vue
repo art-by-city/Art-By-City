@@ -202,11 +202,10 @@ import {
   Artwork,
   LegacyArtwork,
   LegacyArtworkImage,
-  UserTransaction,
-  SetUserTransactionStatusPayload,
   Profile,
   ArtworkImageWithPreviews
-  } from '~/types'
+  } from '~/app/core'
+import { UserTransaction, SetUserTransactionStatusPayload } from '~/app/ui'
 import { debounce } from '~/app/util'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 

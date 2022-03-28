@@ -26,7 +26,7 @@ import { Component, Vue } from 'nuxt-property-decorator'
 import _ from 'lodash'
 
 import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
-import { FeedItem } from '~/types'
+import { FeedItem } from '~/app/core'
 import FeedLoadMore from './FeedLoadMore.component.vue'
 
 @Component({

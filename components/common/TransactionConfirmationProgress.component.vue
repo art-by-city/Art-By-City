@@ -50,7 +50,7 @@
 <script lang="ts">
 import { Component, Emit, Prop, Vue } from 'nuxt-property-decorator'
 
-import { UserTransaction } from '~/types'
+import { UserTransaction } from '~/app/ui'
 
 @Component
 export default class TransactionConfirmationProgress extends Vue {

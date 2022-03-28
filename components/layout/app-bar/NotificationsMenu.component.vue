@@ -80,7 +80,7 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-import { Notification } from '~/models'
+import { Notification } from '~/app/ui'
 import NotificationComponent
   from '~/components/notifications/Notification.component.vue'
 import {
