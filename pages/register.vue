@@ -395,7 +395,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
-import { EMAIL_REGEX, debounce } from '~/helpers'
+import { EMAIL_REGEX, debounce } from '~/app/util'
 
 type VForm = Vue & {
   reset: () => void

@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
-import { convertARtoUSD } from '~/helpers'
+import { convertARtoUSD } from '~/app/util'
 
 @Component
 export default class CurrencyEstimate extends Vue {

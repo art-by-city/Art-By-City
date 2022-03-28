@@ -1,6 +1,6 @@
 import { Bundle, DataItem } from 'arbundles'
 
-import { longTo32ByteArray } from '~/helpers'
+import { longTo32ByteArray } from '~/app/util'
 
 export default class BundleFactory {
   static create(items: DataItem[]): Bundle {

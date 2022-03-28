@@ -1,5 +1,5 @@
 import { NotificationType } from '~/types'
-import { uuidv4 } from '~/helpers'
+import { uuidv4 } from '~/app/util'
 
 export default class Notification {
   guid: string = uuidv4()

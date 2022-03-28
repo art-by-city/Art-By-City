@@ -7,7 +7,7 @@ import {
   LegacyArtworkManifest
 } from '~/types'
 import { FactoryCreationError } from '../'
-import { uuidv4 } from '../../helpers'
+import { uuidv4 } from '~/app/util'
 
 export default class ArtworkFactory {
   build(

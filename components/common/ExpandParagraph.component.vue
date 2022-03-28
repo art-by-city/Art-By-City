@@ -12,7 +12,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 @Component
 export default class ExpandParagraph extends Vue {

@@ -88,7 +88,7 @@ import TransactionDialog from
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import { LIKING_ARTIST_FEE } from '~/app/services/likes'
-import { convertARtoUSD } from '~/helpers'
+import { convertARtoUSD } from '~/app/util'
 
 @Component({
   components: {

@@ -53,7 +53,7 @@ import TransactionDialog from
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import AvatarUploadInput from './AvatarUploadInput.component.vue'
-import { readFileAsArrayBufferAsync, uuidv4 } from '~/helpers'
+import { readFileAsArrayBufferAsync, uuidv4 } from '~/app/util'
 
 @Component({
   components: {

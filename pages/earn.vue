@@ -118,7 +118,7 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 
 import { Artwork, FeedItem, LegacyArtwork, LikeWithTip, Tip } from '~/types'
-import { convertARtoUSD } from '~/helpers'
+import { convertARtoUSD } from '~/app/util'
 
 @Component({
   middleware: 'auth',

@@ -64,7 +64,7 @@
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
 import { Artwork, LegacyArtwork, Profile } from '~/types'
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 @Component
 export default class ArtworkCard extends Vue {

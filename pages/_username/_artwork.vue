@@ -207,7 +207,7 @@ import {
   Profile,
   ArtworkImageWithPreviews
   } from '~/types'
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 
 @Component({

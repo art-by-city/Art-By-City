@@ -74,7 +74,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Watch } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 const ZOOM_UPPER_LIMIT: number = 4.1
 const ZOOM_LOWER_LIMIT: number = -0.9
