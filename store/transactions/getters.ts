@@ -1,6 +1,6 @@
 import { getterTree } from 'typed-vuex'
 
-import { isProcessing } from '~/types'
+import { isProcessing } from '~/app/ui'
 import state from './state'
 
 const getters = getterTree(state, {

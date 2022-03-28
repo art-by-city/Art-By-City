@@ -3,8 +3,7 @@ import Arweave from 'arweave'
 import Transaction from 'arweave/web/lib/transaction'
 import * as ArweaveUtils from 'arweave/web/lib/utils'
 
-import { SignerFactory } from '~/factories'
-import { ArweaveConfig } from '~/types'
+import { ArweaveConfig, SignerFactory } from '~/app/infra/arweave'
 
 export default class ArweaveService {
   $arweave!: Arweave

@@ -117,7 +117,7 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-import { Artwork, FeedItem, LegacyArtwork, LikeWithTip, Tip } from '~/types'
+import { Artwork, FeedItem, LegacyArtwork, LikeWithTip, Tip } from '~/app/core'
 import { convertARtoUSD } from '~/app/util'
 
 @Component({

@@ -47,13 +47,13 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import { DomainEntityCategory, URLArtworkImage } from '~/types'
+import { DomainEntityCategory, URLArtworkImage } from '~/app/core'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 import AvatarUploadInput from './AvatarUploadInput.component.vue'
-import { readFileAsArrayBufferAsync, uuidv4 } from '~/app/util'
+import { readFileAsArrayBufferAsync } from '~/app/util'
 
 @Component({
   components: {

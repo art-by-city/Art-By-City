@@ -36,7 +36,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import { FeedItem, LikeWithTip } from '~/types'
+import { FeedItem, LikeWithTip } from '~/app/core'
 
 @Component
 export default class LikedByList extends Vue {

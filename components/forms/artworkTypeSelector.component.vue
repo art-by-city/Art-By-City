@@ -20,7 +20,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Model } from 'nuxt-property-decorator'
 
-import { ArtworkType } from '~/types'
+import { ArtworkType } from '~/app/core'
 
 @Component
 export default class ArtworkTypeSelector extends Vue {

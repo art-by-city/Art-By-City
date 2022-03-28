@@ -82,7 +82,7 @@
 import { Component, Prop, Emit } from 'nuxt-property-decorator'
 import _ from 'lodash'
 
-import { DomainEntityCategory, Like } from '~/types'
+import { DomainEntityCategory, Like } from '~/app/core'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from

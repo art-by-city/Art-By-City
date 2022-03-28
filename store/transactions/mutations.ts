@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import { mutationTree } from 'typed-vuex'
 
-import { SetUserTransactionStatusPayload, UserTransaction } from '~/types'
+import { SetUserTransactionStatusPayload, UserTransaction } from '~/app/ui'
 import state from './state'
 
 export const ADD_TRANSACTION = 'ADD_TRANSACTION'

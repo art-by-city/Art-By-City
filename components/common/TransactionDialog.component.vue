@@ -5,7 +5,7 @@ import { Vue, Component, PropSync } from 'nuxt-property-decorator'
 import Transaction from 'arweave/web/lib/transaction'
 
 import { debounce } from '~/app/util'
-import { DomainEntityCategory } from '~/types'
+import { DomainEntityCategory } from '~/app/core'
 import TransactionFormControls from
   '~/components/forms/transactionFormControls.component.vue'
 

@@ -1,7 +1,7 @@
 import { actionTree } from 'typed-vuex'
 
-import { TransactionNotificationType, UserTransactionType } from '~/types'
-import { TransactionNotificationFactory } from '~/factories'
+import { TransactionNotificationType, UserTransactionType } from '~/app/ui'
+import { TransactionNotificationFactory } from '~/app/ui/notifications'
 import state from './state'
 import getters from './getters'
 import mutations, { ADD_NOTIFICATION } from './mutations'

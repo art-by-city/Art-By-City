@@ -73,7 +73,7 @@ import { Component, Emit, Model, Prop, Vue } from 'nuxt-property-decorator'
 import Cropper from 'cropperjs'
 
 import { debounce } from '~/app/util'
-import { URLArtworkImage } from '~/types'
+import { URLArtworkImage } from '~/app/core'
 
 @Component
 export default class AvatarUploadInput extends Vue {

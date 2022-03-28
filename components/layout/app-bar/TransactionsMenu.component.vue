@@ -65,7 +65,7 @@ import { Vue, Component } from 'nuxt-property-decorator'
 
 import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
-import { UserTransaction } from '~/types'
+import { UserTransaction } from '~/app/ui'
 
 @Component({
   components: {

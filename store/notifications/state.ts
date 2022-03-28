@@ -1,4 +1,4 @@
-import { Notification } from '~/models'
+import { Notification } from '~/app/ui'
 
 export const DEFAULT_STATE = {
   notifications: [] as Notification[]

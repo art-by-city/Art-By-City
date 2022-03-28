@@ -35,7 +35,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import { Notification } from '~/models'
+import { Notification } from '~/app/ui'
 
 @Component
 export default class NotificationComponent extends Vue {
