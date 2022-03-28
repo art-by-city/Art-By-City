@@ -72,7 +72,7 @@
 import { Component, Emit, Model, Prop, Vue } from 'nuxt-property-decorator'
 import Cropper from 'cropperjs'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 import { URLArtworkImage } from '~/types'
 
 @Component

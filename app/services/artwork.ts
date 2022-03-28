@@ -8,7 +8,7 @@ import {
   FeedItem,
   LegacyArtwork
 } from '~/types'
-import { uuidv4 } from '~/helpers'
+import { uuidv4 } from '~/app/util'
 import { ArtworkFactory, ArtworkBundleFactory } from '~/factories'
 import { LIKED_ENTITY_TAG } from './likes'
 import { TransactionService, LikesService } from '.'

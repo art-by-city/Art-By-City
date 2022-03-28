@@ -176,7 +176,7 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 
 import { User } from '~/models'
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
 import EditProfileDialog from

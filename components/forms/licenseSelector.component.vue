@@ -29,7 +29,7 @@
 import { Component, Model, Vue } from 'nuxt-property-decorator'
 
 import { License } from '~/types'
-import spdx from '~/helpers/licenses.json'
+import spdx from '~/app/util/licenses.json'
 
 @Component
 export default class LicenseSelector extends Vue {

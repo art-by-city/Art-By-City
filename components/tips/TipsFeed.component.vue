@@ -53,7 +53,7 @@ import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
 import { FeedItem, Tip } from '~/types'
 import FeedLoadMore from '~/components/feed/FeedLoadMore.component.vue'
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 @Component({
   components: {

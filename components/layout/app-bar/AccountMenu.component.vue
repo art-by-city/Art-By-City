@@ -47,7 +47,7 @@
 <script lang="ts">
 import { Vue, Component, Emit } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 @Component
 export default class AccountMenu extends Vue {

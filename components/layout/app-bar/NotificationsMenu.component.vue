@@ -87,7 +87,7 @@ import {
   ADD_NOTIFICATION,
   MARK_NOTIFICATIONS_READ
 } from '~/store/notifications/mutations'
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 
 @Component({
   components: {

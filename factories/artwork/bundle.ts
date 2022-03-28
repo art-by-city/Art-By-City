@@ -1,6 +1,6 @@
 import { Bundle, DataItem } from 'arbundles'
 
-import { readFileAsArrayBufferAsync } from '~/helpers'
+import { readFileAsArrayBufferAsync } from '~/app/util'
 import { ArtworkCreationOptions, ArtworkImageWithPreviews, ArtworkManifest } from '~/types'
 import { BundleFactory, DataItemFactory, SignerFactory } from '..'
 import PreviewFactory from './preview'

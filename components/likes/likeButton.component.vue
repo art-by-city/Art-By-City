@@ -64,7 +64,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
-import { debounce } from '~/helpers'
+import { debounce } from '~/app/util'
 import LikedByList from './LikedByList.component.vue'
 import LikeDialog from './LikeDialog.component.vue'
 

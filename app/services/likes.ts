@@ -5,7 +5,7 @@ import _ from 'lodash'
 import { TransactionService } from '.'
 import { TransactionSearchResults } from '~/factories/transaction'
 import { FeedItem, LikeWithTip } from '~/types'
-import { uuidv4 } from '~/helpers'
+import { uuidv4 } from '~/app/util'
 
 export const LIKED_ENTITY_TAG = 'liked-entity'
 export const LIKING_ARTIST_FEE = '0.0002' // AR

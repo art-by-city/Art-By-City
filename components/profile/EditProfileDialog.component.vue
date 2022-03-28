@@ -81,7 +81,7 @@
 import { Component } from 'nuxt-property-decorator'
 
 import { DomainEntityCategory, Profile } from '~/types'
-import { twitter, twitch, instagram, maxLength } from '~/helpers/rules'
+import { twitter, twitch, instagram, maxLength } from '~/app/util/rules'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
