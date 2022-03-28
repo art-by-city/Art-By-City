@@ -51,7 +51,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import { FeedItem, Tip } from '~/types'
+import { FeedItem, Tip } from '~/app/core'
 import FeedLoadMore from '~/components/feed/FeedLoadMore.component.vue'
 import { debounce } from '~/app/util'
 

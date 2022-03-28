@@ -213,7 +213,7 @@ import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
 import Transaction from 'arweave/web/lib/transaction'
 
-import { ArtworkCreationOptions, URLArtworkImage } from '~/types'
+import { ArtworkCreationOptions, URLArtworkImage } from '~/app/core'
 import { debounce, uuidv4 } from '~/app/util'
 import CitySelector from '~/components/forms/citySelector.component.vue'
 import ArtworkTypeSelector from

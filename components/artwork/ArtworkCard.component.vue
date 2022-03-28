@@ -63,7 +63,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import { Artwork, LegacyArtwork, Profile } from '~/types'
+import { Artwork, LegacyArtwork, Profile } from '~/app/core'
 import { debounce } from '~/app/util'
 
 @Component

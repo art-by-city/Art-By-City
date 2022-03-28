@@ -1,6 +1,6 @@
 import { Auth as NuxtAuth } from '@nuxtjs/auth-next'
 
-import { User } from '~/models'
+import { User } from '~/app/core/user'
 
 // NB: This allows us to type User from $auth
 // see https://github.com/nuxt-community/auth-module/issues/1097

@@ -1,7 +1,7 @@
 import { mutationTree } from 'typed-vuex'
 
-import { Notification } from '~/models'
-import { MarkNotificationsReadPayload } from '~/types'
+import { Notification } from '~/app/ui'
+import { MarkNotificationsReadPayload } from '~/app/ui'
 import state from './state'
 
 export const ADD_NOTIFICATION = 'ADD_NOTIFICATION'

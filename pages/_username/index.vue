@@ -175,7 +175,7 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-import { User } from '~/models'
+import { User } from '~/app/core/user'
 import { debounce } from '~/app/util'
 import AvatarUploadDialog from
   '~/components/avatar/AvatarUploadDialog.component.vue'
@@ -189,7 +189,7 @@ import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 import LikesFeed from '~/components/profile/LikesFeed.component.vue'
 import TipsFeed from '~/components/tips/TipsFeed.component.vue'
 import ExpandParagraph from '~/components/common/ExpandParagraph.component.vue'
-import { DomainEntity, DomainEntityCategory } from '~/types'
+import { DomainEntity, DomainEntityCategory } from '~/app/core'
 
 @Component({
   components: {

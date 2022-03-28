@@ -1,6 +1,6 @@
 import Transaction from 'arweave/node/lib/transaction'
 
-import { Avatar } from '~/types'
+import { Avatar } from '~/app/core/avatar'
 import { TransactionService } from '.'
 
 export default class AvatarService extends TransactionService {

@@ -4,7 +4,7 @@ import {
   SetUserTransactionStatusPayload,
   TransactionNotificationType,
   UserTransaction
-} from '~/types'
+} from '~/app/ui'
 import { accessorType } from '~/store'
 import state from './state'
 import getters from './getters'

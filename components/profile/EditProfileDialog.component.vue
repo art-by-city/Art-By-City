@@ -80,7 +80,7 @@
 <script lang="ts">
 import { Component } from 'nuxt-property-decorator'
 
-import { DomainEntityCategory, Profile } from '~/types'
+import { DomainEntityCategory, Profile } from '~/app/core'
 import { twitter, twitch, instagram, maxLength } from '~/app/util/rules'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'

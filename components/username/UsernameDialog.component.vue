@@ -58,7 +58,7 @@
 <script lang="ts">
 import { Component, Watch } from 'nuxt-property-decorator'
 
-import { DomainEntityCategory } from '~/types'
+import { DomainEntityCategory } from '~/app/core'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 
 @Component

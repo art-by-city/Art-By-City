@@ -36,8 +36,7 @@
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 import MD5 from 'crypto-js/md5'
 
-import User from '~/models/user/user'
-import { Profile } from '~/types'
+import { Profile, User } from '~/app/core'
 
 @Component
 export default class UserAvatar extends Vue {

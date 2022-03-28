@@ -1,7 +1,7 @@
 import ArdbTransaction from 'ardb/lib/models/transaction'
 import Transaction from 'arweave/node/lib/transaction'
 
-import { FeedItem, Tip } from '~/types'
+import { FeedItem, Tip } from '~/app/core'
 import { uuidv4 } from '~/app/util'
 import { TransactionService } from '.'
 

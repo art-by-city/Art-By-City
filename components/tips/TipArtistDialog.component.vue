@@ -62,7 +62,7 @@
 import _ from 'lodash'
 import { Component, Prop } from 'nuxt-property-decorator'
 
-import { DomainEntityCategory, Tip } from '~/types'
+import { DomainEntityCategory, Tip } from '~/app/core'
 import { convertARtoUSD } from '~/app/util'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 

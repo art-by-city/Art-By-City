@@ -8,7 +8,8 @@ import {
   UserTransactionStatus,
   isProcessing,
   SetUserTransactionStatusPayload
-} from '~/types'
+} from '~/app/ui'
+
 import {
   ADD_TRANSACTION,
   SET_TRANSACTION_STATUS

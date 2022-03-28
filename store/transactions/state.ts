@@ -1,4 +1,4 @@
-import { UserTransaction } from '~/types'
+import { UserTransaction } from '~/app/ui'
 
 export const DEFAULT_STATE = {
   transactions: [] as UserTransaction[]

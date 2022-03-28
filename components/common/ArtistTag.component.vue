@@ -26,7 +26,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
-import User from '~/models/user/user'
+import { User } from '~/app/core/user'
 
 @Component
 export default class ArtistTag extends Vue {

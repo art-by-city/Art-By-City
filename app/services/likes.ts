@@ -3,8 +3,9 @@ import Transaction from 'arweave/node/lib/transaction'
 import _ from 'lodash'
 
 import { TransactionService } from '.'
-import { TransactionSearchResults } from '~/factories/transaction'
-import { FeedItem, LikeWithTip } from '~/types'
+import { TransactionSearchResults } from '~/app/infra/arweave'
+import { FeedItem } from '~/app/core/feed'
+import { LikeWithTip } from '~/app/core/likes'
 import { uuidv4 } from '~/app/util'
 
 export const LIKED_ENTITY_TAG = 'liked-entity'

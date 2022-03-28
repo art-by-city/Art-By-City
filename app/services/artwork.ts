@@ -5,11 +5,14 @@ import _ from 'lodash'
 import {
   Artwork,
   ArtworkCreationOptions,
-  FeedItem,
   LegacyArtwork
-} from '~/types'
+} from '~/app/core/artwork'
+import { FeedItem } from '~/app/core/feed'
 import { uuidv4 } from '~/app/util'
-import { ArtworkFactory, ArtworkBundleFactory } from '~/factories'
+import {
+  ArtworkFactory,
+  ArtworkBundleFactory
+} from '~/app/core/artwork/factory'
 import { LIKED_ENTITY_TAG } from './likes'
 import { TransactionService, LikesService } from '.'
 
