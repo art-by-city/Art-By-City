@@ -52,7 +52,7 @@ export default {
     { src: '~/plugins/smartweave.ts' },
     { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',
-    '~/plugins/filters.ts',
+    { src: '~/plugins/filters' },
     { src: '~/plugins/localforage.ts', ssr: false },
     { src: '~/plugins/toasts/toasts.ts' }
   ],
