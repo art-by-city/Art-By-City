@@ -73,6 +73,15 @@
           >
             DeSo
           </v-btn>
+          <v-btn
+           href="https://minds.com/artbycity"
+           target="_blank"
+           text
+           x-small
+           tile
+          >
+            Minds
+          </v-btn>
         </v-col>
       </v-row>
     </v-container>
