@@ -2,6 +2,10 @@ runtime: nodejs16
 
 instance_class: F4_1G
 
+automatic_scaling:
+  cpu_utilization:
+    target_utilization: 0.75
+
 handlers:
   - url: /_nuxt
     static_dir: .nuxt/dist/client
