@@ -1,33 +1,10 @@
-<template>
-  <v-container>
-    <v-row justify="center">
-      <v-col cols="6">
-        <ArtworkEditForm
-          @uploading="onUploading"
-          @save="onSave"
-          @cancel="onCancel"
-        />
-      </v-col>
-    </v-row>
-  </v-container>
-</template>
+<template></template>
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-import { ArtworkEditForm } from '~/components/artwork/edit'
-
-@Component({
-  middleware: 'auth',
-  components: {
-    ArtworkEditForm
-  }
-})
-export default class UploadPage extends Vue {
-  get head() {
-    return { title: 'Publish' }
-  }
-
+@Component
+export default class PublishingPage extends Vue {
   isUploading: boolean = false
 
   beforeRouteLeave(to: any, from: any, next: Function) {
