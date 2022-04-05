@@ -1,23 +1,31 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col cols="6">
-        <ArtworkEditForm
-          @uploading="onUploading"
-          @save="onSave"
-          @cancel="onCancel"
-        />
+      <v-col cols="12" class="text-center">
+        <h1>Publish</h1>
+      </v-col>
+    </v-row>
+    <v-row justify="center">
+      <v-col cols="12" class="text-center">
+        <v-btn x-large outlined to="/publish/artwork">
+          <v-icon x-large>mdi-image</v-icon>
+          Artwork
+        </v-btn>
+      </v-col>
+      <v-col cols="12" class="text-center">
+        <v-btn x-large outlined to="/publish/audio">
+          <v-icon x-large>mdi-music</v-icon>
+          Audio
+        </v-btn>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Vue } from 'nuxt-property-decorator'
 
 import { ArtworkEditForm } from '~/components/artwork/edit'
-import PublishingPage from
-  '~/components/publishing/PublishingPage.component.vue'
 
 @Component({
   middleware: 'auth',
@@ -25,7 +33,7 @@ import PublishingPage from
     ArtworkEditForm
   }
 })
-export default class PublishPage extends PublishingPage {
+export default class PublishPage extends Vue {
   get head() {
     return { title: 'Publish' }
   }

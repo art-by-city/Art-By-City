@@ -15,7 +15,7 @@ export default class PublishingPage extends Vue {
     }
   }
 
-  onSave({ txId, slug }: { txId: string, slug: string }) {
+  onSave() {
     const profileUrl = this.$auth.user.username || this.$auth.user.address
     if (profileUrl) {
       this.$router.push(`/${profileUrl}?publishSuccess=true`)
