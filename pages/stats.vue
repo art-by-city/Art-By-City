@@ -34,6 +34,10 @@
           <h3>Total Earned</h3>
           <CurrencyEstimate :winston="totalEarned" />
         </div>
+        <div>
+          <h3>Total Transactions</h3>
+          <span>{{ totalTransactions }}</span>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -69,6 +73,7 @@ export default class StatsPage extends Vue {
   totalTips: number = 0
   totalEarnedFromTips: string = '0'
   totalEarned: string = '0'
+  totalTransactions: number = 0
 
   fetchOnServer = false
   async fetch() {
@@ -77,6 +82,8 @@ export default class StatsPage extends Vue {
     const txs = await query.findAll({
       sort: 'HEIGHT_DESC'
     }) as ArdbTransaction[]
+
+    this.totalTransactions = txs.length
 
     const addresses = _
       .chain(txs)
