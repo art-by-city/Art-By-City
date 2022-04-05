@@ -41,6 +41,8 @@ const DEFAULTS: ArweaveWalletSchemeOptions = {
   }
 }
 
+const TOKEN = DEFAULTS.token.prefix + DEFAULTS.name
+
 export class ArweaveWalletNotInstalledError extends Error {
   constructor() {
     super('Arweave Wallet extension not installed')
@@ -77,10 +79,11 @@ export default class ArweaveWalletScheme<
   check(checkStatus = false): SchemeCheck {
     const response: SchemeCheck = {
       valid: false,
-      tokenExpired: false
+      tokenExpired: false,
+      isRefreshable: true
     }
 
-    const token = this.token.sync()
+    const token = this.$auth.$storage.syncUniversal(TOKEN) || false
 
     if (!checkStatus) {
       response.valid = true
@@ -145,6 +148,7 @@ export default class ArweaveWalletScheme<
 
     if (address) {
       this.token.set(address)
+      this.$auth.$storage.setUniversal(TOKEN, address)
       this.$auth.setUser(await this.$auth.ctx.$userService.fetchUser(address))
     }
   }
