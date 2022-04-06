@@ -199,7 +199,7 @@ import { ArtworkEditForm } from '~/components/artwork/edit'
 import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
 import {
-  Artwork,
+  ImageArtwork,
   LegacyArtwork,
   LegacyArtworkImage,
   Profile,
@@ -255,7 +255,7 @@ export default class ArtworkPage extends Vue {
     }
   }
 
-  artwork: Artwork | LegacyArtwork | null = null
+  artwork: ImageArtwork | LegacyArtwork | null = null
   profile: Profile | null = null
   username: string | null = null
   previewImage: ArtworkImageWithPreviews | LegacyArtworkImage | null = null

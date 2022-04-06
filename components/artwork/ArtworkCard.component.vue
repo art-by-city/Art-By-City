@@ -63,7 +63,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import { Artwork, LegacyArtwork, Profile } from '~/app/core'
+import { ImageArtwork, LegacyArtwork, Profile } from '~/app/core'
 import { debounce } from '~/app/util'
 
 @Component
@@ -89,7 +89,7 @@ export default class ArtworkCard extends Vue {
     }
   }
 
-  artwork: Artwork | LegacyArtwork | null = null
+  artwork: ImageArtwork | LegacyArtwork | null = null
   profile: Profile | null = null
   username: string | null = null
 

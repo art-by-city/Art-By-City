@@ -1,18 +1,18 @@
 import {
-  Artwork,
+  ImageArtwork,
   ArtworkImageWithPreviews,
-  ArtworkManifest,
+  ImageArtworkManifest,
   LegacyArtwork,
   LegacyArtworkManifest
 } from '~/app/core/artwork'
 import { FactoryCreationError } from '~/app/core/error'
 import { uuidv4 } from '~/app/util'
 
-export default class ArtworkFactory {
+export default class ImageArtworkBuilder {
   build(
     id: string,
-    opts: Partial<ArtworkManifest> | Partial<LegacyArtworkManifest>
-  ): Artwork | LegacyArtwork {
+    opts: Partial<ImageArtworkManifest> | Partial<LegacyArtworkManifest>
+  ): ImageArtwork | LegacyArtwork {
     if (!id) {
       throw new FactoryCreationError('missing id')
     }

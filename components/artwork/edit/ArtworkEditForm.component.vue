@@ -60,13 +60,6 @@
                       :accept="accept"
                       @input="onArtworkImageChanged($event, i)"
                     />
-                    <!-- <v-file-input
-                      class="artwork-upload-button"
-                      :accept="accept"
-                      hide-input
-                      prepend-icon="mdi-camera"
-                      @change="onAddArtworkImageClicked($event)"
-                    ></v-file-input> -->
                     <div style="display: inline-flex;">
                       <v-btn
                         icon
@@ -208,67 +201,38 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit } from 'nuxt-property-decorator'
+import { Component, Emit } from 'nuxt-property-decorator'
 import draggable from 'vuedraggable'
 import Cropper from 'cropperjs'
-import Transaction from 'arweave/web/lib/transaction'
 
-import { ArtworkCreationOptions, URLArtworkImage } from '~/app/core'
+import { ImageArtworkCreationOptions } from '~/app/core'
 import { debounce, uuidv4 } from '~/app/util'
-import CitySelector from '~/components/forms/citySelector.component.vue'
-import ArtworkTypeSelector from
-  '~/components/forms/artworkTypeSelector.component.vue'
-import LicenseSelector from '~/components/forms/licenseSelector.component.vue'
-import HashtagSelector from '~/components/forms/hashtagSelector.component.vue'
-import TransactionFormControls from
-  '~/components/forms/transactionFormControls.component.vue'
+import { PublishingForm } from '~/components/publishing'
+import {
+  LicenseSelector,
+  TransactionFormControls
+} from '~/components/forms'
 
 @Component({
   components: {
-    CitySelector,
-    ArtworkTypeSelector,
-    HashtagSelector,
     draggable,
     LicenseSelector,
     TransactionFormControls
   }
 })
-export default class ArtworkEditForm extends Vue {
-  $refs!: {
-    cropImage: HTMLImageElement,
-    form: Vue & {
-      validate: () => boolean
-      resetValidation: () => void
-    }
-  }
-  artwork: ArtworkCreationOptions = {
+export default class ArtworkEditForm extends PublishingForm {
+  artwork: ImageArtworkCreationOptions = {
     creator: this.$auth.user?.address || '',
     title: '',
     slug: '',
     description: '',
     images: []
   }
-  cropMode: boolean = false
-  cropImage?: URLArtworkImage
-  cropImageIndex?: number
-  cropper?: Cropper
-  valid = false
-  dirty = false
-  isUploading: boolean = false
-  isSigned: boolean = false
-  transaction: Transaction | null = null
-  info: string = ''
-  uploadPct?: number | null = null
 
   readonly accept = 'image/apng,image/avif,image/gif,image/jpeg,image/png,'
                   + 'image/svg+xml,image/webp'
 
   @Emit('previewImageChanged') onPreviewImageChanged() {}
-  @Emit('save') save(txId: string, slug?: string) {
-    return { txId, slug }
-  }
-  @Emit('cancel') onCancel() {}
-  @Emit('uploading') onUploading(isUploading: boolean) { return isUploading }
 
   rules = {
     required: (value: string = '') => value.length < 1 ? 'Required' : true,
@@ -344,20 +308,6 @@ export default class ArtworkEditForm extends Vue {
 
   get hasImageValidationErrors(): boolean {
     return this.dirty && this.artwork.images.length < 1
-  }
-
-  get txTotal() {
-    if (this.transaction) {
-      return this.transaction.reward
-    }
-
-    return undefined
-  }
-
-  get txSize() {
-    if (this.transaction) {
-      return this.transaction.data_size
-    }
   }
 
   @debounce
@@ -470,7 +420,6 @@ export default class ArtworkEditForm extends Vue {
     if (this.isSigned && this.transaction) {
       this.isUploading = true
       this.onUploading(true)
-      const txId = this.transaction.id
       this.uploadPct = 0
       this.$txQueueService.submitUserTransaction(
         this.transaction,
@@ -490,7 +439,7 @@ export default class ArtworkEditForm extends Vue {
             this.$toasts.error('Error submitting user tx: ' + err.message)
             this.isUploading = false
           } else {
-            return this.save(txId, this.artwork.slug)
+            return this.save()
           }
         },
         true,

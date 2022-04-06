@@ -1,23 +1,17 @@
-import { TrackableEntity } from '../common'
+import { AudioArtworkCreationOptions, AudioArtworkManifest } from './audio'
+import { ImageArtworkCreationOptions, ImageArtworkManifest } from './image'
 
-export * from './legacy'
-
-export interface ArtworkCreationOptions {
+export interface BaseArtworkCreationOptions {
   created?: number
   creator: string
   title: string
   slug: string
   description?: string
-  type?: string
-  medium?: string
   city?: string
   license?: License
-  images: (URLArtworkImage & TrackableEntity)[]
 }
 
-export interface URLArtworkImage { url: string, type: string }
-
-export interface ArtworkManifest {
+export interface BaseArtworkManifest {
   version: 1
   published: Date
   created?: number
@@ -25,17 +19,15 @@ export interface ArtworkManifest {
   title: string
   slug: string
   description?: string
-  type?: string
-  images: ArtworkImageWithPreviews[]
-  license?: License
-  medium?: string
   city?: string
+  license?: License
 }
 
-export interface Artwork extends ArtworkManifest {
+export interface BaseArtwork extends BaseArtworkManifest {
   id: string
-  images: (ArtworkImageWithPreviews & TrackableEntity)[]
 }
+
+export interface URLArtworkImage { url: string, type: string }
 
 export type ArtworkImageWithPreviews = {
   image: string,
@@ -51,3 +43,13 @@ export interface License {
   licenseId: string
   seeAlso: string[]
 }
+
+export type ArtworkCreationOptions =
+  | ImageArtworkCreationOptions
+  | AudioArtworkCreationOptions
+
+export type ArtworkManifest =
+  | ImageArtworkManifest
+  | AudioArtworkManifest
+
+export * from './legacy'

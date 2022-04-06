@@ -117,7 +117,7 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-import { Artwork, FeedItem, LegacyArtwork, LikeWithTip, Tip } from '~/app/core'
+import { ImageArtwork, FeedItem, LegacyArtwork, LikeWithTip, Tip } from '~/app/core'
 import { convertARtoUSD } from '~/app/util'
 
 @Component({
@@ -162,7 +162,7 @@ export default class EarnPage extends Vue {
     forceCache: false,
     hasMore: true,
   }
-  artwork: { [id: string]: Artwork | LegacyArtwork } = {}
+  artwork: { [id: string]: ImageArtwork | LegacyArtwork } = {}
 
   get tipsTotal(): string {
     return this.tips.items

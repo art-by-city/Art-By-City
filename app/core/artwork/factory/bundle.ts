@@ -4,7 +4,12 @@ import { readFileAsArrayBufferAsync } from '~/app/util'
 import {
   ArtworkCreationOptions,
   ArtworkImageWithPreviews,
-  ArtworkManifest
+  ImageArtworkCreationOptions,
+  AudioArtworkCreationOptions,
+  AudioArtworkManifest,
+  ImageArtworkManifest,
+  ArtworkManifest,
+  BaseArtworkManifest
 } from '~/app/core/artwork'
 import { PreviewFactory } from '~/app/infra/image'
 import {
@@ -36,8 +41,9 @@ export default class ArtworkBundleFactory {
     const signer = await SignerFactory.create()
     const resizer = new PreviewFactory()
 
-    const images = await Promise.all(
-      opts.images.map(async ({ url, type }, idx) => {
+    const images = "images" in opts ? opts.images : [opts.image]
+    const processedImages = await Promise.all(
+      images.map(async ({ url, type }, idx) => {
         const previewType = 'image/jpeg'
         const previewUrl = await resizer.create(url, {
           maxWidth: 1920,
@@ -86,7 +92,7 @@ export default class ArtworkBundleFactory {
       })
     )
 
-    const manifest = this.createManifest(opts, images)
+    const manifest = this.createManifest(opts, processedImages)
     const manifestDataItem = await DataItemFactory.create(
       JSON.stringify(manifest),
       signer,
@@ -100,46 +106,68 @@ export default class ArtworkBundleFactory {
     )
 
     return {
-      bundle: BundleFactory.create([ manifestDataItem, ...images.flat() ]),
+      bundle: BundleFactory.create([
+        manifestDataItem,
+        ...processedImages.flat()
+      ]),
       manifestId: manifestDataItem.id
     }
   }
 
   private createManifest(
-    artwork: ArtworkCreationOptions,
+    opts: ArtworkCreationOptions,
     imageItems: DataItem[][]
   ): ArtworkManifest {
-    return {
+    const manifest: BaseArtworkManifest = {
       version: 1,
       published: new Date(),
-      created: artwork.created,
-      creator: artwork.creator,
-      title: artwork.title,
-      slug: artwork.slug,
-      description: artwork.description,
-      type: artwork.type,
-      medium: artwork.medium,
-      city: artwork.city?.toLowerCase(),
-      license: artwork.license,
-      images: imageItems.map(([preview, preview4k, image]) => {
-        const imageWithPreview: ArtworkImageWithPreviews = {
-          image: image.id,
-          preview: preview.id,
-          preview4k: preview4k.id
-        }
-
-        const isAnimated = image.tags.some(
-          tag =>
-            tag.name === 'Content-Type'
-            && animatedImageTypes.includes(tag.value)
-        )
-
-        if (isAnimated) {
-          imageWithPreview.animated = true
-        }
-
-        return imageWithPreview
-      })
+      created: opts.created,
+      creator: opts.creator,
+      title: opts.title,
+      slug: opts.slug,
+      description: opts.description,
+      city: opts.city?.toLowerCase(),
+      license: opts.license,
     }
+
+    if ("images" in opts) {
+      const imageManifest: ImageArtworkManifest = {
+        ...manifest,
+        type: opts.type,
+        medium: opts.medium,
+        images: imageItems.map(([preview, preview4k, image]) => {
+          const imageWithPreview: ArtworkImageWithPreviews = {
+            image: image.id,
+            preview: preview.id,
+            preview4k: preview4k.id
+          }
+
+          const isAnimated = image.tags.some(
+            tag =>
+              tag.name === 'Content-Type'
+              && animatedImageTypes.includes(tag.value)
+          )
+
+          if (isAnimated) {
+            imageWithPreview.animated = true
+          }
+
+          return imageWithPreview
+        })
+      }
+
+      return imageManifest
+    } else if ("audio" in opts) {
+      throw new Error('Artwork Type Not Yet Implemented')
+      // const audioManifest: AudioArtworkManifest = {
+      //   ...manifest,
+      //   image: 'TODO',
+      //   audio: 'TODO'
+      // }
+
+      // return audioManifest
+    }
+
+    throw new Error('Artwork Type Not Yet Implemented')
   }
 }

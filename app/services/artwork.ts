@@ -3,16 +3,14 @@ import Transaction from 'arweave/node/lib/transaction'
 import _ from 'lodash'
 
 import {
-  Artwork,
+  ArtworkTransactionFactory,
+  ImageArtwork,
   ArtworkCreationOptions,
-  LegacyArtwork
+  LegacyArtwork,
+  ImageArtworkBuilder
 } from '~/app/core/artwork'
 import { FeedItem } from '~/app/core/feed'
 import { uuidv4 } from '~/app/util'
-import {
-  ArtworkFactory,
-  ArtworkBundleFactory
-} from '~/app/core/artwork/factory'
 import { LIKED_ENTITY_TAG } from './likes'
 import { TransactionService, LikesService } from '.'
 
@@ -20,18 +18,19 @@ const PAGE_SIZE = 9
 
 export default class ArtworkService extends TransactionService {
   $likesService!: LikesService
-  artworkBundleFactory!: ArtworkBundleFactory
+  artworkTransactionFactory!: ArtworkTransactionFactory
 
   cache: {
     slugs: { [slug: string]: string }
-    artwork: { [id: string]: Artwork | LegacyArtwork }
+    artwork: { [id: string]: ImageArtwork | LegacyArtwork }
   } = { slugs: {}, artwork: {} }
 
   constructor(context: Context) {
     super(context)
 
     this.$likesService = context.$likesService
-    this.artworkBundleFactory = new ArtworkBundleFactory(
+    this.artworkTransactionFactory = new ArtworkTransactionFactory(
+      this.$arweave,
       this.config.app.name,
       this.config.app.version
     )
@@ -41,27 +40,13 @@ export default class ArtworkService extends TransactionService {
     opts: ArtworkCreationOptions,
     logCb?: Function
   ): Promise<Transaction> {
-    const {
-      bundle,
-      manifestId
-    } = await this.artworkBundleFactory.create(opts, logCb)
-    const data = bundle.getRaw()
-    const tx = await this.$arweave.createTransaction({ data })
-    tx.addTag('App-Name', this.config.app.name)
-    tx.addTag('App-Version', this.config.app.version)
-    tx.addTag('Bundle-Format', 'binary')
-    tx.addTag('Bundle-Version', '2.0.0')
-    tx.addTag('Category', 'artwork:bundle')
-    tx.addTag('slug', opts.slug)
-    tx.addTag('Manifest-ID', manifestId)
-
-    return tx
+    return await this.artworkTransactionFactory.create(opts, logCb)
   }
 
   async fetchByTxIdOrSlug(
     txIdOrSlug: string,
     owner: string
-  ): Promise<Artwork | LegacyArtwork | null> {
+  ): Promise<ImageArtwork | LegacyArtwork | null> {
     if (this.cache.slugs[txIdOrSlug]) {
       return await this.fetch(this.cache.slugs[txIdOrSlug])
     }
@@ -114,13 +99,13 @@ export default class ArtworkService extends TransactionService {
       : null
   }
 
-  async fetch(id: string): Promise<Artwork | LegacyArtwork | null> {
+  async fetch(id: string): Promise<ImageArtwork | LegacyArtwork | null> {
     try {
       if (!this.cache.artwork[id]) {
         const url = `${this.context.$arweaveService.config.gateway}/${id}`
         const res = await this.context.$axios.get(url)
 
-        const artwork = new ArtworkFactory().build(id, res.data)
+        const artwork = new ImageArtworkBuilder().build(id, res.data)
 
         this.cache.artwork[id] = artwork
       }
