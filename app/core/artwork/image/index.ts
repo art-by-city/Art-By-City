@@ -22,7 +22,9 @@ export interface ImageArtworkManifest extends BaseArtworkManifest {
 }
 
 export interface ImageArtwork extends BaseArtwork {
+  medium?: string
+  type?: string
   images: (ArtworkImageWithPreviews & TrackableEntity)[]
 }
 
-export { default as ImageArtworkBuilder } from './builder'
+export { default as ImageArtworkFactory } from './factory'

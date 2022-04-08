@@ -50,6 +50,9 @@
           </div>
         </div>
       </v-row>
+      <v-row v-if="artwork.audio" justify="center" dense>
+        <audio controls :src="artworkUrlFromId(artwork.audio.stream)" />
+      </v-row>
       <v-row dense justify="center">
         <v-col cols="10">
           <v-divider></v-divider>
@@ -199,12 +202,11 @@ import { ArtworkEditForm } from '~/components/artwork/edit'
 import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
 import {
-  ImageArtwork,
-  LegacyArtwork,
   LegacyArtworkImage,
   Profile,
-  ArtworkImageWithPreviews
-  } from '~/app/core'
+  ArtworkImageWithPreviews,
+  Artwork
+} from '~/app/core'
 import { UserTransaction, SetUserTransactionStatusPayload } from '~/app/ui'
 import { debounce } from '~/app/util'
 import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
@@ -220,9 +222,9 @@ import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 export default class ArtworkPage extends Vue {
   head() {
     if (!this.artwork) { return {} }
-    const creator = this.artwork.version === 0
-      ? this.artwork.creator.address
-      : this.artwork.creator
+    const creator = typeof this.artwork.creator === 'string'
+      ? this.artwork.creator
+      : this.artwork.creator.address
     const usernameOrAddress = this.username || creator
     const txIdOrSlug = this.artwork.slug || this.artwork.id
 
@@ -231,7 +233,11 @@ export default class ArtworkPage extends Vue {
       `${this.$config.baseUrl}/${usernameOrAddress}/${txIdOrSlug}`
     const thumbnailUrl = this.$config.arweave.gateway
       + '/'
-      + this.artwork.images[0].preview
+      + (
+        'images' in this.artwork
+          ? this.artwork.images[0].preview
+          : this.artwork.image.preview
+      )
     const twitter = this.profile?.twitter || ''
 
     return {
@@ -255,7 +261,7 @@ export default class ArtworkPage extends Vue {
     }
   }
 
-  artwork: ImageArtwork | LegacyArtwork | null = null
+  artwork: Artwork | null = null
   profile: Profile | null = null
   username: string | null = null
   previewImage: ArtworkImageWithPreviews | LegacyArtworkImage | null = null
@@ -275,17 +281,17 @@ export default class ArtworkPage extends Vue {
     }
 
     return this.artwork
-      ? this.artwork.version === 0
-        ? this.artwork.creator.address
-        : this.artwork.creator
+      ? typeof this.artwork.creator === 'string'
+        ? this.artwork.creator
+        : this.artwork.creator.address
       : ''
   }
 
   get creator() {
     return this.artwork
-      ? this.artwork.version === 0
-        ? this.artwork.creator.address
-        : this.artwork.creator
+      ? typeof this.artwork.creator === 'string'
+        ? this.artwork.creator
+        : this.artwork.creator.address
       : ''
   }
 
@@ -370,8 +376,12 @@ export default class ArtworkPage extends Vue {
       index = 0
     }
 
-    if (this.artwork && this.artwork.images.length - 1 >= index) {
-      this.previewImage = this.artwork.images[index]
+    if (this.artwork) {
+      if ('images' in this.artwork && this.artwork.images.length - 1 >= index) {
+        this.previewImage = this.artwork.images[index]
+      } else if ('image' in this.artwork) {
+        this.previewImage = this.artwork.image
+      }
     }
   }
 

@@ -1,5 +1,6 @@
-import { AudioArtworkCreationOptions, AudioArtworkManifest } from './audio'
-import { ImageArtworkCreationOptions, ImageArtworkManifest } from './image'
+import { AudioArtwork, AudioArtworkCreationOptions, AudioArtworkManifest } from './audio'
+import { ImageArtwork, ImageArtworkCreationOptions, ImageArtworkManifest } from './image'
+import { LegacyArtwork } from './legacy'
 
 export interface BaseArtworkCreationOptions {
   created?: number
@@ -12,12 +13,12 @@ export interface BaseArtworkCreationOptions {
 }
 
 export interface BaseArtworkManifest {
-  version: 1
+  version: 0 | 1
   published: Date
   created?: number
   creator: string
   title: string
-  slug: string
+  slug?: string
   description?: string
   city?: string
   license?: License
@@ -51,5 +52,10 @@ export type ArtworkCreationOptions =
 export type ArtworkManifest =
   | ImageArtworkManifest
   | AudioArtworkManifest
+
+export type Artwork =
+  | ImageArtwork
+  | AudioArtwork
+  | LegacyArtwork
 
 export * from './legacy'

@@ -10,16 +10,19 @@ import {
 export interface AudioArtworkCreationOptions
   extends BaseArtworkCreationOptions
 {
+  genre?: string
   image: (TrackableEntity & URLArtworkImage)
   audio: (TrackableEntity & URLArtworkAudio)
 }
 
 export interface AudioArtworkManifest extends BaseArtworkManifest {
+  genre?: string
   image: ArtworkImageWithPreviews,
   audio: ArtworkAudioWithStream
 }
 
 export interface AudioArtwork extends BaseArtwork {
+  genre?: string
   image: TrackableEntity & ArtworkImageWithPreviews
   audio: TrackableEntity & ArtworkAudioWithStream
 }
@@ -33,3 +36,6 @@ export interface ArtworkAudioWithStream {
   audio: string
   stream: string
 }
+
+export { default as StreamFactory } from './stream'
+export { default as AudioArtworkFactory } from './factory'

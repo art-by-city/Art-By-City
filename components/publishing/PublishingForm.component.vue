@@ -4,13 +4,12 @@
 import { Component, Emit, Vue } from 'nuxt-property-decorator'
 import Transaction from 'arweave/web/lib/transaction'
 
-import { ArtworkCreationOptions, URLArtworkImage } from '~/app/core/artwork'
+import { ArtworkCreationOptions } from '~/app/core/artwork'
 
 @Component
 export default class PublishingForm extends Vue {
   artwork: Partial<ArtworkCreationOptions> = {}
   $refs!: {
-    cropImage: HTMLImageElement,
     form: Vue & {
       validate: () => boolean
       resetValidation: () => void
@@ -23,10 +22,6 @@ export default class PublishingForm extends Vue {
   transaction: Transaction | null = null
   info: string = ''
   uploadPct?: number | null = null
-  cropMode: boolean = false
-  cropImage?: URLArtworkImage
-  cropImageIndex?: number
-  cropper?: Cropper
 
   @Emit('save') save() {}
   @Emit('cancel') onCancel() {}

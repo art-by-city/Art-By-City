@@ -150,5 +150,20 @@ export default {
     plugins: [
       new IgnoreNotFoundExportPlugin()
     ]
-  }
+  },
+
+  serverMiddleware: [
+    {
+      path: '/',
+      handler: '~/server-middleware/shared-array-buffers-CORS-headers.ts'
+    }
+  ]
+  // render: {
+  //   static: {
+  //     setHeaders(res) {
+  //       res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+  //       res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+  //     }
+  //   }
+  // }
 }

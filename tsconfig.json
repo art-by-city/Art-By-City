@@ -36,6 +36,7 @@
       "@types/async",
       "@types/crypto-js",
       "@types/prettier",
+      "@types/ffmpeg.js",
       "reflect-metadata",
       "vuetify",
       "arconnect"

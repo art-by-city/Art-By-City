@@ -7,7 +7,8 @@ import {
   ImageArtwork,
   ArtworkCreationOptions,
   LegacyArtwork,
-  ImageArtworkBuilder
+  ArtworkFactory,
+  Artwork
 } from '~/app/core/artwork'
 import { FeedItem } from '~/app/core/feed'
 import { uuidv4 } from '~/app/util'
@@ -22,7 +23,7 @@ export default class ArtworkService extends TransactionService {
 
   cache: {
     slugs: { [slug: string]: string }
-    artwork: { [id: string]: ImageArtwork | LegacyArtwork }
+    artwork: { [id: string]: Artwork }
   } = { slugs: {}, artwork: {} }
 
   constructor(context: Context) {
@@ -46,7 +47,7 @@ export default class ArtworkService extends TransactionService {
   async fetchByTxIdOrSlug(
     txIdOrSlug: string,
     owner: string
-  ): Promise<ImageArtwork | LegacyArtwork | null> {
+  ): Promise<Artwork | null> {
     if (this.cache.slugs[txIdOrSlug]) {
       return await this.fetch(this.cache.slugs[txIdOrSlug])
     }
@@ -99,13 +100,13 @@ export default class ArtworkService extends TransactionService {
       : null
   }
 
-  async fetch(id: string): Promise<ImageArtwork | LegacyArtwork | null> {
+  async fetch(id: string): Promise<Artwork | null> {
     try {
       if (!this.cache.artwork[id]) {
         const url = `${this.context.$arweaveService.config.gateway}/${id}`
         const res = await this.context.$axios.get(url)
 
-        const artwork = new ImageArtworkBuilder().build(id, res.data)
+        const artwork = new ArtworkFactory().create(id, res.data)
 
         this.cache.artwork[id] = artwork
       }

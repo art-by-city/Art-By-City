@@ -9,9 +9,11 @@ import {
   AudioArtworkManifest,
   ImageArtworkManifest,
   ArtworkManifest,
-  BaseArtworkManifest
+  BaseArtworkManifest,
+  ArtworkAudioWithStream,
+  PreviewFactory,
+  StreamFactory
 } from '~/app/core/artwork'
-import { PreviewFactory } from '~/app/infra/image'
 import {
   BundleFactory,
   DataItemFactory,
@@ -91,8 +93,39 @@ export default class ArtworkBundleFactory {
         ]
       })
     )
+    let processedAudio: DataItem[][] = []
 
-    const manifest = this.createManifest(opts, processedImages)
+    let manifest: ArtworkManifest
+    if ("images" in opts) {
+      manifest = this.createImageArtworkManifest(opts, processedImages)
+    } else {
+      const blob = await fetch(opts.audio.url).then(r => r.blob())
+      const buffer = await readFileAsArrayBufferAsync(blob)
+      const audio = new Uint8Array(buffer)
+
+      const streamEncoder = new StreamFactory()
+      const streamType = 'TODO'
+      const stream = await streamEncoder.create(audio)
+      processedAudio = [[
+        await DataItemFactory.create(
+          stream,
+          signer,
+          [{ name: 'Content-Type', value: streamType }]
+        ),
+        await DataItemFactory.create(
+          audio,
+          signer,
+          [{ name: 'Content-Type', value: opts.audio.type }]
+        )
+      ]]
+
+      manifest = this.createAudioArtworkManifest(
+        opts,
+        processedImages,
+        processedAudio
+      )
+    }
+
     const manifestDataItem = await DataItemFactory.create(
       JSON.stringify(manifest),
       signer,
@@ -108,17 +141,17 @@ export default class ArtworkBundleFactory {
     return {
       bundle: BundleFactory.create([
         manifestDataItem,
-        ...processedImages.flat()
+        ...processedImages.flat(),
+        ...processedAudio.flat()
       ]),
       manifestId: manifestDataItem.id
     }
   }
 
-  private createManifest(
-    opts: ArtworkCreationOptions,
-    imageItems: DataItem[][]
-  ): ArtworkManifest {
-    const manifest: BaseArtworkManifest = {
+  private createBaseManifest(
+    opts: ArtworkCreationOptions
+  ): BaseArtworkManifest {
+    return {
       version: 1,
       published: new Date(),
       created: opts.created,
@@ -129,45 +162,69 @@ export default class ArtworkBundleFactory {
       city: opts.city?.toLowerCase(),
       license: opts.license,
     }
-
-    if ("images" in opts) {
-      const imageManifest: ImageArtworkManifest = {
-        ...manifest,
-        type: opts.type,
-        medium: opts.medium,
-        images: imageItems.map(([preview, preview4k, image]) => {
-          const imageWithPreview: ArtworkImageWithPreviews = {
-            image: image.id,
-            preview: preview.id,
-            preview4k: preview4k.id
-          }
-
-          const isAnimated = image.tags.some(
-            tag =>
-              tag.name === 'Content-Type'
-              && animatedImageTypes.includes(tag.value)
-          )
-
-          if (isAnimated) {
-            imageWithPreview.animated = true
-          }
-
-          return imageWithPreview
-        })
-      }
-
-      return imageManifest
-    } else if ("audio" in opts) {
-      throw new Error('Artwork Type Not Yet Implemented')
-      // const audioManifest: AudioArtworkManifest = {
-      //   ...manifest,
-      //   image: 'TODO',
-      //   audio: 'TODO'
-      // }
-
-      // return audioManifest
-    }
-
-    throw new Error('Artwork Type Not Yet Implemented')
   }
+
+  private createImageArtworkManifest(
+    opts: ImageArtworkCreationOptions,
+    imageItems: DataItem[][]
+  ): ImageArtworkManifest {
+    const base = this.createBaseManifest(opts)
+
+    return {
+      ...base,
+      type: opts.type,
+      medium: opts.medium,
+      images: imageItems.map(mapImagePreviewDataItemsForManifest)
+    }
+  }
+
+  private createAudioArtworkManifest(
+    opts: AudioArtworkCreationOptions,
+    imageItems: DataItem[][],
+    audioItems: DataItem[][]
+  ): AudioArtworkManifest {
+    const base = this.createBaseManifest(opts)
+
+    return {
+      ...base,
+      genre: opts.genre,
+      image: mapImagePreviewDataItemsForManifest(imageItems[0]),
+      audio: mapAudioPreviewDataItemsForManifest(audioItems[0])
+    }
+  }
+}
+
+function mapAudioPreviewDataItemsForManifest(
+  [stream, audio]: DataItem[],
+  _index?: number,
+  _array?: DataItem[][]
+): ArtworkAudioWithStream {
+  return {
+    audio: audio.id,
+    stream: stream.id
+  }
+}
+
+function mapImagePreviewDataItemsForManifest(
+  [preview, preview4k, image]: DataItem[],
+  _index?: number,
+  _array?: DataItem[][]
+): ArtworkImageWithPreviews {
+  const imageWithPreview: ArtworkImageWithPreviews = {
+    image: image.id,
+    preview: preview.id,
+    preview4k: preview4k.id
+  }
+
+  const isAnimated = image.tags.some(
+    tag =>
+      tag.name === 'Content-Type'
+      && animatedImageTypes.includes(tag.value)
+  )
+
+  if (isAnimated) {
+    imageWithPreview.animated = true
+  }
+
+  return imageWithPreview
 }

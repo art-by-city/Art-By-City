@@ -15,11 +15,11 @@
 
           <v-fade-transition>
             <v-overlay
-              v-if="!disabled && (hover || isAnimated)"
+              v-if="!disabled && (hover || isPlayable)"
               absolute
               class="artwork-overlay fill-height"
             >
-              <div v-if="isAnimated" id="playIcon">
+              <div v-if="isPlayable" id="playIcon">
                 <v-icon x-large>mdi-play</v-icon>
               </div>
               <v-row align="end" class="fill-height pa-1 pl-4">
@@ -63,7 +63,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import { ImageArtwork, LegacyArtwork, Profile } from '~/app/core'
+import { Artwork, ImageArtwork, LegacyArtwork, Profile } from '~/app/core'
 import { debounce } from '~/app/util'
 
 @Component
@@ -79,9 +79,9 @@ export default class ArtworkCard extends Vue {
   @debounce
   @Emit('click') onArtworkCardClicked() {
     if (this.artwork) {
-      const address = this.artwork.version === 0
-        ? this.artwork.creator.address
-        : this.artwork.creator
+      const address = typeof this.artwork.creator === 'string'
+        ? this.artwork.creator
+        : this.artwork.creator.address
       const creatorUrl = this.username || address
       const artworkUrl = this.artwork.slug || this.artwork.id
 
@@ -89,7 +89,7 @@ export default class ArtworkCard extends Vue {
     }
   }
 
-  artwork: ImageArtwork | LegacyArtwork | null = null
+  artwork: Artwork | null = null
   profile: Profile | null = null
   username: string | null = null
 
@@ -98,15 +98,37 @@ export default class ArtworkCard extends Vue {
   }
 
   src() {
-    if (this.artwork && this.artwork.images.length > 0) {
-      return this.artworkUrlFromId(this.artwork.images[0].preview)
+    if (this.artwork) {
+      if ('images' in this.artwork && this.artwork.images.length > 0) {
+        return this.artworkUrlFromId(this.artwork.images[0].preview)
+      } else if ('image' in this.artwork) {
+        return this.artworkUrlFromId(this.artwork.image.preview)
+      }
     }
 
     return ''
   }
 
-  get isAnimated(): boolean {
-    return !!(this.artwork && this.artwork.images[0].animated)
+  get isPlayable(): boolean {
+    if (this.artwork) {
+      if ('images' in this.artwork) {
+        return !!this.artwork.images[0].animated
+      } else if ('audio' in this.artwork) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  get isAudio(): boolean {
+    if (this.artwork) {
+      if ('audio' in this.artwork) {
+        return true
+      }
+    }
+
+    return false
   }
 
   get displayName() {
@@ -119,9 +141,9 @@ export default class ArtworkCard extends Vue {
     }
 
     return this.artwork
-      ? this.artwork.version === 0
-        ? this.artwork.creator.address
-        : this.artwork.creator
+      ? typeof this.artwork.creator === 'string'
+        ? this.artwork.creator
+        : this.artwork.creator.address
       : ''
   }
 
@@ -130,9 +152,9 @@ export default class ArtworkCard extends Vue {
     this.artwork = await this.$artworkService.fetch(this.txId)
 
     if (this.artwork) {
-      const address = this.artwork.version === 0
-        ? this.artwork.creator.address
-        : this.artwork.creator
+      const address = typeof this.artwork.creator === 'string'
+        ? this.artwork.creator
+        : this.artwork.creator.address
       this.profile = await this.$profileService.fetchProfile(address)
 
       this.username = await this.$usernameService.resolveUsername(address)

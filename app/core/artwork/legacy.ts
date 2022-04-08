@@ -8,10 +8,11 @@ export interface LegacyArtwork extends LegacyArtworkManifest {
 }
 
 export interface LegacyArtworkManifest {
+  version?: 0
   published?: Date
   creator: { address: string }
   title: string
-  slug: string
+  slug?: string
   created?: number
   description?: string
   type?: string
