@@ -1,20 +1,12 @@
-// import _process from 'process'
-// import ffmpeg from 'ffmpeg.js/ffmpeg-mp4'
-// const ffmpeg = require('ffmpeg.js/ffmpeg-mp4')
 import { createFFmpeg, FFmpeg } from '@ffmpeg/ffmpeg'
 
-// window.process.stdout = {
-//   write: (val: string) => { console.log(val); return true }
-// }
-// if (process.browser) {
-//   process = _process
-// }
 export default class StreamFactory {
   ffmpeg!: FFmpeg
 
-  constructor() {
+  constructor(progressCb: ({ ratio }: { ratio: number }) => void) {
     this.ffmpeg = createFFmpeg({
-      log: true
+      log: process.env.NODE_ENV !== 'production',
+      progress: progressCb
     })
   }
 
@@ -27,6 +19,8 @@ export default class StreamFactory {
 
     await this.ffmpeg.run(
       '-i', './audio.test',
+      '-vn',
+      '-map', 'a',
       '-codec:a', 'aac',
       '-b:a', '256k',
       '-movflags', '+faststart',

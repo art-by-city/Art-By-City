@@ -38,7 +38,6 @@
     "cropperjs": "^1.5.9",
     "crypto-js": "^4.1.1",
     "dotenv": "^8.2.0",
-    "ffmpeg.js": "^4.2.9003",
     "fuse.js": "^6.4.0",
     "ignore-not-found-export-webpack-plugin": "^1.0.1",
     "localforage": "^1.10.0",

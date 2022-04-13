@@ -225,12 +225,9 @@ export default class AudioEditForm extends PublishingForm {
   }
 
   async onAudioChanged(event: InputEvent) {
-    console.log('[AudioEditForm] onAudioChanged()')
     if (event.target) {
-      console.log('[AudioEditForm] onAudioChanged() has event.target')
       const target = event.target as HTMLInputElement
       if (target.files && target.files[0]) {
-        console.log('[AudioEditForm] onAudioChanged() has target.files[0]')
         const audio = target.files[0]
         this.artwork.audio = {
           guid: uuidv4(),
@@ -266,8 +263,15 @@ export default class AudioEditForm extends PublishingForm {
       this.uploadPct = 0
       this.transaction = await this.$artworkService.createArtworkTransaction(
         this.artwork,
-        () => {
-          processedCount++
+        (progress?: number) => {
+          console.log('PROGRESS', progress)
+          if (typeof progress === 'number') {
+            this.info = 'Encoding streamable audio...'
+            processedCount = progress + 1
+          } else {
+            processedCount = 1
+          }
+
           this.uploadPct = 100 * (processedCount) / 2
         }
       )

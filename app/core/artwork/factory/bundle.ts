@@ -71,7 +71,7 @@ export default class ArtworkBundleFactory {
         const preview4k = new Uint8Array(preview4kBuffer)
 
         if (logCb) {
-          logCb({ idx })
+          logCb()
         }
 
         return [
@@ -103,14 +103,17 @@ export default class ArtworkBundleFactory {
       const buffer = await readFileAsArrayBufferAsync(blob)
       const audio = new Uint8Array(buffer)
 
-      const streamEncoder = new StreamFactory()
-      const streamType = 'TODO'
+      const streamEncoder = new StreamFactory(({ ratio }) => {
+        if (logCb) {
+          logCb(ratio)
+        }
+      })
       const stream = await streamEncoder.create(audio)
       processedAudio = [[
         await DataItemFactory.create(
           stream,
           signer,
-          [{ name: 'Content-Type', value: streamType }]
+          [{ name: 'Content-Type', value: 'audio/mp4' }]
         ),
         await DataItemFactory.create(
           audio,
