@@ -2,25 +2,22 @@
   <div>
     <v-container v-if="artwork">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
-        <v-img
-          class="preview-artwork"
+        <img
+          crossorigin
+          class="preview-artwork artwork-image contain"
           :class="{ 'animated': previewImage.animated }"
-          max-height="75vh"
-          max-width="75vw"
           :src="previewSrc"
-          :lazy-src="artworkUrlFromId(previewImage.preview4k)"
-          contain
           @click="onPreviewArtworkClicked"
         >
-          <template v-slot:placeholder>
+          <!-- <template v-slot:placeholder>
             <TransactionPlaceholder :txId="previewImage.preview4k" />
-          </template>
+          </template> -->
           <v-overlay absolute :value="showAnimationOverlay">
             <v-btn x-large icon @click.prevent="showAnimation = true">
               <v-icon>mdi-play</v-icon>
             </v-btn>
           </v-overlay>
-        </v-img>
+        </img>
       </v-row>
       <v-row
         v-if="artwork.images && artwork.images.length > 1"
@@ -33,25 +30,27 @@
             v-for="(image, i) in artwork.images"
             :key="i"
           >
-            <v-img
-              aspect-ratio="1.7"
-              :src="artworkUrlFromId(image.preview4k || image.preview)"
-              class="clickable"
-              :class="{
-                'highlighted': image.preview === previewImage
-                  || (previewImage && image.guid === previewImage.image.guid)
-              }"
-              @click="setPreviewImage(i)"
-            >
-              <template v-slot:placeholder>
-                <TransactionPlaceholder :txId="image.preview" />
-              </template>
-            </v-img>
+            <v-responsive aspect-ratio="1.7">
+              <img
+                crossorigin
+                :src="artworkUrlFromId(image.preview4k || image.preview)"
+                class="clickable artwork-image-select-preview"
+                :class="{
+                  'highlighted': image.preview === previewImage
+                    || (previewImage && image.guid === previewImage.image.guid)
+                }"
+                @click="setPreviewImage(i)"
+              />
+            </v-responsive>
           </div>
         </div>
       </v-row>
       <v-row v-if="artwork.audio" justify="center" dense>
-        <audio controls :src="artworkUrlFromId(artwork.audio.stream)" />
+        <audio
+          :src="artworkUrlFromId(artwork.audio.stream)"
+          controls
+          controlsList="nodownload"
+        />
       </v-row>
       <v-row dense justify="center">
         <v-col cols="10">
@@ -403,6 +402,8 @@ export default class ArtworkPage extends Vue {
 <style scoped>
 .preview-artwork {
   cursor: zoom-in;
+  max-height: 75vh;
+  max-width: 75vw;
 }
 .preview-artwork.animated {
   cursor: unset;
@@ -421,5 +422,18 @@ export default class ArtworkPage extends Vue {
 }
 .adjust-icon {
   margin-top: -3px;
+}
+.artwork-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.artwork-image.contain {
+  object-fit: contain;
+}
+.artwork-image-select-preview {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
 }
 </style>

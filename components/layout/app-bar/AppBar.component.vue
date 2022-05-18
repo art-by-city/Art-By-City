@@ -115,6 +115,9 @@ export default class AppBar extends Vue {
 </script>
 
 <style scoped>
+.app-bar {
+  z-index: 6;
+}
 .app-bar >>> .v-toolbar__content {
 /* .app-bar { */
   height: 100%;

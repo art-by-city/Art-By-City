@@ -19,6 +19,7 @@ import {
   DataItemFactory,
   SignerFactory
 } from '~/app/infra/arweave'
+import { FactoryCreationError } from '../../error'
 
 const animatedImageTypes = [
   'image/apng',
@@ -93,8 +94,8 @@ export default class ArtworkBundleFactory {
         ]
       })
     )
-    let processedAudio: DataItem[][] = []
 
+    let processedAudio: DataItem[][] = []
     let manifest: ArtworkManifest
     if ("images" in opts) {
       manifest = this.createImageArtworkManifest(opts, processedImages)
@@ -109,6 +110,13 @@ export default class ArtworkBundleFactory {
         }
       })
       const stream = await streamEncoder.create(audio)
+
+      if (!stream.length) {
+        throw new FactoryCreationError(
+          'Error encoding streamable copy of audio'
+        )
+      }
+
       processedAudio = [[
         await DataItemFactory.create(
           stream,

@@ -21,6 +21,7 @@
         >
         </div>
         <img
+          crossorigin
           class="artwork-zoom-image"
           ref="image"
           :class="{ 'dragging': isDragging }"
@@ -126,6 +127,7 @@ export default class ArtworkZoomDialog extends Vue {
       this.image.height = image.height
     }
 
+    image.crossOrigin = ''
     image.src = this.src
   }
 

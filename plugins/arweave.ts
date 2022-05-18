@@ -1,7 +1,6 @@
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 import Arweave from 'arweave'
-import { AxiosInstance } from 'axios'
 
 declare module 'vue/types/vue' {
   // this.$myInjectedFunction inside Vue components

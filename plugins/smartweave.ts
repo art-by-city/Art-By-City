@@ -6,6 +6,7 @@ import {
 } from 'redstone-smartweave'
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
+import Arweave from 'arweave'
 
 declare module 'vue/types/vue' {
   // this.$myInjectedFunction inside Vue components
@@ -35,7 +36,7 @@ declare module 'vuex/types/index' {
 
 // const CONTRACT_GATEWAY = 'https://gateway.redstone.finance'
 
-export default ({ app }: Context, inject: Inject) => {
+export default ({ $config }: Context, inject: Inject) => {
   try {
     if (process.env.NODE_ENV !== 'development') {
       LoggerFactory.INST.logLevel('fatal')
@@ -43,12 +44,16 @@ export default ({ app }: Context, inject: Inject) => {
       LoggerFactory.INST.logLevel('error')
     }
 
+    const arweave = new Arweave($config.arweave?.api || {})
+
     let smartweave = process.server
-      ? SmartWeaveNodeFactory.memCachedBased(app.$arweave)
-      : SmartWeaveWebFactory.memCachedBased(app.$arweave)
+      ? SmartWeaveNodeFactory.memCachedBased(arweave)
+      : SmartWeaveWebFactory.memCachedBased(arweave)
 
     if (process.env.NODE_ENV !== 'development') {
       smartweave.useRedStoneGateway({ notCorrupted: true })
+    } else {
+      smartweave.useArweaveGateway()
     }
 
     inject('smartweave', smartweave.build())

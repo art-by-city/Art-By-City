@@ -27,10 +27,9 @@
             size="192"
             :class="{ 'file-input-border': !src }"
           >
-            <v-img
-              aspect-ratio="1"
-              width="192"
-              height="192"
+            <img
+              crossorigin
+              style="width: 192px; height: 192px;"
               :src="src"
               class="clickable"
             >
@@ -60,7 +59,7 @@
                   </v-btn>
                 </div>
               </v-overlay>
-            </v-img>
+            </img>
           </v-avatar>
         </v-hover>
       </div>

@@ -11,7 +11,11 @@
           </v-row>
           <v-row class="mt-4 mb-1 mx-auto" justify="center">
             <template v-if="isOwner">
-              <v-speed-dial v-model="showEditSpeedDial" direction="bottom">
+              <v-speed-dial
+                v-model="showEditSpeedDial"
+                direction="bottom"
+                style="z-index: 6;"
+              >
                 <template v-slot:activator>
                   <v-btn
                     v-model="showEditSpeedDial"
@@ -23,11 +27,24 @@
                   </v-btn>
                 </template>
 
-                <v-btn small @click="onEditAvatarClicked">Avatar</v-btn>
-
-                <v-btn small @click="onEditProfileClicked">Profile</v-btn>
+                <v-btn
+                  color="white"
+                  small
+                  @click="onEditAvatarClicked"
+                >
+                  Avatar
+                </v-btn>
 
                 <v-btn
+                  color="white"
+                  small
+                  @click="onEditProfileClicked"
+                >
+                  Profile
+                </v-btn>
+
+                <v-btn
+                  color="white"
                   small
                   @click="onEditUsernameClicked"
                 >

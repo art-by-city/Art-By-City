@@ -5,8 +5,11 @@ export default function (
   res: http.ServerResponse,
   next: Function
 ) {
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+  // if ((req as any).url === '/publish/audio') {
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-site')
+  // }
 
   next()
 }

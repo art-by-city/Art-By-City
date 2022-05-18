@@ -6,33 +6,45 @@
       autocomplete="off"
       :disabled="isUploading || isSigned"
     >
-      <v-row dense justify="center">
+      <v-row dense justify="center" align="center">
         <template v-if="artwork.audio.url">
           <audio controls :src="artwork.audio.url" />
         </template>
         <template v-else>
-          <label
-            class="audio-upload-label"
-            for="upload"
-          >
-            <v-icon>mdi-music-note-plus</v-icon>
-          </label>
-          <input
-            id="upload"
-            class="audio-upload-input"
-            type="file"
-            :accept="accept"
-            @input="onAudioChanged($event)"
-          />
+          <v-col cols="6">
+            <v-responsive
+              class="audio-input-container text-center"
+              :class="{ 'has-error': hasAudioValidationErrors }"
+            >
+              <label
+                class="audio-upload-label"
+                for="upload"
+              >
+                <v-icon>mdi-music-note-plus</v-icon>
+              </label>
+              <input
+                id="upload"
+                class="audio-upload-input"
+                type="file"
+                :accept="accept"
+                @input="onAudioChanged($event)"
+              />
+            </v-responsive>
+            <span v-if="hasAudioValidationErrors" class="red--text caption">
+              An audio file is required
+            </span>
+          </v-col>
         </template>
       </v-row>
       <v-row dense justify="center">
-        <ImageInput
-          v-model="artwork.image"
-          :valid="!hasImageValidationErrors"
-          :disabled="isUploading || isSigned"
-          :max="1"
-        />
+        <v-col cols="6">
+          <ImageInput
+            v-model="artwork.image"
+            :valid="!hasImageValidationErrors"
+            :disabled="isUploading || isSigned"
+            :max="1"
+          />
+        </v-col>
       </v-row>
       <v-row dense justify="center">
         <v-col cols="12">
@@ -234,6 +246,15 @@ export default class AudioEditForm extends PublishingForm {
           type: audio.type,
           url: URL.createObjectURL(audio)
         }
+        if (parent) {
+          parent.postMessage(
+            {
+              type: 'audio-streamable-created',
+              audio: this.artwork.audio
+            },
+            '*' // TODO -> strict origin
+          )
+        }
         await this.suggestMetadataFromFile(audio)
       }
     }
@@ -252,6 +273,10 @@ export default class AudioEditForm extends PublishingForm {
     this.generateSlugFromTitle(this.artwork.title)
   }
 
+  mounted() {
+    console.log('[audio-edit-form] crossOriginIsolated?', window?.crossOriginIsolated)
+  }
+
   async onSign() {
     this.dirty = true
     this.valid = this.$refs.form.validate()
@@ -261,23 +286,29 @@ export default class AudioEditForm extends PublishingForm {
       this.info = 'Building Artwork transaction...'
       let processedCount = 0
       this.uploadPct = 0
-      this.transaction = await this.$artworkService.createArtworkTransaction(
-        this.artwork,
-        (progress?: number) => {
-          console.log('PROGRESS', progress)
-          if (typeof progress === 'number') {
-            this.info = 'Encoding streamable audio...'
-            processedCount = progress + 1
-          } else {
-            processedCount = 1
+      console.log('[audio-edit-form] onSign()')
+      try {
+        this.transaction = await this.$artworkService.createArtworkTransaction(
+          this.artwork,
+          (progress?: number) => {
+            console.log('PROGRESS', progress)
+            if (typeof progress === 'number' && progress > 0) {
+              this.info = 'Encoding streamable audio...'
+              processedCount = progress + 1
+            } else if (typeof progress !== 'number') {
+              processedCount = 1
+            }
+
+            this.uploadPct = 100 * (processedCount) / 2
           }
+        )
 
-          this.uploadPct = 100 * (processedCount) / 2
-        }
-      )
-
-      this.info = 'Waiting on signature...'
-      this.isSigned = await this.$arweaveService.sign(this.transaction, true)
+        this.info = 'Waiting on signature...'
+        this.isSigned = await this.$arweaveService.sign(this.transaction, true)
+      } catch (err) {
+        console.error(err)
+        this.$toasts.error(err)
+      }
 
       this.info = ''
       this.uploadPct = null
@@ -350,8 +381,21 @@ export default class AudioEditForm extends PublishingForm {
   height: 28px;
   width: 28px;
   display: inline-flex;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 .audio-upload-input {
   display: none;
+}
+
+.audio-input-container {
+  border: 1px dashed black;
+  height: 72px;
+  /* width: 100%; */
+}
+.has-error {
+  border: 1px solid red;
 }
 </style>

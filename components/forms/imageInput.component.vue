@@ -90,7 +90,7 @@
             v-if="!valid"
             class="red--text caption"
           >
-            At least 1 image is required
+            An image is required
           </span>
         </div>
       </draggable>
@@ -285,7 +285,6 @@ export default class ImageInput extends Vue {
 .artwork-image-selector {
   height: 56px;
   width: 96px;
-  margin: 5px;
 }
 .artwork-image-selector.has-error {
   border: 1px solid red;

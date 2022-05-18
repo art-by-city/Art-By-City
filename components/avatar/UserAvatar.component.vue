@@ -2,11 +2,12 @@
   <div class="user-avatar">
     <v-avatar color="transparent" :size="size">
       <nuxt-link :to="`/${username || user.address}`" class="mb-n1">
-        <v-img :src="src" aspect-ratio="1" :width="size">
-          <template v-slot:placeholder>
-            <TransactionPlaceholder :txId="user.address" />
-          </template>
-        </v-img>
+        <img
+          crossorigin
+          :src="src"
+          :style="`width: ${size};`"
+          class="user-avatar-img"
+        />
       </nuxt-link>
     </v-avatar>
 
@@ -45,7 +46,12 @@ export default class UserAvatar extends Vue {
     required: true
   }) readonly user!: User
 
+  onImgLoadStart() {
+    console.log('onImgLoadStart')
+  }
+
   src: string = ''
+  srcReady: boolean = false
   username: string | null = null
   profile: Profile | null = null
 
@@ -87,16 +93,16 @@ export default class UserAvatar extends Vue {
 
   get size() {
     if (this.dense) {
-      return 32
+      return '32px'
     }
 
     switch (this.$vuetify.breakpoint.name) {
-      case 'xs': return 128
+      case 'xs': return '128px'
       case 'sm':
       case 'md':
       case 'lg':
       case 'xl':
-        default: return 192
+        default: return '192px'
     }
   }
 
@@ -186,5 +192,8 @@ export default class UserAvatar extends Vue {
   margin-left: 0px;
   margin-top: 0px;
   margin-bottom: 0px;
+}
+.user-avatar-img {
+  object-fit: contain;
 }
 </style>

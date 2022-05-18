@@ -16,11 +16,17 @@ export default class SmartWeaveService extends ArweaveService {
     contract: Contract<ContractState>,
     input: ContractInput
   ) {
-    return await contract
-      .connect('use_wallet')
-      .writeInteraction<ContractInput>(input, [
-        { name: 'App-Name', value: this.config.app.name },
-        { name: 'App-Version', value: this.config.app.version }
-      ], undefined, true)
+    try {
+      return await contract
+        .connect('use_wallet')
+        .writeInteraction<ContractInput>(input, [
+          { name: 'App-Name', value: this.config.app.name },
+          { name: 'App-Version', value: this.config.app.version }
+        ], undefined, true)
+    } catch (err) {
+      console.error(err)
+
+      return null
+    }
   }
 }

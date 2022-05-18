@@ -47,7 +47,7 @@
     "nuxt-property-decorator": "^2.7.2",
     "nuxt-typed-vuex": "^0.2.0",
     "process": "^0.11.10",
-    "redstone-smartweave": "^0.4.50",
+    "redstone-smartweave": "^0.5.3",
     "reflect-metadata": "^0.1.13",
     "sass-loader": "^10.1.1",
     "sharp": "^0.30.1",

@@ -143,9 +143,7 @@ export default class EditProfileDialog extends TransactionDialog<Profile> {
       this.transaction = await this.$profileService.createProfileTransaction(
         this.asset
       )
-
       this.isSigned = await this.$arweaveService.sign(this.transaction)
-
       this.isUploading = false
     }
   }

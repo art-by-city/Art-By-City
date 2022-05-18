@@ -2,59 +2,60 @@
   <div class="artwork-card">
     <v-hover :disabled="disabled">
       <template v-slot:default="{ hover }">
-        <v-img
-          :src="src()"
-          style="cursor: pointer"
-          aspect-ratio="1"
-          class="elevation-2"
+        <v-card
+          tile
+          :ripple="false"
+          class="artwork-image-container elevation-2"
           @click="onArtworkCardClicked"
         >
-          <template v-slot:placeholder>
-            <TransactionPlaceholder :txId="txId" />
-          </template>
+          <img crossorigin :src="src()" class="artwork-image">
+            <!-- <template v-slot:placeholder>
+              <TransactionPlaceholder :txId="txId" />
+            </template> -->
 
-          <v-fade-transition>
-            <v-overlay
-              v-if="!disabled && (hover || isPlayable)"
-              absolute
-              class="artwork-overlay fill-height"
-            >
-              <div v-if="isPlayable" id="playIcon">
-                <v-icon x-large>mdi-play</v-icon>
-              </div>
-              <v-row align="end" class="fill-height pa-1 pl-4">
-                <v-col
-                  cols="auto"
-                  class="
-                    artwork-overlay-title-container
-                    disable-text-highlighting
-                  "
-                >
-                  <div
-                    v-if="disabled"
-                    class="artwork-card-disable-overlay"
-                  ></div>
-                  <template v-if="hover">
-                    <a class="artwork-card-title white--text">
-                      {{ artwork ? artwork.title : '' }}
-                    </a>
-                    <br />
-                    <a
-                      class="
-                        artwork-card-title
-                        white--text
-                        font-italic
-                        font-weight-thin
-                      "
-                    >
-                      {{ displayName }}
-                    </a>
-                  </template>
-                </v-col>
-              </v-row>
-            </v-overlay>
-          </v-fade-transition>
-        </v-img>
+            <v-fade-transition>
+              <v-overlay
+                v-if="!disabled && (hover || isPlayable)"
+                absolute
+                class="artwork-overlay fill-height"
+              >
+                <div v-if="isPlayable" id="playIcon">
+                  <v-icon x-large>mdi-play</v-icon>
+                </div>
+                <v-row dense align="end" class="fill-height pa-1 pl-4">
+                  <v-col
+                    cols="auto"
+                    class="
+                      artwork-overlay-title-container
+                      disable-text-highlighting
+                    "
+                  >
+                    <div
+                      v-if="disabled"
+                      class="artwork-card-disable-overlay"
+                    ></div>
+                    <template v-if="hover">
+                      <a class="artwork-card-title white--text">
+                        {{ artwork ? artwork.title : '' }}
+                      </a>
+                      <br />
+                      <a
+                        class="
+                          artwork-card-title
+                          white--text
+                          font-italic
+                          font-weight-thin
+                        "
+                      >
+                        {{ displayName }}
+                      </a>
+                    </template>
+                  </v-col>
+                </v-row>
+              </v-overlay>
+            </v-fade-transition>
+          </img>
+        </v-card>
       </template>
     </v-hover>
   </div>
@@ -63,7 +64,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
 
-import { Artwork, ImageArtwork, LegacyArtwork, Profile } from '~/app/core'
+import { Artwork, Profile } from '~/app/core'
 import { debounce } from '~/app/util'
 
 @Component
@@ -164,6 +165,9 @@ export default class ArtworkCard extends Vue {
 </script>
 
 <style scoped>
+.artwork-overlay {
+  z-index: 5;
+}
 .artwork-overlay >>> div.v-overlay__content {
   height: 100%;
   width: 100%;
@@ -182,7 +186,16 @@ export default class ArtworkCard extends Vue {
   left: 0;
   z-index: 8990;
 }
-
+.artwork-image-container {
+  aspect-ratio: 1;
+  cursor: pointer;
+}
+.artwork-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 #playIcon {
   position: absolute;
   left: 50%;
