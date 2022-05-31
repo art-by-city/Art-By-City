@@ -125,7 +125,18 @@ export default class ArtworkService extends TransactionService {
         this.cache.artwork[id] = artwork
       }
 
-      return this.cache.artwork[id]
+      let views
+      try {
+        const viewsResponse = await this.context.$axios.get(
+          `/node/views/${id}`
+        )
+
+        if (typeof viewsResponse.data === 'number') {
+          views = viewsResponse.data
+        }
+      } catch (viewFetchError) {}
+
+      return { views, ...this.cache.artwork[id] }
     } catch (error) {
       console.error(error)
 
