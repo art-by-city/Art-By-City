@@ -70,6 +70,11 @@
               {{ displayName }}
             </nuxt-link>
           </v-row>
+          <v-row dense v-if="artwork.views">
+            <strong>Views</strong>
+            &nbsp;
+            <span>{{ artwork.views }}</span>
+          </v-row>
           <v-row dense v-if="artwork.created">
             <strong>Created</strong>
             &nbsp;

@@ -35,6 +35,7 @@ export interface ArtworkManifest {
 export interface Artwork extends ArtworkManifest {
   id: string
   images: (ArtworkImageWithPreviews & TrackableEntity)[]
+  views?: number
 }
 
 export type ArtworkImageWithPreviews = {

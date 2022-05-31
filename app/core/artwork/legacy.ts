@@ -5,6 +5,7 @@ export interface LegacyArtwork extends LegacyArtworkManifest {
   version: 0
   id: string
   images: (ArtworkImageWithPreviews & TrackableEntity)[]
+  views?: number
 }
 
 export interface LegacyArtworkManifest {
