@@ -31,7 +31,7 @@ env_variables:
   ARWEAVE_PORT: 443
   ARTIST_PREREGISTRATION_URL: https://us-central1-clean-linker-273919.cloudfunctions.net/artist-preregistration
   USERNAMES_CONTRACT_ID: BaAP2wyqSiF7Eqw3vcBvVss3C0H8i1NGQFgMY6nGpnk
-  ARWEAVE_GATEWAY: https://gateway.artby.city
+  ARWEAVE_GATEWAY: /node
 
 includes:
   - secrets.yaml
