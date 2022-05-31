@@ -1,7 +1,7 @@
 {
   "name": "art-by-city",
   "version": "1.0.0",
-  "description": "Art x By x City",
+  "description": "Art By City",
   "author": "Jim Toth <jim@meme.coach>",
   "private": true,
   "scripts": {
