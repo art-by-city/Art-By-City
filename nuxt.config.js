@@ -71,6 +71,9 @@ export default {
     { src: '@nuxtjs/axios', mode: 'client' },
     { src: '@nuxtjs/auth-next', mode: 'client' }
   ],
+  serverMiddleware: [
+    { path: '/node', handler: '~/server/index.ts' }
+  ],
   publicRuntimeConfig: {
     baseUrl: process.env.BASE_URL || 'http://localhost:3000',
     arweave: {
