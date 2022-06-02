@@ -18,11 +18,11 @@ export default class ArweaveService {
 
   async sign(transaction: Transaction, manual: boolean = false): Promise<boolean> {
     try {
-      if (!manual) {
-        await this.$arweave.transactions.sign(transaction)
-      } else {
+      // if (!manual) {
+      //   await this.$arweave.transactions.sign(transaction)
+      // } else {
         await this.signManually(transaction)
-      }
+      // }
     } catch (error) {
       error.message
         ? this.context.$toasts.error(error.message)
