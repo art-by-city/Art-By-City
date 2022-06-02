@@ -118,7 +118,7 @@ export default class ArtworkService extends TransactionService {
     try {
       if (!this.cache.artwork[id]) {
         const url = `${this.context.$arweaveService.config.gateway}/${id}`
-        const res = await this.context.$axios.get(url)
+        const res = await this.context.$axios.get(url, { headers: [] })
 
         const artwork = new ArtworkFactory().build(id, res.data)
 
