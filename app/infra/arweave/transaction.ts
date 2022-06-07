@@ -54,6 +54,7 @@ export default class TransactionFactory {
 
     const tx = await this.arweave.createTransaction(opts)
 
+    tx.addTag('Protocol', 'ArtByCity')
     tx.addTag('App-Name', this.config.name)
     tx.addTag('App-Version', this.config.version)
     const hasContentTypeTag = tags.some(tag => tag.tag === 'Content-Type')

@@ -95,7 +95,8 @@ export default class ArtworkBundleFactory {
         { name: 'slug', value: opts.slug },
         { name: 'Category', value: 'artwork' },
         { name: 'App-Name', value: this.appName },
-        { name: 'App-Version', value: this.appVersion }
+        { name: 'App-Version', value: this.appVersion },
+        { name: 'Protocol', value: 'ArtByCity' }
       ]
     )
 

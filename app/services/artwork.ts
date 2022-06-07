@@ -47,6 +47,7 @@ export default class ArtworkService extends TransactionService {
     } = await this.artworkBundleFactory.create(opts, logCb)
     const data = bundle.getRaw()
     const tx = await this.$arweave.createTransaction({ data })
+    tx.addTag('Protocol', 'ArtByCity')
     tx.addTag('App-Name', this.config.app.name)
     tx.addTag('App-Version', this.config.app.version)
     tx.addTag('Bundle-Format', 'binary')
