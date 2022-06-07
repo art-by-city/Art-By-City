@@ -113,6 +113,39 @@
               </v-icon>
             </a>
           </v-row>
+          <v-row dense v-if="isOwner">
+            <strong>Asset Links</strong>
+            &nbsp;
+            <small>(only visible to you)</small>
+            <ul>
+              <li>
+                <strong>Manifest</strong>
+                <a target="_blank" :href="artworkUrlFromId(artwork.id)">
+                  {{ artwork.id }}
+                </a>
+              </li>
+              <template v-for="(image, i) in artwork.images">
+                <li :key="i">
+                  <strong>[{{ i }}] Original</strong>
+                  <a target="_blank" :href="artworkUrlFromId(image.image)">
+                    {{ image.image }}
+                  </a>
+                </li>
+                <li>
+                  <strong>[{{ i }}] 4K Resolution (JPEG)</strong>
+                  <a target="_blank" :href="artworkUrlFromId(image.preview4k)">
+                    {{ image.preview4k }}
+                  </a>
+                </li>
+                <li>
+                  <strong>[{{ i }}] HD Resoslution (JPEG)</strong>
+                  <a target="_blank" :href="artworkUrlFromId(image.preview)">
+                    {{ image.preview }}
+                  </a>
+                </li>
+              </template>
+            </ul>
+          </v-row>
           <v-row dense v-if="artwork.license">
             <strong>License</strong>
             &nbsp;
@@ -292,6 +325,10 @@ export default class ArtworkPage extends Vue {
         ? this.artwork.creator.address
         : this.artwork.creator
       : ''
+  }
+
+  get isOwner() {
+    return this.$auth.loggedIn && this.$auth.user.address === this.creator
   }
 
   get previewSrc() {
