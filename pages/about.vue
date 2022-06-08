@@ -128,13 +128,38 @@
       </v-col>
     </v-row>
     <v-row justify="center">
-      <v-col cols="12">
+      <v-col cols="12" class="text-center">
         <section id="owf-presentation" class="mb-12">
+          <h2>Open Web Foundry Demo Day</h2>
           <iframe
             class="d-block mx-auto"
             width="560"
             height="315"
             src="https://www.youtube.com/embed/tL_LFaurxRg"
+            title="YouTube video player"
+            frameborder="0"
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture
+            "
+            allowfullscreen
+          ></iframe>
+        </section>
+      </v-col>
+    </v-row>
+    <v-row justify="center">
+      <v-col cols="12" class="text-center">
+        <section id="owf-presentation" class="mb-12">
+          <h2>ETH Shanghai 2022 Hackathon Demo</h2>
+          <iframe
+            class="d-block mx-auto"
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/9OjGlT1nxM4"
             title="YouTube video player"
             frameborder="0"
             allow="
