@@ -117,31 +117,89 @@
             <strong>Asset Links</strong>
             &nbsp;
             <small>(only visible to you)</small>
+          </v-row>
+          <v-row dense v-if="isOwner">
             <ul>
               <li>
                 <strong>Manifest</strong>
-                <a target="_blank" :href="artworkUrlFromId(artwork.id)">
-                  {{ artwork.id }}
-                </a>
+                <v-btn
+                  icon
+                  small
+                  tile
+                  @click="copyAssetUrlToClipboard(artwork.id)"
+                >
+                  <v-icon small dense>mdi-content-copy</v-icon>
+                </v-btn>
+                <v-btn
+                  icon
+                  small
+                  tile
+                  target="_blank"
+                  :href="arweaveAssetUrlFromId(artwork.id)"
+                >
+                  <v-icon small dense>mdi-open-in-new</v-icon>
+                </v-btn>
               </li>
               <template v-for="(image, i) in artwork.images">
                 <li :key="i">
                   <strong>[{{ i }}] Original</strong>
-                  <a target="_blank" :href="artworkUrlFromId(image.image)">
-                    {{ image.image }}
-                  </a>
+                  <v-btn
+                    icon
+                    small
+                    tile
+                    @click="copyAssetUrlToClipboard(image.image)"
+                  >
+                    <v-icon small dense>mdi-content-copy</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    small
+                    tile
+                    target="_blank"
+                    :href="arweaveAssetUrlFromId(image.image)"
+                  >
+                    <v-icon small dense>mdi-open-in-new</v-icon>
+                  </v-btn>
                 </li>
                 <li>
-                  <strong>[{{ i }}] 4K Resolution (JPEG)</strong>
-                  <a target="_blank" :href="artworkUrlFromId(image.preview4k)">
-                    {{ image.preview4k }}
-                  </a>
+                  <strong>[{{ i }}] 4K (JPEG)</strong>
+                  <v-btn
+                    icon
+                    small
+                    tile
+                    @click="copyAssetUrlToClipboard(image.preview4k)"
+                  >
+                    <v-icon small dense>mdi-content-copy</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    small
+                    tile
+                    target="_blank"
+                    :href="arweaveAssetUrlFromId(image.preview4k)"
+                  >
+                    <v-icon small dense>mdi-open-in-new</v-icon>
+                  </v-btn>
                 </li>
                 <li>
-                  <strong>[{{ i }}] HD Resoslution (JPEG)</strong>
-                  <a target="_blank" :href="artworkUrlFromId(image.preview)">
-                    {{ image.preview }}
-                  </a>
+                  <strong>[{{ i }}] HD (JPEG)</strong>
+                  <v-btn
+                    icon
+                    small
+                    tile
+                    @click="copyAssetUrlToClipboard(image.preview)"
+                  >
+                    <v-icon small dense>mdi-content-copy</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    small
+                    tile
+                    target="_blank"
+                    :href="arweaveAssetUrlFromId(image.preview)"
+                  >
+                    <v-icon small dense>mdi-open-in-new</v-icon>
+                  </v-btn>
                 </li>
               </template>
             </ul>
@@ -401,6 +459,16 @@ export default class ArtworkPage extends Vue {
       console.error(error)
       this.$toasts.error(error)
     }
+  }
+
+  @debounce
+  async copyAssetUrlToClipboard(id: string) {
+    await navigator.clipboard.writeText(this.arweaveAssetUrlFromId(id))
+    this.$toasts.success('Copied URL to clipboard!')
+  }
+
+  arweaveAssetUrlFromId(id: string): string {
+    return `https://arweave.net/${id}`
   }
 
   artworkUrlFromId(id: string): string {
