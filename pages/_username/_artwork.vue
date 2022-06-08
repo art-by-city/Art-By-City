@@ -404,7 +404,7 @@ export default class ArtworkPage extends Vue {
   }
 
   artworkUrlFromId(id: string): string {
-    return `${this.$arweaveService.config.gateway}/${id}`
+    return this.$artworkService.gatewayUrlForAsset(id)
   }
 
   setPreviewImage(index?: number) {

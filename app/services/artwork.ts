@@ -15,12 +15,14 @@ import {
 } from '~/app/core/artwork/factory'
 import { LIKED_ENTITY_TAG } from './likes'
 import { TransactionService, LikesService } from '.'
+import { createSession, Session } from '~/app/ui'
 
 const PAGE_SIZE = 9
 
 export default class ArtworkService extends TransactionService {
   $likesService!: LikesService
   artworkBundleFactory!: ArtworkBundleFactory
+  session!: Session
 
   cache: {
     slugs: { [slug: string]: string }
@@ -35,6 +37,7 @@ export default class ArtworkService extends TransactionService {
       this.config.app.name,
       this.config.app.version
     )
+    this.session = createSession()
   }
 
   async createArtworkTransaction(
@@ -118,7 +121,7 @@ export default class ArtworkService extends TransactionService {
   async fetch(id: string): Promise<Artwork | LegacyArtwork | null> {
     try {
       if (!this.cache.artwork[id]) {
-        const url = `${this.context.$arweaveService.config.gateway}/${id}`
+        const url = this.gatewayUrlForAsset(id)
         const res = await this.context.$axios.get(url, {
           transformRequest: (data, headers) => {
             delete headers.Arweave
@@ -127,6 +130,10 @@ export default class ArtworkService extends TransactionService {
             return data
           }
         })
+
+        if (res.status < 200 || res.status >= 400) {
+          return null
+        }
 
         const artwork = new ArtworkFactory().build(id, res.data)
 
@@ -278,6 +285,10 @@ export default class ArtworkService extends TransactionService {
       cursorV0: nextCursorV0 || cursorV0,
       feed: this.buildFeed(txIds)
     }
+  }
+
+  gatewayUrlForAsset(id: string) {
+    return `${this.config.gateway}/${id}?sid=${this.session.sid}`
   }
 
   async fetchLikedArtworkFeed(
