@@ -51,15 +51,17 @@ export default class FaqPage extends Vue {
       q: 'What is Art By City?',
       a: `
         <p>
-          Art By City is an Artist Community
+          Art By City is a Web3 Art Curation Protocol & Artist Community
           ${this.link(
             'DAO',
             'https://en.wikipedia.org/wiki/Decentralized_autonomous_organization'
-          )}. More specifically, Art By City is a type of DAO called a
+          )}.
+          More specifically, Art By City is a type of DAO called a
           ${this.link(
             'Profit Sharing Community',
             'https://www.arweave.org/profit-sharing-communities',
-          )} or PSC.
+          )}
+          or PSC.
         </p>
         <p>
           The <b>Art By City</b> DAO governs the <b>Art By City</b>
