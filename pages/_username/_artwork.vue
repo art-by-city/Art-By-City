@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-container v-if="artwork">
+    <v-container v-if="artwork" fluid class="px-0">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
         <v-img
           class="preview-artwork"
@@ -242,6 +242,8 @@
           </div>
         </v-col>
       </v-row>
+
+      <ArweaveSeal />
 
       <ArtworkZoomDialog
         v-if="previewImage"

@@ -7,3 +7,4 @@ export { default as TransactionConfirmationProgress } from
 export { default as TransactionPlaceholder } from
   './TransactionPlaceholder.component.vue'
 export { default as CurrencyEstimate } from './CurrencyEstimate.component.vue'
+export { default as ArweaveSeal } from './ArweaveSeal.component.vue'

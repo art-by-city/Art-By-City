@@ -5,7 +5,8 @@ import {
   UserAvatar,
   SplashLogo,
   TransactionPlaceholder,
-  CurrencyEstimate
+  CurrencyEstimate,
+  ArweaveSeal
 } from '~/components/common'
 
 Vue.use({
@@ -15,5 +16,6 @@ Vue.use({
     vue.component('SplashLogo', SplashLogo)
     vue.component('TransactionPlaceholder', TransactionPlaceholder)
     vue.component('CurrencyEstimate', CurrencyEstimate)
+    vue.component('ArweaveSeal', ArweaveSeal)
   }
 })
