@@ -5,14 +5,14 @@ export interface LegacyArtwork extends LegacyArtworkManifest {
   version: 0
   id: string
   images: (ArtworkImageWithPreviews & TrackableEntity)[]
-  views?: number
 }
 
 export interface LegacyArtworkManifest {
+  version?: 0
   published?: Date
   creator: { address: string }
   title: string
-  slug: string
+  slug?: string
   created?: number
   description?: string
   type?: string
