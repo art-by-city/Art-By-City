@@ -101,6 +101,11 @@
             &nbsp;
             <span>{{ artwork.medium }}</span>
           </v-row>
+          <v-row dense v-if="artwork.genre">
+            <strong>Genre</strong>
+            &nbsp;
+            <span>{{ artwork.genre }}</span>
+          </v-row>
           <v-row dense v-if="artwork.published">
             <strong>Published</strong>
             &nbsp;
