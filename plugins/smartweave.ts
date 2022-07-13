@@ -44,8 +44,8 @@ export default ({ app }: Context, inject: Inject) => {
     }
 
     let smartweave = process.server
-      ? SmartWeaveNodeFactory.memCachedBased(app.$arweave)
-      : SmartWeaveWebFactory.memCachedBased(app.$arweave)
+      ? SmartWeaveNodeFactory.memCachedBased(app.$arweave as any)
+      : SmartWeaveWebFactory.memCachedBased(app.$arweave as any)
 
     if (process.env.NODE_ENV !== 'development') {
       smartweave.useRedStoneGateway({ notCorrupted: true })

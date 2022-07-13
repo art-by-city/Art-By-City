@@ -1,18 +1,13 @@
-import {
-  Artwork,
-  ArtworkImageWithPreviews,
-  ArtworkManifest,
-  LegacyArtwork,
-  LegacyArtworkManifest
-} from '~/app/core/artwork'
 import { FactoryCreationError } from '~/app/core/error'
-import { uuidv4 } from '~/app/util'
+import { Artwork, ArtworkManifest, BaseArtwork } from '../artwork'
+import { AudioArtworkFactory } from '../audio'
+import { ImageArtworkFactory } from '../image'
 
 export default class ArtworkFactory {
-  build(
+  create(
     id: string,
-    opts: Partial<ArtworkManifest> | Partial<LegacyArtworkManifest>
-  ): Artwork | LegacyArtwork {
+    opts: Partial<ArtworkManifest>
+  ): Artwork {
     if (!id) {
       throw new FactoryCreationError('missing id')
     }
@@ -25,51 +20,22 @@ export default class ArtworkFactory {
       throw new FactoryCreationError('missing title')
     }
 
-    if (!opts.images) {
-      throw new FactoryCreationError('missing images')
+    const base: BaseArtwork = {
+      ...opts,
+      id,
+      version: opts.version || 0,
+      published: opts.published || new Date(),
+      creator: opts.creator,
+      title: opts.title,
+      slug: opts.slug,
     }
 
-    if ('version' in opts && opts.version) {
-      if (!opts.published) {
-        throw new FactoryCreationError('missing published')
-      }
-
-      if (!opts.slug) {
-        throw new FactoryCreationError('missing slug')
-      }
-
-      return {
-        ...opts,
-        id,
-        version: opts.version,
-        published: opts.published,
-        creator: opts.creator,
-        title: opts.title,
-        slug: opts.slug,
-        images: opts.images.map(image => {
-          return { guid: uuidv4(), ...image }
-        }),
-      }
-    } else {
-      const artwork: LegacyArtwork = {
-        id,
-        version: 0,
-        published: opts.published,
-        creator: opts.creator as { address: string },
-        title: opts.title,
-        slug: opts.slug || id,
-        created: opts.created,
-        description: opts.description,
-        type: opts.type,
-        license: opts.license,
-        medium: opts.medium,
-        city: opts.city,
-        images: (opts.images as ArtworkImageWithPreviews[]).map(image => {
-          return { guid: uuidv4(), ...image }
-        })
-      }
-
-      return artwork
+    if ('images' in opts) {
+      return new ImageArtworkFactory().create(base, opts)
+    } else if ('audio' in opts) {
+      return new AudioArtworkFactory().create(base, opts)
     }
+
+    throw new FactoryCreationError('Could not parse Artwork Manifest')
   }
 }

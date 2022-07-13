@@ -1,5 +1,3 @@
-import Arweave from 'arweave/web/common'
-
 export const readFileAsDataUrlAsync = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()

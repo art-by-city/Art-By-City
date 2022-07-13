@@ -1,2 +1,5 @@
 export * from './artwork'
+export * from './image'
+export * from './audio'
+export * from './factory'
 export * from './legacy'
