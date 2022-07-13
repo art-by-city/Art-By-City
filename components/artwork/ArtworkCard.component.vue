@@ -13,11 +13,11 @@
 
             <v-fade-transition>
               <v-overlay
-                v-if="!disabled && (hover || isAnimated)"
+                v-if="!disabled && (hover || isPlayable)"
                 absolute
                 class="artwork-overlay fill-height"
               >
-                <div v-if="isAnimated" id="playIcon">
+                <div v-if="isPlayable" id="playIcon">
                   <v-icon x-large>mdi-play</v-icon>
                 </div>
                 <v-row align="end" class="fill-height pa-1 pl-4">
@@ -60,10 +60,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'nuxt-property-decorator'
+import { Vue, Component, Prop } from 'nuxt-property-decorator'
 
-import { Artwork, LegacyArtwork, Profile } from '~/app/core'
-import { debounce } from '~/app/util'
+import { Artwork, Profile } from '~/app/core'
 
 @Component
 export default class ArtworkCard extends Vue {
@@ -75,11 +74,15 @@ export default class ArtworkCard extends Vue {
   @Prop()
   disabled?: boolean
 
+  artwork: Artwork | null = null
+  profile: Profile | null = null
+  username: string | null = null
+
   get href(): string {
     if (this.artwork) {
-      const address = this.artwork.version === 0
-        ? this.artwork.creator.address
-        : this.artwork.creator
+      const address = typeof this.artwork.creator === 'string'
+        ? this.artwork.creator
+        : this.artwork.creator.address
       const creatorUrl = this.username || address
       const artworkUrl = this.artwork.slug || this.artwork.id
 
@@ -89,22 +92,26 @@ export default class ArtworkCard extends Vue {
     return ''
   }
 
-  artwork: Artwork | LegacyArtwork | null = null
-  profile: Profile | null = null
-  username: string | null = null
-
-  src() {
-    if (this.artwork && this.artwork.images.length > 0) {
-      const id = this.artwork.images[0].preview
-
-      return this.$artworkService.gatewayUrlForAsset(id)
+  get isPlayable(): boolean {
+    if (this.artwork) {
+      if ('images' in this.artwork) {
+        return !!this.artwork.images[0].animated
+      } else if ('audio' in this.artwork) {
+        return true
+      }
     }
 
-    return ''
+    return false
   }
 
-  get isAnimated(): boolean {
-    return !!(this.artwork && this.artwork.images[0].animated)
+  get isAudio(): boolean {
+    if (this.artwork) {
+      if ('audio' in this.artwork) {
+        return true
+      }
+    }
+
+    return false
   }
 
   get displayName() {
@@ -117,9 +124,9 @@ export default class ArtworkCard extends Vue {
     }
 
     return this.artwork
-      ? this.artwork.version === 0
-        ? this.artwork.creator.address
-        : this.artwork.creator
+      ? typeof this.artwork.creator === 'string'
+        ? this.artwork.creator
+        : this.artwork.creator.address
       : ''
   }
 
@@ -128,13 +135,30 @@ export default class ArtworkCard extends Vue {
     this.artwork = await this.$artworkService.fetch(this.txId)
 
     if (this.artwork) {
-      const address = this.artwork.version === 0
-        ? this.artwork.creator.address
-        : this.artwork.creator
+      const address = typeof this.artwork.creator === 'string'
+        ? this.artwork.creator
+        : this.artwork.creator.address
       this.profile = await this.$profileService.fetchProfile(address)
 
       this.username = await this.$usernameService.resolveUsername(address)
     }
+  }
+
+  private artworkUrlFromId(id: string) {
+    return `${this.$arweaveService.config.gateway}/${id}`
+  }
+
+  // TODO -> could this be a getter?
+  src() {
+    if (this.artwork) {
+      if ('images' in this.artwork && this.artwork.images.length > 0) {
+        return this.artworkUrlFromId(this.artwork.images[0].preview)
+      } else if ('image' in this.artwork) {
+        return this.artworkUrlFromId(this.artwork.image.preview)
+      }
+    }
+
+    return ''
   }
 }
 </script>

@@ -1,17 +1,24 @@
-import { Bundle, DataItem } from 'arbundles'
+import { Bundle, bundleAndSignData, DataItem } from 'arbundles'
 
 import { readFileAsArrayBufferAsync } from '~/app/util'
 import {
   ArtworkCreationOptions,
   ArtworkImageWithPreviews,
-  ArtworkManifest
+  ImageArtworkCreationOptions,
+  AudioArtworkCreationOptions,
+  AudioArtworkManifest,
+  ImageArtworkManifest,
+  ArtworkManifest,
+  BaseArtworkManifest,
+  ArtworkAudioWithStream,
+  PreviewFactory
 } from '~/app/core/artwork'
-import { PreviewFactory } from '~/app/infra/image'
 import {
   BundleFactory,
   DataItemFactory,
   SignerFactory
 } from '~/app/infra/arweave'
+// import { FactoryCreationError } from '../../error'
 
 const animatedImageTypes = [
   'image/apng',
@@ -36,8 +43,9 @@ export default class ArtworkBundleFactory {
     const signer = await SignerFactory.create()
     const resizer = new PreviewFactory()
 
-    const images = await Promise.all(
-      opts.images.map(async ({ url, type }, idx) => {
+    const images = "images" in opts ? opts.images : [opts.image]
+    const processedImages = await Promise.all(
+      images.map(async ({ url, type }, idx) => {
         const previewType = 'image/jpeg'
         const previewUrl = await resizer.create(url, {
           maxWidth: 1920,
@@ -63,7 +71,7 @@ export default class ArtworkBundleFactory {
         const preview4k = new Uint8Array(preview4kBuffer)
 
         if (logCb) {
-          logCb({ idx })
+          logCb()
         }
 
         return [
@@ -86,7 +94,48 @@ export default class ArtworkBundleFactory {
       })
     )
 
-    const manifest = this.createManifest(opts, images)
+    let processedAudio: DataItem[][] = []
+    let manifest: ArtworkManifest
+    if ("images" in opts) {
+      manifest = this.createImageArtworkManifest(opts, processedImages)
+    } else {
+      const blob = await fetch(opts.audio.url).then(r => r.blob())
+      const buffer = await readFileAsArrayBufferAsync(blob)
+      const audio = new Uint8Array(buffer)
+
+      // const streamEncoder = new StreamFactory(({ ratio }) => {
+      //   if (logCb) {
+      //     logCb(ratio)
+      //   }
+      // })
+      // const stream = await streamEncoder.create(audio)
+
+      // if (!stream.length) {
+      //   throw new FactoryCreationError(
+      //     'Error encoding streamable copy of audio'
+      //   )
+      // }
+
+      processedAudio = [[
+        // await DataItemFactory.create(
+        //   stream,
+        //   signer,
+        //   [{ name: 'Content-Type', value: 'audio/mp4' }]
+        // ),
+        await DataItemFactory.create(
+          audio,
+          signer,
+          [{ name: 'Content-Type', value: opts.audio.type }]
+        )
+      ]]
+
+      manifest = this.createAudioArtworkManifest(
+        opts,
+        processedImages,
+        processedAudio
+      )
+    }
+
     const manifestDataItem = await DataItemFactory.create(
       JSON.stringify(manifest),
       signer,
@@ -101,46 +150,93 @@ export default class ArtworkBundleFactory {
     )
 
     return {
-      bundle: BundleFactory.create([ manifestDataItem, ...images.flat() ]),
+      bundle: BundleFactory.create([
+        manifestDataItem,
+        ...processedImages.flat(),
+        ...processedAudio.flat()
+      ]),
       manifestId: manifestDataItem.id
     }
   }
 
-  private createManifest(
-    artwork: ArtworkCreationOptions,
-    imageItems: DataItem[][]
-  ): ArtworkManifest {
+  private createBaseManifest(
+    opts: ArtworkCreationOptions
+  ): BaseArtworkManifest {
     return {
       version: 1,
       published: new Date(),
-      created: artwork.created,
-      creator: artwork.creator,
-      title: artwork.title,
-      slug: artwork.slug,
-      description: artwork.description,
-      type: artwork.type,
-      medium: artwork.medium,
-      city: artwork.city?.toLowerCase(),
-      license: artwork.license,
-      images: imageItems.map(([preview, preview4k, image]) => {
-        const imageWithPreview: ArtworkImageWithPreviews = {
-          image: image.id,
-          preview: preview.id,
-          preview4k: preview4k.id
-        }
-
-        const isAnimated = image.tags.some(
-          tag =>
-            tag.name === 'Content-Type'
-            && animatedImageTypes.includes(tag.value)
-        )
-
-        if (isAnimated) {
-          imageWithPreview.animated = true
-        }
-
-        return imageWithPreview
-      })
+      created: opts.created,
+      creator: opts.creator,
+      title: opts.title,
+      slug: opts.slug,
+      description: opts.description,
+      city: opts.city?.toLowerCase(),
+      license: opts.license,
     }
   }
+
+  private createImageArtworkManifest(
+    opts: ImageArtworkCreationOptions,
+    imageItems: DataItem[][]
+  ): ImageArtworkManifest {
+    const base = this.createBaseManifest(opts)
+
+    return {
+      ...base,
+      type: opts.type,
+      medium: opts.medium,
+      images: imageItems.map(mapImagePreviewDataItemsForManifest)
+    }
+  }
+
+  private createAudioArtworkManifest(
+    opts: AudioArtworkCreationOptions,
+    imageItems: DataItem[][],
+    audioItems: DataItem[][]
+  ): AudioArtworkManifest {
+    const base = this.createBaseManifest(opts)
+
+    return {
+      ...base,
+      genre: opts.genre,
+      image: mapImagePreviewDataItemsForManifest(imageItems[0]),
+      audio: mapAudioPreviewDataItemsForManifest(audioItems[0])
+    }
+  }
+}
+
+function mapAudioPreviewDataItemsForManifest(
+  // [stream, audio]: DataItem[],
+  [ audio ]: DataItem[],
+  _index?: number,
+  _array?: DataItem[][]
+): ArtworkAudioWithStream {
+  return {
+    audio: audio.id,
+    // stream: stream.id
+  }
+}
+
+function mapImagePreviewDataItemsForManifest(
+  [preview, preview4k, image]: DataItem[],
+  _index?: number,
+  _array?: DataItem[][]
+): ArtworkImageWithPreviews {
+  const imageWithPreview: ArtworkImageWithPreviews = {
+    image: image.id,
+    preview: preview.id,
+    preview4k: preview4k.id
+  }
+
+  const isAnimated = image.tags.some(
+    tag =>
+      tag.name === 'Content-Type'
+      && animatedImageTypes.includes(tag.value)
+  )
+
+  if (isAnimated) {
+    imageWithPreview.animated = true
+  }
+
+  return imageWithPreview
 }
