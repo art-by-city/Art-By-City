@@ -1,15 +1,15 @@
-import { Contract, SmartWeave } from 'redstone-smartweave'
+import { Contract, Warp } from 'warp-contracts'
 import { Context } from '@nuxt/types'
 
 import { ArweaveService } from '.'
 
 export default class SmartWeaveService extends ArweaveService {
-  $smartweave!: SmartWeave
+  $warp!: Warp
 
   constructor(context: Context) {
     super(context)
 
-    this.$smartweave = context.$smartweave
+    this.$warp = context.$warp
   }
 
   async writeInteraction<ContractInput, ContractState>(

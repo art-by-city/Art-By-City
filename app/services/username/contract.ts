@@ -1,4 +1,4 @@
-import { ContractInteraction, HandlerResult } from 'redstone-smartweave'
+import { ContractInteraction, HandlerResult } from 'warp-contracts'
 
 export function ContractAssert(cond: boolean, message: any): asserts cond {
   if (!(cond)) {

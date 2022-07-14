@@ -1,39 +1,32 @@
 import {
   LoggerFactory,
-  SmartWeave,
-  SmartWeaveNodeFactory,
-  SmartWeaveWebFactory
-} from 'redstone-smartweave'
+  Warp,
+  WarpNodeFactory,
+  WarpWebFactory
+} from 'warp-contracts'
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 
 declare module 'vue/types/vue' {
-  // this.$myInjectedFunction inside Vue components
   interface Vue {
-    $smartweave: SmartWeave
+    $warp: Warp
   }
 }
 
 declare module '@nuxt/types' {
-  // nuxtContext.app.$myInjectedFunction inside
-  // asyncData, fetch, plugins, middleware, nuxtServerInit
   interface NuxtAppOptions {
-    $smartweave: SmartWeave
+    $warp: Warp
   }
-  // nuxtContext.$myInjectedFunction
   interface Context {
-    $smartweave: SmartWeave
+    $warp: Warp
   }
 }
 
 declare module 'vuex/types/index' {
-  // this.$myInjectedFunction inside Vuex stores
   interface Store<S> {
-    $smartweave: SmartWeave
+    $warp: Warp
   }
 }
-
-// const CONTRACT_GATEWAY = 'https://gateway.redstone.finance'
 
 export default ({ app }: Context, inject: Inject) => {
   try {
@@ -43,16 +36,16 @@ export default ({ app }: Context, inject: Inject) => {
       LoggerFactory.INST.logLevel('error')
     }
 
-    let smartweave = process.server
-      ? SmartWeaveNodeFactory.memCachedBased(app.$arweave as any)
-      : SmartWeaveWebFactory.memCachedBased(app.$arweave as any)
+    let warp = process.server
+      ? WarpNodeFactory.memCachedBased(app.$arweave as any)
+      : WarpWebFactory.memCachedBased(app.$arweave as any)
 
-    if (process.env.NODE_ENV !== 'development') {
-      smartweave.useRedStoneGateway({ notCorrupted: true })
+    if (process.env.NODE_ENV !== 'production') {
+      warp.useArweaveGateway()
     }
 
-    inject('smartweave', smartweave.build())
+    inject('warp', warp.build())
   } catch (error) {
-    console.error('Error during SmartWeave plugin bootstrap', error)
+    console.error('Error during Warp contracts plugin bootstrap', error)
   }
 }
