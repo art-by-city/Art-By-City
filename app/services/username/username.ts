@@ -1,5 +1,5 @@
 import { Context } from '@nuxt/types'
-import { Contract } from 'redstone-smartweave'
+import { Contract } from 'warp-contracts'
 import Transaction from 'arweave/web/lib/transaction'
 
 import { SmartWeaveService } from '..'
@@ -14,7 +14,7 @@ export default class UsernameService extends SmartWeaveService {
 
     this.txId = this.config.contracts['usernames']
 
-    this.contract = this.$smartweave
+    this.contract = this.$warp
       .contract<UsernamesContractState>(this.txId)
       .setEvaluationOptions({
         // NB: Boost perf since this contract does not read other contracts
