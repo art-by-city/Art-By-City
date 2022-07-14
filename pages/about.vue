@@ -14,19 +14,16 @@
         <section id="tagline" class="my-12">
           <p class="text-h4">
             <b>Art By City</b> is a
-            <b>decentralized artist community &amp; protocol</b>
+            <b>decentralized art curation protocol</b>
           </p>
         </section>
 
         <section id="about" class="my-12">
           <p>
-            <b>Art By City</b> is first and foremost an artist community
-            <a
-              class="black--text"
-              href="https://en.wikipedia.org/wiki/Decentralized_autonomous_organization"
-              target="_blank"
-            >DAO</a>.
-            More specifically, <b>Art By City</b> is a
+            <b>Art By City</b> is a chain-agnostic Web3 art and creative
+            content protocol built on <b>Arweave</b>.
+            The protocol is governed by the <b>Art By City DAO</b>.
+            The <b>Art By City DAO</b> is a
             <a
               class="black--text"
               href="https://www.arweave.org/profit-sharing-communitie"
