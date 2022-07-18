@@ -26,6 +26,7 @@ export interface BaseArtworkManifest {
 
 export interface BaseArtwork extends BaseArtworkManifest {
   id: string
+  views?: number
 }
 
 export interface URLArtworkImage { url: string, type: string }
