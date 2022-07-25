@@ -45,6 +45,15 @@
       >
         earn
       </v-btn>
+      <v-btn
+        v-if="$auth.user.roles && $auth.user.roles.includes('admin')"
+        class="app-bar-button"
+        to="/stats"
+        text
+        tile
+      >
+        stats
+      </v-btn>
       <v-divider vertical class="ml-0 mr-4 white-divider" />
       <AccountMenu @logout="onLogoutClicked" />
       <NotificationsMenu />

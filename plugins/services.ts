@@ -7,6 +7,7 @@ import {
   LikesService,
   PriceService,
   ProfileService,
+  StatsService,
   TipsService,
   TransactionQueueService,
   UserService,
@@ -26,6 +27,7 @@ declare module 'vue/types/vue' {
     $arweaveService: ArweaveService
     $tipsService: TipsService
     $priceService: PriceService
+    $statsService: StatsService
   }
 }
 
@@ -43,6 +45,7 @@ declare module '@nuxt/types' {
     $arweaveService: ArweaveService
     $tipsService: TipsService
     $priceService: PriceService
+    $statsService: StatsService
   }
   // nuxtContext.$myInjectedFunction
   interface Context {
@@ -56,6 +59,7 @@ declare module '@nuxt/types' {
     $arweaveService: ArweaveService
     $tipsService: TipsService
     $priceService: PriceService
+    $statsService: StatsService
   }
 }
 
@@ -72,6 +76,7 @@ declare module 'vuex/types/index' {
     $arweaveService: ArweaveService
     $tipsService: TipsService
     $priceService: PriceService
+    $statsService: StatsService
   }
 }
 
@@ -85,6 +90,7 @@ const servicesPlugin: Plugin = (context, inject) => {
   inject('arweaveService', new ArweaveService(context))
   inject('tipsService', new TipsService(context))
   inject('priceService', new PriceService(context))
+  inject('statsService', new StatsService(context))
 
   // Injected last, depends on LikesService
   inject('artworkService', new ArtworkService(context))
