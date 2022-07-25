@@ -6,4 +6,5 @@ export default interface User {
   username?: string | null
   avatar?: Avatar | null
   profile?: Profile | null
+  roles?: string[]
 }
