@@ -42,10 +42,18 @@
           <v-btn
            href="https://discord.gg/w4Yhc95b8p"
            target="_blank"
-           icon
            x-small
+           plain
+           elevation="0"
+           color="white"
+           class="pa-0"
           >
-            <v-icon>mdi-discord</v-icon>
+            <v-img
+              width="16px"
+              height="16px"
+              contain
+              src="/logo/discord/Discord-Logo-Black.svg"
+            ></v-img>
           </v-btn>
           <v-btn
            href="https://twitch.tv/artbycity"
