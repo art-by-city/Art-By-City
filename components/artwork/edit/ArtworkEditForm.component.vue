@@ -119,6 +119,7 @@ import {
 })
 export default class ArtworkEditForm extends PublishingForm {
   artwork: ImageArtworkCreationOptions = {
+    subCategory: 'image',
     creator: this.$auth.user?.address || '',
     title: '',
     slug: '',

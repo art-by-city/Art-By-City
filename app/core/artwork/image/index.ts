@@ -10,6 +10,7 @@ import {
 export interface ImageArtworkCreationOptions
   extends BaseArtworkCreationOptions
 {
+  subCategory: 'image'
   type?: string
   medium?: string
   images: (URLArtworkImage & TrackableEntity)[]

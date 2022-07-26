@@ -175,6 +175,7 @@ export default class AudioEditForm extends PublishingForm {
     'audio/aac,audio/flac,audio/mpeg,audio/wav,audio/ogg,audio/webm'
 
   artwork: AudioArtworkCreationOptions = {
+    subCategory: 'audio',
     creator: this.$auth.user?.address || '',
     title: '',
     slug: '',
