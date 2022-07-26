@@ -10,6 +10,7 @@ import {
 export interface AudioArtworkCreationOptions
   extends BaseArtworkCreationOptions
 {
+  subCategory: 'audio'
   genre?: string
   image: (TrackableEntity & URLArtworkImage)
   audio: (TrackableEntity & URLArtworkAudio)

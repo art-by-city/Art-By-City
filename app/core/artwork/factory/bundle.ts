@@ -143,6 +143,7 @@ export default class ArtworkBundleFactory {
         { name: 'Content-Type', value: 'application/json' },
         { name: 'slug', value: opts.slug },
         { name: 'Category', value: 'artwork' },
+        { name: 'Sub-Category', value: opts.subCategory },
         { name: 'App-Name', value: this.appName },
         { name: 'App-Version', value: this.appVersion },
         { name: 'Protocol', value: 'ArtByCity' }
