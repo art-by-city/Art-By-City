@@ -93,13 +93,13 @@
             :rules="[rules.year]"
           ></v-text-field>
 
-          <v-text-field
+          <!-- <v-text-field
             v-model="artwork.city"
             name="artworkCity"
             label="City Code"
             placeholder="NYC"
             :rules="[rules.city]"
-          ></v-text-field>
+          ></v-text-field> -->
 
           <v-text-field
             v-model="artwork.genre"
@@ -122,7 +122,7 @@
             :rules="[rules.maxLength(1024)]"
           ></v-textarea>
 
-          <LicenseSelector v-model="artwork.license" />
+          <!-- <LicenseSelector v-model="artwork.license" /> -->
         </v-col>
       </v-row>
       <v-row dense>
