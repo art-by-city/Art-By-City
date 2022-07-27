@@ -208,8 +208,6 @@ export default class ThreeDEditForm extends PublishingForm {
 
   mounted() {
     this.canvas = document.getElementById('threeDCanvas') as HTMLCanvasElement
-
-    console.log('got canvas', this.canvas)
   }
 
   async on3dChanged(event: InputEvent) {
@@ -227,78 +225,119 @@ export default class ThreeDEditForm extends PublishingForm {
     const url = URL.createObjectURL(file)
 
     if (!this.pc) {
-      this.pc = new pc.Application(this.canvas)
+      this.pc = new pc.Application(this.canvas, {
+        graphicsDeviceOptions: {
+          maxPixelRatio: 1
+        }
+      })
+      this.pc.setCanvasResolution(pc.RESOLUTION_FIXED, 640, 480)
     }
 
     // TODO -> unload previous asset from playcanvas
 
     // NB: from https://github.com/playcanvas/engine/blob/main/examples/src/examples/loaders/glb.tsx
     let camerasComponents: Array<pc.CameraComponent> = []
-    this.pc.assets.loadFromUrlAndFilename(url, file.name, 'model', (err, asset) => {
+    this.pc.assets.loadFromUrlAndFilename(url, file.name, 'container', (err, asset) => {
       if (asset && !err) {
-        this.pc.start()
-
-        console.log('got asset', asset)
+        console.log('got asset', asset.id, asset)
         console.log('got resource', asset.resource)
 
         const model = asset.resource as pc.Model
 
+
         // create an instance using render component
-        // const entity = asset.resource.instantiateModelEntity() as pc.Entity
-        this.pc.root.addChild(model.getGraph())
-        // this.pc.root.addChild(model.get)
+        const entity = asset.resource.instantiateModelEntity() as pc.Entity
+        console.log('got model entity', entity)
+        this.pc.root.addChild(entity)
+
+        // const box = new pc.Entity('cube')
+        // box.addComponent('render', { type: 'box' })
+        // box.addComponent('model', {
+        //   asset,
+        //   type: 'asset'
+        // })
+        // this.pc.root.addChild(box)
 
         // find all cameras - by default they are disabled
         // set their aspect ratio to automatic to work with any window size
-        if (model.cameras.length < 1) {
-          model.setCameras([{
-            nearClip: 1,
-            farClip: 100,
-            fov: 55
-          }])
-        }
-        camerasComponents = model.cameras as pc.CameraComponent[]
-        camerasComponents.forEach((component) => {
-          console.log('camera component', component)
-          component.aspectRatioMode = pc.ASPECT_AUTO
+        // if (model.cameras.length < 1) {
+        //   model.setCameras([{
+        //     nearClip: 1,
+        //     farClip: 100,
+        //     fov: 55
+        //   }])
+        // }
+        // camerasComponents = model.cameras as pc.CameraComponent[]
+        // camerasComponents.forEach((component) => {
+        //   console.log('camera component', component)
+        //   component.aspectRatioMode = pc.ASPECT_AUTO
+        // })
+
+        const camera = new pc.Entity('camera')
+        camera.addComponent('camera', {
+          clearColor: new pc.Color(0.5, 0.6, 0.9)
         })
+        this.pc.root.addChild(camera)
+        camera.setPosition(0, 0, 100)
 
         // enable all lights from the glb
-        if (model.lights.length < 1) {
-          model.setLights([{
-            type: "omni",
-            color: new pc.Color(1, 1, 1),
-            range: 10
-          }])
-        }
-        const lightComponents: Array<pc.LightComponent>
-          = model.lights as pc.LightComponent[]
-        lightComponents.forEach((component) => {
-          component.enabled = true
+        // if (model.lights.length < 1) {
+        //   model.setLights([{
+        //     type: "omni",
+        //     color: new pc.Color(1, 1, 1),
+        //     range: 10
+        //   }])
+        // }
+        // const lightComponents: Array<pc.LightComponent>
+        //   = model.lights as pc.LightComponent[]
+        // lightComponents.forEach((component) => {
+        //   component.enabled = true
+        // })
+
+        const light = new pc.Entity('light')
+        light.addComponent('light')
+        this.pc.root.addChild(light)
+        light.setEulerAngles(45, 0, 0)
+
+        this.pc.on('update', function (dt: number) {
+          // box.rotate(10 * dt, 20 * dt, 30 * dt)
+          // entity.rotate(0, 20 * dt, 0)
         })
 
-        let time = 0
-        let activeCamera = 0
-        this.pc.on('update', function (dt) {
-          time -= dt
-
-          // change the camera every few seconds
-          if (time <= 0) {
-            time = 2
-
-            // disable current camera
-            if (camerasComponents[activeCamera]) {
-              camerasComponents[activeCamera].enabled = false
-            }
-
-            // activate next camera
-            activeCamera = (activeCamera + 1) % camerasComponents.length
-
-            if (camerasComponents[activeCamera]) {
-              camerasComponents[activeCamera].enabled = true
-            }
+        const mouse = new pc.Mouse(document.body);
+        let x = 0
+        const y = 0
+        mouse.on('mousemove', function (event) {
+          // event.preventDefault()
+          if (event.buttons[pc.MOUSEBUTTON_LEFT]) {
+            x += event.dx
+            entity.setLocalEulerAngles(0.2 * y, 0.2 * x, 0)
           }
         })
+        mouse.on('mousewheel', function (event: pc.MouseEvent) {
+          event.event.preventDefault()
+          camera.translate(0, 0, event.wheelDelta * 10)
+        })
+
+        const keyboard = new pc.Keyboard(document.body)
+        this.pc.on('update', function () {
+          if (keyboard.isPressed(pc.KEY_LEFT)) {
+            // entity.rotate(0, -1, 0)
+            camera.translate(1, 0, 0)
+          }
+          if (keyboard.isPressed(pc.KEY_RIGHT)) {
+            // entity.rotate(0, 1, 0)
+            camera.translate(-1, 0, 0)
+          }
+          if (keyboard.isPressed(pc.KEY_UP)) {
+            camera.translate(0, -1, 0)
+          }
+          if (keyboard.isPressed(pc.KEY_DOWN)) {
+            camera.translate(0, 1, 0)
+          }
+        })
+
+        this.pc.start()
 
         this.artwork.model = {
           guid: uuidv4(),
@@ -324,6 +363,9 @@ export default class ThreeDEditForm extends PublishingForm {
 </script>
 
 <style scoped>
+#threeDCanvas {
+  width: 100%;
+}
 .threeD-upload-label {
   cursor: pointer;
   height: 28px;
