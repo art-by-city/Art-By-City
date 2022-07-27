@@ -185,32 +185,12 @@ export default class ArtworkEditForm extends PublishingForm {
     }
   }
 
-  get slugBase(): string {
-    const username = this.$auth.user.username || this.artwork.creator
-
-    return `artby.city/${username}/`
-  }
-
   get hasImageValidationErrors(): boolean {
     return this.dirty && this.artwork.images.length < 1
   }
 
   async onPrimaryImageChanged(image: File) {
     await this.suggestMetadataFromFile(image)
-  }
-
-  private generateSlugFromTitle(title: string) {
-    this.artwork.slug = title
-      .toLowerCase()
-      .trim()
-      .replace(/[\s]/g, '-')
-      .replace(/[^a-z0-9_\-\.]/g, '')
-  }
-
-  private async suggestMetadataFromFile(image: File) {
-    // Suggested title is filename without extension
-    this.artwork.title = image.name.slice(0, image.name.lastIndexOf('.'))
-    this.generateSlugFromTitle(this.artwork.title)
   }
 
   async onSign() {

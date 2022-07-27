@@ -241,12 +241,6 @@ export default class AudioEditForm extends PublishingForm {
     }
   }
 
-  get slugBase(): string {
-    const username = this.$auth.user.username || this.artwork.creator
-
-    return `artby.city/${username}/`
-  }
-
   get hasImageValidationErrors(): boolean {
     return this.dirty && !this.artwork.image.url
   }
@@ -265,15 +259,6 @@ export default class AudioEditForm extends PublishingForm {
           type: audio.type,
           url: URL.createObjectURL(audio)
         }
-        if (parent) {
-          parent.postMessage(
-            {
-              type: 'audio-streamable-created',
-              audio: this.artwork.audio
-            },
-            '*' // TODO -> strict origin
-          )
-        }
         await this.suggestMetadataFromFile(audio)
       }
     }
@@ -282,19 +267,6 @@ export default class AudioEditForm extends PublishingForm {
   @debounce
   async onDeleteAudioClicked() {
     this.artwork.audio = { guid: uuidv4(), url: '', type: '' }
-  }
-
-  private generateSlugFromTitle(title: string) {
-    this.artwork.slug = title
-      .toLowerCase()
-      .trim()
-      .replace(/[\s]/g, '-')
-      .replace(/[^a-z0-9_\-\.]/g, '')
-  }
-
-  private async suggestMetadataFromFile(file: File) {
-    this.artwork.title = file.name.slice(0, file.name.lastIndexOf('.'))
-    this.generateSlugFromTitle(this.artwork.title)
   }
 
   async onSign() {
