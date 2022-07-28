@@ -35,6 +35,7 @@
       "@nuxtjs/auth-next",
       "@types/async",
       "@types/crypto-js",
+      "@types/mime-types",
       "@types/prettier",
       "reflect-metadata",
       "vuetify",
