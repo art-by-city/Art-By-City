@@ -10,9 +10,29 @@
         <ThreeDInput
           v-model="artwork.model"
           @file="on3dFileChanged"
+          @previewGenerated="onPreviewImageGenerated"
+          @delete="on3dFileDeleted"
           :valid="!has3dValidationErrors"
           :disabled="isUploading || isSigned"
         />
+      </v-row>
+
+      <v-row v-if="artwork.image.url" dense justify="center">
+        <v-col cols="6">
+          <h2>Preview Image</h2>
+          <!-- <ImageInput
+            v-model="artwork.image"
+            :valid="!hasImageValidationErrors"
+            :disabled="isUploading || isSigned"
+            :max="1"
+          /> -->
+          <v-img
+            aspect-ratio="1.7"
+            max-height="300px"
+            contain
+            :src="artwork.image.url"
+          ></v-img>
+        </v-col>
       </v-row>
 
       <v-row dense justify="center">
@@ -94,6 +114,8 @@ import {
   ThreeDInput,
   TransactionFormControls
 } from '~/components/forms'
+import { URLArtworkImage } from '~/app/core/artwork'
+import { uuidv4 } from '~/app/util'
 
 @Component({
   components: {
@@ -108,7 +130,8 @@ export default class ThreeDEditForm extends PublishingForm {
   artwork: any = {
     model: {
       url: null
-    }
+    },
+    image: { guid: uuidv4(), url: '', type: '' }
   }
 
   rules = {
@@ -173,8 +196,21 @@ export default class ThreeDEditForm extends PublishingForm {
     return this.dirty && !this.artwork.model.url
   }
 
+  get hasImageValidationErrors(): boolean {
+    return this.dirty && !this.artwork.image.url
+  }
+
   async on3dFileChanged(file: File) {
     await this.suggestMetadataFromFile(file)
+    this.artwork.image = { guid: uuidv4(), url: '', type: '' }
+  }
+
+  async on3dFileDeleted() {
+    this.artwork.image = { guid: uuidv4(), url: '', type: '' }
+  }
+
+  async onPreviewImageGenerated(previewImage: URLArtworkImage) {
+    this.artwork.image = previewImage
   }
 
   async onSign() {

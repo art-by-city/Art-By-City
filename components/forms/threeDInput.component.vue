@@ -1,15 +1,24 @@
 <template>
   <div class="threeD-input">
     <template v-if="model.url">
-      <ThreeDViewer
-        :url="model.url"
-        :type="model.type"
-        :disabled="disabled"
-      />
+      <v-col cols="12">
+        <ThreeDViewer
+          :url="model.url"
+          :type="model.type"
+          :disabled="disabled"
+          ref="ThreeDViewer"
+        />
 
-      <v-btn icon small @click="onDelete3dClicked" :disabled="disabled">
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
+        <v-btn icon small @click="onDelete3dClicked" :disabled="disabled">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </v-col>
+
+      <v-col cols="12">
+        <v-btn @click="onGeneratePreviewImageClicked">
+          Generate Preview Image
+        </v-btn>
+      </v-col>
     </template>
 
     <template v-else>
@@ -47,6 +56,7 @@
 import { Component, Emit, Model, Prop, Vue } from 'nuxt-property-decorator'
 import * as mime from 'mime-types'
 
+import { URLArtworkImage } from '~/app/core/artwork'
 import { debounce, uuidv4 } from '~/app/util'
 import ThreeDViewer from '../artwork/ThreeDViewer.component.vue'
 
@@ -56,7 +66,7 @@ import ThreeDViewer from '../artwork/ThreeDViewer.component.vue'
   }
 })
 export default class ThreeDInput extends Vue {
-  readonly accept = 'model/*' // TODO -> restrict to supported formats
+  readonly accept = '.glb, .gltf'
 
   @Model('input', {
     type: [Object],
@@ -65,12 +75,18 @@ export default class ThreeDInput extends Vue {
 
   // TODO -> arg & return types
   @Emit('input') onThreeDInputChanged(model: any): any {
-    console.log('ThreeDInput.onThreeDInputChanged() model.type', model.type)
     return model
   }
 
   @Emit('file') onThreeDFileChanged(file: File): File {
     return file
+  }
+
+  @Emit('delete') onThreeDFileDeleted() {}
+
+  @Emit('previewGenerated')
+  onPreviewImageGenerated(image: URLArtworkImage): URLArtworkImage {
+    return image
   }
 
   @Prop({
@@ -92,6 +108,19 @@ export default class ThreeDInput extends Vue {
       url: '',
       type: ''
     })
+    this.onThreeDFileDeleted()
+  }
+
+  @debounce
+  async onGeneratePreviewImageClicked() {
+    try {
+      const threeDViewerComponent = this.$refs['ThreeDViewer'] as ThreeDViewer
+      this.onPreviewImageGenerated(
+        await threeDViewerComponent.generatePreviewImage()
+      )
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   async on3dChanged(event: InputEvent) {

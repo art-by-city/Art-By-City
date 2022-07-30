@@ -19,6 +19,7 @@
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "useUnknownInCatchVariables": false,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "~/*": [

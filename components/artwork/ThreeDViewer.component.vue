@@ -12,6 +12,9 @@ import { Component, Prop, Vue } from 'nuxt-property-decorator'
 import * as pc from 'playcanvas'
 import * as mime from 'mime-types'
 
+import { URLArtworkImage } from '~/app/core'
+import { uuidv4 } from '~/app/util'
+
 @Component
 export default class ThreeDViewer extends Vue {
   private pc?: pc.Application
@@ -32,6 +35,12 @@ export default class ThreeDViewer extends Vue {
     default: true
   }) readonly disabled!: boolean
 
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly editable!: boolean
+
   mounted() {
     this.resetPlayCanvas()
     this.loadAsset()
@@ -39,6 +48,48 @@ export default class ThreeDViewer extends Vue {
 
   destroyed() {
     this.resetPlayCanvas()
+  }
+
+  async generatePreviewImage(): Promise<URLArtworkImage> {
+      const type = 'image/png'
+
+      try {
+        const url = await new Promise<string>((resolve, reject) => {
+          // this.pc?.graphicsDevice.canvas.context
+          this.pc?.graphicsDevice.canvas.getContext(
+            'webgl',
+            { preserveDrawingBuffer: true }
+          )
+          this.pc?.graphicsDevice.canvas.toBlob(blob => {
+            if (blob) {
+              resolve(URL.createObjectURL(blob))
+            } else {
+              reject('Error generating image preview')
+            }
+          }, type)
+        })
+
+        return { url, type }
+      } catch (err) {
+        console.error(err)
+        return { url: '', type: '' }
+      }
+      // const canvas =
+      //   document.getElementById('threeDCanvas') as HTMLCanvasElement
+      // console.log('ThreeDInput.onGeneratePreviewImageClicked() canvas', canvas)
+      // const type = 'image/png'
+      // this.onPreviewImageGenerated(
+      //   await new Promise<string>((resolve, reject) => {
+      //     canvas.toBlob(blob => {
+      //       if (blob) {
+      //         resolve(URL.createObjectURL(blob))
+      //       } else {
+      //         reject('Error generating image preview')
+      //       }
+      //     }, type)
+      //   }),
+      //   type
+      // )
   }
 
   private resetPlayCanvas() {
@@ -51,8 +102,8 @@ export default class ThreeDViewer extends Vue {
       case 'model/gltf-binary':
         this.loadGlb()
         break
-      case 'model/obj':
-        this.loadObj()
+      case 'model/gltf+json':
+        this.loadGlb()
         break
       default:
         console.error('Error: unsupported asset type')
@@ -64,75 +115,45 @@ export default class ThreeDViewer extends Vue {
     const canvas = document.getElementById('threeDCanvas') as HTMLCanvasElement
     this.pc = new pc.Application(canvas, {
       graphicsDeviceOptions: {
-        maxPixelRatio: 1
+        // NB: Blurry unless enabled, might be perf hit on older mobile devices
+        maxPixelRatio: 1,
+
+        // NB: Necessary to generate preview assets, may impact performance
+        preserveDrawingBuffer: true
       }
     })
     this.pc.setCanvasResolution(pc.RESOLUTION_FIXED, 1920, 1080)
+
     // NB: from https://github.com/playcanvas/engine/blob/main/examples/src/examples/loaders/glb.tsx
-    let camerasComponents: Array<pc.CameraComponent> = []
     this.pc.assets.loadFromUrlAndFilename(
       this.url,
       `asset.${extension}`,
       'container',
       (err, asset) => {
         if (this.pc && asset && !err) {
-          // create an instance using render component
-          const entity = asset.resource.instantiateModelEntity() as pc.Entity
+          const entity = (asset.resource as pc.ContainerResource).instantiateRenderEntity()
           this.pc.root.addChild(entity)
 
-          // const box = new pc.Entity('cube')
-          // box.addComponent('render', { type: 'box' })
-          // box.addComponent('model', {
-          //   asset,
-          //   type: 'asset'
-          // })
-          // this.pc.root.addChild(box)
+          const cameras = entity.findComponents('camera') as pc.CameraComponent[]
+          if (cameras.length < 1) {
+            const camera = new pc.Entity('camera')
+            camera.addComponent('camera', {
+              clearColor: new pc.Color(1, 1, 1)
+            })
+            this.pc.root.addChild(camera)
+            camera.setPosition(0, 0, 10)
+            cameras.push(camera.camera!)
+          }
 
-          // find all cameras - by default they are disabled
-          // set their aspect ratio to automatic to work with any window size
-          // if (model.cameras.length < 1) {
-          //   model.setCameras([{
-          //     nearClip: 1,
-          //     farClip: 100,
-          //     fov: 55
-          //   }])
-          // }
-          // camerasComponents = model.cameras as pc.CameraComponent[]
-          // camerasComponents.forEach((component) => {
-          //   console.log('camera component', component)
-          //   component.aspectRatioMode = pc.ASPECT_AUTO
-          // })
-
-          const camera = new pc.Entity('camera')
-          camera.addComponent('camera', {
-            clearColor: new pc.Color(0.5, 0.6, 0.9)
-          })
-          this.pc.root.addChild(camera)
-          camera.setPosition(0, 0, 100)
-
-          // enable all lights from the glb
-          // if (model.lights.length < 1) {
-          //   model.setLights([{
-          //     type: "omni",
-          //     color: new pc.Color(1, 1, 1),
-          //     range: 10
-          //   }])
-          // }
-          // const lightComponents: Array<pc.LightComponent>
-          //   = model.lights as pc.LightComponent[]
-          // lightComponents.forEach((component) => {
-          //   component.enabled = true
-          // })
-
-          const light = new pc.Entity('light')
-          light.addComponent('light')
-          this.pc.root.addChild(light)
-          light.setEulerAngles(45, 0, 0)
-
-          // this.pc.on('update', function (dt: number) {
-          //   box.rotate(10 * dt, 20 * dt, 30 * dt)
-          //   entity.rotate(0, 20 * dt, 0)
-          // })
+          const lights = entity.findComponents('light') as pc.LightComponent[]
+          if (lights.length < 1) {
+            const light = new pc.Entity('light')
+            light.addComponent('light')
+            this.pc.root.addChild(light)
+            light.setEulerAngles(45, 0, 0)
+            lights.push(light.light!)
+          }
+          lights.forEach(light => light.enabled = true)
 
           const mouse = new pc.Mouse(document.body)
           let x = 0
@@ -154,20 +175,31 @@ export default class ThreeDViewer extends Vue {
           // })
 
           const keyboard = new pc.Keyboard(document.body)
-          this.pc.on('update', function (dt: number) {
-            if (keyboard.isPressed(pc.KEY_LEFT)) {
-              // entity.rotate(0, -1, 0)
-              camera.translate(1, 0, 0)
+          this.pc.on('update', (dt: number) => {
+            let camera = cameras.find(c => c.enabled)?.entity
+
+            if (!camera && cameras[0]) {
+              cameras[0].enabled = true
+              camera = cameras[0].entity
             }
-            if (keyboard.isPressed(pc.KEY_RIGHT)) {
-              // entity.rotate(0, 1, 0)
-              camera.translate(-1, 0, 0)
-            }
-            if (keyboard.isPressed(pc.KEY_UP)) {
-              camera.translate(0, -1, 0)
-            }
-            if (keyboard.isPressed(pc.KEY_DOWN)) {
-              camera.translate(0, 1, 0)
+
+            if (camera) {
+              // should rotate the scene instead?
+
+              if (keyboard.isPressed(pc.KEY_LEFT)) {
+                // entity.rotate(0, -1, 0)
+                camera.translate(1, 0, 0)
+              }
+              if (keyboard.isPressed(pc.KEY_RIGHT)) {
+                // entity.rotate(0, 1, 0)
+                camera.translate(-1, 0, 0)
+              }
+              if (keyboard.isPressed(pc.KEY_UP)) {
+                camera.translate(0, -1, 0)
+              }
+              if (keyboard.isPressed(pc.KEY_DOWN)) {
+                camera.translate(0, 1, 0)
+              }
             }
           })
 
@@ -178,15 +210,12 @@ export default class ThreeDViewer extends Vue {
       }
     )
   }
-
-  private async loadObj() {
-    // TODO
-  }
 }
 </script>
 
 <style scoped>
 #threeDCanvas {
   width: 100%;
+  border: 1px solid black;
 }
 </style>
