@@ -7,32 +7,71 @@
       :disabled="isUploading || isSigned"
     >
       <v-row dense justify="center">
-        <ThreeDInput
-          v-model="artwork.model"
-          @file="on3dFileChanged"
-          @previewGenerated="onPreviewImageGenerated"
-          @delete="on3dFileDeleted"
-          :valid="!has3dValidationErrors"
-          :disabled="isUploading || isSigned"
-        />
+        <v-col cols="12">
+          <ThreeDInput
+            v-model="artwork.model"
+            ref="ThreeDInput"
+            @file="on3dFileChanged"
+            @delete="on3dFileDeleted"
+            :valid="!has3dValidationErrors"
+            :disabled="isUploading || isSigned"
+          />
+        </v-col>
       </v-row>
 
-      <v-row v-if="artwork.image.url" dense justify="center">
+      <v-row dense justify="center">
+        <v-col cols="12">
+          <v-banner class="caption" outlined tile>
+            <v-icon>mdi-exclamation-thick</v-icon>
+            <template v-if="artwork.model && artwork.model.url">
+              You can click &amp; drag to rotate,
+              use the mouse wheel to zoom in and out,
+              and the arrow keys to move the camera viewport.
+            </template>
+            <template v-else>
+              Publishing 3D Models is currently limited to
+              <a
+                class="black--text"
+                href="https://en.wikipedia.org/wiki/GlTF"
+                target="_blank"
+              >GLTF / GLB</a>
+              format.  For best results, use GLB.
+            </template>
+          </v-banner>
+        </v-col>
+      </v-row>
+
+      <v-row dense justify="center" v-if="artwork.model && artwork.model.url">
         <v-col cols="6">
-          <h2>Preview Image</h2>
-          <!-- <ImageInput
+          <v-btn
+            outlined
+            elevation="2"
+            @click="onGeneratePreviewImageClicked"
+          >
+            Generate Preview Image from 3D Model
+          </v-btn>
+        </v-col>
+        <v-col cols="6">
+          <div class="caption">
+            Or upload your own preview image below
+            <v-icon>mdi-arrow-down</v-icon>
+          </div>
+        </v-col>
+
+        <v-col cols="12">
+          <ImageInput
             v-model="artwork.image"
             :valid="!hasImageValidationErrors"
             :disabled="isUploading || isSigned"
             :max="1"
-          /> -->
-          <v-img
-            aspect-ratio="1.78"
-            max-height="300px"
-            contain
-            :src="artwork.image.url"
-          ></v-img>
+          />
         </v-col>
+        <!-- <v-img
+          aspect-ratio="1.78"
+          max-height="300px"
+          contain
+          :src="artwork.image.url"
+        ></v-img> -->
       </v-row>
 
       <v-row dense justify="center">
@@ -115,7 +154,7 @@ import {
   TransactionFormControls
 } from '~/components/forms'
 import { URLArtworkImage } from '~/app/core/artwork'
-import { uuidv4 } from '~/app/util'
+import { debounce, uuidv4 } from '~/app/util'
 
 @Component({
   components: {
@@ -213,8 +252,41 @@ export default class ThreeDEditForm extends PublishingForm {
     this.artwork.image = previewImage
   }
 
+  @debounce
+  async onGeneratePreviewImageClicked() {
+    try {
+      const threeDInputComponent = this.$refs['ThreeDInput'] as ThreeDInput
+      this.artwork.image = await threeDInputComponent.generatePreviewImage()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   async onSign() {
-    // TODO
+    this.dirty = true
+    this.valid = this.$refs.form.validate()
+
+    if (this.hasImageValidationErrors || this.has3dValidationErrors) {
+      this.valid = false
+    }
+
+    if (this.valid) {
+      this.isUploading = true
+
+      this.info = 'Building Artwork transaction...'
+      this.uploadPct = 0
+      this.transaction = await this.$artworkService.createArtworkTransaction(
+        this.artwork,
+        () => { this.uploadPct = 100 }
+      )
+
+      this.info = 'Waiting on signature...'
+      this.isSigned = await this.$arweaveService.sign(this.transaction, true)
+
+      this.info = ''
+      this.uploadPct = null
+      this.isUploading = false
+    }
   }
 
   async onSubmit() {

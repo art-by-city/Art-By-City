@@ -1,28 +1,24 @@
 <template>
   <div class="threeD-input">
     <template v-if="model.url">
-      <v-col cols="12">
-        <ThreeDViewer
-          :url="model.url"
-          :type="model.type"
-          :disabled="disabled"
-          ref="ThreeDViewer"
-        />
+      <v-row dense>
+        <v-col cols="12">
+          <ThreeDViewer
+            :url="model.url"
+            :type="model.type"
+            :disabled="disabled"
+            ref="ThreeDViewer"
+          />
 
-        <v-btn icon small @click="onDelete3dClicked" :disabled="disabled">
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </v-col>
-
-      <v-col cols="12">
-        <v-btn @click="onGeneratePreviewImageClicked">
-          Generate Preview Image
-        </v-btn>
-      </v-col>
+          <v-btn icon small @click="onDelete3dClicked" :disabled="disabled">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
     </template>
 
     <template v-else>
-      <v-col cols="12">
+      <v-col cols="12" class="pa-0">
         <v-responsive
           class="threeD-input-container text-center"
           :class="{ 'has-error': !valid }"
@@ -84,11 +80,6 @@ export default class ThreeDInput extends Vue {
 
   @Emit('delete') onThreeDFileDeleted() {}
 
-  @Emit('previewGenerated')
-  onPreviewImageGenerated(image: URLArtworkImage): URLArtworkImage {
-    return image
-  }
-
   @Prop({
     type: Boolean,
     required: false,
@@ -111,15 +102,13 @@ export default class ThreeDInput extends Vue {
     this.onThreeDFileDeleted()
   }
 
-  @debounce
-  async onGeneratePreviewImageClicked() {
+  async generatePreviewImage() {
     try {
       const threeDViewerComponent = this.$refs['ThreeDViewer'] as ThreeDViewer
-      this.onPreviewImageGenerated(
-        await threeDViewerComponent.generatePreviewImage()
-      )
+      return await threeDViewerComponent.generatePreviewImage()
     } catch (err) {
       console.error(err)
+      return null
     }
   }
 

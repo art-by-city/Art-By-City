@@ -14,6 +14,7 @@ export default class PublishingForm extends Vue {
       validate: () => boolean
       resetValidation: () => void
     }
+    [key: string]: any
   }
   valid = false
   dirty = false
