@@ -97,6 +97,15 @@
                 <v-icon small color="black">mdi-twitch</v-icon>
                 @{{ artist.profile.twitch }}
               </a>
+              <a
+                v-if="artist.profile && artist.profile.soundcloud"
+                class="pr-3 text-decoration-none"
+                :href="`https://soundcloud.com/${artist.profile.soundcloud}`"
+                target="_blank"
+              >
+                <v-icon small color="black">mdi-soundcloud</v-icon>
+                @{{ artist.profile.soundcloud }}
+              </a>
             </v-card-subtitle>
             <v-card-text class="pb-0">
               <ExpandParagraph v-if="artist.profile" dense>
