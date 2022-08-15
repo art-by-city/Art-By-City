@@ -13,7 +13,6 @@ import * as pc from 'playcanvas'
 import * as mime from 'mime-types'
 
 import { URLArtworkImage } from '~/app/core'
-import { uuidv4 } from '~/app/util'
 
 @Component
 export default class ThreeDViewer extends Vue {
@@ -55,7 +54,6 @@ export default class ThreeDViewer extends Vue {
 
       try {
         const url = await new Promise<string>((resolve, reject) => {
-          // this.pc?.graphicsDevice.canvas.context
           this.pc?.graphicsDevice.canvas.getContext(
             'webgl',
             { preserveDrawingBuffer: true }
@@ -74,22 +72,6 @@ export default class ThreeDViewer extends Vue {
         console.error(err)
         return { url: '', type: '' }
       }
-      // const canvas =
-      //   document.getElementById('threeDCanvas') as HTMLCanvasElement
-      // console.log('ThreeDInput.onGeneratePreviewImageClicked() canvas', canvas)
-      // const type = 'image/png'
-      // this.onPreviewImageGenerated(
-      //   await new Promise<string>((resolve, reject) => {
-      //     canvas.toBlob(blob => {
-      //       if (blob) {
-      //         resolve(URL.createObjectURL(blob))
-      //       } else {
-      //         reject('Error generating image preview')
-      //       }
-      //     }, type)
-      //   }),
-      //   type
-      // )
   }
 
   private resetPlayCanvas() {
@@ -124,82 +106,67 @@ export default class ThreeDViewer extends Vue {
     })
     this.pc.setCanvasResolution(pc.RESOLUTION_FIXED, 1920, 1080)
 
-    // NB: from https://github.com/playcanvas/engine/blob/main/examples/src/examples/loaders/glb.tsx
     this.pc.assets.loadFromUrlAndFilename(
       this.url,
       `asset.${extension}`,
       'container',
       (err, asset) => {
         if (this.pc && asset && !err) {
-          const entity = (asset.resource as pc.ContainerResource).instantiateRenderEntity()
+          const entity =
+            (asset.resource as pc.ContainerResource).instantiateRenderEntity()
           this.pc.root.addChild(entity)
 
-          const cameras = entity.findComponents('camera') as pc.CameraComponent[]
-          if (cameras.length < 1) {
-            const camera = new pc.Entity('camera')
-            camera.addComponent('camera', {
-              clearColor: new pc.Color(1, 1, 1)
-            })
-            this.pc.root.addChild(camera)
-            camera.setPosition(0, 0, 10)
-            cameras.push(camera.camera!)
-          }
+          const camera = new pc.Entity('camera')
+          camera.addComponent('camera', {
+            clearColor: new pc.Color(1, 1, 1)
+          })
+          this.pc.root.addChild(camera)
+          camera.setPosition(0, 0, 50)
 
-          const lights = entity.findComponents('light') as pc.LightComponent[]
-          if (lights.length < 1) {
-            const light = new pc.Entity('light')
-            light.addComponent('light')
-            this.pc.root.addChild(light)
-            light.setEulerAngles(45, 0, 0)
-            lights.push(light.light!)
-          }
-          lights.forEach(light => light.enabled = true)
+          const light = new pc.Entity('light')
+          light.addComponent('light')
+          this.pc.root.addChild(light)
+          light.setEulerAngles(45, 0, 0)
 
           const mouse = new pc.Mouse(document.body)
           let x = 0
-          const y = 0
-          // mouse.on(pc.EVENT_MOUSEDOWN, (event: pc.MouseEvent) => {})
+          let y = 0
           mouse.on(pc.EVENT_MOUSEMOVE, (event: pc.MouseEvent) => {
             if (this.disabled) {
               return
             }
-            // event.event.preventDefault()
+
+            event.event.preventDefault()
             if (event.buttons[pc.MOUSEBUTTON_LEFT]) {
               x += event.dx
+              y += event.dy
               entity.setLocalEulerAngles(0.2 * y, 0.2 * x, 0)
             }
           })
-          // mouse.on('mousewheel', function (event: pc.MouseEvent) {
-          //   event.event.preventDefault()
-          //   camera.translate(0, 0, event.wheelDelta * 10)
-          // })
+          mouse.on('mousewheel', function (event: pc.MouseEvent) {
+            const eventTarget = event.event.target as Element
+            if (eventTarget && eventTarget.id === 'threeDCanvas') {
+              event.event.preventDefault()
+              camera.translate(0, 0, event.wheelDelta * 10)
+            }
+          })
 
           const keyboard = new pc.Keyboard(document.body)
+          keyboard.on('keydown', e => {
+            e.event.preventDefault()
+          })
           this.pc.on('update', (dt: number) => {
-            let camera = cameras.find(c => c.enabled)?.entity
-
-            if (!camera && cameras[0]) {
-              cameras[0].enabled = true
-              camera = cameras[0].entity
+            if (keyboard.isPressed(pc.KEY_LEFT)) {
+              camera.translate(1, 0, 0)
             }
-
-            if (camera) {
-              // should rotate the scene instead?
-
-              if (keyboard.isPressed(pc.KEY_LEFT)) {
-                // entity.rotate(0, -1, 0)
-                camera.translate(1, 0, 0)
-              }
-              if (keyboard.isPressed(pc.KEY_RIGHT)) {
-                // entity.rotate(0, 1, 0)
-                camera.translate(-1, 0, 0)
-              }
-              if (keyboard.isPressed(pc.KEY_UP)) {
-                camera.translate(0, -1, 0)
-              }
-              if (keyboard.isPressed(pc.KEY_DOWN)) {
-                camera.translate(0, 1, 0)
-              }
+            if (keyboard.isPressed(pc.KEY_RIGHT)) {
+              camera.translate(-1, 0, 0)
+            }
+            if (keyboard.isPressed(pc.KEY_UP)) {
+              camera.translate(0, -1, 0)
+            }
+            if (keyboard.isPressed(pc.KEY_DOWN)) {
+              camera.translate(0, 1, 0)
             }
           })
 
@@ -217,5 +184,9 @@ export default class ThreeDViewer extends Vue {
 #threeDCanvas {
   width: 100%;
   border: 1px solid black;
+  cursor: grab;
+}
+#threeDCanvas:active {
+  cursor: grabbing;
 }
 </style>

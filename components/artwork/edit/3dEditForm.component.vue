@@ -27,7 +27,7 @@
             :max="1"
           /> -->
           <v-img
-            aspect-ratio="1.7"
+            aspect-ratio="1.78"
             max-height="300px"
             contain
             :src="artwork.image.url"
