@@ -58,6 +58,14 @@
                   prepend-icon="mdi-twitch"
                   :rules="[rules.twitch]"
                 ></v-text-field>
+
+                <v-text-field
+                  v-model="asset.soundcloud"
+                  name="soundcloud"
+                  label="SoundCloud Username"
+                  prepend-icon="mdi-soundcloud"
+                  :rules="[rules.soundcloud]"
+                ></v-text-field>
               </v-form>
             </v-card-text>
             <v-card-actions>
@@ -81,7 +89,7 @@
 import { Component } from 'nuxt-property-decorator'
 
 import { DomainEntityCategory, Profile } from '~/app/core'
-import { twitter, twitch, instagram, maxLength } from '~/app/util/rules'
+import { twitter, twitch, instagram, soundcloud, maxLength } from '~/app/util/rules'
 import TransactionDialog from
   '~/components/common/TransactionDialog.component.vue'
 import TransactionFormControls from
@@ -108,6 +116,7 @@ export default class EditProfileDialog extends TransactionDialog<Profile> {
       twitter,
       twitch,
       instagram,
+      soundcloud,
       displayName: maxLength(50),
       bio: maxLength(1024)
     }
