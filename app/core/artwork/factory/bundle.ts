@@ -11,7 +11,10 @@ import {
   ArtworkManifest,
   BaseArtworkManifest,
   ArtworkAudioWithStream,
-  PreviewFactory
+  PreviewFactory,
+  ModelArtworkCreationOptions,
+  ModelArtworkManifest,
+  ArtworkModel
 } from '~/app/core/artwork'
 import {
   BundleFactory,
@@ -95,10 +98,11 @@ export default class ArtworkBundleFactory {
     )
 
     let processedAudio: DataItem[][] = []
-    let manifest: ArtworkManifest
-    if ("images" in opts) {
+    let processedModels: DataItem[][] = []
+    let manifest: ArtworkManifest | null
+    if ('images' in opts) {
       manifest = this.createImageArtworkManifest(opts, processedImages)
-    } else {
+    } else if ('audio' in opts) {
       const blob = await fetch(opts.audio.url).then(r => r.blob())
       const buffer = await readFileAsArrayBufferAsync(blob)
       const audio = new Uint8Array(buffer)
@@ -134,6 +138,30 @@ export default class ArtworkBundleFactory {
         processedImages,
         processedAudio
       )
+    } else if ('model' in opts) {
+      const blob = await fetch(opts.model.url).then(r => r.blob())
+      const buffer = await readFileAsArrayBufferAsync(blob)
+      const model = new Uint8Array(buffer)
+
+      processedModels = [[
+        await DataItemFactory.create(
+          model,
+          signer,
+          [{ name: 'Content-Type', value: opts.model.type }]
+        )
+      ]]
+
+      manifest = this.createModelArtworkManifest(
+        opts,
+        processedImages,
+        processedModels
+      )
+    } else {
+      manifest = null
+    }
+
+    if (!manifest) {
+      throw new Error('Artwork type not supported')
     }
 
     const manifestDataItem = await DataItemFactory.create(
@@ -154,7 +182,8 @@ export default class ArtworkBundleFactory {
       bundle: BundleFactory.create([
         manifestDataItem,
         ...processedImages.flat(),
-        ...processedAudio.flat()
+        ...processedAudio.flat(),
+        ...processedModels.flat()
       ]),
       manifestId: manifestDataItem.id
     }
@@ -203,6 +232,28 @@ export default class ArtworkBundleFactory {
       image: mapImagePreviewDataItemsForManifest(imageItems[0]),
       audio: mapAudioPreviewDataItemsForManifest(audioItems[0])
     }
+  }
+
+  private createModelArtworkManifest(
+    opts: ModelArtworkCreationOptions,
+    imageItems: DataItem[][],
+    modelItems: DataItem[][]
+  ): ModelArtworkManifest {
+    const base = this.createBaseManifest(opts)
+
+    return {
+      ...base,
+      image: mapImagePreviewDataItemsForManifest(imageItems[0]),
+      model: mapModelPreviewDataItemsForManifest(modelItems[0])
+    }
+  }
+}
+
+function mapModelPreviewDataItemsForManifest(
+  [ model ]: DataItem[]
+): ArtworkModel {
+  return {
+    model: model.id
   }
 }
 

@@ -58,6 +58,7 @@
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
                   <v-btn
+                    v-if="max && max > 1"
                     icon
                     small
                     :disabled="disabled"
