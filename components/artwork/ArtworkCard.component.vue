@@ -18,7 +18,9 @@
                 class="artwork-overlay fill-height"
               >
                 <div v-if="isPlayable" id="playIcon">
-                  <v-icon x-large>mdi-play</v-icon>
+                  <v-icon x-large>
+                    {{ isModel ? 'mdi-rotate-3d' : 'mdi-play' }}
+                  </v-icon>
                 </div>
                 <v-row align="end" class="fill-height pa-1 pl-4">
                   <v-col
@@ -96,7 +98,10 @@ export default class ArtworkCard extends Vue {
     if (this.artwork) {
       if ('images' in this.artwork) {
         return !!this.artwork.images[0].animated
-      } else if ('audio' in this.artwork) {
+      } else if (
+        'audio' in this.artwork
+        || 'model' in this.artwork
+      ) {
         return true
       }
     }
@@ -105,13 +110,11 @@ export default class ArtworkCard extends Vue {
   }
 
   get isAudio(): boolean {
-    if (this.artwork) {
-      if ('audio' in this.artwork) {
-        return true
-      }
-    }
+    return !!this.artwork && 'audio' in this.artwork
+  }
 
-    return false
+  get isModel(): boolean {
+    return !!this.artwork && 'model' in this.artwork
   }
 
   get displayName() {

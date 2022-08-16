@@ -12,8 +12,8 @@ export interface AudioArtworkCreationOptions
 {
   subCategory: 'audio'
   genre?: string
-  image: (TrackableEntity & URLArtworkImage)
-  audio: (TrackableEntity & URLArtworkAudio)
+  image: TrackableEntity & URLArtworkImage
+  audio: TrackableEntity & URLArtworkAudio
 }
 
 export interface AudioArtworkManifest extends BaseArtworkManifest {

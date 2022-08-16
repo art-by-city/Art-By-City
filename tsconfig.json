@@ -19,6 +19,7 @@
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     "useUnknownInCatchVariables": false,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "~/*": [
@@ -35,6 +36,7 @@
       "@nuxtjs/auth-next",
       "@types/async",
       "@types/crypto-js",
+      "@types/mime-types",
       "@types/prettier",
       "reflect-metadata",
       "vuetify",

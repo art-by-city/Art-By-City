@@ -41,7 +41,7 @@ export const socialHandles: {
     message: 'Must be a valid Instagram username'
   },
   soundcloud: {
-    regex: /^[a-z0-9_\-]{3,25}$/, // TODO, max length?
+    regex: /^[a-z0-9_\-]{3,25}$/,
     message: 'Must be a valid SoundCloud username'
   }
 }

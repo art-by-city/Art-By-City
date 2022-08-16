@@ -1,61 +1,63 @@
 <template>
-  <v-container class="audio-edit-form">
+  <v-container class="model-edit-form">
     <v-form
       ref="form"
       v-model="valid"
       autocomplete="off"
       :disabled="isUploading || isSigned"
     >
-      <v-row dense justify="center" align="center">
-        <template v-if="artwork.audio.url">
-          <audio controls :src="artwork.audio.url" />
-          <v-btn icon small @click="onDeleteAudioClicked">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </template>
-        <template v-else>
-          <v-col cols="6">
-            <v-responsive
-              class="audio-input-container text-center"
-              :class="{ 'has-error': hasAudioValidationErrors }"
-            >
-              <label
-                class="audio-upload-label"
-                for="upload"
-              >
-                <v-icon>mdi-music-note-plus</v-icon>
-              </label>
-              <input
-                id="upload"
-                class="audio-upload-input"
-                type="file"
-                :accept="accept"
-                @input="onAudioChanged($event)"
-              />
-            </v-responsive>
-            <span v-if="hasAudioValidationErrors" class="red--text caption">
-              An audio file is required
-            </span>
-          </v-col>
-        </template>
-      </v-row>
       <v-row dense justify="center">
-        <v-col cols="6">
+        <v-col cols="12">
+          <ModelInput
+            v-model="artwork.model"
+            ref="ModelInput"
+            @file="onModelFileChanged"
+            @delete="onModelFileDeleted"
+            :valid="!hasModelValidationErrors"
+            :disabled="isUploading || isSigned"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row dense justify="center">
+        <v-col cols="12">
           <v-banner class="caption" outlined tile>
             <v-icon>mdi-exclamation-thick</v-icon>
-            For best results use AAC 256bit with
-            <a
-              class="black--text"
-              href="https://en.wikipedia.org/wiki/Progressive_download"
-              target="_blank"
-            >
-              Progressive Download
-            </a>
+            <template v-if="artwork.model && artwork.model.url">
+              You can click &amp; drag to rotate, right-click to pan, and
+              use the mouse wheel to zoom in and out.
+            </template>
+            <template v-else>
+              Publishing 3D Models is currently limited to
+              <a
+                class="black--text"
+                href="https://en.wikipedia.org/wiki/GlTF"
+                target="_blank"
+              >GLTF / GLB</a>
+              format.  For best results, use GLB.
+            </template>
           </v-banner>
         </v-col>
       </v-row>
-      <v-row dense justify="center">
+
+      <v-row dense justify="center" v-if="artwork.model && artwork.model.url">
         <v-col cols="6">
+          <v-btn
+            outlined
+            elevation="2"
+            @click="onGeneratePreviewImageClicked"
+          >
+            Generate Preview Image from 3D Model
+          </v-btn>
+        </v-col>
+        <v-col cols="6">
+          <div class="caption">
+            Or upload your own preview image below
+            <v-icon>mdi-arrow-down</v-icon>
+          </div>
+        </v-col>
+
+        <v-col cols="12">
           <ImageInput
             v-model="artwork.image"
             :valid="!hasImageValidationErrors"
@@ -64,6 +66,7 @@
           />
         </v-col>
       </v-row>
+
       <v-row dense justify="center">
         <v-col cols="12">
           <v-text-field
@@ -101,21 +104,11 @@
             :rules="[rules.city]"
           ></v-text-field> -->
 
-          <v-text-field
-            v-model="artwork.genre"
-            type="text"
-            name="genre"
-            label="Genre"
-            counter="240"
-            placeholder="e.g. Rock, Hip-Hop, Blues, EDM"
-            :rules="[rules.maxLength(240)]"
-          ></v-text-field>
-
           <v-textarea
             v-model="artwork.description"
             name="artworkDescription"
             label="Description"
-            hint="Enter a description for this Audio"
+            hint="Enter a description for this 3D Asset"
             auto-grow
             rows="2"
             counter="1024"
@@ -125,15 +118,7 @@
           <!-- <LicenseSelector v-model="artwork.license" /> -->
         </v-col>
       </v-row>
-      <v-row dense>
-        <!-- <div class="text-caption">
-          Note: Audio will have streamable version generated in AAC 256kb.
-        </div> -->
-        <div class="text-caption">
-          Note: Images will have JPEG thumbnail previews generated in 1080p and
-          4k resolutions but will not exceed source image dimensions.
-        </div>
-      </v-row>
+
       <v-row dense justify="center">
         <TransactionFormControls
           :loading="isUploading"
@@ -158,29 +143,28 @@ import { PublishingForm } from '~/components/publishing'
 import {
   ImageInput,
   LicenseSelector,
+  ModelInput,
   TransactionFormControls
 } from '~/components/forms'
-import { AudioArtworkCreationOptions } from '~/app/core/artwork/audio'
+import { ModelArtworkCreationOptions } from '~/app/core/artwork'
 import { debounce, uuidv4 } from '~/app/util'
 
 @Component({
   components: {
     ImageInput,
     LicenseSelector,
+    ModelInput,
     TransactionFormControls
   }
 })
-export default class AudioEditForm extends PublishingForm {
-  readonly accept =
-    'audio/aac,audio/flac,audio/mpeg,audio/wav,audio/ogg,audio/webm'
-
-  artwork: AudioArtworkCreationOptions = {
-    subCategory: 'audio',
+export default class ModelEditForm extends PublishingForm {
+  artwork: ModelArtworkCreationOptions = {
+    subCategory: 'model',
     creator: this.$auth.user?.address || '',
     title: '',
     slug: '',
-    image: { guid: uuidv4(), url: '', type: '' },
-    audio: { guid: uuidv4(), url: '', type: '' }
+    model: { guid: uuidv4(), url: '', type: '' },
+    image: { guid: uuidv4(), url: '', type: '' }
   }
 
   rules = {
@@ -241,64 +225,56 @@ export default class AudioEditForm extends PublishingForm {
     }
   }
 
+  get hasModelValidationErrors(): boolean {
+    return this.dirty && !this.artwork.model.url
+  }
+
   get hasImageValidationErrors(): boolean {
     return this.dirty && !this.artwork.image.url
   }
 
-  get hasAudioValidationErrors(): boolean {
-    return this.dirty && !this.artwork.audio.url
+  async onModelFileChanged(file: File) {
+    await this.suggestMetadataFromFile(file)
+    this.artwork.image = { guid: uuidv4(), url: '', type: '' }
   }
 
-  async onAudioChanged(event: InputEvent) {
-    if (event.target) {
-      const target = event.target as HTMLInputElement
-      if (target.files && target.files[0]) {
-        const audio = target.files[0]
-        this.artwork.audio = {
-          guid: uuidv4(),
-          type: audio.type,
-          url: URL.createObjectURL(audio)
-        }
-        await this.suggestMetadataFromFile(audio)
-      }
-    }
+  async onModelFileDeleted() {
+    this.artwork.image = { guid: uuidv4(), url: '', type: '' }
   }
 
   @debounce
-  async onDeleteAudioClicked() {
-    this.artwork.audio = { guid: uuidv4(), url: '', type: '' }
+  async onGeneratePreviewImageClicked() {
+    try {
+      const modelInputComponent = this.$refs['ModelInput'] as ModelInput
+      const previewImage = await modelInputComponent.generatePreviewImage()
+      if (previewImage) {
+        this.artwork.image = { guid: uuidv4(), ...previewImage }
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   async onSign() {
     this.dirty = true
     this.valid = this.$refs.form.validate()
 
+    if (this.hasImageValidationErrors || this.hasModelValidationErrors) {
+      this.valid = false
+    }
+
     if (this.valid) {
       this.isUploading = true
+
       this.info = 'Building Artwork transaction...'
-      let processedCount = 0
       this.uploadPct = 0
-      try {
-        this.transaction = await this.$artworkService.createArtworkTransaction(
-          this.artwork,
-          (progress?: number) => {
-            if (typeof progress === 'number' && progress > 0) {
-              this.info = 'Encoding streamable audio...'
-              processedCount = progress + 1
-            } else if (typeof progress !== 'number') {
-              processedCount = 1
-            }
+      this.transaction = await this.$artworkService.createArtworkTransaction(
+        this.artwork,
+        () => { this.uploadPct = 100 }
+      )
 
-            this.uploadPct = 100 * (processedCount) / 2
-          }
-        )
-
-        this.info = 'Waiting on signature...'
-        this.isSigned = await this.$arweaveService.sign(this.transaction, true)
-      } catch (err) {
-        console.error(err)
-        this.$toasts.error(err)
-      }
+      this.info = 'Waiting on signature...'
+      this.isSigned = await this.$arweaveService.sign(this.transaction, true)
 
       this.info = ''
       this.uploadPct = null
@@ -344,48 +320,9 @@ export default class AudioEditForm extends PublishingForm {
 </script>
 
 <style scoped>
-/* .audio-upload-button {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-} */
-.audio-upload-button.v-text-field {
-  margin-top: 0px;
-  display: inline-flex;
-  align-items: center;
-  padding: 2px;
-}
-.audio-upload-button >>> .v-input__control {
-  display: none;
-}
-.audio-upload-button >>> .v-input__prepend-outer {
-  margin-right: 0px;
-  margin-left: 0px;
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
-.audio-upload-label {
-  cursor: pointer;
-  height: 28px;
-  width: 28px;
-  display: inline-flex;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-.audio-upload-input {
-  display: none;
-}
-
-.audio-input-container {
-  border: 1px dashed black;
-  height: 72px;
-  /* width: 100%; */
-}
-.has-error {
-  border: 1px solid red;
+.model-edit-form {
+  background-color: white;
+  padding: 12px 48px;
+  width: 100%;
 }
 </style>
