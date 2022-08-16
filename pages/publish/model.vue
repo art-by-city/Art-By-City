@@ -7,7 +7,7 @@
     </v-row>
     <v-row justify="center">
       <v-col cols="6">
-        <ThreeDEditForm
+        <ModelEditForm
           @uploading="onUploading"
           @save="onSave"
           @cancel="onCancel"
@@ -21,15 +21,15 @@
 import { Component } from 'nuxt-property-decorator'
 
 import { PublishingPage } from '~/components/publishing'
-import { ThreeDEditForm } from '~/components/artwork/edit'
+import { ModelEditForm } from '~/components/artwork/edit'
 
 @Component({
   middleware: 'auth',
   components: {
-    ThreeDEditForm
+    ModelEditForm
   }
 })
-export default class Publish3dPage extends PublishingPage {
+export default class PublishModelPage extends PublishingPage {
   get head() {
     return { title: 'Publish 3D' }
   }

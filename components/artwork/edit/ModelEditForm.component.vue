@@ -1,5 +1,5 @@
 <template>
-  <v-container class="threeD-edit-form">
+  <v-container class="model-edit-form">
     <v-form
       ref="form"
       v-model="valid"
@@ -8,12 +8,12 @@
     >
       <v-row dense justify="center">
         <v-col cols="12">
-          <ThreeDInput
+          <ModelInput
             v-model="artwork.model"
-            ref="ThreeDInput"
-            @file="on3dFileChanged"
-            @delete="on3dFileDeleted"
-            :valid="!has3dValidationErrors"
+            ref="ModelInput"
+            @file="onModelFileChanged"
+            @delete="onModelFileDeleted"
+            :valid="!hasModelValidationErrors"
             :disabled="isUploading || isSigned"
           />
         </v-col>
@@ -24,9 +24,8 @@
           <v-banner class="caption" outlined tile>
             <v-icon>mdi-exclamation-thick</v-icon>
             <template v-if="artwork.model && artwork.model.url">
-              You can click &amp; drag to rotate,
-              use the mouse wheel to zoom in and out,
-              and the arrow keys to move the camera viewport.
+              You can click &amp; drag to rotate, right-click to pan, and
+              use the mouse wheel to zoom in and out.
             </template>
             <template v-else>
               Publishing 3D Models is currently limited to
@@ -66,12 +65,6 @@
             :max="1"
           />
         </v-col>
-        <!-- <v-img
-          aspect-ratio="1.78"
-          max-height="300px"
-          contain
-          :src="artwork.image.url"
-        ></v-img> -->
       </v-row>
 
       <v-row dense justify="center">
@@ -150,26 +143,27 @@ import { PublishingForm } from '~/components/publishing'
 import {
   ImageInput,
   LicenseSelector,
-  ThreeDInput,
+  ModelInput,
   TransactionFormControls
 } from '~/components/forms'
-import { URLArtworkImage } from '~/app/core/artwork'
+import { ModelArtworkCreationOptions } from '~/app/core/artwork'
 import { debounce, uuidv4 } from '~/app/util'
 
 @Component({
   components: {
     ImageInput,
     LicenseSelector,
-    ThreeDInput,
+    ModelInput,
     TransactionFormControls
   }
 })
-export default class ThreeDEditForm extends PublishingForm {
-  // TODO -> type & default values
-  artwork: any = {
-    model: {
-      url: null
-    },
+export default class ModelEditForm extends PublishingForm {
+  artwork: ModelArtworkCreationOptions = {
+    subCategory: 'model',
+    creator: this.$auth.user?.address || '',
+    title: '',
+    slug: '',
+    model: { guid: uuidv4(), url: '', type: '' },
     image: { guid: uuidv4(), url: '', type: '' }
   }
 
@@ -231,7 +225,7 @@ export default class ThreeDEditForm extends PublishingForm {
     }
   }
 
-  get has3dValidationErrors(): boolean {
+  get hasModelValidationErrors(): boolean {
     return this.dirty && !this.artwork.model.url
   }
 
@@ -239,24 +233,23 @@ export default class ThreeDEditForm extends PublishingForm {
     return this.dirty && !this.artwork.image.url
   }
 
-  async on3dFileChanged(file: File) {
+  async onModelFileChanged(file: File) {
     await this.suggestMetadataFromFile(file)
     this.artwork.image = { guid: uuidv4(), url: '', type: '' }
   }
 
-  async on3dFileDeleted() {
+  async onModelFileDeleted() {
     this.artwork.image = { guid: uuidv4(), url: '', type: '' }
-  }
-
-  async onPreviewImageGenerated(previewImage: URLArtworkImage) {
-    this.artwork.image = previewImage
   }
 
   @debounce
   async onGeneratePreviewImageClicked() {
     try {
-      const threeDInputComponent = this.$refs['ThreeDInput'] as ThreeDInput
-      this.artwork.image = await threeDInputComponent.generatePreviewImage()
+      const modelInputComponent = this.$refs['ModelInput'] as ModelInput
+      const previewImage = await modelInputComponent.generatePreviewImage()
+      if (previewImage) {
+        this.artwork.image = { guid: uuidv4(), ...previewImage }
+      }
     } catch (err) {
       console.error(err)
     }
@@ -266,7 +259,7 @@ export default class ThreeDEditForm extends PublishingForm {
     this.dirty = true
     this.valid = this.$refs.form.validate()
 
-    if (this.hasImageValidationErrors || this.has3dValidationErrors) {
+    if (this.hasImageValidationErrors || this.hasModelValidationErrors) {
       this.valid = false
     }
 
@@ -290,13 +283,44 @@ export default class ThreeDEditForm extends PublishingForm {
   }
 
   async onSubmit() {
-    // TODO
+    if (this.isSigned && this.transaction) {
+      this.isUploading = true
+      this.onUploading(true)
+      this.uploadPct = 0
+      this.$txQueueService.submitUserTransaction(
+        this.transaction,
+        {
+          id: this.transaction.id,
+          last_tx: this.transaction.last_tx,
+          type: 'artwork',
+          status: 'PENDING_SUBMISSION',
+          created: new Date().getTime()
+        },
+        (err?: Error) => {
+          this.info = ''
+          this.uploadPct = null
+          this.onUploading(false)
+          if (err) {
+            console.error('Error submitting user tx', err)
+            this.$toasts.error('Error submitting user tx: ' + err.message)
+            this.isUploading = false
+          } else {
+            return this.save()
+          }
+        },
+        true,
+        (pctComplete: number) => {
+          this.info = `Uploading transaction...`
+          this.uploadPct = pctComplete
+        }
+      )
+    }
   }
 }
 </script>
 
 <style scoped>
-.threeD-edit-form {
+.model-edit-form {
   background-color: white;
   padding: 12px 48px;
   width: 100%;

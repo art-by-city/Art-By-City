@@ -2,6 +2,7 @@ import { FactoryCreationError } from '~/app/core/error'
 import { Artwork, ArtworkManifest, BaseArtwork } from '../artwork'
 import { AudioArtworkFactory } from '../audio'
 import { ImageArtworkFactory } from '../image'
+import { ModelArtworkFactory } from '../model'
 
 export default class ArtworkFactory {
   create(
@@ -34,6 +35,8 @@ export default class ArtworkFactory {
       return new ImageArtworkFactory().create(base, opts)
     } else if ('audio' in opts) {
       return new AudioArtworkFactory().create(base, opts)
+    } else if ('model' in opts) {
+      return new ModelArtworkFactory().create(base, opts)
     }
 
     throw new FactoryCreationError('Could not parse Artwork Manifest')

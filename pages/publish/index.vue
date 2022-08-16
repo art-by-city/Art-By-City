@@ -19,7 +19,7 @@
         </v-btn>
       </v-col>
       <v-col cols="12" class="text-center">
-        <v-btn x-large outlined to="/publish/3d">
+        <v-btn x-large outlined to="/publish/model">
           <v-icon x-large>mdi-cube</v-icon>
           3D
         </v-btn>

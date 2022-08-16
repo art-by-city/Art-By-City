@@ -2,9 +2,26 @@
   <div>
     <v-container v-if="artwork" fluid class="px-0">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
+        <template v-if="isModel && showingAnimation">
+          <v-col cols="10" class="model-viewer-container">
+            <ModelViewer
+              :url="artworkUrlFromId(artwork.model.model)"
+              type="model/gltf-binary"
+            />
+          </v-col>
+
+          <v-row dense justify="center">
+            <v-banner class="caption" outlined tile>
+              <v-icon>mdi-exclamation-thick</v-icon>
+              You can click &amp; drag to rotate, right-click to pan, and
+              use the mouse wheel to zoom in and out.
+            </v-banner>
+          </v-row>
+        </template>
         <v-img
+          v-else
           class="preview-artwork"
-          :class="{ 'animated': previewImage.animated }"
+          :class="{ 'animated': previewImage.animated || isModel }"
           max-height="75vh"
           max-width="75vw"
           :src="previewSrc"
@@ -16,8 +33,8 @@
             <TransactionPlaceholder :txId="previewImage.preview4k" />
           </template>
           <v-overlay absolute :value="showAnimationOverlay">
-            <v-btn x-large icon @click.prevent="showAnimation = true">
-              <v-icon>mdi-play</v-icon>
+            <v-btn x-large icon @click.prevent="showingAnimation = true">
+              <v-icon>{{ isModel ? 'mdi-rotate-3d' : 'mdi-play' }}</v-icon>
             </v-btn>
           </v-overlay>
         </v-img>
@@ -173,6 +190,28 @@
                     tile
                     target="_blank"
                     :href="arweaveAssetUrlFromId(artwork.audio.audio)"
+                  >
+                    <v-icon small dense>mdi-open-in-new</v-icon>
+                  </v-btn>
+                </li>
+              </template>
+              <template v-if="artwork.model">
+                <li>
+                  <strong>Model</strong>
+                  <v-btn
+                    icon
+                    small
+                    tile
+                    @click="copyAssetUrlToClipboard(artwork.model.model)"
+                  >
+                    <v-icon small dense>mdi-content-copy</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    small
+                    tile
+                    target="_blank"
+                    :href="arweaveAssetUrlFromId(artwork.model.model)"
                   >
                     <v-icon small dense>mdi-open-in-new</v-icon>
                   </v-btn>
@@ -336,6 +375,7 @@ import ArtworkZoomDialog from
 import { ArtworkEditForm } from '~/components/artwork/edit'
 import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
+import ModelViewer from '~/components/artwork/ModelViewer.component.vue'
 import {
   Artwork,
   LegacyArtwork,
@@ -352,7 +392,8 @@ import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
     LikeButton,
     ArtworkZoomDialog,
     ArtworkEditForm,
-    TransactionConfirmationProgress
+    TransactionConfirmationProgress,
+    ModelViewer
   }
 })
 export default class ArtworkPage extends Vue {
@@ -405,7 +446,7 @@ export default class ArtworkPage extends Vue {
   txIdOrSlug: string = this.$route.params.artwork
   txId?: string
   tx: UserTransaction | null = null
-  showAnimation: boolean = false
+  showingAnimation: boolean = false
 
   get displayName() {
     if (this.profile?.displayName) {
@@ -440,7 +481,7 @@ export default class ArtworkPage extends Vue {
     if (this.previewImage && this.artwork) {
       const preview = this.previewImage as ArtworkImageWithPreviews
       return this.artworkUrlFromId(
-        preview.animated && this.showAnimation
+        preview.animated && this.showingAnimation
           ? preview.image
           : preview.preview4k
       )
@@ -449,11 +490,18 @@ export default class ArtworkPage extends Vue {
     }
   }
 
+  get isModel(): boolean {
+    return !!this.artwork && 'model' in this.artwork
+  }
+
   get showAnimationOverlay(): boolean {
-    return !!(
-      !this.showAnimation
-      && (this.previewImage as any).animated
-    )
+    return !this.showingAnimation
+      &&
+      (
+        (this.previewImage as any).animated
+        || (this.artwork && 'model' in this.artwork)
+      )
+
   }
 
   @debounce
@@ -541,9 +589,9 @@ export default class ArtworkPage extends Vue {
   onPreviewArtworkClicked() {
     if (this.previewImage) {
       const preview = this.previewImage as ArtworkImageWithPreviews
-      if (preview.animated) {
+      if (preview.animated || this.isModel) {
         // NB: This will load in the animation file
-        this.showAnimation = true
+        this.showingAnimation = true
       } else {
         this.zoom = true
       }
@@ -573,5 +621,9 @@ export default class ArtworkPage extends Vue {
 }
 .adjust-icon {
   margin-top: -3px;
+}
+.model-viewer-container {
+  max-height: 75vh;
+  max-width: 75vw;
 }
 </style>

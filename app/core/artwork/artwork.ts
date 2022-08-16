@@ -1,6 +1,19 @@
-import { AudioArtwork, AudioArtworkCreationOptions, AudioArtworkManifest } from './audio'
-import { ImageArtwork, ImageArtworkCreationOptions, ImageArtworkManifest } from './image'
+import {
+  AudioArtwork,
+  AudioArtworkCreationOptions,
+  AudioArtworkManifest
+} from './audio'
+import {
+  ImageArtwork,
+  ImageArtworkCreationOptions,
+  ImageArtworkManifest
+} from './image'
 import { LegacyArtwork } from './legacy'
+import {
+  ModelArtwork,
+  ModelArtworkCreationOptions,
+  ModelArtworkManifest,
+} from './model'
 
 export interface BaseArtworkCreationOptions {
   created?: number
@@ -49,14 +62,17 @@ export interface License {
 export type ArtworkCreationOptions =
   | ImageArtworkCreationOptions
   | AudioArtworkCreationOptions
+  | ModelArtworkCreationOptions
 
 export type ArtworkManifest =
   | ImageArtworkManifest
   | AudioArtworkManifest
+  | ModelArtworkManifest
 
 export type Artwork =
   | ImageArtwork
   | AudioArtwork
+  | ModelArtwork
   | LegacyArtwork
 
 export * from './legacy'

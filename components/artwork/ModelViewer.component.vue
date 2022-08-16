@@ -1,8 +1,10 @@
 <template>
-  <div class="threeD-viewer">
+  <div class="model-viewer">
     <canvas
-      id="threeDCanvas"
+      id="modelCanvas"
       :class="{ 'hidden': !url }"
+      width="75vw"
+      height="75vh"
     ></canvas>
   </div>
 </template>
@@ -15,7 +17,7 @@ import * as mime from 'mime-types'
 import { URLArtworkImage } from '~/app/core'
 
 @Component
-export default class ThreeDViewer extends Vue {
+export default class ModelViewer extends Vue {
   private pc?: pc.Application
 
   @Prop({
@@ -31,7 +33,7 @@ export default class ThreeDViewer extends Vue {
   @Prop({
     type: Boolean,
     required: false,
-    default: true
+    default: false
   }) readonly disabled!: boolean
 
   @Prop({
@@ -94,7 +96,7 @@ export default class ThreeDViewer extends Vue {
 
   private async loadGlb() {
     const extension = mime.extension(this.type)
-    const canvas = document.getElementById('threeDCanvas') as HTMLCanvasElement
+    const canvas = document.getElementById('modelCanvas') as HTMLCanvasElement
     this.pc = new pc.Application(canvas, {
       graphicsDeviceOptions: {
         // NB: Blurry unless enabled, might be perf hit on older mobile devices
@@ -102,77 +104,53 @@ export default class ThreeDViewer extends Vue {
 
         // NB: Necessary to generate preview assets, may impact performance
         preserveDrawingBuffer: true
-      }
+      },
+      keyboard: new pc.Keyboard(canvas),
+      mouse: new pc.Mouse(canvas),
+      touch: new pc.TouchDevice(canvas)
     })
     this.pc.setCanvasResolution(pc.RESOLUTION_FIXED, 1920, 1080)
 
-    this.pc.assets.loadFromUrlAndFilename(
-      this.url,
-      `asset.${extension}`,
-      'container',
-      (err, asset) => {
-        if (this.pc && asset && !err) {
-          const entity =
-            (asset.resource as pc.ContainerResource).instantiateRenderEntity()
+    const assets = {
+      userAsset: new pc.Asset('userAsset', 'container', {
+        url: this.url,
+        filename: `userAsset.${extension}`
+      }),
+      orbitCameraScript: new pc.Asset('orbitCameraScript', 'script', {
+        url: '/scripts/playcanvas/orbit-camera.js'
+      })
+    }
+
+
+    window.pc = pc
+    new pc.AssetListLoader(Object.values(assets), this.pc.assets).load(
+      (err: Error, failed: any[]) => {
+        if (this.pc && !err) {
+          const entity = assets.userAsset.resource.instantiateRenderEntity()
           this.pc.root.addChild(entity)
 
           const camera = new pc.Entity('camera')
           camera.addComponent('camera', {
             clearColor: new pc.Color(1, 1, 1)
           })
+          camera.addComponent('script')
+          camera.script!.create('orbitCamera', {
+            attributes: {
+              focusEntity: entity
+            }
+          }) as pc.ScriptType
+          camera.script!.create('orbitCameraInputMouse')
+          camera.script!.create('orbitCameraInputTouch')
           this.pc.root.addChild(camera)
-          camera.setPosition(0, 0, 50)
 
           const light = new pc.Entity('light')
-          light.addComponent('light')
+          light.addComponent('light', { type: 'directional' })
           this.pc.root.addChild(light)
-          light.setEulerAngles(45, 0, 0)
-
-          const mouse = new pc.Mouse(document.body)
-          let x = 0
-          let y = 0
-          mouse.on(pc.EVENT_MOUSEMOVE, (event: pc.MouseEvent) => {
-            if (this.disabled) {
-              return
-            }
-
-            event.event.preventDefault()
-            if (event.buttons[pc.MOUSEBUTTON_LEFT]) {
-              x += event.dx
-              y += event.dy
-              entity.setLocalEulerAngles(0.2 * y, 0.2 * x, 0)
-            }
-          })
-          mouse.on('mousewheel', function (event: pc.MouseEvent) {
-            const eventTarget = event.event.target as Element
-            if (eventTarget && eventTarget.id === 'threeDCanvas') {
-              event.event.preventDefault()
-              camera.translate(0, 0, event.wheelDelta * 10)
-            }
-          })
-
-          const keyboard = new pc.Keyboard(document.body)
-          keyboard.on('keydown', e => {
-            e.event.preventDefault()
-          })
-          this.pc.on('update', (dt: number) => {
-            if (keyboard.isPressed(pc.KEY_LEFT)) {
-              camera.translate(1, 0, 0)
-            }
-            if (keyboard.isPressed(pc.KEY_RIGHT)) {
-              camera.translate(-1, 0, 0)
-            }
-            if (keyboard.isPressed(pc.KEY_UP)) {
-              camera.translate(0, -1, 0)
-            }
-            if (keyboard.isPressed(pc.KEY_DOWN)) {
-              camera.translate(0, 1, 0)
-            }
-          })
+          light.setLocalEulerAngles(45, 30, 0)
 
           this.pc.start()
         } else {
-          console.error('Error', err || 'missing asset')
+          console.error('Error', err || 'missing asset', failed)
         }
       }
     )
@@ -181,12 +159,19 @@ export default class ThreeDViewer extends Vue {
 </script>
 
 <style scoped>
-#threeDCanvas {
+.model-viewer {
   width: 100%;
+  height: 100%;
+}
+#modelCanvas {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  max-height: 100%;
   border: 1px solid black;
   cursor: grab;
 }
-#threeDCanvas:active {
+#modelCanvas:active {
   cursor: grabbing;
 }
 </style>
