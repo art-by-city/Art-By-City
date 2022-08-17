@@ -25,7 +25,7 @@
 import { Component, Emit, Prop, Vue } from 'nuxt-property-decorator'
 
 import { FeedItem } from '~/app/core'
-import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
+import { ArtworkCard } from '~/components/artwork'
 import FeedLoadMore from '~/components/feed/FeedLoadMore.component.vue'
 
 @Component({

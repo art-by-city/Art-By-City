@@ -24,7 +24,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
-import ArtworkCard from '~/components/artwork/ArtworkCard.component.vue'
+import { ArtworkCard } from '~/components/artwork'
 import { FeedItem } from '~/app/core'
 import FeedLoadMore from '~/components/feed/FeedLoadMore.component.vue'
 
