@@ -41,8 +41,8 @@ export default class ArweaveSeal extends Vue {
 
 <style scoped>
 .arweave-seal {
-  position: absolute;
-  z-index: 9999;
+  /* position: absolute; */
+  /* z-index: 9999; */
   box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.025);
 }
 </style>

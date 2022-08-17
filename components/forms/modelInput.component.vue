@@ -55,7 +55,7 @@ import { Component, Emit, Model, Prop, Vue } from 'nuxt-property-decorator'
 import * as mime from 'mime-types'
 
 import { debounce, uuidv4 } from '~/app/util'
-import ModelViewer from '../artwork/ModelViewer.component.vue'
+import { ModelViewer } from '../artwork'
 import { TrackableEntity, URLArtworkModel } from '~/app/core'
 
 @Component({
