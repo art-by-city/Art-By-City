@@ -399,6 +399,7 @@ import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 export default class ArtworkPage extends Vue {
   head() {
     if (!this.artwork) { return {} }
+
     const creator = typeof this.artwork.creator === 'string'
       ? this.artwork.creator
       : this.artwork.creator.address
@@ -408,33 +409,50 @@ export default class ArtworkPage extends Vue {
     const title = `${this.artwork.title} by ${this.displayName}`
     const url =
       `${this.$config.baseUrl}/${usernameOrAddress}/${txIdOrSlug}`
-    const thumbnailUrl = this.$config.arweave.gateway
-      + '/'
-      + (
+    const thumbnailUrl = this.arweaveAssetUrlFromId(
         'images' in this.artwork
           ? this.artwork.images[0].preview
           : this.artwork.image.preview
       )
-    const twitter = this.profile?.twitter || ''
+
+    const meta = [
+      // Open Graph
+      { property: 'og:title', content: title },
+      { property: 'og:type', content: 'artbycity:artwork' },
+      { property: 'og:url', content: url },
+      { property: 'og:image', content: thumbnailUrl },
+      // { property: 'og:image:type', content: '' },
+      // { property: 'og:image:width', content: '' },
+      // { property: 'og:image:height', content: '' },
+
+      // Twitter
+      { name: 'twitter:card', content: 'summary_large_image' },
+    ]
+
+    if (this.profile?.twitter) {
+      meta.push({
+        name: 'twitter:creator',
+        content: `@${this.profile.twitter}`
+      })
+    }
+
+    if (this.artwork.description) {
+      meta.push(
+        { property: 'og:description', content: this.artwork.description },
+        { property: 'og:image:alt', content: this.artwork.description }
+      )
+    }
+
+    if ('audio' in this.artwork) {
+      meta.push({
+        property: 'og:audio',
+        content: this.arweaveAssetUrlFromId(this.artwork.audio.audio)
+      })
+    }
 
     return {
       title,
-      meta: [
-        // Open Graph
-        { property: 'og:title',        content: title                    },
-        { property: 'og:description',  content: this.artwork.description },
-        { property: 'og:type',         content: 'artbycity:artwork'      },
-        { property: 'og:url',          content: url                      },
-        { property: 'og:image',        content: thumbnailUrl             },
-        { property: 'og:image:alt',    content: this.artwork.description },
-        // { property: 'og:image:type',   content: ''                       },
-        // { property: 'og:image:width',  content: ''                       },
-        // { property: 'og:image:height', content: ''                       },
-
-        // Twitter
-        { name: 'twitter:card',    content: 'summary_large_image' },
-        { name: 'twitter:creator', content: `@${twitter}`         },
-      ]
+      meta
     }
   }
 

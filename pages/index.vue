@@ -14,5 +14,19 @@ import PitchContent from '~/components/pitch/PitchContent.component.vue'
     PitchContent
   }
 })
-export default class HomePage extends Vue {}
+export default class HomePage extends Vue {
+  head() {
+    return {
+      meta: [
+        { property: 'og:title', content: 'Art By City' },
+        {
+          property: 'og:image',
+          content:
+            `${this.$config.baseUrl}/logo/logo_by_daliah_ammar_square.png`
+        },
+        { property: 'og:type', content: 'website' }
+      ]
+    }
+  }
+}
 </script>

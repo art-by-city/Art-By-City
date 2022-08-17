@@ -223,35 +223,42 @@ export default class UserProfilePage extends Vue {
 
     let avatarUrl = ''
     if (this.artist.avatar) {
-      avatarUrl = this.artist.avatar?.version === 1
-        ? `${this.$config.baseUrl}/api/avatar/${this.artist.address}`
-        : this.artist.avatar.src
+      avatarUrl = 'src' in this.artist.avatar
+        ? this.artist.avatar.src
+        : this.artist.avatar
     }
 
     const avatarAlt = `${this.primaryName}'s avatar`
-    const twitter = this.artist?.profile?.twitter || ''
+
+    const meta = [
+      // Open Graph
+      { property: 'og:title', content: title },
+      { property: 'og:description', content: description },
+      { property: 'og:type', content: 'profile' },
+      {
+        property: 'og:profile:username',
+        content: this.artist.username || this.artist.address },
+      { property: 'og:url', content: url },
+      { property: 'og:image', content: avatarUrl },
+      { property: 'og:image:alt', content: avatarAlt },
+      // { property: 'og:image:type', content: '' },
+      // { property: 'og:image:width', content: '' },
+      // { property: 'og:image:height', content: '' },
+
+      // Twitter
+      { name: 'twitter:card', content: 'summary' },
+    ]
+
+    if (this.artist.profile?.twitter) {
+      meta.push({
+        name: 'twitter:creator',
+        content: `@${this.artist.profile.twitter}`
+      })
+    }
 
     return {
       title,
-      meta: [
-        // Open Graph
-        { property: 'og:title',            content: title       },
-        { property: 'og:description',      content: description },
-        { property: 'og:type',             content: 'profile'   },
-        {
-          property: 'og:profile:username',
-          content: this.artist.username || this.artist.address  },
-        { property: 'og:url',              content: url         },
-        { property: 'og:image',            content: avatarUrl   },
-        { property: 'og:image:alt',        content: avatarAlt   },
-        // { property: 'og:image:type',       content: ''          },
-        // { property: 'og:image:width',      content: ''          },
-        // { property: 'og:image:height',     content: ''          },
-
-        // Twitter
-        { name: 'twitter:card',    content: 'summary'     },
-        { name: 'twitter:creator', content: `@${twitter}` },
-      ]
+      meta
     }
   }
 
