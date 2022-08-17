@@ -84,241 +84,12 @@
         </v-col>
       </v-row>
       <v-row dense>
-        <v-col offset-sm="2" cols="12" sm="5">
-          <v-row dense>
-            <span class="text-h4 text-sm-h2">{{ artwork.title }}</span>
-          </v-row>
-          <v-row dense>
-            <strong>Created by</strong>
-            &nbsp;
-            <nuxt-link
-              :to="`/${username || artwork.creator.address || artwork.creator}`"
-              class="text-truncate"
-            >
-              {{ displayName }}
-            </nuxt-link>
-          </v-row>
-          <v-row dense v-if="artwork.views">
-            <strong>Views</strong>
-            &nbsp;
-            <span>{{ artwork.views }}</span>
-          </v-row>
-          <v-row dense v-if="artwork.created">
-            <strong>Created</strong>
-            &nbsp;
-            <span>{{ artwork.created }}</span>
-          </v-row>
-          <v-row dense v-if="artwork.city">
-            <strong>City</strong>
-            &nbsp;
-            <span class="text-uppercase">{{ artwork.city }}</span>
-          </v-row>
-          <v-row dense v-if="artwork.medium">
-            <strong>Medium</strong>
-            &nbsp;
-            <span>{{ artwork.medium }}</span>
-          </v-row>
-          <v-row dense v-if="artwork.genre">
-            <strong>Genre</strong>
-            &nbsp;
-            <span>{{ artwork.genre }}</span>
-          </v-row>
-          <v-row dense v-if="artwork.published">
-            <strong>Published</strong>
-            &nbsp;
-            <span>
-              {{ (new Date(artwork.published)).toLocaleDateString() }}
-            </span>
-          </v-row>
-          <v-row dense>
-            <strong>Transaction ID</strong>
-            &nbsp;
-            <span class="text-truncate">{{ artwork.id }}</span>
-            &nbsp;
-            <a
-              :href="`https://viewblock.io/arweave/tx/${artwork.id}`"
-              target="_blank"
-              class="license-anchor"
-            >
-              ViewBlock
-              <v-icon small dense class="adjust-icon">
-                mdi-open-in-new
-              </v-icon>
-            </a>
-          </v-row>
-          <v-row dense v-if="isOwner">
-            <strong>Asset Links</strong>
-            &nbsp;
-            <small>(only visible to you)</small>
-          </v-row>
-          <v-row dense v-if="isOwner">
-            <ul>
-              <li>
-                <strong>Manifest</strong>
-                <v-btn
-                  icon
-                  small
-                  tile
-                  @click="copyAssetUrlToClipboard(artwork.id)"
-                >
-                  <v-icon small dense>mdi-content-copy</v-icon>
-                </v-btn>
-                <v-btn
-                  icon
-                  small
-                  tile
-                  target="_blank"
-                  :href="arweaveAssetUrlFromId(artwork.id)"
-                >
-                  <v-icon small dense>mdi-open-in-new</v-icon>
-                </v-btn>
-              </li>
-              <template v-if="artwork.audio">
-                <li>
-                  <strong>Audio</strong>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    @click="copyAssetUrlToClipboard(artwork.audio.audio)"
-                  >
-                    <v-icon small dense>mdi-content-copy</v-icon>
-                  </v-btn>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    target="_blank"
-                    :href="arweaveAssetUrlFromId(artwork.audio.audio)"
-                  >
-                    <v-icon small dense>mdi-open-in-new</v-icon>
-                  </v-btn>
-                </li>
-              </template>
-              <template v-if="artwork.model">
-                <li>
-                  <strong>Model</strong>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    @click="copyAssetUrlToClipboard(artwork.model.model)"
-                  >
-                    <v-icon small dense>mdi-content-copy</v-icon>
-                  </v-btn>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    target="_blank"
-                    :href="arweaveAssetUrlFromId(artwork.model.model)"
-                  >
-                    <v-icon small dense>mdi-open-in-new</v-icon>
-                  </v-btn>
-                </li>
-              </template>
-              <template
-                v-for="(image, i) in (artwork.images || [artwork.image])"
-              >
-                <li :key="i">
-                  <strong>[{{ i }}] Original</strong>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    @click="copyAssetUrlToClipboard(image.image)"
-                  >
-                    <v-icon small dense>mdi-content-copy</v-icon>
-                  </v-btn>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    target="_blank"
-                    :href="arweaveAssetUrlFromId(image.image)"
-                  >
-                    <v-icon small dense>mdi-open-in-new</v-icon>
-                  </v-btn>
-                </li>
-                <li>
-                  <strong>[{{ i }}] 4K (JPEG)</strong>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    @click="copyAssetUrlToClipboard(image.preview4k)"
-                  >
-                    <v-icon small dense>mdi-content-copy</v-icon>
-                  </v-btn>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    target="_blank"
-                    :href="arweaveAssetUrlFromId(image.preview4k)"
-                  >
-                    <v-icon small dense>mdi-open-in-new</v-icon>
-                  </v-btn>
-                </li>
-                <li>
-                  <strong>[{{ i }}] HD (JPEG)</strong>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    @click="copyAssetUrlToClipboard(image.preview)"
-                  >
-                    <v-icon small dense>mdi-content-copy</v-icon>
-                  </v-btn>
-                  <v-btn
-                    icon
-                    small
-                    tile
-                    target="_blank"
-                    :href="arweaveAssetUrlFromId(image.preview)"
-                  >
-                    <v-icon small dense>mdi-open-in-new</v-icon>
-                  </v-btn>
-                </li>
-              </template>
-            </ul>
-          </v-row>
-          <v-row dense v-if="artwork.license">
-            <strong>License</strong>
-            &nbsp;
-            <span>{{ artwork.license.name }}</span>
-            &nbsp;
-            <a
-              :href="artwork.license.reference"
-              target="_blank"
-              class="license-anchor"
-            >
-              Learn More
-              <v-icon small dense class="adjust-icon">
-                mdi-open-in-new
-              </v-icon>
-            </a>
-          </v-row>
-          <v-row dense v-if="artwork.description">
-            <strong>Description</strong>
-            <div style="width: 100%">
-              {{ artwork.description }}
-            </div>
-          </v-row>
-        </v-col>
-        <v-col cols="5">
-          <div
-            v-if="$auth.loggedIn && $auth.user.address"
-            style="align-self: flex-end"
-          >
-            <LikeButton
-              :disabled="creator === $auth.user.address"
-              :entityOwner="creator"
-              :entityTxId="artwork.id"
-              :entityDescription="artwork.title"
-              :ownerDisplayName="displayName"
-            />
-          </div>
+        <v-col offset-sm="2" cols="8">
+          <ArtworkMetadata
+            :artwork="artwork"
+            :profile="profile || undefined"
+            :username="username"
+          />
         </v-col>
       </v-row>
 
@@ -369,13 +140,14 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 
-import LikeButton from '~/components/likes/likeButton.component.vue'
-import ArtworkZoomDialog from
-  '~/components/artwork/ArtworkZoomDialog.component.vue'
 import { ArtworkEditForm } from '~/components/artwork/edit'
 import TransactionConfirmationProgress from
   '~/components/common/TransactionConfirmationProgress.component.vue'
-import ModelViewer from '~/components/artwork/ModelViewer.component.vue'
+import {
+  ArtworkMetadata,
+  ArtworkZoomDialog,
+  ModelViewer
+} from '~/components/artwork'
 import {
   Artwork,
   LegacyArtwork,
@@ -389,11 +161,11 @@ import { SET_TRANSACTION_STATUS } from '~/store/transactions/mutations'
 
 @Component({
   components: {
-    LikeButton,
     ArtworkZoomDialog,
     ArtworkEditForm,
     TransactionConfirmationProgress,
-    ModelViewer
+    ModelViewer,
+    ArtworkMetadata
   }
 })
 export default class ArtworkPage extends Vue {
@@ -480,19 +252,6 @@ export default class ArtworkPage extends Vue {
         ? this.artwork.creator
         : this.artwork.creator.address
       : ''
-
-  }
-
-  get creator() {
-    return this.artwork
-      ? typeof this.artwork.creator === 'string'
-        ? this.artwork.creator
-        : this.artwork.creator.address
-      : ''
-  }
-
-  get isOwner() {
-    return this.$auth.loggedIn && this.$auth.user.address === this.creator
   }
 
   get previewSrc() {
@@ -572,12 +331,6 @@ export default class ArtworkPage extends Vue {
       console.error(error)
       this.$toasts.error(error)
     }
-  }
-
-  @debounce
-  async copyAssetUrlToClipboard(id: string) {
-    await navigator.clipboard.writeText(this.arweaveAssetUrlFromId(id))
-    this.$toasts.success('Copied URL to clipboard!')
   }
 
   arweaveAssetUrlFromId(id: string): string {
