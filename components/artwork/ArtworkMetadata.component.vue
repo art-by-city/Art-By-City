@@ -3,13 +3,13 @@
 
     <!-- Title & Likes -->
     <v-row dense>
-      <v-col cols="10" class="pa-0">
-        <span class="text-h4 text-sm-h2 font-weight-medium">
+      <v-col cols="8" md="9" lg="10" class="pa-0">
+        <span class="text-h4 text-md-h2 text-sm-h3 font-weight-medium">
           {{ artwork.title }}
         </span>
       </v-col>
 
-      <v-col cols="2">
+      <v-col cols="4" md="3" lg="2">
         <LikeButton
           :disabled="creator === $auth.user.address"
           :entityOwner="creator"
@@ -40,7 +40,7 @@
     </v-row>
 
     <v-row dense>
-      <v-col cols="6">
+      <v-col cols="12" lg="6">
         <v-tabs v-model="tab" color="black">
           <v-tabs-slider color="black"></v-tabs-slider>
           <v-tab>Metadata</v-tab>
@@ -167,7 +167,7 @@
         </v-tabs-items>
       </v-col>
 
-      <v-col cols="2">
+      <v-col cols="12" lg="2">
         <v-tabs v-model="tab2" color="black">
           <v-tabs-slider color="black"></v-tabs-slider>
           <v-tab>Stats</v-tab>
@@ -186,6 +186,8 @@
             </v-simple-table>
           </v-tab-item>
         </v-tabs-items>
+
+        <ArweaveSeal />
       </v-col>
     </v-row>
   </v-container>

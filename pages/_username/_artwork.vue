@@ -84,7 +84,7 @@
         </v-col>
       </v-row>
       <v-row dense>
-        <v-col offset-sm="2" cols="8">
+        <v-col offset-md="2" cols="12" md="8">
           <ArtworkMetadata
             :artwork="artwork"
             :profile="profile || undefined"
@@ -92,8 +92,6 @@
           />
         </v-col>
       </v-row>
-
-      <ArweaveSeal />
 
       <ArtworkZoomDialog
         v-if="previewImage"
