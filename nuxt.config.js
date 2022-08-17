@@ -1,5 +1,7 @@
 import IgnoreNotFoundExportPlugin from 'ignore-not-found-export-webpack-plugin'
 
+const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+
 export default {
   /*
    ** Headers of the page
@@ -75,7 +77,7 @@ export default {
     { path: '/node', handler: '~/server/index.ts' }
   ],
   publicRuntimeConfig: {
-    baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+    baseUrl,
     arweave: {
       app: {
         name: process.env.APP_NAME || 'ArtByCity-Development',

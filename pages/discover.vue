@@ -27,8 +27,13 @@ export default class DiscoverPage extends Vue {
           name: 'Description',
           content: desc
         },
-        { property: 'og:title',       content: title },
-        { property: 'og:description', content: desc  }
+        { property: 'og:title', content: title },
+        { property: 'og:description', content: desc },
+        {
+          property: 'og:image',
+          content:
+            `${this.$config.baseUrl}/logo/logo_by_daliah_ammar_square.png`
+        },
       ]
     }
   }

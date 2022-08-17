@@ -74,7 +74,6 @@ export default class DefaultLayout extends Vue {
   }
 
   created() {
-
     this.$nuxt.$on('needs-auth', (cb: Function) => {
       if (this.$auth.loggedIn) {
         cb()
