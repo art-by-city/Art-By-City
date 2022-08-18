@@ -15,7 +15,7 @@ import FeedComponent from '~/components/feed/Feed.component.vue'
   }
 })
 export default class DiscoverPage extends Vue {
-  get head() {
+  head() {
     const title = 'Discover'
     const desc = 'Discover Art published on the Permaweb'
 
