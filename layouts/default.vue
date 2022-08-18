@@ -5,7 +5,7 @@
       @login="login"
       @logout="logout"
       @signup="showSignupModal"
-      :transparent="offsetTop < 1000"
+      :transparent="$route.path === '/' && offsetTop < 1000"
     />
 
     <v-main class="main" v-scroll="onScroll">
