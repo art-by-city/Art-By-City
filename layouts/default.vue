@@ -5,13 +5,12 @@
       @login="login"
       @logout="logout"
       @signup="showSignupModal"
+      :transparent="offsetTop < 1000"
     />
 
-    <v-main class="main">
-      <!-- <v-container fluid class="pl-4 pr-4 pt-7 main-container"> -->
+    <v-main class="main" v-scroll="onScroll">
       <nuxt v-if="!$slots.default" />
       <slot />
-      <!-- </v-container> -->
     </v-main>
 
     <Footer />
@@ -63,6 +62,7 @@ export default class DefaultLayout extends Vue {
   toasts: ToastMessage[] = []
   showAuthDialog: string = ''
   isLoggingIn: boolean = false
+  offsetTop: number = 0
 
   removeToast(toast: ToastMessage) {
     this.$toasts.remove(toast)
@@ -111,6 +111,12 @@ export default class DefaultLayout extends Vue {
 
   async showSignupModal() {
     this.showAuthDialog = 'sign-up'
+  }
+
+  onScroll(e: Event) {
+    if (e.target) {
+      this.offsetTop = (e.target as any).scrollingElement.scrollTop || 0
+    }
   }
 }
 </script>

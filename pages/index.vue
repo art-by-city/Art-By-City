@@ -30,3 +30,9 @@ export default class HomePage extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.pitch-content {
+  margin-top: -48px;
+}
+</style>

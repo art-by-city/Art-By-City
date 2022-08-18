@@ -7,9 +7,9 @@
     dark
     max-width="100%"
     class="app-bar"
+    :class="{ transparent }"
   >
     <v-btn id="app-logo" text tile color="white" plain to="/">
-      <!-- ART &times; BY &times; CITY -->
       <img
         id="app-logo-image"
         src="/logo/logo_by_daliah_ammar_dark_transparent.png"
@@ -26,7 +26,7 @@
     >
       discover
     </v-btn>
-    <v-divider v-if="!$auth.loggedIn" vertical class="white-divider" />
+    <v-divider v-if="!$auth.loggedIn" vertical class="divider" />
 
     <template v-if="$auth.loggedIn">
       <v-btn
@@ -54,7 +54,7 @@
       >
         stats
       </v-btn>
-      <v-divider vertical class="ml-0 mr-4 white-divider" />
+      <v-divider vertical class="ml-0 mr-4 divider" />
       <AccountMenu @logout="onLogoutClicked" />
       <NotificationsMenu />
       <TransactionsMenu />
@@ -69,9 +69,9 @@
         :loading="loading"
         :disabled="loading"
       >log in</v-btn>
-      <v-divider vertical class="white-divider" />
+      <v-divider vertical class="divider" />
       <v-btn
-        class="app-bar-button pr-0"
+        class="app-bar-button last"
         @click="onSignUpClicked"
         text
         tile
@@ -102,15 +102,14 @@ export default class AppBar extends Vue {
     default: false
   }) readonly loading: boolean | undefined
 
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) readonly transparent: boolean | undefined
+
   get isMobile() {
-    switch (this.$vuetify.breakpoint.name) {
-      case 'xs':
-      case 'sm':
-      case 'md': return true
-      case 'lg':
-      case 'xl':
-        default: return false
-    }
+    return ['xs', 'sm', 'md'].includes(this.$vuetify.breakpoint.name)
   }
 
   @debounce
@@ -119,6 +118,7 @@ export default class AppBar extends Vue {
   @debounce
   @Emit('signup') onSignUpClicked() {}
 
+  @debounce
   @Emit('logout') onLogoutClicked() {}
 }
 </script>
@@ -142,6 +142,18 @@ export default class AppBar extends Vue {
   height: 100%;
 }
 
+.app-bar >>> .app-bar-button.last {
+  padding-right: 0;
+}
+
+.app-bar.transparent >>> .app-bar-button.last {
+  padding-right: 16px;
+}
+
+.app-bar.transparent >>> #app-logo {
+  display: none;
+}
+
 #app-logo >>> .v-btn__content {
   opacity: 1 !important;
 }
@@ -151,7 +163,11 @@ export default class AppBar extends Vue {
   height: 36px;
 }
 
-.white-divider {
+.divider {
   border-color: white;
+}
+
+.app-bar.transparent >>> .divider {
+  border-color: transparent;
 }
 </style>
