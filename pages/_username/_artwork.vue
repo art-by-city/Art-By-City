@@ -1,5 +1,19 @@
 <template>
-  <div>
+  <div style="height: 100%">
+    <v-container v-if="$fetchState.pending" style="height:100%;">
+      <v-row justify="center">
+        <v-col cols="6">
+          <v-progress-linear
+            indeterminate
+            color="black"
+            background-color="transparent"
+            height="2"
+            bottom
+            class="my-16"
+          ></v-progress-linear>
+        </v-col>
+      </v-row>
+    </v-container>
     <v-container v-if="artwork" fluid class="px-0">
       <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1 mx-0">
         <template v-if="isModel && showingAnimation">
