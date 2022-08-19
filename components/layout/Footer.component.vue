@@ -6,21 +6,34 @@
     app
     :absolute="!fixed"
   >
-    <v-container class="text-lowercase text-center">
+    <v-container class="text-lowercase text-center pa-1 pa-md-2 pa-lg-3">
       <v-row dense justify="center" no-gutters>
-        <v-col cols="12" md="4" class="text-caption">
+        <v-col cols="4" md="3" lg="3" offset="4" offset-md="0" class="text-caption">
           &copy; {{ new Date().getFullYear() }} art x by x city
         </v-col>
-        <v-col cols="12" md="4">
+        <v-col cols="1" offset="3" class="d-md-none">
+          <v-btn icon x-small @click="toggleExpanded">
+            <v-icon>
+              mdi-chevron-double-{{ expanded ? 'down' : 'up' }}
+            </v-icon>
+          </v-btn>
+        </v-col>
+        <v-col
+          cols="12" md="5" lg="6"
+          class="d-md-flex" :class="{ 'd-none': !expanded }"
+        >
           <nuxt-link class="black--text mr-2" to="/">Home</nuxt-link>
           <nuxt-link class="black--text mr-2" to="/discover">Discover</nuxt-link>
           <nuxt-link class="black--text mr-2" to="/about">About</nuxt-link>
           <nuxt-link class="black--text mr-2" to="/faq">FAQ</nuxt-link>
           <nuxt-link class="black--text mr-2" to="/create">
-            Create an Arweave Wallet
+            Create Wallet
           </nuxt-link>
         </v-col>
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12" md="4" lg="3"
+          class="d-md-flex" :class="{ 'd-none': !expanded }"
+        >
           <v-btn
            href="https://gitlab.com/art-by-city"
            target="_blank"
@@ -112,13 +125,22 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
+import { debounce } from '~/app/util'
+
 @Component
 export default class Footer extends Vue {
+  expanded: boolean = false
+
   @Prop({
     type: Boolean,
     required: false,
     default: false
   }) fixed!: boolean
+
+  @debounce
+  toggleExpanded() {
+    this.expanded = !this.expanded
+  }
 }
 </script>
 
