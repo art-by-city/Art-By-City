@@ -5,7 +5,7 @@
       :key="item.guid"
       justify="center"
     >
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-lazy transition="fade-transition">
           <ArtworkCard :txId="item.txId" />
         </v-lazy>
