@@ -4,7 +4,7 @@
       <v-row dense>
         <v-col
           cols="2" offset="2"
-            sm="2" offset-sm="3"
+            lg="2" offset-lg="3"
         >
           <v-row class="mt-4" justify="center">
             <UserAvatar :user="artist" />
@@ -51,8 +51,8 @@
           </v-row>
         </v-col>
         <v-col
-          cols="6" offset="2"
-            sm="4" offset-sm="0"
+          cols="7" offset="1"
+            lg="4" offset-lg="0"
         >
           <v-card elevation="0">
             <v-card-title>
@@ -125,7 +125,7 @@
         </v-col>
       </v-row>
       <v-row dense>
-        <v-col cols="10" offset="1" sm="6" offset-sm="3">
+        <v-col cols="10" offset="1" lg="6" offset-lg="3">
           <v-tabs v-model="tab" color="black">
             <v-tab nuxt :to="$route.path">
               Art
@@ -139,7 +139,7 @@
       <v-row dense>
         <v-col
           cols="12"
-            sm="6"  offset-sm="3"
+            lg="6"  offset-lg="3"
         >
           <template v-if="tab === 'liked'">
             <LikesFeed :address="artist.address" />
