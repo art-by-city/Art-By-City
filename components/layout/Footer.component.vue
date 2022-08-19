@@ -1,5 +1,11 @@
 <template>
-  <v-footer class="app-footer" color="white" padless app>
+  <v-footer
+    class="app-footer"
+    color="white"
+    padless
+    app
+    :absolute="!fixed"
+  >
     <v-container class="text-lowercase text-center">
       <v-row dense justify="center" no-gutters>
         <v-col cols="12" md="4" class="text-caption">
@@ -104,10 +110,16 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'nuxt-property-decorator'
+import { Component, Prop, Vue } from 'nuxt-property-decorator'
 
 @Component
-export default class Footer extends Vue {}
+export default class Footer extends Vue {
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false
+  }) fixed!: boolean
+}
 </script>
 
 <style scoped>
