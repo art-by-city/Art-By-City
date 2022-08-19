@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-container v-if="artwork" fluid class="px-0">
-      <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1">
+      <v-row v-if="previewImage" dense justify="center" class="pa-0 pb-1 mx-0">
         <template v-if="isModel && showingAnimation">
           <v-col cols="10" class="model-viewer-container">
             <ModelViewer
@@ -43,6 +43,7 @@
         v-if="artwork.audio && artwork.audio.audio"
         justify="center"
         dense
+        class="mx-0"
       >
         <audio
           controls
@@ -54,6 +55,7 @@
         v-if="artwork.images && artwork.images.length > 1"
         justify="center"
         dense
+        class="mx-0"
       >
         <div class="artwork-image-selector-container">
           <div
@@ -78,12 +80,12 @@
           </div>
         </div>
       </v-row>
-      <v-row dense justify="center">
+      <v-row dense justify="center" class="mx-0">
         <v-col cols="10">
           <v-divider></v-divider>
         </v-col>
       </v-row>
-      <v-row dense>
+      <v-row dense class="mx-0">
         <v-col offset-md="2" cols="12" md="8">
           <ArtworkMetadata
             :artwork="artwork"
