@@ -13,7 +13,7 @@
       <slot />
     </v-main>
 
-    <Footer />
+    <Footer :fixed="shouldFooterBeFixed" />
 
     <AuthDialog @login="login" :show.sync="showAuthDialog" />
 
@@ -63,6 +63,12 @@ export default class DefaultLayout extends Vue {
   showAuthDialog: string = ''
   isLoggingIn: boolean = false
   offsetTop: number = 0
+
+  get shouldFooterBeFixed(): boolean {
+    const paths = ['/discover']
+
+    return paths.includes(this.$route.path)
+  }
 
   removeToast(toast: ToastMessage) {
     this.$toasts.remove(toast)
