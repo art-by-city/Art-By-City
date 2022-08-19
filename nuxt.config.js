@@ -30,7 +30,7 @@ export default {
    ** Customize the progress-bar color
    */
   loading: {
-    color: 'blue',
+    color: 'white',
     height: '5px',
     duration: 10000,
     continuous: true,
