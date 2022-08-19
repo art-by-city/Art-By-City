@@ -106,6 +106,15 @@
                 <v-icon small color="black">mdi-soundcloud</v-icon>
                 @{{ artist.profile.soundcloud }}
               </a>
+              <a
+                v-if="artist.profile && artist.profile.linkedin"
+                class="pr-3 text-decoration-none"
+                :href="`https://linkedin.com/in/${artist.profile.linkedin}`"
+                target="_blank"
+              >
+                <v-icon small color="black">mdi-linkedin</v-icon>
+                @{{ artist.profile.linkedin }}
+              </a>
             </v-card-subtitle>
             <v-card-text class="pb-0">
               <ExpandParagraph v-if="artist.profile" dense>

@@ -6,27 +6,29 @@ export function maxLength(limit: number) {
   }
 }
 
+type SocialHandleRegexTextInput = {
+  regex: RegExp,
+  message: string
+}
+
 function removePrecedingAtSymbol(value: string): string {
   return value[0] === '@' ? value.substring(1) : value
 }
 
-function socialHandleRegexTest(expression: RegExp, message: string): Function {
+function socialHandleRegexTest(testConfig: SocialHandleRegexTextInput): Function {
   return (username: string = '', required = false) => {
     if (!required && !username) {
       return true
     }
 
-    return expression.test(removePrecedingAtSymbol(username))
+    return testConfig.regex.test(removePrecedingAtSymbol(username))
       ? true
-      : message
+      : testConfig.message
   }
 }
 
 export const socialHandles: {
-  [socialNetwork: string]: {
-    regex: RegExp,
-    message: string
-  }
+  [socialNetwork: string]: SocialHandleRegexTextInput
 } = {
   twitter: {
     regex: /^[A-Za-z0-9_]{1,15}$/,
@@ -43,32 +45,23 @@ export const socialHandles: {
   soundcloud: {
     regex: /^[a-z0-9_\-]{3,25}$/,
     message: 'Must be a valid SoundCloud username'
+  },
+  linkedin: {
+    regex: /^[a-z0-9]{3,100}$/,
+    message: 'Must be a valid LinkedIn username'
   }
 }
 
-const twitter = socialHandleRegexTest(
-  socialHandles.twitter.regex,
-  socialHandles.twitter.message
-)
-
-const twitch = socialHandleRegexTest(
-  socialHandles.twitch.regex,
-  socialHandles.twitch.message
-)
-
-const instagram = socialHandleRegexTest(
-  socialHandles.instagram.regex,
-  socialHandles.instagram.message
-)
-
-const soundcloud = socialHandleRegexTest(
-  socialHandles.soundcloud.regex,
-  socialHandles.soundcloud.message
-)
+const twitter = socialHandleRegexTest(socialHandles.twitter)
+const twitch = socialHandleRegexTest(socialHandles.twitch)
+const instagram = socialHandleRegexTest(socialHandles.instagram)
+const soundcloud = socialHandleRegexTest(socialHandles.soundcloud)
+const linkedin = socialHandleRegexTest(socialHandles.linkedin)
 
 export {
   twitter,
   twitch,
   instagram,
-  soundcloud
+  soundcloud,
+  linkedin
 }
