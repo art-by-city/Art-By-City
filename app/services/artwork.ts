@@ -4,9 +4,7 @@ import _ from 'lodash'
 
 import {
   ArtworkTransactionFactory,
-  ImageArtwork,
   ArtworkCreationOptions,
-  LegacyArtwork,
   ArtworkFactory,
   Artwork
 } from '~/app/core/artwork'
@@ -114,7 +112,7 @@ export default class ArtworkService extends TransactionService {
       let views
       try {
         const viewsResponse = await this.context.$axios.get(
-          `/node/views/${id}`
+          `${this.context.$arweaveService.config.gateway}/views/${id}`
         )
 
         if (typeof viewsResponse.data === 'number') {
