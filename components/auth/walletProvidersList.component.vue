@@ -11,6 +11,7 @@
         elevation="2"
         outlined
         class="mx-4"
+        @click="onWalletProviderClicked(provider.name)"
       >
         <v-img
           :src="provider.logo"
@@ -26,17 +27,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'nuxt-property-decorator'
+import { Component, Emit, Vue } from 'nuxt-property-decorator'
+import { debounce } from '~/app/util'
 
 @Component
 export default class WalletProvidersList extends Vue {
   walletProviders = [
-    // {
-    //   org: 'Koii',
-    //   name: 'Finnie',
-    //   url: 'https://koii.network/getFinnie',
-    //   logo: 'logo/koii/Koii_Logo_blue.png'
-    // },
     {
       org: 'th8ta',
       name: 'ArConnect',
@@ -44,5 +40,11 @@ export default class WalletProvidersList extends Vue {
       logo: 'logo/arconnect/logo64.png'
     }
   ]
+
+  @debounce
+  @Emit('click')
+  onWalletProviderClicked(providerName: string) {
+    return providerName
+  }
 }
 </script>

@@ -110,7 +110,7 @@ export default class FaqPage extends Vue {
         </p>
         <p>
           If you're familiar with blockchain technology, you can head over to
-          ${this.link('artby.city/create', '/create')} to create an Arweave
+          ${this.link('artby.city/wallete', '/wallet')} to create an Arweave
           wallet.
         </p>
         <p>
@@ -123,7 +123,7 @@ export default class FaqPage extends Vue {
     {
       id: 'how-do-i-create-arweave-wallet',
       q: 'How do I get an Arweave Wallet?',
-      a: `Head over to ${this.link('artby.city/create', '/create')}`
+      a: `Head over to ${this.link('artby.city/wallet', '/wallet')}`
     },
     {
       id: 'how-do-i-backup-wallet',
