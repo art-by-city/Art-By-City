@@ -41,16 +41,18 @@
       </v-row>
 
       <v-row dense justify="center" v-if="artwork.model && artwork.model.url">
-        <v-col cols="6">
+        <v-col cols="12">
           <v-btn
             outlined
+            block
             elevation="2"
             @click="onGeneratePreviewImageClicked"
+            :color="hasImageValidationErrors ? 'error' : 'black'"
           >
-            Generate Preview Image from 3D Model
+            Generate Preview Image
           </v-btn>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="12">
           <div class="caption">
             Or upload your own preview image below
             <v-icon>mdi-arrow-down</v-icon>
