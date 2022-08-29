@@ -11,7 +11,7 @@
 
       <v-col cols="4" md="3" lg="2">
         <LikeButton
-          :disabled="!$auth.isLoggedIn || $auth.user && creator === $auth.user.address"
+          :disabled="!$auth.loggedIn || isOwner"
           :entityOwner="creator"
           :entityTxId="artwork.id"
           :entityDescription="artwork.title"
