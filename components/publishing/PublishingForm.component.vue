@@ -43,6 +43,10 @@ export default class PublishingForm extends Vue {
   }
 
   get slugBase(): string {
+    if (!this.$auth.loggedIn) {
+      return ''
+    }
+
     const username = this.$auth.user.username || this.artwork.creator
 
     return `artby.city/${username}/`

@@ -104,7 +104,7 @@ export default {
     },
     redirect: {
       logout: '/',
-      login: false,
+      login: '/',
       home: false
     },
     strategies: {
