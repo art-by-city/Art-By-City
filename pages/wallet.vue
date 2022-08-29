@@ -23,12 +23,25 @@
                 elevation="2"
                 outlined
                 class="mx-auto mb-2"
+                :loading="isGeneratingKeyfile"
                 @click="onDownloadKeyfileClicked"
               >
                 <span class="mx-2">Download Arweave Keyfile</span>
                 <v-icon dense>mdi-file-download</v-icon>
               </v-btn>
             </v-sheet>
+            <v-btn
+              ref="step1Continue"
+              elevation="2"
+              outlined
+              class="mx-auto mb-2"
+              @click="stepForward"
+            >
+              Continue
+            </v-btn>
+            <small>
+              press <strong>Enter</strong><v-icon>mdi-keyboard-return</v-icon>
+            </small>
           </v-stepper-content>
 
           <!-- Install Wallet Extension -->
@@ -42,11 +55,23 @@
                 be adding support for more wallets in the future!
               </p>
               <p>
-                Note: you may need to refresh the browser to enable the
+                <b>Note:</b> you will need to refresh the browser to enable the
                 extension after installation.
               </p>
-              <WalletProvidersList />
+              <WalletProvidersList @click="onWalletProviderClicked" />
             </v-sheet>
+            <v-btn
+              ref="step2Continue"
+              elevation="2"
+              outlined
+              class="mx-auto mb-2"
+              @click="stepForward"
+            >
+              Continue
+            </v-btn>
+            <small>
+              press <strong>Enter</strong><v-icon>mdi-keyboard-return</v-icon>
+            </small>
           </v-stepper-content>
 
           <!-- Import Keyfile into Wallet Extension -->
@@ -66,6 +91,7 @@
               </p>
             </v-sheet>
           </v-stepper-content>
+        </v-stepper>
         </v-stepper>
       </v-col>
     </v-row>
@@ -89,22 +115,56 @@ export default class CreateWalletPage extends Vue {
   }
 
   step: number = 1
+  isGeneratingKeyfile: boolean = false
+
+  @debounce
+  stepForward() {
+    this.step = this.step + 1
+  }
 
   @debounce
   async onDownloadKeyfileClicked() {
-    const jwk = await this.$arweave.wallets.generate()
-    const address = await this.$arweave.wallets.jwkToAddress(jwk)
-    const keyfile = new Blob(
-      [JSON.stringify(jwk)],
-      { type: 'application/json' }
-    )
-    const keyfileUrl = URL.createObjectURL(keyfile)
-    const downloadAnchor = document.createElement('a')
-    downloadAnchor.setAttribute('href', keyfileUrl)
-    downloadAnchor.setAttribute('download', `arweave-key-${address}.json`)
-    document.body.appendChild(downloadAnchor)
-    downloadAnchor.click()
-    document.body.removeChild(downloadAnchor)
+    if (!this.isGeneratingKeyfile) {
+      this.isGeneratingKeyfile = true
+      const jwk = await this.$arweave.wallets.generate()
+      const address = await this.$arweave.wallets.jwkToAddress(jwk)
+      const keyfile = new Blob(
+        [JSON.stringify(jwk)],
+        { type: 'application/json' }
+      )
+      const keyfileUrl = URL.createObjectURL(keyfile)
+      const downloadAnchor = document.createElement('a')
+      downloadAnchor.setAttribute('href', keyfileUrl)
+      downloadAnchor.setAttribute('download', `arweave-key-${address}.json`)
+      document.body.appendChild(downloadAnchor)
+      downloadAnchor.click()
+      document.body.removeChild(downloadAnchor)
+      this.focusFormField('step1Continue')
+      this.isGeneratingKeyfile = false
+    }
+  }
+
+  @debounce
+  onWalletProviderClicked() {
+    this.focusFormField('step2Continue')
+  }
+
+  focusFormField(refName: string) {
+    try {
+      const ref = (this.$refs[refName] as Vue)
+      const el = (ref.$el as HTMLElement)
+      if (el.tagName === 'BUTTON') {
+        el.focus()
+      } else {
+        const tags = ['input', 'textarea']
+        for (const n in tags) {
+          let matchingChild = el.getElementsByTagName(tags[n]).item(0)
+          if (matchingChild) {
+            (matchingChild as HTMLElement).focus()
+          }
+        }
+      }
+    } catch (err) {}
   }
 }
 </script>
