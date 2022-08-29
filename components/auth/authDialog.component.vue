@@ -119,7 +119,7 @@ export default class AuthDialog extends Vue {
 
   onCreate() {
     this.close()
-    this.$router.push('/create')
+    this.$router.push('/wallet')
   }
 
   private close() {

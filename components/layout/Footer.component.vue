@@ -26,7 +26,7 @@
           <nuxt-link class="black--text mr-2" to="/discover">Discover</nuxt-link>
           <nuxt-link class="black--text mr-2" to="/about">About</nuxt-link>
           <nuxt-link class="black--text mr-2" to="/faq">FAQ</nuxt-link>
-          <nuxt-link class="black--text mr-2" to="/create">
+          <nuxt-link class="black--text mr-2" to="/wallet">
             Create Wallet
           </nuxt-link>
         </v-col>
