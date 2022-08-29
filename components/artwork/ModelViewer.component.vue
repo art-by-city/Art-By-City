@@ -126,9 +126,15 @@ export default class ModelViewer extends Vue {
     new pc.AssetListLoader(Object.values(assets), this.pc.assets).load(
       (err: Error, failed: any[]) => {
         if (this.pc && !err) {
-          const entity = assets.userAsset.resource.instantiateRenderEntity()
+          const entity =
+            assets.userAsset.resource.instantiateRenderEntity() as pc.Entity
           this.pc.root.addChild(entity)
 
+          // console.log('got userAsset', assets.userAsset)
+          // console.log('got userAsset.resource', assets.userAsset.resource)
+          // console.log('got container render entity', entity)
+
+          // Cameras
           const camera = new pc.Entity('camera')
           camera.addComponent('camera', {
             clearColor: new pc.Color(1, 1, 1)
@@ -143,10 +149,28 @@ export default class ModelViewer extends Vue {
           camera.script!.create('orbitCameraInputTouch')
           this.pc.root.addChild(camera)
 
-          const light = new pc.Entity('light')
-          light.addComponent('light', { type: 'directional' })
-          this.pc.root.addChild(light)
-          light.setLocalEulerAngles(45, 30, 0)
+          // Lights
+          const lights = entity.findComponents('light') as pc.LightComponent[]
+          if (lights.length > 0) {
+            lights.forEach(light => {
+              light.enabled = true
+            })
+          } else {
+            const light = new pc.Entity('light')
+            light.addComponent('light', { type: 'directional' })
+            this.pc.root.addChild(light)
+            light.setLocalEulerAngles(45, 30, 0)
+          }
+
+          // Animations
+          if (assets.userAsset.resource.animations.length > 0) {
+            entity.addComponent('anim', { activate: true })
+            entity.anim!.assignAnimation(
+              '1',
+              assets.userAsset.resource.animations[0].resource
+            )
+            entity.anim!.baseLayer.transition('1')
+          }
 
           this.pc.start()
         } else {
