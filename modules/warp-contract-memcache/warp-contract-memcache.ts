@@ -34,7 +34,7 @@ export class WarpContractMemcache {
 
   async readState(contractName: string): Promise<any> {
     if (!contractName || !this.contracts[contractName]) {
-      return null
+      throw new Error(`Contract ${contractName} not found`)
     }
 
     const res = await this.contracts[contractName].readState()
