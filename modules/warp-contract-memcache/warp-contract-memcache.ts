@@ -18,7 +18,6 @@ export class WarpContractMemcache {
       ? WarpFactory.forLocal()
       : WarpFactory.forMainnet()
 
-    console.log('WarpContractMemcache loading contracts', contractIdsByName)
     const contractNames = Object.keys(contractIdsByName)
     for (let i = 0; i < contractNames.length; i++) {
       const contractName = contractNames[i]
@@ -34,7 +33,7 @@ export class WarpContractMemcache {
 
   async readState(contractName: string): Promise<any> {
     if (!contractName || !this.contracts[contractName]) {
-      return null
+      throw new Error(`Contract ${contractName} not found`)
     }
 
     const res = await this.contracts[contractName].readState()
