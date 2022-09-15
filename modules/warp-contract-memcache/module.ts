@@ -11,6 +11,7 @@ export const module: Module = function (opts: WarpContractMemcacheOptions) {
   this.nuxt.hook(
     'vue-renderer:ssr:prepareContext',
     (ssrContext: SsrContextWithWarpContractMemcache) => {
+      console.log('WarpContractMemcache Module setting ssrContext')
       ssrContext.$smartweaveCache = smartweaveMemcache
     }
   )

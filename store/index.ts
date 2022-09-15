@@ -38,7 +38,10 @@ export const actions = actionTree({ state }, {
       context.ssrContext as SsrContextWithWarpContractMemcache
     ).$smartweaveCache
 
+    console.log('Store nuxtServerInit() reading usernames')
     const { usernames } = await smartweaveCache.readState('usernames')
+    console.log('Store nuxtServerInit() got usernames', Object.keys(usernames).length)
+
     commit(`usernames/${SET_USERNAMES}`, usernames)
   }
 })
