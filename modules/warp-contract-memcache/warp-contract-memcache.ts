@@ -24,7 +24,7 @@ export class WarpContractMemcache {
       ? WarpFactory.forLocal()
       : WarpFactory.forMainnet({
         ...defaultCacheOptions,
-        inMemory: process.server
+        inMemory: true
       })
 
     const contractNames = Object.keys(contractIdsByName)
