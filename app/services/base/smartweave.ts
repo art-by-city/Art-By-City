@@ -18,10 +18,14 @@ export default class SmartWeaveService extends ArweaveService {
   ) {
     return await contract
       .connect('use_wallet')
-      .writeInteraction<ContractInput>(input, [
-        { name: 'Protocol', value: 'ArtByCity' },
-        { name: 'App-Name', value: this.config.app.name },
-        { name: 'App-Version', value: this.config.app.version }
-      ], undefined, true)
+      .writeInteraction<ContractInput>(input, {
+        disableBundling: true,
+        strict: true,
+        tags: [
+          { name: 'Protocol', value: 'ArtByCity' },
+          { name: 'App-Name', value: this.config.app.name },
+          { name: 'App-Version', value: this.config.app.version }
+        ]
+      })
   }
 }

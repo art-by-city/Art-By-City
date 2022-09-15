@@ -15,7 +15,7 @@
     "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919"
   },
   "dependencies": {
-    "@artbycity/node": "^2.0.1",
+    "@artbycity/node": "^2.0.4",
     "@babel/plugin-proposal-optional-chaining": "^7.18.9",
     "@nuxt/types": "^2.15.7",
     "@nuxt/typescript-build": "^2.1.0",
@@ -54,7 +54,7 @@
     "typescript": "^4.4.3",
     "vee-validate": "^3.3.0",
     "vuedraggable": "^2.24.1",
-    "warp-contracts": "^1.1.10"
+    "warp-contracts": "^1.2.2"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "^7.0.2",
