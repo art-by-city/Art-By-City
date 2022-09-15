@@ -7,12 +7,11 @@ import {
 import { WarpContractMemcache } from './warp-contract-memcache'
 
 export const module: Module = function (opts: WarpContractMemcacheOptions) {
-  const smartweaveMemcache = new WarpContractMemcache(opts.contracts)
+  const warpContractMemcache = new WarpContractMemcache(opts.contracts)
   this.nuxt.hook(
     'vue-renderer:ssr:prepareContext',
     (ssrContext: SsrContextWithWarpContractMemcache) => {
-      console.log('WarpContractMemcache Module setting ssrContext')
-      ssrContext.$smartweaveCache = smartweaveMemcache
+      ssrContext.$warpContractMemcache = warpContractMemcache
     }
   )
 }

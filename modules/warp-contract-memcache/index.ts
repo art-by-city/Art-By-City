@@ -4,7 +4,7 @@ import { module } from './module'
 import { WarpContractMemcache } from './warp-contract-memcache'
 
 export type SsrContextWithWarpContractMemcache = Context['ssrContext'] & {
-  $smartweaveCache: WarpContractMemcache
+  $warpContractMemcache: WarpContractMemcache
 }
 
 export type ContractIdsByName = { [name: string]: string }

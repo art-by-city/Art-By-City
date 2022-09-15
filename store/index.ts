@@ -34,15 +34,18 @@ export const mutations: MutationTree<RootState> = {
 }
 export const actions = actionTree({ state }, {
   async nuxtServerInit({ commit }, context: Context) {
-    const smartweaveCache = (
+    const warpContractMemcache = (
       context.ssrContext as SsrContextWithWarpContractMemcache
-    ).$smartweaveCache
+    ).$warpContractMemcache
 
     console.log('Store nuxtServerInit() reading usernames')
-    const { usernames } = await smartweaveCache.readState('usernames')
-    console.log('Store nuxtServerInit() got usernames', Object.keys(usernames).length)
-
-    commit(`usernames/${SET_USERNAMES}`, usernames)
+    try {
+      const { usernames } = await warpContractMemcache.readState('usernames')
+      console.log('Store nuxtServerInit() got usernames', Object.keys(usernames).length)
+      commit(`usernames/${SET_USERNAMES}`, usernames)
+    } catch (err) {
+      console.error('Store nuxtServerInit() NO USERNAMES!', err)
+    }
   }
 })
 
