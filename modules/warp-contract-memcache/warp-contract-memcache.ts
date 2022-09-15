@@ -1,4 +1,10 @@
-import { Contract, LoggerFactory, Warp, WarpFactory } from 'warp-contracts'
+import {
+  Contract,
+  defaultCacheOptions,
+  LoggerFactory,
+  Warp,
+  WarpFactory
+} from 'warp-contracts'
 
 import { ContractIdsByName } from '.'
 
@@ -16,7 +22,10 @@ export class WarpContractMemcache {
 
     this.$warp = process.env.NODE_ENV !== 'production'
       ? WarpFactory.forLocal()
-      : WarpFactory.forMainnet()
+      : WarpFactory.forMainnet({
+        ...defaultCacheOptions,
+        inMemory: process.server
+      })
 
     const contractNames = Object.keys(contractIdsByName)
     for (let i = 0; i < contractNames.length; i++) {
