@@ -23,6 +23,7 @@ import {
   usernamesState,
   usernamesMutations,
 } from './usernames'
+import { WarpContractMemcache } from '../modules/warp-contract-memcache/warp-contract-memcache'
 
 const defaultState = {}
 export const state = () => ({...defaultState})
@@ -32,6 +33,13 @@ export const mutations: MutationTree<RootState> = {
   CLEAR_MUTATION,
   RESTORE_MUTATION
 }
+
+let _warpContractMemcache: WarpContractMemcache
+if (process.server) {
+  _warpContractMemcache = new WarpContractMemcache({
+    usernames: process.env.USERNAMES_CONTRACT_ID || ''
+  })
+}
 export const actions = actionTree({ state }, {
   async nuxtServerInit({ commit }, context: Context) {
     const warpContractMemcache = (
@@ -40,7 +48,7 @@ export const actions = actionTree({ state }, {
 
     console.log('Store nuxtServerInit() reading usernames')
     try {
-      const { usernames } = await warpContractMemcache.readState('usernames')
+      const { usernames } = await _warpContractMemcache!.readState('usernames')
       console.log('Store nuxtServerInit() got usernames', Object.keys(usernames).length)
       commit(`usernames/${SET_USERNAMES}`, usernames)
     } catch (err) {
