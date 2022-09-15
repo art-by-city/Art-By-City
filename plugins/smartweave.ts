@@ -1,4 +1,9 @@
-import { LoggerFactory, Warp, WarpFactory } from 'warp-contracts'
+import {
+  defaultCacheOptions,
+  LoggerFactory,
+  Warp,
+  WarpFactory
+} from 'warp-contracts'
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 
@@ -25,15 +30,18 @@ declare module 'vuex/types/index' {
 
 export default ({ app }: Context, inject: Inject) => {
   try {
-    if (process.env.NODE_ENV !== 'development') {
-      LoggerFactory.INST.logLevel('fatal')
-    } else {
+    if (process.env.NODE_ENV !== 'production') {
       LoggerFactory.INST.logLevel('error')
+    } else {
+      LoggerFactory.INST.logLevel('fatal')
     }
 
     const warp = process.env.NODE_ENV !== 'production'
       ? WarpFactory.forLocal()
-      : WarpFactory.forMainnet()
+      : WarpFactory.forMainnet({
+        ...defaultCacheOptions,
+        inMemory: process.server
+      })
 
     inject('warp', warp)
   } catch (error) {
