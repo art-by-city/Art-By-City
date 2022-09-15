@@ -71,7 +71,15 @@ export default {
    */
   modules: [
     { src: '@nuxtjs/axios', mode: 'client' },
-    { src: '@nuxtjs/auth-next', mode: 'client' }
+    { src: '@nuxtjs/auth-next', mode: 'client' },
+    [
+      '~/modules/warp-contract-memcache',
+      {
+        contracts: {
+          usernames: process.env.USERNAMES_CONTRACT_ID || ''
+        }
+      }
+    ]
   ],
   serverMiddleware: [
     { path: '/node', handler: '~/server/index.ts' }

@@ -1,9 +1,4 @@
-import {
-  LoggerFactory,
-  Warp,
-  WarpNodeFactory,
-  WarpWebFactory
-} from 'warp-contracts'
+import { LoggerFactory, Warp, WarpFactory } from 'warp-contracts'
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 
@@ -36,15 +31,11 @@ export default ({ app }: Context, inject: Inject) => {
       LoggerFactory.INST.logLevel('error')
     }
 
-    let warp = process.server
-      ? WarpNodeFactory.memCachedBased(app.$arweave as any)
-      : WarpWebFactory.memCachedBased(app.$arweave as any)
+    const warp = process.env.NODE_ENV !== 'production'
+      ? WarpFactory.forLocal()
+      : WarpFactory.forMainnet()
 
-    if (process.env.NODE_ENV !== 'production') {
-      warp.useArweaveGateway()
-    }
-
-    inject('warp', warp.build())
+    inject('warp', warp)
   } catch (error) {
     console.error('Error during Warp contracts plugin bootstrap', error)
   }
