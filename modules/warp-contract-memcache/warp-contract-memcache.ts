@@ -1,13 +1,13 @@
-import { Contract, LoggerFactory, Warp, WarpFactory } from 'warp-contracts'
+import { LoggerFactory, Warp, WarpFactory } from 'warp-contracts'
 
 import { ContractIdsByName } from '.'
 
 export class WarpContractMemcache {
   $warp!: Warp
 
-  contracts: { [contractName: string]: Contract } = {}
+  contracts: ContractIdsByName = {}
 
-  constructor(contractIdsByName: ContractIdsByName) {
+  constructor(contracts: ContractIdsByName) {
     if (process.env.NODE_ENV !== 'development') {
       LoggerFactory.INST.logLevel('fatal')
     } else {
@@ -18,17 +18,8 @@ export class WarpContractMemcache {
       ? WarpFactory.forLocal()
       : WarpFactory.forMainnet()
 
-    const contractNames = Object.keys(contractIdsByName)
-    for (let i = 0; i < contractNames.length; i++) {
-      const contractName = contractNames[i]
-      const contractId = contractIdsByName[contractName]
-      this.contracts[contractName] = this.$warp.contract(contractId)
-      console.log(
-        'WarpContractMemcache loading contract',
-        contractName,
-        contractId
-      )
-    }
+    this.contracts = contracts
+    console.log('WarpContractMemcache got contracts', this.contracts)
   }
 
   async readState(contractName: string): Promise<any> {
@@ -36,7 +27,9 @@ export class WarpContractMemcache {
       throw new Error(`Contract ${contractName} not found`)
     }
 
-    const res = await this.contracts[contractName].readState()
+    const res = await this.$warp
+      .contract(this.contracts[contractName])
+      .readState()
 
     return res.cachedValue.state
   }
