@@ -1,6 +1,5 @@
 import { GetterTree, MutationTree } from 'vuex'
 import { actionTree, getAccessorType } from 'typed-vuex'
-import { Context } from '@nuxt/types'
 
 import {
   CLEAR_MUTATION,
