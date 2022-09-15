@@ -18,11 +18,18 @@ export class WarpContractMemcache {
       ? WarpFactory.forLocal()
       : WarpFactory.forMainnet()
 
+    console.log('WarpContractMemcache loading contracts', contractIdsByName)
+
     const contractNames = Object.keys(contractIdsByName)
     for (let i = 0; i < contractNames.length; i++) {
       const contractName = contractNames[i]
       const contractId = contractIdsByName[contractName]
       this.contracts[contractName] = this.$warp.contract(contractId)
+      console.log(
+        'WarpContractMemcache loading contract',
+        contractName,
+        contractId
+      )
     }
   }
 
