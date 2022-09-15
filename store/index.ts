@@ -1,10 +1,15 @@
 import { GetterTree, MutationTree } from 'vuex'
 import { actionTree, getAccessorType } from 'typed-vuex'
+import { Context } from '@nuxt/types'
 
 import {
   CLEAR_MUTATION,
   RESTORE_MUTATION
 } from '~/plugins/persist-store'
+import {
+  SsrContextWithWarpContractMemcache
+} from '~/modules/warp-contract-memcache'
+
 import transactionsState from './transactions/state'
 import transactionsGetters from './transactions/getters'
 import transactionsMutations from './transactions/mutations'
@@ -14,7 +19,7 @@ import notificationsGetters from './notifications/getters'
 import notificationsMutations from './notifications/mutations'
 import notificationsActions from './notifications/actions'
 import {
-  FETCH_USERNAMES,
+  SET_USERNAMES,
   usernamesActions,
   usernamesState,
   usernamesMutations,
@@ -30,8 +35,23 @@ export const mutations: MutationTree<RootState> = {
 }
 
 export const actions = actionTree({ state }, {
-  async nuxtServerInit({ dispatch }) {
-    await dispatch(`usernames/${FETCH_USERNAMES}`)
+  async nuxtServerInit({ commit }, context: Context) {
+    const warpContractMemcache = (
+      context.ssrContext as SsrContextWithWarpContractMemcache
+    ).$warpContractMemcache
+
+    console.log('Store nuxtServerInit() reading usernames')
+    try {
+      const { usernames } = await warpContractMemcache.readState('usernames')
+      console.log(
+        'Store nuxtServerInit() got usernames',
+        Object.keys(usernames).length
+      )
+      commit(`usernames/${SET_USERNAMES}`, usernames)
+    } catch (err) {
+      console.error('Store nuxtServerInit() NO USERNAMES!', err)
+    }
+
   }
 })
 
