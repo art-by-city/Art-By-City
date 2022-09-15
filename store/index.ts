@@ -40,13 +40,8 @@ export const actions = actionTree({ state }, {
       context.ssrContext as SsrContextWithWarpContractMemcache
     ).$warpContractMemcache
 
-    console.log('Store nuxtServerInit() reading usernames')
     try {
       const { usernames } = await warpContractMemcache.readState('usernames')
-      console.log(
-        'Store nuxtServerInit() got usernames',
-        Object.keys(usernames).length
-      )
       commit(`usernames/${SET_USERNAMES}`, usernames)
     } catch (err) {
       console.error('Store nuxtServerInit() NO USERNAMES!', err)
