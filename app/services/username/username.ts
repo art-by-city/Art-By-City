@@ -1,6 +1,5 @@
 import { Context } from '@nuxt/types'
 import { Contract } from 'warp-contracts'
-import Transaction from 'arweave/web/lib/transaction'
 
 import { SmartWeaveService } from '..'
 import { UsernamesContractState, handle } from './contract'
@@ -8,25 +7,44 @@ import { UsernamesContractState, handle } from './contract'
 export default class UsernameService extends SmartWeaveService {
   private contract!: Contract<UsernamesContractState>
   private txId!: string
+  private isContractReady: boolean = false
 
   constructor(context: Context) {
     super(context)
 
     this.txId = this.config.contracts['usernames']
 
-    this.contract = this.$warp
-      .contract<UsernamesContractState>(this.txId)
-      .setEvaluationOptions({
-        // NB: Boost perf since this contract does not read other contracts
-        updateCacheForEachInteraction: false
-      })
+    if (process.client) {
+      this.contract = this.$warp
+        .contract<UsernamesContractState>(this.txId)
+        .setEvaluationOptions({
+          // NB: Boost perf since this contract does not read other contracts
+          updateCacheForEachInteraction: false
+        })
+
+      this.contract.readState().then(() => this.isContractReady = true)
+    }
+  }
+
+  private async getUsernames(): Promise<UsernamesContractState['usernames']> {
+    if (process.client && this.isContractReady) {
+      const {
+        cachedValue: {
+          state: { usernames }
+        }
+      } = await this.contract.readState()
+
+      return usernames
+    } else {
+      return this.context.app.$accessor.usernames.usernames
+    }
   }
 
   async resolveUsername(address: string): Promise<string | null> {
     try {
-      const { state } = await this.contract.readState()
+      const usernames = await this.getUsernames()
 
-      return state.usernames[address] || null
+      return usernames[address] || null
     } catch (err) {
       console.error(err)
     }
@@ -36,10 +54,10 @@ export default class UsernameService extends SmartWeaveService {
 
   async resolveAddress(username: string): Promise<string | null> {
     try {
-      const { state } = await this.contract.readState()
+      const usernames = await this.getUsernames()
 
-      for (const address in state.usernames) {
-        if (state.usernames[address] === username) {
+      for (const address in usernames) {
+        if (usernames[address] === username) {
           return address
         }
       }
@@ -75,7 +93,7 @@ export default class UsernameService extends SmartWeaveService {
 
   async validate(username: string, caller: string): Promise<string | null> {
     try {
-      const { state } = await this.contract.readState()
+      const { cachedValue: { state } } = await this.contract.readState()
 
       const clonedState: UsernamesContractState = { usernames: {} }
 
@@ -105,21 +123,21 @@ export default class UsernameService extends SmartWeaveService {
   }
 
   async registerUsername(username: string): Promise<string | null> {
-    return await this.writeInteraction(
+    return (await this.writeInteraction(
       this.contract,
       {
         function: 'register',
         username
       }
-    )
+    ))?.originalTxId || null
   }
 
   async releaseUsername(): Promise<string | null> {
-    return await this.writeInteraction(
+    return (await this.writeInteraction(
       this.contract,
       {
         function: 'release'
       }
-    )
+    ))?.originalTxId || null
   }
 }
