@@ -3,7 +3,8 @@ runtime: nodejs16
 instance_class: F4_1G
 
 automatic_scaling:
-  target_cpu_utilization: 0.75
+  target_cpu_utilization: 0.80
+  max_concurrent_requests: 500
 
 handlers:
   - url: /_nuxt
