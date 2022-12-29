@@ -18,7 +18,8 @@ export const APP_INFO = {
 
 // TODO -> Extend TokenableSchemeOptions and add these
 export const APP_PERMISSIONS: PermissionType[] = [
-  'ACCESS_ADDRESS'
+  'ACCESS_ADDRESS',
+  'ACCESS_PUBLIC_KEY'
 ]
 
 type ArweaveWalletSchemeOptions = {} & TokenableSchemeOptions

@@ -1,6 +1,9 @@
 import IgnoreNotFoundExportPlugin from 'ignore-not-found-export-webpack-plugin'
 
 const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
+const ark = {
+  baseUrl: process.env.ARK_URL || 'https://ark-core.decent.land'
+}
 
 export default {
   /*
@@ -51,6 +54,7 @@ export default {
   plugins: [
     { src: '~/plugins/arweave.ts' },
     { src: '~/plugins/ardb.ts' },
+    { src: '~/plugins/ark' },
     { src: '~/plugins/smartweave.ts' },
     { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',
@@ -87,6 +91,7 @@ export default {
   ],
   publicRuntimeConfig: {
     baseUrl,
+    ark,
     arweave: {
       app: {
         name: process.env.APP_NAME || 'ArtByCity-Development',

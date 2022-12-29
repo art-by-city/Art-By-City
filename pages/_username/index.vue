@@ -15,25 +15,50 @@
                 <template v-slot:activator>
                   <v-btn
                     v-model="showEditSpeedDial"
-                    text
                     outlined
+                    elevation="2"
+                    color="black"
                     x-small
                   >
                     Edit
                   </v-btn>
                 </template>
 
-                <v-btn small @click="onEditAvatarClicked">Avatar</v-btn>
-
-                <v-btn small @click="onEditProfileClicked">Profile</v-btn>
+                <v-btn
+                  small
+                  outlined
+                  elevation="2"
+                  color="black"
+                  class="profile-edit-button"
+                  @click="onEditAvatarClicked"
+                >Avatar</v-btn>
 
                 <v-btn
                   small
-                  @click="onEditUsernameClicked"
-                >
-                  Username
-                </v-btn>
+                  outlined
+                  elevation="2"
+                  color="black"
+                  class="profile-edit-button"
+                  @click="onEditProfileClicked"
+                >Profile</v-btn>
 
+                <v-btn
+                  small
+                  outlined
+                  elevation="2"
+                  color="black"
+                  class="profile-edit-button"
+                  @click="onEditUsernameClicked"
+                >Username</v-btn>
+
+                <v-btn
+                  small
+                  outlined
+                  elevation="2"
+                  color="black"
+                  class="profile-edit-button"
+                  @click="onEditIdentityClicked"
+                >Identity</v-btn>
               </v-speed-dial>
             </template>
             <template v-if="!isOwner && $auth.loggedIn">
@@ -161,6 +186,7 @@
       <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
       <EditProfileDialog :show.sync="showEditProfileDialog" />
       <UsernameDialog :show.sync="showUsernameDialog" />
+      <EditIdentityDialog :show.sync="showIdentityDialog" />
 
       <v-snackbar
         v-model="showRecentPublicationMessage"
@@ -203,6 +229,8 @@ import UsernameDialog from
   '~/components/username/UsernameDialog.component.vue'
 import TipArtistDialog from
   '~/components/tips/TipArtistDialog.component.vue'
+import EditIdentityDialog from
+  '~/components/identity/EditIdentityDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 import LikesFeed from '~/components/profile/LikesFeed.component.vue'
 import TipsFeed from '~/components/tips/TipsFeed.component.vue'
@@ -213,6 +241,7 @@ import { DomainEntity, DomainEntityCategory } from '~/app/core'
   components: {
     AvatarUploadDialog,
     ArtistFeed,
+    EditIdentityDialog,
     EditProfileDialog,
     ExpandParagraph,
     LikesFeed,
@@ -275,6 +304,7 @@ export default class UserProfilePage extends Vue {
   showEditSpeedDial: boolean = false
   showAvatarUploadDialog: boolean = false
   showEditProfileDialog: boolean = false
+  showIdentityDialog: boolean = false
   showUsernameDialog: boolean = false
   showTipArtistDialog: boolean = false
   likesCount: number = 0
@@ -405,6 +435,11 @@ export default class UserProfilePage extends Vue {
   }
 
   @debounce
+  onEditIdentityClicked() {
+    this.showIdentityDialog = true
+  }
+
+  @debounce
   onTipClicked() {
     this.showTipArtistDialog = true
   }
@@ -436,5 +471,8 @@ export default class UserProfilePage extends Vue {
   position: absolute;
   bottom: 0;
   right: 0;
+}
+.profile-edit-button {
+  background-color: white;
 }
 </style>
