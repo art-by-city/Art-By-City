@@ -169,6 +169,7 @@
             <v-card-actions>
               <v-container>
                 <v-row justify="center">
+                  <v-btn @click="testJwt">test jwt</v-btn>
                   <TransactionFormControls
                     :loading="isUploading || isValidating"
                     :disabled="isValidating || !valid || !dirty"
@@ -282,7 +283,7 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
   }
 
   @debounce
-  async onConnectIdentityClicked(network: ArkNetworkKey) {
+  async onConnectIdentityClicked() {
     if (window.ethereum.request) {
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts'
@@ -294,16 +295,12 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
   @debounce
   async onLinkIdentityClicked(network: ArkNetworkKey) {
     try {
-      const { foreignAddress, verificationReq } = await this.$ark.linkIdentity(
+      await this.$ark.linkIdentity(
         network,
         this.$auth.user.address
       )
 
-      console.log(
-        `onLinkIdentityClicked(${network}) foreignAddress, verificationReq`,
-        foreignAddress,
-        verificationReq
-      )
+      this.$fetch()
     } catch (error) {
       console.error(error)
     }

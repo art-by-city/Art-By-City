@@ -105,7 +105,3 @@ export const ArkNetworks: Record<ArkNetworkKey, ArkNetwork> = {
     exmKey: 'EVM'
   }
 }
-
-
-
-

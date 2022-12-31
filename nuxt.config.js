@@ -54,6 +54,7 @@ export default {
   plugins: [
     { src: '~/plugins/arweave.ts' },
     { src: '~/plugins/ardb.ts' },
+    { src: '~/plugins/artbycity' },
     { src: '~/plugins/ark' },
     { src: '~/plugins/smartweave.ts' },
     { src: '~/plugins/services.ts' },
@@ -92,6 +93,9 @@ export default {
   publicRuntimeConfig: {
     baseUrl,
     ark,
+    artByCity: {
+      nodeUrl: process.env.ABC_NODE_URL || baseUrl + '/node'
+    },
     arweave: {
       app: {
         name: process.env.APP_NAME || 'ArtByCity-Development',

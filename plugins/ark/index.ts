@@ -1,7 +1,7 @@
 import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 import { ethers } from 'ethers'
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 import { SignerFactory } from '~/app/infra/arweave'
 import { ArkNetworkKey, ArkNetworks } from './networks'
@@ -46,45 +46,31 @@ export class ArkPlugin {
       : null
   }
 
-  async linkIdentity(network: ArkNetworkKey, arweaveAddress: string): Promise<{
-    foreignAddress: string,
-    verificationReq: string
-  }> {
+  async linkIdentity(network: ArkNetworkKey, arweaveAddress: string) {
+    // 1) Get foreignAddress & interact with EVM contract
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     const signer = provider.getSigner()
     const foreignAddress = await signer.getAddress()
-
     this.contracts[network] = this.contracts[network].connect(signer)
     const { hash: verificationReq } = (
       await this.contracts[network].linkIdentity(arweaveAddress)
     ) as ethers.providers.TransactionResponse
 
-    return {
-      foreignAddress,
-      verificationReq
-    }
-  }
-
-  async linkIdentityOld(
-    network: ArkNetworkKey,
-    foreignAddress: string,
-    verificationReq: string
-  ): Promise<void> {
-    const signer = await SignerFactory.create()
-    const arweavePublicKey = signer.publicKey.toString('base64')
+    // 2) Create arweave signature
+    const arSigner = await SignerFactory.create()
+    const arweavePublicKey = arSigner.publicKey.toString('base64')
     const prefix = 'my pubkey for DL ARK is: '
     const message = new TextEncoder().encode(`${prefix}${arweavePublicKey}`)
-    const signature = (await signer.sign(message)).toString()
+    const signature = (await arSigner.sign(message)).toString()
 
-    const data = {
+    // TODO -> 3) Post to Art By City Node
+    await this.context.$artbycity.linkIdentity({
       arweavePublicKey: this.context.$auth.user.address,
       foreignAddress,
       network,
       verificationReq,
       signature
-    }
-
-    // TODO -> post to Art By City Node
+    })
   }
 }
 

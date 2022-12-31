@@ -1,6 +1,12 @@
-import ArtByCityNode from '@artbycity/node'
+// import ArtByCityNode from '@artbycity/node'
+import ArtByCityNode from '../../node/src/app'
+import fs from 'fs'
 
-const abc = new ArtByCityNode('EGy6I7YCKqEH8aA7IOA2HEjqeOsHqu9W4c67SFdVnmo')
+const adminJWKPath = process.env.ADMIN_JWK_PATH || 'ADMIN_JWK_PATH not set!'
+const adminJWKBuffer = fs.readFileSync(adminJWKPath)
+const adminJWK = JSON.parse(adminJWKBuffer.toString())
+
+const abc = new ArtByCityNode(adminJWK)
   .app
   .callback()
 
