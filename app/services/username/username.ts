@@ -76,16 +76,38 @@ export default class UsernameService extends SmartWeaveService {
     const resolvedUsername = await this.resolveUsername(usernameOrAddress)
     const resolvedAddress = await this.resolveAddress(usernameOrAddress)
 
-    if (!resolvedUsername && !resolvedAddress) {
-      if (usernameOrAddress.length === 43) {
-        address = usernameOrAddress
-      }
+    if (resolvedUsername && resolvedAddress) {
+      // Both username and address resolved. This shouldn't happen, but could
+      // if someone set their username to their arweave address
+      address = resolvedAddress
+      username = resolvedUsername
     } else if (!resolvedUsername && resolvedAddress) {
+      // Username didn't resolve but address did, so we were passed a username
       username = usernameOrAddress
       address = resolvedAddress
     } else if (resolvedUsername && !resolvedAddress) {
+      // Username resolved but address didn't, so we were passed an address
       address = usernameOrAddress
       username = resolvedUsername
+    } else {
+      // Try to resolve ark identities if neither username or address resolve
+      const identities = await this.context.$ark.resolve(usernameOrAddress)
+
+      if (identities) {
+        // arweave_address might be null if it hasn't been confirmed by ARK yet
+        address = identities.arweave_address
+
+        // Now that we have an arweave address, try again to get a username
+        const maybeUsername = await this.resolveUsername(address)
+        if (maybeUsername) {
+          username = maybeUsername
+        }
+      } else {
+        // Fall back on assuming arweave address
+        if (usernameOrAddress.length === 43) {
+          address = usernameOrAddress
+        }
+      }
     }
 
     return { username, address }

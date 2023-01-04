@@ -10,10 +10,14 @@ const MAX_RETRIES = 1
 
 export class ArtByCityClient {
   private api!: AxiosInstance
+  private noAuthApi!: AxiosInstance
   private retries: number = 0
 
   constructor(private context: Context) {
     this.api = axios.create({
+      baseURL: context.$config.artByCity.nodeUrl
+    })
+    this.noAuthApi = axios.create({
       baseURL: context.$config.artByCity.nodeUrl
     })
 
@@ -131,7 +135,7 @@ export class ArtByCityClient {
   }
 
   async resolve(address: string) {
-    const { data } = await this.api.get(`/identity/resolve/${address}`)
+    const { data } = await this.noAuthApi.get(`/identity/resolve/${address}`)
 
     return data
   }

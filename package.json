@@ -15,7 +15,7 @@
     "deploy:production": "gcloud app deploy app.production.yaml --project clean-linker-273919"
   },
   "dependencies": {
-    "@artbycity/node": "^2.0.6",
+    "@artbycity/node": "^2.0.7",
     "@babel/plugin-proposal-optional-chaining": "^7.18.9",
     "@nuxt/types": "^2.15.7",
     "@nuxt/typescript-build": "^2.1.0",

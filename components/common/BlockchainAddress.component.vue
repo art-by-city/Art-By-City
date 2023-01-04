@@ -18,6 +18,10 @@ export default class BlockchainAddress extends Vue {
   @Prop({ type: String, required: true }) address!: string
 
   get truncatedAddress(): string {
+    if (this.address.length < this.leadingChars + this.trailingChars + 3) {
+      return this.address
+    }
+
     return this.address.substring(0, this.leadingChars)
       + '...'
       + this.address.substring(this.address.length - this.trailingChars)

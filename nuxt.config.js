@@ -54,8 +54,8 @@ export default {
   plugins: [
     { src: '~/plugins/arweave.ts' },
     { src: '~/plugins/ardb.ts' },
-    { src: '~/plugins/artbycity', ssr: false },
-    { src: '~/plugins/ark', ssr: false },
+    { src: '~/plugins/artbycity' },
+    { src: '~/plugins/ark' },
     { src: '~/plugins/smartweave.ts' },
     { src: '~/plugins/services.ts' },
     '~/plugins/components.ts',

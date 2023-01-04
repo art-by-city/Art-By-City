@@ -13,7 +13,7 @@
               <a
                 href="https://ark.decent.land/#faq"
                 target="_blank"
-                class="grey--text identity-dialog-subtitle-anchor"
+                class="grey--text decentdotland-anchor"
               >
                 <img
                   class="decentdotland-logo"
@@ -131,11 +131,7 @@
                   outlined
                   dense
                   @input="onNetworkSelected(network)"
-                >
-                  <template v-slot:append-outer>
-
-                  </template>
-                </v-select>
+                ></v-select>
 
                 <template v-if="foreignAddress">
                   <v-text-field
@@ -228,11 +224,8 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
       : []
   }
 
-  fetchOnServer = false
   async fetch() {
-    if (this.$ark) {
-      this.identities = await this.$ark.resolve(this.$auth.user.address)
-    }
+    this.identities = await this.$ark.resolve(this.$auth.user.address)
   }
 
   private reset() {
@@ -394,7 +387,7 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
 .text-align-center {
   text-align: center;
 }
-.identity-dialog-subtitle-anchor {
+.decentdotland-anchor {
   display: flex;
   align-items: center;
 }

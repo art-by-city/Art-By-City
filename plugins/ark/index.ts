@@ -14,16 +14,6 @@ export * from './networks'
 export class ArkPlugin {
   readonly networks = ArkNetworks
   api!: AxiosInstance
-  contracts: Record<ArkNetworkKey, ethers.Contract> = {
-    ['ETH-MAINNET']: new ethers.Contract(
-      ArkNetworks['ETH-MAINNET'].contract,
-      ArkNetworks['ETH-MAINNET'].abi
-    ),
-    ['ETH-GOERLI']: new ethers.Contract(
-      ArkNetworks['ETH-GOERLI'].contract,
-      ArkNetworks['ETH-GOERLI'].abi
-    )
-  }
 
   get contractKeysAndLabels(): { key: string, label: string }[] {
     const keys = Object.keys(ArkNetworks) as ArkNetworkKey[]
@@ -48,26 +38,31 @@ export class ArkPlugin {
   }
 
   async linkIdentity(network: ArkNetworkKey, arweaveAddress: string) {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    const signer = provider.getSigner()
-    const foreignAddress = await signer.getAddress()
-    this.contracts[network] = this.contracts[network].connect(signer)
-    const { hash: verificationReq } = (
-      await this.contracts[network].linkIdentity(arweaveAddress)
-    ) as ethers.providers.TransactionResponse
+    const arkNetwork = ArkNetworks[network]
+    if (arkNetwork.contract && arkNetwork.abi) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      const foreignAddress = await signer.getAddress()
+      const contract = new ethers.Contract(
+        arkNetwork.contract, arkNetwork.abi
+      ).connect(signer)
+      const { hash: verificationReq } = (
+        await contract.linkIdentity(arweaveAddress)
+      ) as ethers.providers.TransactionResponse
 
-    const {
-      arweavePublicKey,
-      signature
-    } = await this.generateARKArweaveSignature()
+      const {
+        arweavePublicKey,
+        signature
+      } = await this.generateARKArweaveSignature()
 
-    return await this.context.$artbycity.linkIdentity({
-      arweavePublicKey,
-      foreignAddress,
-      network,
-      verificationReq,
-      signature
-    })
+      return await this.context.$artbycity.linkIdentity({
+        arweavePublicKey,
+        foreignAddress,
+        network,
+        verificationReq,
+        signature
+      })
+    }
   }
 
   async unlinkIdentity(foreignAddress: string) {
