@@ -2,6 +2,7 @@ import { Context } from '@nuxt/types'
 import { Inject } from '@nuxt/types/app'
 import { ethers } from 'ethers'
 import axios, { AxiosInstance } from 'axios'
+import Arweave from 'arweave'
 
 import { SignerFactory } from '~/app/infra/arweave'
 import { ArkNetworkKey, ArkNetworks } from './networks'
@@ -39,15 +40,14 @@ export class ArkPlugin {
   }
 
   async resolve(address: string): Promise<ArkIdentity | null> {
-    const { data } = await this.api.get(`/v2/address/resolve/${address}`)
+    const id = await this.context.$artbycity.resolve(address)
 
-    return data.arweave_address
-      ? data as ArkIdentity
+    return id.arweave_address
+      ? id
       : null
   }
 
   async linkIdentity(network: ArkNetworkKey, arweaveAddress: string) {
-    // 1) Get foreignAddress & interact with EVM contract
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     const signer = provider.getSigner()
     const foreignAddress = await signer.getAddress()
@@ -56,21 +56,58 @@ export class ArkPlugin {
       await this.contracts[network].linkIdentity(arweaveAddress)
     ) as ethers.providers.TransactionResponse
 
-    // 2) Create arweave signature
-    const arSigner = await SignerFactory.create()
-    const arweavePublicKey = arSigner.publicKey.toString('base64')
-    const prefix = 'my pubkey for DL ARK is: '
-    const message = new TextEncoder().encode(`${prefix}${arweavePublicKey}`)
-    const signature = (await arSigner.sign(message)).toString()
+    const {
+      arweavePublicKey,
+      signature
+    } = await this.generateARKArweaveSignature()
 
-    // TODO -> 3) Post to Art By City Node
-    await this.context.$artbycity.linkIdentity({
-      arweavePublicKey: this.context.$auth.user.address,
+    return await this.context.$artbycity.linkIdentity({
+      arweavePublicKey,
       foreignAddress,
       network,
       verificationReq,
       signature
     })
+  }
+
+  async unlinkIdentity(foreignAddress: string) {
+    const {
+      arweavePublicKey,
+      signature
+    } = await this.generateARKArweaveSignature()
+
+    return await this.context.$artbycity.unlinkIdentity({
+      arweavePublicKey,
+      signature,
+      foreignAddress
+    })
+  }
+
+  async setPrimaryAddress(primary_address: string) {
+    const {
+      arweavePublicKey,
+      signature
+    } = await this.generateARKArweaveSignature()
+
+    return await this.context.$artbycity.setPrimaryAddress({
+      arweavePublicKey,
+      signature,
+      primary_address
+    })
+  }
+
+  private async generateARKArweaveSignature() {
+    const arSigner = await SignerFactory.create()
+    const arweavePublicKey = Arweave.utils
+      .bufferTob64Url(arSigner.publicKey)
+      .substring(0, 683)
+    const message = new TextEncoder().encode(
+      `my pubkey for DL ARK is: ${arweavePublicKey}`
+    )
+    const signatureBytes = await arSigner.sign(message)
+    const signature = Buffer.from(signatureBytes).toString('base64')
+
+    return { arweavePublicKey, signature }
   }
 }
 

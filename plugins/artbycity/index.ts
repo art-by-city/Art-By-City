@@ -88,18 +88,52 @@ export class ArtByCityClient {
 
   async linkIdentity(payload: {
     arweavePublicKey: string
-    foreignAddress: string,
-    network: string,
-    verificationReq: string,
+    foreignAddress: string
+    network: string
+    verificationReq: string
     signature: string
   }) {
-    const {
-      data,
-      status,
-      statusText
-    } = await this.api.post('/identity/link', payload)
+    const { data } = await this.api.post('/identity/link', payload)
 
-    console.log('$artbycity.linkIdentity()', data, status, statusText)
+    if (data && data.execution && data.execution.state) {
+      return data.execution.state
+    }
+
+    return null
+  }
+
+  async unlinkIdentity(payload: {
+    arweavePublicKey: string
+    signature: string
+    foreignAddress: string
+  }) {
+    const { data } = await this.api.post('/identity/unlink', payload)
+
+    if (data && data.execution && data.execution.state) {
+      return data.execution.state
+    }
+
+    return null
+  }
+
+  async setPrimaryAddress(payload: {
+    arweavePublicKey: string
+    signature: string
+    primary_address: string
+  }) {
+    const { data } = await this.api.post('/identity/set-primary', payload)
+
+    if (data && data.execution && data.execution.state) {
+      return data.execution.state
+    }
+
+    return null
+  }
+
+  async resolve(address: string) {
+    const { data } = await this.api.get(`/identity/resolve/${address}`)
+
+    return data
   }
 }
 

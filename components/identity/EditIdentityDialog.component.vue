@@ -7,11 +7,23 @@
     <v-container dense class="pa-1">
       <v-row dense>
         <v-col dense cols="12" class="pa-0">
-          <v-card>
+          <v-card :loading="$fetchState.pending">
             <v-card-title>Edit Identity</v-card-title>
+            <v-card-subtitle>
+              <a
+                href="https://ark.decent.land/#faq"
+                target="_blank"
+                class="grey--text identity-dialog-subtitle-anchor"
+              >
+                <img
+                  class="decentdotland-logo"
+                  src="/logo/decentdotland/logo25.png"
+                />
+                Ark Protocol
+              </a>
+            </v-card-subtitle>
             <v-divider></v-divider>
             <v-card-text>
-
               <v-simple-table
                 dense
                 v-if="identities && identities.addresses.length > 0"
@@ -22,6 +34,7 @@
                     <th>Address</th>
                     <th>Status</th>
                     <th>Primary</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -76,6 +89,7 @@
                         outlined
                         x-small
                         elevation="2"
+                        :loading="isUploading"
                         @click="onSetPrimaryIdentityClicked(network, address)"
                       >Set Primary</v-btn>
                     </td>
@@ -84,32 +98,17 @@
                         outlined
                         x-small
                         elevation="2"
-                        @click="onUnlinkIdentityClicked(network, address)"
+                        :loading="isUploading"
+                        @click="onUnlinkIdentityClicked(address)"
                       >Unlink</v-btn>
                     </td>
                   </tr>
                 </tbody>
               </v-simple-table>
 
-              <v-simple-table
-                dense
-                v-if="identities && identities.unevaluated_addresses.length > 0"
-              >
-                <thead>
-                  <tr>
-                    <th>Pending</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="{ address } in identities.unevaluated_addresses"
-                    :key="address"
-                    style="width: 100%"
-                  >
-                    <td class="text-truncate">{{ address }}</td>
-                  </tr>
-                </tbody>
-              </v-simple-table>
+              <span v-else-if="!$fetchState.pending">
+                No identities linked!
+              </span>
 
               <v-divider></v-divider>
 
@@ -125,7 +124,7 @@
 
                 <v-select
                   v-model="network"
-                  :items="$ark.contractKeysAndLabels"
+                  :items="contractKeysAndLabels"
                   item-text="label"
                   item-value="key"
                   label="Network"
@@ -134,52 +133,58 @@
                   @input="onNetworkSelected(network)"
                 >
                   <template v-slot:append-outer>
-                    <v-btn
-                      outlined
-                      elevation="2"
-                      color="black"
-                      small
-                      :disabled="!network"
-                      @click="onConnectIdentityClicked"
-                    >Connect</v-btn>
+
                   </template>
                 </v-select>
 
                 <template v-if="foreignAddress">
                   <v-text-field
+                    label="Address"
                     outlined
                     dense
                     disabled
                     v-model="foreignAddress"
                   ></v-text-field>
-
                   <v-btn
                     name="linkIdentity"
-                    v-if="foreignAddress"
                     outlined
                     elevation="2"
                     color="black"
                     small
+                    :loading="isUploading"
                     :disabled="isAlreadyConnected"
                     @click="onLinkIdentityClicked(network)"
                   >Link</v-btn>
+                  <span v-if="isAlreadyConnected">
+                    Address already connected!
+                  </span>
+                </template>
+                <template v-else-if="network">
+                  <v-btn
+                    name="connect"
+                    outlined
+                    elevation="2"
+                    color="black"
+                    small
+                    :loading="isUploading"
+                    :disabled="!network"
+                    @click="onConnectIdentityClicked"
+                  >Connect</v-btn>
                 </template>
               </v-form>
             </v-card-text>
             <v-card-actions>
               <v-container>
                 <v-row justify="center">
-                  <v-btn @click="testJwt">test jwt</v-btn>
-                  <TransactionFormControls
-                    :loading="isUploading || isValidating"
-                    :disabled="isValidating || !valid || !dirty"
-                    :signed="isSigned"
-                    :txTotal="txTotal"
-                    isContract
-                    @sign="onSign"
-                    @cancel="onCancel"
-                    @submit="onSubmit"
-                  />
+                  <v-btn
+                    outlined
+                    elevation="2"
+                    color="error"
+                    :disabled="isUploading"
+                    @click="onCancel"
+                  >
+                    Close
+                  </v-btn>
                 </v-row>
               </v-container>
             </v-card-actions>
@@ -191,7 +196,7 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'nuxt-property-decorator'
+import { Component, Watch } from 'nuxt-property-decorator'
 
 import { DomainEntityCategory } from '~/app/core'
 import { debounce } from '~/app/util'
@@ -207,35 +212,66 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
 
   identities: ArkIdentity | null = null
   network: string | null = null
+  prevNetwork: string | null = null
   foreignAddress: string = ''
+  isAlreadyConnected: boolean = false
 
-  get isAlreadyConnected(): boolean {
-    if (this.identities) {
-      const matchCurrentNetworkAndAddress = ({ address, network }: {
-        address: string,
-        network: string
-      }) => {
-        return network === this.network
-          && address.toUpperCase() === this.foreignAddress.toUpperCase()
-      }
-
-      const isAlreadyConfirmed = this.identities
-        .addresses
-        .some(matchCurrentNetworkAndAddress)
-
-      const isAlreadyPending = this.identities
-        .unevaluated_addresses
-        .some(matchCurrentNetworkAndAddress)
-
-      return isAlreadyConfirmed || isAlreadyPending
+  @Watch('open') async onOpen(open: boolean) {
+    if (open) {
+      this.$fetch()
     }
+  }
 
-    return false
+  get contractKeysAndLabels() {
+    return this.$ark
+      ? this.$ark.contractKeysAndLabels
+      : []
   }
 
   fetchOnServer = false
   async fetch() {
-    this.identities = await this.$ark.resolve(this.$auth.user.address)
+    if (this.$ark) {
+      this.identities = await this.$ark.resolve(this.$auth.user.address)
+    }
+  }
+
+  private reset() {
+    this.network = null
+    this.prevNetwork = null
+    this.foreignAddress = ''
+    this.isAlreadyConnected = false
+  }
+
+  private updateIdentitiesFromState(state: any) {
+    const ids: any[] = state.identities
+    const id = ids.find(i => i.public_key === this.$auth.user.publicKey)
+    this.identities = id ? id : null
+  }
+
+  private updateIsAlreadyConnected() {
+    const checkIsAlreadyConnected = () => {
+      if (this.identities) {
+        const matchCurrentNetworkAndAddress = ({ address }: {
+          address: string
+        }) => {
+          return address && address.toUpperCase() === this.foreignAddress.toUpperCase()
+        }
+
+        const isAlreadyConfirmed = this.identities
+          .addresses
+          .some(matchCurrentNetworkAndAddress)
+
+        const isAlreadyPending = this.identities
+          .unevaluated_addresses
+          .some(matchCurrentNetworkAndAddress)
+
+        return isAlreadyConfirmed || isAlreadyPending
+      }
+
+      return false
+    }
+
+    this.isAlreadyConnected = checkIsAlreadyConnected()
   }
 
   private async switchEthereumChain(network: ArkNetworkKey) {
@@ -247,6 +283,9 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
             method: 'wallet_switchEthereumChain',
             params: [{ chainId }]
           })
+
+          // NB: cache prev network on successful change
+          this.prevNetwork = network
         }
       }
     } catch (error) {
@@ -267,7 +306,7 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
         //   console.error(addError)
         // }
       } else {
-        // TODO -> revert network on cancel
+        this.network = this.prevNetwork
         console.error(error)
       }
     }
@@ -275,11 +314,13 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
 
   @debounce
   async onNetworkSelected(network: ArkNetworkKey) {
+    this.isUploading = true
     this.foreignAddress = ''
 
     if (ArkNetworks[network].exmKey === 'EVM') {
       await this.switchEthereumChain(network)
     }
+    this.isUploading = false
   }
 
   @debounce
@@ -289,28 +330,60 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
         method: 'eth_requestAccounts'
       }) as string[]
       this.foreignAddress = accounts[0] || ''
+      this.updateIsAlreadyConnected()
     }
   }
 
   @debounce
   async onLinkIdentityClicked(network: ArkNetworkKey) {
+    this.isUploading = true
+
     try {
-      await this.$ark.linkIdentity(
+      const state = await this.$ark.linkIdentity(
         network,
         this.$auth.user.address
       )
 
-      this.$fetch()
+      this.updateIdentitiesFromState(state)
+      this.reset()
     } catch (error) {
       console.error(error)
     }
+
+    this.isUploading = false
   }
 
   @debounce
-  async onUnlinkIdentityClicked(network: string, address: string) {}
+  async onUnlinkIdentityClicked(address: string) {
+    this.isUploading = true
+
+    try {
+      const state = await this.$ark.unlinkIdentity(address)
+
+      this.updateIdentitiesFromState(state)
+      this.reset()
+    } catch (error) {
+      console.error(error)
+    }
+
+    this.isUploading = false
+  }
 
   @debounce
-  async onSetPrimaryIdentityClicked(network: string, address: string) {}
+  async onSetPrimaryIdentityClicked(address: string) {
+    this.isUploading = true
+
+    try {
+      const state = await this.$ark.setPrimaryAddress(address)
+
+      this.updateIdentitiesFromState(state)
+      this.reset()
+    } catch (error) {
+      console.error(error)
+    }
+
+    this.isUploading = false
+  }
 
   @debounce
   async onSign() {}
@@ -320,5 +393,14 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
 <style scoped>
 .text-align-center {
   text-align: center;
+}
+.identity-dialog-subtitle-anchor {
+  display: flex;
+  align-items: center;
+}
+.decentdotland-logo {
+  height: 25px;
+  width: 25px;
+  margin-right: 5px;
 }
 </style>

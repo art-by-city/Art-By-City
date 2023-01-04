@@ -16,16 +16,22 @@ export default class ArweaveWalletSigner implements Signer {
     const signature = await window.arweaveWallet.signature(message, {
       name: "RSA-PSS",
       saltLength: 32,
-    }) as any
+    })
 
-    const signatureArray = []
-    const keys = Object.keys(signature)
+    return Buffer.from(signature)
+    // const signature = await window.arweaveWallet.signature(message, {
+    //   name: "RSA-PSS",
+    //   saltLength: 32,
+    // }) as any
 
-    for (let i = 0; i < keys.length; i++) {
-      signatureArray.push(signature[keys[i]])
-    }
+    // const signatureArray = []
+    // const keys = Object.keys(signature)
 
-    return Uint8Array.from(signatureArray)
+    // for (let i = 0; i < keys.length; i++) {
+    //   signatureArray.push(signature[keys[i]])
+    // }
+
+    // return Uint8Array.from(signatureArray)
   }
 
   static async verify(
