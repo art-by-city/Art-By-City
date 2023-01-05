@@ -53,6 +53,7 @@ deploy_staging:
   script:
   - node generateSecrets.js > secrets.yaml
   - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
+  - cp $ADMIN_JWK_PATH abc-node-admin-jwk.json
   - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
   - gcloud --quiet --project $PROJECT_ID app deploy app.staging.yaml
 deploy_production:
@@ -70,6 +71,7 @@ deploy_production:
   script:
   - node generateSecrets.js > secrets.yaml
   - node generateKeyfile.js "$(echo $PRIVATE_KEY | base32 -d)" > /tmp/$CI_PIPELINE_ID.json
+  - cp $ADMIN_JWK_PATH abc-node-admin-jwk.json
   - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
   - gcloud --quiet --project $PROJECT_ID app deploy app.production.yaml
 include:

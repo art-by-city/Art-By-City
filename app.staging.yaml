@@ -33,6 +33,7 @@ env_variables:
   ARTIST_PREREGISTRATION_URL: https://us-central1-art-by-city-staging-299519.cloudfunctions.net/artist-preregistration
   USERNAMES_CONTRACT_ID: UHPC-7wenVg-JyS81EXKCnLlKvjSbfrIsnWt1F8hueg
   ARWEAVE_GATEWAY: /node
+  ADMIN_JWK_PATH: ./abc-node-admin-jwk.json
 
 includes:
   - secrets.yaml
