@@ -1,9 +1,14 @@
 import ArtByCityNode from '@artbycity/node'
 import fs from 'fs'
 
-const adminJWKPath = process.env.ADMIN_JWK_PATH || 'ADMIN_JWK_PATH not set!'
-const adminJWKBuffer = fs.readFileSync(adminJWKPath)
-const adminJWK = JSON.parse(adminJWKBuffer.toString())
+let adminJWK
+try {
+  const adminJWKPath = process.env.ADMIN_JWK_PATH || 'ADMIN_JWK_PATH not set!'
+  const adminJWKBuffer = fs.readFileSync(adminJWKPath)
+  adminJWK = JSON.parse(adminJWKBuffer.toString())
+} catch (error) {
+  console.error('Error bootstrapping ArtByCityNode', error)
+}
 
 const abc = new ArtByCityNode(adminJWK)
   .app
