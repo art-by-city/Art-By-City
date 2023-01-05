@@ -12,6 +12,5 @@ console.log(
   DB_NAME: ${process.env.DB_NAME}
   EXM_API_KEY: ${process.env.EXM_API_KEY}
   ARK_EXM_FUNCTION_ID: ${process.env.ARK_EXM_FUNCTION_ID}
-  ADMIN_JWK_PATH: ${process.env.ADMIN_JWK_PATH}
   `
 )
