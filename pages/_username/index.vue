@@ -15,25 +15,50 @@
                 <template v-slot:activator>
                   <v-btn
                     v-model="showEditSpeedDial"
-                    text
                     outlined
+                    elevation="2"
+                    color="black"
                     x-small
                   >
                     Edit
                   </v-btn>
                 </template>
 
-                <v-btn small @click="onEditAvatarClicked">Avatar</v-btn>
-
-                <v-btn small @click="onEditProfileClicked">Profile</v-btn>
+                <v-btn
+                  small
+                  outlined
+                  elevation="2"
+                  color="black"
+                  class="profile-edit-button"
+                  @click="onEditAvatarClicked"
+                >Avatar</v-btn>
 
                 <v-btn
                   small
-                  @click="onEditUsernameClicked"
-                >
-                  Username
-                </v-btn>
+                  outlined
+                  elevation="2"
+                  color="black"
+                  class="profile-edit-button"
+                  @click="onEditProfileClicked"
+                >Profile</v-btn>
 
+                <v-btn
+                  small
+                  outlined
+                  elevation="2"
+                  color="black"
+                  class="profile-edit-button"
+                  @click="onEditUsernameClicked"
+                >Username</v-btn>
+
+                <v-btn
+                  small
+                  outlined
+                  elevation="2"
+                  color="black"
+                  class="profile-edit-button"
+                  @click="onEditIdentityClicked"
+                >Identity</v-btn>
               </v-speed-dial>
             </template>
             <template v-if="!isOwner && $auth.loggedIn">
@@ -42,6 +67,8 @@
                 text
                 outlined
                 x-small
+                color="black"
+                elevation="2"
                 @click="onTipClicked"
               >
                 Tip
@@ -69,6 +96,26 @@
                   style="vertical-align: middle;"
                 />
                 <span>{{ tertiaryName }}</span>
+              </p>
+              <p class="mb-0 ark-container" v-if="arkPrimaryIdentity">
+                <a
+                  href="https://ark.decent.land/#faq"
+                  target="_blank"
+                  class="grey--text decentdotland-anchor"
+                >
+                  <img
+                    class="decentdotland-logo"
+                    src="/logo/decentdotland/logo25.png"
+                  />
+                </a>
+                <span>{{ arkPrimaryIdentity }}</span>
+                &nbsp;
+                <a
+                  v-if="identities && identities.addresses.length > 1"
+                  @click="onOpenIdentitiesDialogClicked"
+                >
+                  (+{{ identities.addresses.length - 1 }} more)
+                </a>
               </p>
               <a
                 v-if="artist.profile && artist.profile.twitter"
@@ -161,6 +208,7 @@
       <AvatarUploadDialog :show.sync="showAvatarUploadDialog" />
       <EditProfileDialog :show.sync="showEditProfileDialog" />
       <UsernameDialog :show.sync="showUsernameDialog" />
+      <EditIdentityDialog :show.sync="showEditIdentityDialog" />
 
       <v-snackbar
         v-model="showRecentPublicationMessage"
@@ -187,6 +235,12 @@
         :recipientDisplayName="primaryName"
       />
     </template>
+    <template v-if="identities">
+      <IdentitiesDialog
+        :show.sync="showIdentitiesDialog"
+        :identities="identities"
+      />
+    </template>
   </div>
 </template>
 
@@ -203,18 +257,25 @@ import UsernameDialog from
   '~/components/username/UsernameDialog.component.vue'
 import TipArtistDialog from
   '~/components/tips/TipArtistDialog.component.vue'
+import EditIdentityDialog from
+  '~/components/identity/EditIdentityDialog.component.vue'
+import IdentitiesDialog from
+  '~/components/identity/IdentitiesDialog.component.vue'
 import ArtistFeed from '~/components/profile/ArtistFeed.component.vue'
 import LikesFeed from '~/components/profile/LikesFeed.component.vue'
 import TipsFeed from '~/components/tips/TipsFeed.component.vue'
 import ExpandParagraph from '~/components/common/ExpandParagraph.component.vue'
 import { DomainEntity, DomainEntityCategory } from '~/app/core'
+import { ArkIdentity } from '~/plugins/ark'
 
 @Component({
   components: {
     AvatarUploadDialog,
     ArtistFeed,
+    EditIdentityDialog,
     EditProfileDialog,
     ExpandParagraph,
+    IdentitiesDialog,
     LikesFeed,
     UsernameDialog,
     TipArtistDialog,
@@ -275,10 +336,13 @@ export default class UserProfilePage extends Vue {
   showEditSpeedDial: boolean = false
   showAvatarUploadDialog: boolean = false
   showEditProfileDialog: boolean = false
+  showEditIdentityDialog: boolean = false
+  showIdentitiesDialog: boolean = false
   showUsernameDialog: boolean = false
   showTipArtistDialog: boolean = false
   likesCount: number = 0
   tab: null | string = null
+  identities: ArkIdentity | null = null
 
   get isOwner(): boolean {
     return this.$auth.user
@@ -310,6 +374,14 @@ export default class UserProfilePage extends Vue {
   get tertiaryName(): string {
     if (this.artist?.profile?.displayName || this.artist?.username) {
       return this.artist?.address || ''
+    }
+
+    return ''
+  }
+
+  get arkPrimaryIdentity(): string {
+    if (this.identities) {
+      return this.identities.primary_address
     }
 
     return ''
@@ -348,6 +420,8 @@ export default class UserProfilePage extends Vue {
           this.likesCount = await this.$likesService.fetchTotalLikedByUser(
             this.artist.address
           )
+
+          this.identities = await this.$ark.resolve(this.artist.address)
         }
       }
     } catch (error) {
@@ -405,6 +479,16 @@ export default class UserProfilePage extends Vue {
   }
 
   @debounce
+  onEditIdentityClicked() {
+    this.showEditIdentityDialog = true
+  }
+
+  @debounce
+  onOpenIdentitiesDialogClicked() {
+    this.showIdentitiesDialog = true
+  }
+
+  @debounce
   onTipClicked() {
     this.showTipArtistDialog = true
   }
@@ -436,5 +520,20 @@ export default class UserProfilePage extends Vue {
   position: absolute;
   bottom: 0;
   right: 0;
+}
+.profile-edit-button {
+  background-color: white;
+}
+.decentdotland-anchor {
+  display: flex;
+  align-items: center;
+}
+.decentdotland-logo {
+  height: 25px;
+  width: 25px;
+  margin-right: 5px;
+}
+.ark-container {
+  display: flex;
 }
 </style>

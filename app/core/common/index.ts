@@ -24,3 +24,4 @@ export type DomainEntityCategory =
   | 'profile'
   | 'tip'
   | 'username'
+  | 'identity'
