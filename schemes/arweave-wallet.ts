@@ -18,7 +18,10 @@ export const APP_INFO = {
 
 // TODO -> Extend TokenableSchemeOptions and add these
 export const APP_PERMISSIONS: PermissionType[] = [
-  'ACCESS_ADDRESS'
+  'ACCESS_ADDRESS',
+  'ACCESS_PUBLIC_KEY',
+  'SIGNATURE',
+  'SIGN_TRANSACTION'
 ]
 
 type ArweaveWalletSchemeOptions = {} & TokenableSchemeOptions
@@ -139,16 +142,25 @@ export default class ArweaveWalletScheme<
   }
 
   async fetchUser(): Promise<void> {
-    let address = this.token.get() as string | false
+    let token = this.token.get() as string | false
+    let address: string
+    let publicKey: string
 
-    if (!address) {
+    if (token) {
+      // NB: somehow, the token has already been passed through JSON.parse()
+      address = (token as any).address
+      publicKey = (token as any).publicKey
+    } else {
       address = await window.arweaveWallet.getActiveAddress()
+      publicKey = await window.arweaveWallet.getActivePublicKey()
     }
 
-    if (address) {
-      this.token.set(address)
-      this.$auth.$storage.setUniversal(TOKEN, address)
-      this.$auth.setUser(await this.$auth.ctx.$userService.fetchUser(address))
+    if (address && publicKey) {
+      const newToken = JSON.stringify({ address, publicKey })
+      this.token.set(newToken)
+      this.$auth.$storage.setUniversal(TOKEN, newToken)
+      const user = await this.$auth.ctx.$userService.fetchUser(address)
+      this.$auth.setUser({ ...user, publicKey })
     }
   }
 }

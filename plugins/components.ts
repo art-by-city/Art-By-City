@@ -6,7 +6,8 @@ import {
   SplashLogo,
   TransactionPlaceholder,
   CurrencyEstimate,
-  ArweaveSeal
+  ArweaveSeal,
+  BlockchainAddress
 } from '~/components/common'
 
 Vue.use({
@@ -17,5 +18,6 @@ Vue.use({
     vue.component('TransactionPlaceholder', TransactionPlaceholder)
     vue.component('CurrencyEstimate', CurrencyEstimate)
     vue.component('ArweaveSeal', ArweaveSeal)
+    vue.component('BlockchainAddress', BlockchainAddress)
   }
 })
