@@ -5,7 +5,7 @@ import axios, { AxiosInstance } from 'axios'
 import Arweave from 'arweave'
 
 import { SignerFactory } from '~/app/infra/arweave'
-import { ArkNetworkKey, ArkNetworks } from './networks'
+import { ArkNetworkKey, ArkNetworks, isEVMArkNetwork } from './networks'
 import { ArkIdentity } from './identity'
 
 export * from './identity'
@@ -39,7 +39,7 @@ export class ArkPlugin {
 
   async linkIdentity(network: ArkNetworkKey, arweaveAddress: string) {
     const arkNetwork = ArkNetworks[network]
-    if (arkNetwork.contract && arkNetwork.abi) {
+    if (isEVMArkNetwork(arkNetwork)) {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const signer = provider.getSigner()
       const foreignAddress = await signer.getAddress()
@@ -62,6 +62,8 @@ export class ArkPlugin {
         verificationReq,
         signature
       })
+    } else {
+      // TODO -> handle linking exotic networks :)
     }
   }
 

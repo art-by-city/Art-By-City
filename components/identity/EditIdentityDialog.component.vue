@@ -163,9 +163,12 @@
                     color="black"
                     small
                     :loading="isUploading"
-                    :disabled="!network"
+                    :disabled="!network || shouldConnectBeDisabled"
                     @click="onConnectIdentityClicked"
                   >Connect</v-btn>
+                  <span v-if="shouldConnectBeDisabled">
+                    Support for this network coming soon!
+                  </span>
                 </template>
               </v-form>
             </v-card-text>
@@ -196,7 +199,13 @@ import { Component, Watch } from 'nuxt-property-decorator'
 
 import { DomainEntityCategory } from '~/app/core'
 import { debounce } from '~/app/util'
-import { ArkIdentity, ArkNetworkKey, ArkNetworks } from '../../plugins/ark'
+import {
+  ArkIdentity,
+  ArkNetworkKey,
+  ArkNetworks,
+  isEVMArkNetwork,
+  isRPCEVMArkNetwork
+} from '~/plugins/ark'
 import TransactionDialog from '../common/TransactionDialog.component.vue'
 
 @Component
@@ -269,35 +278,39 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
 
   private async switchEthereumChain(network: ArkNetworkKey) {
     try {
-      if (window.ethereum.request) {
-        const chainId = ArkNetworks[network].chainId
-        if (chainId) {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId }]
-          })
+      const arkNetwork = ArkNetworks[network]
+      if (window.ethereum.request && isEVMArkNetwork(arkNetwork)) {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: arkNetwork.chainId }]
+        })
 
-          // NB: cache prev network on successful change
-          this.prevNetwork = network
-        }
+        // NB: cache prev network on successful change
+        this.prevNetwork = network
       }
     } catch (error) {
       if (error.code === 4902) {
-        // TODO -> try to add network to metamask
-        // try {
-        //   await ethereum.request({
-        //     method: 'wallet_addEthereumChain',
-        //     params: [
-        //       {
-        //         chainId: '0xf00',
-        //         chainName: '...',
-        //         rpcUrls: ['https://...'],
-        //       },
-        //     ],
-        //   })
-        // } catch (addError) {
-        //   console.error(addError)
-        // }
+        // NB: Try to add network to metamask
+        console.log('haha oops try to add to metamask please?')
+        try {
+          const arkNetwork = ArkNetworks[network]
+          if (window.ethereum.request && isRPCEVMArkNetwork(arkNetwork)) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: arkNetwork.chainId,
+                  chainName: arkNetwork.label,
+                  nativeCurrency: arkNetwork.nativeCurrency,
+                  rpcUrls: [arkNetwork.rpcUrl],
+                },
+              ],
+            })
+          }
+        } catch (addError) {
+          this.network = this.prevNetwork
+          console.error(addError)
+        }
       } else {
         this.network = this.prevNetwork
         console.error(error)
@@ -316,14 +329,28 @@ export default class EditIdentityDialog extends TransactionDialog<string> {
     this.isUploading = false
   }
 
+  get shouldConnectBeDisabled(): boolean {
+    if (this.network) {
+      const arkNetwork = ArkNetworks[this.network as ArkNetworkKey]
+      if (window.ethereum.request && isEVMArkNetwork(arkNetwork)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
   @debounce
   async onConnectIdentityClicked() {
-    if (window.ethereum.request) {
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts'
-      }) as string[]
-      this.foreignAddress = accounts[0] || ''
-      this.updateIsAlreadyConnected()
+    if (this.network) {
+      const arkNetwork = ArkNetworks[this.network as ArkNetworkKey]
+      if (window.ethereum.request && isEVMArkNetwork(arkNetwork)) {
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts'
+        }) as string[]
+        this.foreignAddress = accounts[0] || ''
+        this.updateIsAlreadyConnected()
+      }
     }
   }
 
