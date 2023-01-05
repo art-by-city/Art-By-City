@@ -1,5 +1,4 @@
-// import ArtByCityNode from '@artbycity/node'
-import ArtByCityNode from '../../node/src/app'
+import ArtByCityNode from '@artbycity/node'
 import fs from 'fs'
 
 const adminJWKPath = process.env.ADMIN_JWK_PATH || 'ADMIN_JWK_PATH not set!'
