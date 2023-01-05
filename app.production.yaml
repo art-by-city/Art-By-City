@@ -33,6 +33,7 @@ env_variables:
   ARTIST_PREREGISTRATION_URL: https://us-central1-clean-linker-273919.cloudfunctions.net/artist-preregistration
   USERNAMES_CONTRACT_ID: BaAP2wyqSiF7Eqw3vcBvVss3C0H8i1NGQFgMY6nGpnk
   ARWEAVE_GATEWAY: /node
+  ADMIN_JWK_PATH: ./abc-node-admin-jwk.json
 
 includes:
   - secrets.yaml
