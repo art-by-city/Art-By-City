@@ -21,6 +21,7 @@ import {
   DataItemFactory,
   SignerFactory
 } from '~/app/infra/arweave'
+import { ans110 } from '../metadata'
 // import { FactoryCreationError } from '../../error'
 
 const animatedImageTypes = [
@@ -81,17 +82,35 @@ export default class ArtworkBundleFactory {
           await DataItemFactory.create(
             preview,
             signer,
-            [{ name: 'Content-Type', value: previewType }]
+            [
+              { name: 'Content-Type', value: previewType },
+              ...ans110.tags.image({
+                title: opts.title,
+                description: opts.description
+              })
+            ]
           ),
           await DataItemFactory.create(
             preview4k,
             signer,
-            [{ name: 'Content-Type', value: previewType }]
+            [
+              { name: 'Content-Type', value: previewType },
+              ...ans110.tags.image({
+                title: opts.title,
+                description: opts.description
+              })
+            ]
           ),
           await DataItemFactory.create(
             image,
             signer,
-            [{ name: 'Content-Type', value: type }]
+            [
+              { name: 'Content-Type', value: type },
+              ...ans110.tags.image({
+                title: opts.title,
+                description: opts.description
+              })
+            ]
           )
         ]
       })
@@ -129,7 +148,12 @@ export default class ArtworkBundleFactory {
         await DataItemFactory.create(
           audio,
           signer,
-          [{ name: 'Content-Type', value: opts.audio.type }]
+          [
+            { name: 'Content-Type', value: opts.audio.type },
+            ...ans110.tags.music({
+              title: opts.title, description: opts.description
+            })
+          ]
         )
       ]]
 
@@ -147,7 +171,13 @@ export default class ArtworkBundleFactory {
         await DataItemFactory.create(
           model,
           signer,
-          [{ name: 'Content-Type', value: opts.model.type }]
+          [
+            { name: 'Content-Type', value: opts.model.type },
+            ...ans110.tags.model({
+              title: opts.title,
+              description: opts.description
+            })
+          ]
         )
       ]]
 
