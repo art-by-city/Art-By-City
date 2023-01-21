@@ -108,11 +108,13 @@ export default {
       },
       waitForConfirmations: process.env.ARWEAVE_TX_CONFIRMATIONS || 12,
       contracts: {
-        usernames: process.env.USERNAMES_CONTRACT_ID || ''
+        usernames: process.env.USERNAMES_CONTRACT_ID || '',
+        atomicLicenseBase: process.env.BASE_ATOMIC_LICENSE_SRC || ''
       },
       gateway: process.env.ARWEAVE_GATEWAY || 'http://localhost:1984'
     },
-    artistPreregistrationUrl: process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081',
+    artistPreregistrationUrl:
+      process.env.ARTIST_PREREGISTRATION_URL || 'http://localhost:8081',
   },
   auth: {
     cookie: {
