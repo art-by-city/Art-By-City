@@ -31,7 +31,8 @@ export default class ArtworkService extends TransactionService {
     this.artworkTransactionFactory = new ArtworkTransactionFactory(
       this.$arweave,
       this.config.app.name,
-      this.config.app.version
+      this.config.app.version,
+      this.config.contracts.atomicLicenseBase
     )
   }
 

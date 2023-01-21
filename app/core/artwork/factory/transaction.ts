@@ -5,13 +5,14 @@ import { ArtworkCreationOptions } from '..'
 import ArtworkBundleFactory from './bundle'
 
 export default class ArtworkTransactionFactory {
-  $arweave!: Arweave
-  appName!: string
-  appVersion!: string
   artworkBundleFactory!: ArtworkBundleFactory
 
-  constructor($arweave: Arweave, appName: string, appVersion: string) {
-    this.$arweave = $arweave
+  constructor(
+    private $arweave: Arweave,
+    private appName: string,
+    private appVersion: string,
+    private atomicLicenseSrc: string
+  ) {
     this.appName = appName
     this.appVersion = appVersion
     this.artworkBundleFactory = new ArtworkBundleFactory(appName, appVersion)
@@ -35,6 +36,12 @@ export default class ArtworkTransactionFactory {
     tx.addTag('Category', 'artwork:bundle')
     tx.addTag('slug', opts.slug)
     tx.addTag('Manifest-ID', manifestId)
+
+    // Atomic License Contract
+    tx.addTag('App-Name', 'SmartWeaveContract')
+    tx.addTag('App-Version', '0.3.0')
+    tx.addTag('Contract-Src', this.atomicLicenseSrc)
+    tx.addTag('Init-State', JSON.stringify({ owner: opts.creator }))
 
     return tx
   }

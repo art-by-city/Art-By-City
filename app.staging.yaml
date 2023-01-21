@@ -34,6 +34,7 @@ env_variables:
   USERNAMES_CONTRACT_ID: UHPC-7wenVg-JyS81EXKCnLlKvjSbfrIsnWt1F8hueg
   ARWEAVE_GATEWAY: /node
   ADMIN_JWK: ./abc-node-admin-jwk.json
+  BASE_ATOMIC_LICENSE_SRC: OKBWuNioWGMqKYYeoM9jsWiX4SHKOpLZe24_T-Yd-_o
 
 includes:
   - secrets.yaml
